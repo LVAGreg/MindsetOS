@@ -1,0 +1,146 @@
+'use client';
+
+import { useState, useRef } from 'react';
+import { Mic, MicOff } from 'lucide-react';
+
+interface VoiceDictationProps {
+  onTranscriptUpdate: (transcript: string) => void;
+  disabled?: boolean;
+}
+
+export default function VoiceDictation({
+  onTranscriptUpdate,
+  disabled = false,
+}: VoiceDictationProps) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  const startRecording = async () => {
+    try {
+      console.log('🎙️ Requesting microphone access...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Wait 300ms for microphone to fully initialize
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          console.log('📊 Audio chunk received:', event.data.size, 'bytes');
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        console.log('⏹️ Recording stopped, total chunks:', chunksRef.current.length);
+        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      console.log('🔴 Recording started');
+      setIsRecording(true);
+    } catch (error) {
+      console.error('❌ Failed to start recording:', error);
+      alert('Failed to access microphone. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      console.log('⏸️ Stopping recording...');
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsProcessing(true);
+    }
+  };
+
+  const transcribeAudio = async (audioBlob: Blob) => {
+    try {
+      console.log('🎙️ Starting transcription, audio size:', audioBlob.size, 'bytes');
+
+      // Check if audio blob is too small
+      if (audioBlob.size < 1000) {
+        throw new Error('Recording too short. Please speak for at least 1 second.');
+      }
+
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+
+      console.log('📡 Sending transcription request to backend...');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/transcribe`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: formData,
+      });
+
+      console.log('📥 Transcription response status:', response.status);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Transcription failed');
+      }
+
+      const data = await response.json();
+      console.log('✅ Transcription result:', data);
+
+      if (data.transcript) {
+        onTranscriptUpdate(data.transcript);
+      } else {
+        throw new Error('No transcript returned from server');
+      }
+    } catch (error) {
+      console.error('❌ Transcription error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to transcribe audio. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleToggle = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  return (
+    <button
+      onClick={handleToggle}
+      disabled={disabled || isProcessing}
+      className={`px-4 py-4 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+        isRecording
+          ? 'bg-red-500 text-white hover:bg-red-600 animate-pulse'
+          : isProcessing
+          ? 'bg-yellow-500 text-black'
+          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+      } disabled:opacity-50 disabled:cursor-not-allowed`}
+      title={isRecording ? 'Click to stop & transcribe' : isProcessing ? 'Transcribing...' : 'Click to start recording'}
+    >
+      {isRecording ? (
+        <>
+          <MicOff className="w-5 h-5" />
+          <span className="text-sm hidden sm:inline">Recording...</span>
+        </>
+      ) : isProcessing ? (
+        <>
+          <Mic className="w-5 h-5 animate-spin" />
+          <span className="text-sm hidden sm:inline">Transcribing...</span>
+        </>
+      ) : (
+        <Mic className="w-5 h-5" />
+      )}
+    </button>
+  );
+}

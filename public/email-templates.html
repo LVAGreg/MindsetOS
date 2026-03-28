@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpertOS Email System - Template Library</title>
+    <style>
+        :root {
+            --primary-gold: #fcc824;
+            --dark-bg: #1a1a1a;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --border-light: #e0e0e0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .header {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: var(--text-dark);
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-gold);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .from-address {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f4f6;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: var(--card-bg);
+            color: var(--text-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-button.active {
+            background: var(--primary-gold);
+            color: white;
+        }
+
+        .tab-button .badge {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .tab-button.active .badge {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .template-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .template-card.hidden {
+            display: none;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .template-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .template-id {
+            font-size: 12px;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .category-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-transactional {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .category-onboarding {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .category-engagement {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .category-milestone {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .trigger-info {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .trigger-event {
+            font-family: 'Courier New', monospace;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-dark);
+        }
+
+        .subject-line {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f9fafb;
+            border-radius: 4px;
+        }
+
+        /* Email Preview */
+        .email-preview-container {
+            background: #f3f4f6;
+            padding: 20px;
+        }
+
+        .email-preview {
+            width: 375px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-logo {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background: white;
+        }
+
+        .email-logo img {
+            max-width: 80px;
+            height: auto;
+        }
+
+        .email-accent {
+            height: 4px;
+            background: var(--primary-gold);
+        }
+
+        .email-body {
+            padding: 30px 25px;
+            color: var(--text-dark);
+        }
+
+        .email-body h2 {
+            font-size: 22px;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+
+        .email-body p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .email-body ul {
+            margin: 16px 0;
+            padding-left: 20px;
+        }
+
+        .email-body li {
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary-gold);
+            color: white;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #e5b71f;
+            transform: translateY(-2px);
+        }
+
+        .progress-indicator {
+            text-align: center;
+            padding: 12px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .email-footer {
+            padding: 20px 25px;
+            background: #f9fafb;
+            border-top: 1px solid var(--border-light);
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .email-footer a {
+            color: var(--primary-gold);
+            text-decoration: none;
+        }
+
+        .social-links {
+            margin: 12px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            text-decoration: none;
+            color: #6b7280;
+        }
+
+        /* Technical Info Panel */
+        .tech-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tech-panel h2 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .tech-section {
+            margin-bottom: 25px;
+        }
+
+        .tech-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--primary-gold);
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .trigger-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+        }
+
+        .trigger-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .email-preview {
+                width: 100%;
+            }
+
+            .stats {
+                gap: 15px;
+            }
+
+            .filter-tabs {
+                gap: 8px;
+            }
+
+            .tab-button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #cbd5e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .switch.enabled {
+            background: var(--primary-gold);
+        }
+
+        .switch-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .switch.enabled .switch-slider {
+            transform: translateX(20px);
+        }
+
+        .switch-label {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="logo-title">
+                    <div class="logo">EO</div>
+                    <div>
+                        <h1>ExpertOS Email System</h1>
+                        <div class="from-address">
+                            <span>📧</span>
+                            From: Rana &lt;rana@expertconsultingos.com&gt;
+                        </div>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Templates</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">SendGrid</div>
+                        <div class="stat-label">Integration</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="tab-button active" data-category="all">
+                All Templates <span class="badge">15</span>
+            </button>
+            <button class="tab-button" data-category="transactional">
+                Transactional <span class="badge">3</span>
+            </button>
+            <button class="tab-button" data-category="onboarding">
+                Onboarding <span class="badge">5</span>
+            </button>
+            <button class="tab-button" data-category="engagement">
+                Engagement <span class="badge">4</span>
+            </button>
+            <button class="tab-button" data-category="milestone">
+                Milestone <span class="badge">3</span>
+            </button>
+        </div>
+
+        <!-- Template Grid -->
+        <div class="template-grid">
+            <!-- Template 1: Welcome Email -->
+            <div class="template-card" data-category="transactional">
+                <div class="card-header">
+                    <div class="template-title">Welcome Email</div>
+                    <div class="template-id">ID: welcome_email</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-transactional">Transactional</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">user.signup</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> You're in - let's build something
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>You're In</h2>
+                            <p>You're in. ExpertOS is now yours.</p>
+                            <p>I built this for consultants who are tired of guessing what works. You've got proven frameworks, AI agents that actually help, and a system that turns expertise into offers people want.</p>
+                            <p>Three things you can do right now:</p>
+                            <p>Build your Money Model. This is the foundation. You'll know exactly who you help, what you promise, and why they should care.</p>
+                            <p>Design your Fast Fix offer. Turn your big promise into something people can say yes to this week.</p>
+                            <p>Write your first promo. Get the words that actually work—not the ones that sound good but don't convert.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Start with Your Money Model</a>
+                            </p>
+                            <p>Questions? Just reply. I read these.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 2: Password Reset -->
+            <div class="template-card" data-category="transactional">
+                <div class="card-header">
+                    <div class="template-title">Password Reset</div>
+                    <div class="template-id">ID: password_reset</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-transactional">Transactional</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">user.forgot_password</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> Reset your password
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>Password Reset</h2>
+                            <p>Someone (hopefully you) asked to reset your password.</p>
+                            <p>This link dies in 1 hour. Security thing.</p>
+                            <p style="text-align: center;">
+                                <a href="{{reset_link}}" class="cta-button">Reset Password</a>
+                            </p>
+                            <p>If this wasn't you, ignore this email. Your password stays the same.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 3: Email Verification -->
+            <div class="template-card" data-category="transactional">
+                <div class="card-header">
+                    <div class="template-title">Email Verification</div>
+                    <div class="template-id">ID: email_verification</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-transactional">Transactional</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">user.email_change</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> Verify Your New Email Address
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>Verify Your Email Address</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>Please verify your new email address to continue using ExpertOS.</p>
+                            <p style="text-align: center;">
+                                <a href="{{verification_link}}" class="cta-button">Verify Email</a>
+                            </p>
+                            <p>If you didn't change your email address, please contact us immediately.</p>
+                            <p>Best,<br><strong>The ExpertOS Team</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 4: Onboarding Complete -->
+            <div class="template-card" data-category="onboarding">
+                <div class="card-header">
+                    <div class="template-title">Onboarding Complete</div>
+                    <div class="template-id">ID: onboarding_complete</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-onboarding">Onboarding</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">onboarding.complete</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> All agents unlocked
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>All Unlocked</h2>
+                            <p>You did it. Onboarding done. All your AI agents are unlocked.</p>
+                            <p>Here's what that means: You've got six agents who know exactly how to turn your expertise into offers, campaigns, and sales calls that work.</p>
+                            <p>Three conversations. Weeks of work done.</p>
+                            <p>Money Model Mapper shows you who to help and what to promise.</p>
+                            <p>The Five Ones Formula helps you get laser-focused on your one offer.</p>
+                            <p>The Offer Invitation Architect writes the invitation that gets people to say yes.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Start with Money Model</a>
+                            </p>
+                            <p>You've got the tools. Now use them.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 5: Quick Start Guide (Day 1) -->
+            <div class="template-card" data-category="onboarding">
+                <div class="card-header">
+                    <div class="template-title">Quick Start Guide (Day 1)</div>
+                    <div class="template-id">ID: quick_start_day1</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-onboarding">Onboarding</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">24h after signup</span><br>
+                        <strong>Delay:</strong> 24 hours
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> 15 minutes changes everything
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <div class="progress-indicator">Day 1 of Your ExpertOS Journey</div>
+                            <h2>15 Minutes Today</h2>
+                            <p>15 minutes. That's all you need today.</p>
+                            <p>First, finish your profile. Tell me who you are and what you do. Takes three minutes.</p>
+                            <p>Then pick one agent and have a conversation. Just one.</p>
+                            <p>I recommend Money Model Mapper. It'll help you get clear on who you help and what you promise. Everything else gets easier after that.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Start Money Model</a>
+                            </p>
+                            <p>You don't need to do everything today. You just need to do something.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 6: Meet Your AI Agents (Day 3) -->
+            <div class="template-card" data-category="onboarding">
+                <div class="card-header">
+                    <div class="template-title">Meet Your AI Agents (Day 3)</div>
+                    <div class="template-id">ID: meet_agents_day3</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-onboarding">Onboarding</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">72h after signup</span><br>
+                        <strong>Delay:</strong> 72 hours
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> Which agent should you use first?
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <div class="progress-indicator">Day 3 of Your ExpertOS Journey</div>
+                            <h2>Your Agents</h2>
+                            <p>Quick rundown of your agents and when to use them:</p>
+                            <p>Money Model Mapper - Start here. Figure out who you help and what you promise. This is the foundation.</p>
+                            <p>The Five Ones Formula - Get laser-focused on your one person, one problem, one promise, one product, one channel. Use this when you need clarity fast.</p>
+                            <p>The Offer Invitation Architect - Write the invitation that gets people to say yes. Use this when you're ready to promote something.</p>
+                            <p>Email Promo Engine - Build email campaigns that convert. Use this when you want to fill your calendar with sales calls.</p>
+                            <p>Qualification Call Builder - Get the script that converts conversations into clients. Use this when you're taking calls but not closing.</p>
+                            <p>LinkedIn Events Builder - Create event topics that pull people in. Use this when you want to build authority fast.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/agents" class="cta-button">Pick Your Agent</a>
+                            </p>
+                            <p>Most people start with Money Model. That's what I'd do.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 7: Progress Check-in (Day 5) -->
+            <div class="template-card" data-category="onboarding">
+                <div class="card-header">
+                    <div class="template-title">Progress Check-in (Day 5)</div>
+                    <div class="template-id">ID: progress_checkin_day5</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-onboarding">Onboarding</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">120h after signup</span><br>
+                        <strong>Delay:</strong> 120 hours
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> How's It Going, {{user_name}}?
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <div class="progress-indicator">Day 5 of Your ExpertOS Journey</div>
+                            <h2>Quick Check-In 👋</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>You've been using ExpertOS for almost a week now. How's it going?</p>
+                            <p>I wanted to see if you've had a chance to:</p>
+                            <ul>
+                                <li>Explore your AI agents</li>
+                                <li>Start building your money model</li>
+                                <li>Design your first offer</li>
+                            </ul>
+                            <p>If you're stuck on anything, just reply to this email. I'm here to help!</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Continue Building</a>
+                            </p>
+                            <p>Rooting for you,<br>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 8: Success Stories (Day 7) -->
+            <div class="template-card" data-category="onboarding">
+                <div class="card-header">
+                    <div class="template-title">Success Stories (Day 7)</div>
+                    <div class="template-id">ID: success_stories_day7</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-onboarding">Onboarding</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">168h after signup</span><br>
+                        <strong>Delay:</strong> 168 hours
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> See What's Possible with ExpertOS
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <div class="progress-indicator">Day 7 of Your ExpertOS Journey</div>
+                            <h2>What's Possible for You 🌟</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>One week in! I wanted to share what other consultants are achieving with ExpertOS:</p>
+                            <p><em>"I designed my entire service offering in 2 hours. It would have taken me weeks without ExpertOS."</em> – Sarah K., Marketing Consultant</p>
+                            <p><em>"The AI agents helped me clarify my positioning and triple my prices with confidence."</em> – Michael R., Strategy Consultant</p>
+                            <p>These results are 100% possible for you too.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/case-studies" class="cta-button">See What's Possible</a>
+                            </p>
+                            <p>Your success story is next.</p>
+                            <p>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 9: Inactivity Reminder (7 days) -->
+            <div class="template-card" data-category="engagement">
+                <div class="card-header">
+                    <div class="template-title">Inactivity Reminder (7 days)</div>
+                    <div class="template-id">ID: inactivity_7days</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-engagement">Engagement</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">7 days inactive</span><br>
+                        <strong>Delay:</strong> 7 days after last activity
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> 20 minutes could change your month
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>Been a Minute</h2>
+                            <p>Been X days. Life gets busy, I get it.</p>
+                            <p>But here's the thing: most consultants spend weeks trying to figure out their offer. You've got agents that can do it in 20 minutes.</p>
+                            <p>Twenty minutes with Money Model Mapper. That's all it takes to know who you help and what you promise.</p>
+                            <p>Then you're not guessing anymore. You know what to say. You know what to sell. You know who to talk to.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Take 20 Minutes</a>
+                            </p>
+                            <p>The agents are here when you're ready.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 10: Re-engagement (14 days) -->
+            <div class="template-card" data-category="engagement">
+                <div class="card-header">
+                    <div class="template-title">Re-engagement (14 days)</div>
+                    <div class="template-id">ID: reengagement_14days</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-engagement">Engagement</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">14 days inactive</span><br>
+                        <strong>Delay:</strong> 14 days after last activity
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> Need Help Getting Started?
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>Can I Help? 🤝</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>It's been a couple of weeks since you last logged in. I wanted to check—are you stuck on something?</p>
+                            <p>Common challenges I can help with:</p>
+                            <ul>
+                                <li>Not sure where to start</li>
+                                <li>Overwhelmed by options</li>
+                                <li>Need clarity on your business model</li>
+                            </ul>
+                            <p>Just reply to this email and I'll personally help you get unstuck.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/support" class="cta-button">Get Help</a>
+                            </p>
+                            <p>Or, if you're ready to dive back in:</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Restart</a>
+                            </p>
+                            <p>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 11: Weekly Tips -->
+            <div class="template-card" data-category="engagement">
+                <div class="card-header">
+                    <div class="template-title">Weekly Tips</div>
+                    <div class="template-id">ID: weekly_tips</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-engagement">Engagement</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">Weekly schedule</span><br>
+                        <strong>Delay:</strong> Weekly (disabled by default)
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> This Week's Expert Tip from ExpertOS
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Disabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>This Week's Expert Tip 💡</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p><strong>Tip of the Week:</strong> Start with your end goal in mind. Before designing offers, get crystal clear on your money model. It changes everything.</p>
+                            <p>Use the Money Model Agent to:</p>
+                            <ul>
+                                <li>Define your revenue streams</li>
+                                <li>Set realistic income goals</li>
+                                <li>Reverse-engineer your pricing</li>
+                            </ul>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/blog" class="cta-button">Read More</a>
+                            </p>
+                            <p>See you next week,<br>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 12: New Feature Announcement -->
+            <div class="template-card" data-category="engagement">
+                <div class="card-header">
+                    <div class="template-title">New Feature Announcement</div>
+                    <div class="template-id">ID: new_feature_announcement</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-engagement">Engagement</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">Manual</span><br>
+                        <strong>Delay:</strong> Manual trigger
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> 🚀 New Feature: {{feature_name}}
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>🚀 Introducing: {{feature_name}}</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>We just launched something amazing, and you're one of the first to know!</p>
+                            <p><strong>What's new:</strong> {{feature_description}}</p>
+                            <p><strong>Why it matters:</strong> This will save you time, increase clarity, and help you make better decisions faster.</p>
+                            <p style="text-align: center;">
+                                <a href="{{feature_link}}" class="cta-button">Try It Now</a>
+                            </p>
+                            <p>As always, if you have feedback or questions, just reply to this email.</p>
+                            <p>Excited for you,<br>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 13: First Agent Conversation -->
+            <div class="template-card" data-category="milestone">
+                <div class="card-header">
+                    <div class="template-title">First Agent Conversation</div>
+                    <div class="template-id">ID: first_agent_conversation</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-milestone">Milestone</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">agent.first_conversation</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> First chat done - now keep going
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>First One Down</h2>
+                            <p>First chat with [agent]. Done.</p>
+                            <p>Here's something most people don't realize: one conversation with the right agent can replace three weeks of overthinking.</p>
+                            <p>You just proved you can do this. Now do it again.</p>
+                            <p>If you started with Money Model Mapper, go talk to The Offer Invitation Architect next. Turn your big promise into something you can sell this week.</p>
+                            <p>If you started somewhere else, go back and do Money Model. Everything builds from there.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/dashboard" class="cta-button">Next Agent</a>
+                            </p>
+                            <p>Momentum matters. Keep moving.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 14: Money Model Created -->
+            <div class="template-card" data-category="milestone">
+                <div class="card-header">
+                    <div class="template-title">Money Model Created</div>
+                    <div class="template-id">ID: money_model_created</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-milestone">Milestone</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">money_model.created</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> Money Model done - now let's write copy
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>Money Model Complete</h2>
+                            <p>Your Money Model is done. This is bigger than you think.</p>
+                            <p>Most consultants spend months guessing what to say. You just figured it out in one conversation.</p>
+                            <p>Now you know who you help. You know what you promise. You know the three reasons people should work with you.</p>
+                            <p>That's not just clarity. That's copy.</p>
+                            <p>Next step: turn this into an offer people can buy. The Offer Invitation Architect will help you write the invitation that fills your calendar. Or try Presentation Printer to design a talk that positions you as the expert.</p>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/agents" class="cta-button">Pick Your Next Agent</a>
+                            </p>
+                            <p>Foundation's done. Now build on it.</p>
+                            <p>Cheers,<br><strong>Rana</strong></p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template 15: First Campaign Created -->
+            <div class="template-card" data-category="milestone">
+                <div class="card-header">
+                    <div class="template-title">First Campaign Created</div>
+                    <div class="template-id">ID: first_campaign_created</div>
+                    <div class="card-meta">
+                        <span class="category-badge category-milestone">Milestone</span>
+                    </div>
+                    <div class="trigger-info">
+                        <strong>Trigger:</strong> <span class="trigger-event">campaign.created</span><br>
+                        <strong>Delay:</strong> Immediate
+                    </div>
+                    <div class="subject-line">
+                        <strong>Subject:</strong> 🚀 Campaign Ready to Launch!
+                    </div>
+                    <div class="toggle-switch">
+                        <div class="switch enabled">
+                            <div class="switch-slider"></div>
+                        </div>
+                        <span class="switch-label">Enabled</span>
+                    </div>
+                </div>
+                <div class="email-preview-container">
+                    <div class="email-preview">
+                        <div class="email-logo">
+                            <img src="https://expertconsultingos.com/expertas-logo.png" alt="ExpertOS">
+                        </div>
+                        <div class="email-accent"></div>
+                        <div class="email-body">
+                            <h2>🚀 Your Campaign Is Ready!</h2>
+                            <p>Hi {{user_name}},</p>
+                            <p>Congratulations! You just created your first marketing campaign with ExpertOS.</p>
+                            <p>This is where strategy meets execution. You're not just planning—you're doing.</p>
+                            <p><strong>Next steps:</strong></p>
+                            <ul>
+                                <li>Review your campaign messaging</li>
+                                <li>Set your timeline and milestones</li>
+                                <li>Launch and track results</li>
+                            </ul>
+                            <p style="text-align: center;">
+                                <a href="https://expertconsultingos.com/campaigns/{{campaign_id}}" class="cta-button">View Campaign</a>
+                            </p>
+                            <p>You're building something real. Keep going!</p>
+                            <p>Rana</p>
+                        </div>
+                        <div class="email-footer">
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/b2bmarketingstrategies/">in</a>
+                                <a href="https://expertconsultingos.com">🌐</a>
+                            </div>
+                            <p>ExpertOS | Building Expert Consulting Businesses</p>
+                            <p><a href="#">Unsubscribe</a> | <a href="#">Preferences</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Info Panel -->
+        <div class="tech-panel">
+            <h2>Technical Documentation</h2>
+
+            <div class="tech-section">
+                <h3>Database Schema</h3>
+                <div class="code-block">
+CREATE TABLE email_templates (
+    id SERIAL PRIMARY KEY,
+    template_id VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    trigger_event VARCHAR(100),
+    delay_hours INTEGER DEFAULT 0,
+    enabled BOOLEAN DEFAULT true,
+    html_content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE email_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    template_id VARCHAR(100),
+    sent_at TIMESTAMP DEFAULT NOW(),
+    status VARCHAR(50),
+    metadata JSONB
+);
+                </div>
+            </div>
+
+            <div class="tech-section">
+                <h3>API Endpoints</h3>
+                <div class="code-block">
+# Get all templates
+GET /api/email/templates
+
+# Get template by ID
+GET /api/email/templates/:template_id
+
+# Send email manually
+POST /api/email/send
+Body: { user_id, template_id, variables }
+
+# Update template status
+PATCH /api/email/templates/:template_id
+Body: { enabled: true/false }
+
+# Get email logs
+GET /api/email/logs?user_id=123
+                </div>
+            </div>
+
+            <div class="tech-section">
+                <h3>Trigger Events Reference</h3>
+                <div class="trigger-list">
+                    <div class="trigger-item">user.signup</div>
+                    <div class="trigger-item">user.forgot_password</div>
+                    <div class="trigger-item">user.email_change</div>
+                    <div class="trigger-item">onboarding.complete</div>
+                    <div class="trigger-item">agent.first_conversation</div>
+                    <div class="trigger-item">money_model.created</div>
+                    <div class="trigger-item">campaign.created</div>
+                    <div class="trigger-item">inactivity.7days</div>
+                    <div class="trigger-item">inactivity.14days</div>
+                </div>
+            </div>
+
+            <div class="tech-section">
+                <h3>SendGrid Integration</h3>
+                <div class="code-block">
+// Send email via SendGrid
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const msg = {
+  to: user.email,
+  from: 'Rana &lt;rana@expertconsultingos.com&gt;',
+  subject: template.subject,
+  html: renderTemplate(template.html_content, variables),
+  tracking_settings: {
+    click_tracking: { enable: true },
+    open_tracking: { enable: true }
+  }
+};
+
+await sgMail.send(msg);
+                </div>
+            </div>
+
+            <div class="tech-section">
+                <h3>Variable Substitution</h3>
+                <div class="code-block">
+Available variables:
+{{user_name}} - User's first name
+{{user_email}} - User's email address
+{{reset_link}} - Password reset URL
+{{verification_link}} - Email verification URL
+{{feature_name}} - New feature name
+{{feature_description}} - Feature description
+{{feature_link}} - Feature URL
+{{campaign_id}} - Campaign identifier
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        const tabs = document.querySelectorAll('.tab-button');
+        const cards = document.querySelectorAll('.template-card');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const category = tab.dataset.category;
+
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Filter cards
+                cards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Toggle switches (visual only)
+        const switches = document.querySelectorAll('.switch');
+        switches.forEach(sw => {
+            sw.addEventListener('click', () => {
+                sw.classList.toggle('enabled');
+                const label = sw.nextElementSibling;
+                label.textContent = sw.classList.contains('enabled') ? 'Enabled' : 'Disabled';
+            });
+        });
+
+        // Smooth scroll to technical panel
+        const techPanel = document.querySelector('.tech-panel');
+        if (techPanel) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            techPanel.style.opacity = '0';
+            techPanel.style.transform = 'translateY(20px)';
+            techPanel.style.transition = 'all 0.6s ease';
+            observer.observe(techPanel);
+        }
+    </script>
+</body>
+</html>

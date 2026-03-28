@@ -1,0 +1,1922 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Send, Loader2, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
+import { useAppStore, ECOS_AGENTS } from '@/lib/store';
+import { apiClient } from '@/lib/api-client';
+import ReactMarkdown from 'react-markdown';
+import MemoryNotification from './MemoryNotification';
+import MemoryContextSuggestion from './MemoryContextSuggestion';
+import { MemoryPreviewPanel } from './MemoryPreviewPanel';
+
+interface ChatWindowProps {
+  agentId: string;
+}
+// Helper function to parse examples from AI response
+function parseExamples(content: string): { beforeExamples: string; examples: string[]; afterExamples: string; format: 'ex' | 'options' | 'multiselect'; categories?: Array<{name: string; options: string[]}> } | null {
+  // Try MULTI-SELECT format first: "MULTI-SELECT:\n1. Option\n2. Option" (for v4)
+  // This format can have multiple MULTI-SELECT sections across categories
+  if (content.includes('MULTI-SELECT:')) {
+    const allOptions: string[] = [];
+    const categories: Array<{name: string; options: string[]}> = [];
+    let firstMatchIndex = -1;
+    let lastMatchEnd = 0;
+
+    // Find categories with **Category Name:**
+    // Stop at the next ** or instructional text (Select/Remember/Choose/etc.)
+    const categoryRegex = /\*\*([^*]+):\*\*\s*\n\s*MULTI-SELECT:\s*\n([\s\S]*?)(?=\n\*\*|\n(?:Select|Remember|Choose|Note:|Important:)|$)/gi;
+    let match;
+
+    while ((match = categoryRegex.exec(content)) !== null) {
+      if (firstMatchIndex === -1) {
+        firstMatchIndex = match.index;
+      }
+      lastMatchEnd = match.index + match[0].length;
+
+      const categoryName = match[1].trim();
+      const optionsText = match[2];
+      const options = optionsText
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => {
+          return line.replace(/^[\s\*\-]*\d+[\.)\-\s]+/, '').replace(/^[\*\-]\s*/, '').trim();
+        })
+        .filter(line => {
+          const trimmed = line.trim();
+          // Filter out empty lines, section headers, and instructional text
+          return trimmed.length > 0
+            && trimmed.length < 100  // Options shouldn't be super long
+            && !trimmed.includes('?')  // Questions are instructions, not options
+            && !trimmed.toLowerCase().includes('thinking about')  // Descriptive text
+            && !trimmed.toLowerCase().includes('what ')  // Question words
+            && !trimmed.toLowerCase().includes('select ')  // Instructions
+            && !trimmed.match(/^[A-Z][a-z]+:/)
+            && !trimmed.match(/^MULTI-SELECT:/i)
+            && !trimmed.match(/^(Select|Remember|Choose|Note|Important|Thinking)/i);
+        });
+
+      if (options.length > 0) {
+        categories.push({ name: categoryName, options });
+        allOptions.push(...options);
+      }
+    }
+
+    if (allOptions.length > 0) {
+      return {
+        beforeExamples: content.substring(0, firstMatchIndex).trim(),
+        examples: allOptions,
+        afterExamples: content.substring(lastMatchEnd).trim(),
+        format: 'multiselect',
+        categories: categories.length > 0 ? categories : undefined
+      };
+    }
+
+    // Fallback: Try simple MULTI-SELECT format without categories
+    const simpleMultiSelectMatch = content.match(/MULTI-SELECT:\s*\n([\s\S]*?)(?=\n\n|Do any|Which|Let me know|$)/i);
+    if (simpleMultiSelectMatch) {
+      const multiSelectIndex = content.indexOf('MULTI-SELECT:');
+      const optionsText = simpleMultiSelectMatch[1];
+      const options = optionsText
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => line.replace(/^[\s\*\-]*\d+[\.)\-\s]+/, '').replace(/^[\*\-]\s*/, '').trim())
+        .filter(line => {
+          const trimmed = line.trim();
+          return trimmed.length > 0
+            && trimmed.length < 200
+            && !trimmed.match(/^MULTI-SELECT:/i)
+            && !trimmed.match(/^(Select|Remember|Choose|Note|Important|Do any|Which|Let)/i);
+        });
+
+      if (options.length > 0) {
+        const matchEnd = multiSelectIndex + simpleMultiSelectMatch[0].length;
+        return {
+          beforeExamples: content.substring(0, multiSelectIndex).trim(),
+          examples: options,
+          afterExamples: content.substring(matchEnd).trim(),
+          format: 'multiselect'
+        };
+      }
+    }
+  }
+
+  // Try OPTIONS format or "CHOOSE AN OPTION:" format
+  const optionsMatch = content.match(/(?:OPTIONS?:|CHOOSE AN OPTION:|% CHOOSE AN OPTION:)\s*\n([\s\S]*?)(?=\n\n|Remember:|Which resonates|$)/i);
+
+  if (optionsMatch) {
+    const optionsText = optionsMatch[1];
+    const options = optionsText
+      .split('\n')
+      .filter(line => line.trim())
+      .map(line => {
+        // Handle: "1. option", "1) option", "- option", "* option", or just "option"
+        return line.replace(/^[\s\*\-]*\d+[\.)\-\s]+/, '').replace(/^[\*\-]\s*/, '').trim();
+      })
+      .filter(line => {
+        const trimmed = line.trim();
+        return trimmed.length > 0
+          && trimmed.length < 200  // Allow longer titles
+          && !trimmed.match(/^[A-Z][a-z]+:/)  // Filter out section headers
+          && !trimmed.startsWith('"') // Don't include quoted examples in options
+          && !trimmed.toLowerCase().includes('which resonates')
+          && !trimmed.toLowerCase().includes('remember:')
+          && !trimmed.toLowerCase().includes('shall we craft');
+      });
+
+    if (options.length > 0) {
+      const matchIndex = optionsMatch.index || 0;
+      return {
+        beforeExamples: content.substring(0, matchIndex).trim(),
+        examples: options,
+        afterExamples: content.substring(matchIndex + optionsMatch[0].length).trim(),
+        format: 'multiselect'  // Changed to multiselect for better UI
+      };
+    }
+  }
+
+  // Fallback to Ex: format: Ex: "option 1" | "option 2"
+  const examplePattern = /Ex:\s*[""]([^""]+)[""](?:\s*\|\s*[""]([^""]+)[""])?/i;
+  const match = content.match(examplePattern);
+
+  if (!match) return null;
+
+  const matchIndex = match.index || 0;
+  const beforeExamples = content.substring(0, matchIndex).trim();
+  const afterExamples = content.substring(matchIndex + match[0].length).trim();
+
+  const examples = [match[1]];
+  if (match[2]) examples.push(match[2]);
+
+  return { beforeExamples, examples, afterExamples, format: 'ex' };
+}
+
+// Helper function to generate intelligent fallback suggestions
+function generateFallbackSuggestions(messageContent: string, agentId: string): string[] {
+  // Get agent-specific starter prompts as fallback
+  const agent = Object.values(ECOS_AGENTS).find(a => a.id === agentId);
+  const starterPrompts = agent?.starterPrompts || [];
+
+  // Intelligent suggestions based on common conversational patterns
+  const questionPatterns = [
+    { pattern: /who\s+(is|are)/i, suggestions: ['Tell me more about that', 'Can you be more specific?', 'What else should I know?'] },
+    { pattern: /what\s+(is|are)/i, suggestions: ['How does that work?', 'Tell me more', 'Why is that important?'] },
+    { pattern: /why/i, suggestions: ['Can you give me an example?', 'Tell me more about that', 'What should I do next?'] },
+    { pattern: /how/i, suggestions: ['What are the next steps?', 'Can you show me an example?', 'What else do I need?'] },
+    { pattern: /(ready|begin|start|let'?s)/i, suggestions: ['Yes, let\'s begin', 'I\'m ready', 'Let\'s start'] },
+    { pattern: /help|guide|assist/i, suggestions: ['Yes, please help me', 'What should I do first?', 'I need guidance'] },
+    { pattern: /specific|detail|example/i, suggestions: ['Here\'s what I\'m thinking...', 'Let me explain...', 'I want to share more details'] },
+  ];
+
+  // Check message content for patterns
+  for (const { pattern, suggestions } of questionPatterns) {
+    if (pattern.test(messageContent)) {
+      return suggestions;
+    }
+  }
+
+  // Generic fallback suggestions
+  const genericSuggestions = [
+    'Tell me more',
+    'What are the next steps?',
+    'Can you give me an example?',
+  ];
+
+  // Use starter prompts if available, otherwise use generic
+  return starterPrompts.length > 0 ? starterPrompts.slice(0, 3) : genericSuggestions;
+}
+
+export default function ChatWindow({ agentId }: ChatWindowProps) {
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Multi-select state for v4 agent - keyed by message ID to prevent cross-widget contamination
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
+
+  // Widget visibility state - track which widgets are hidden
+  const [hiddenWidgets, setHiddenWidgets] = useState<Set<string>>(new Set());
+
+  // Drawer visibility state - track which suggestion drawers are open
+  const [openDrawers, setOpenDrawers] = useState<Set<string>>(new Set());
+
+  const toggleWidgetVisibility = (widgetId: string) => {
+    setHiddenWidgets(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(widgetId)) {
+        newSet.delete(widgetId);
+      } else {
+        newSet.add(widgetId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleDrawer = (drawerId: string) => {
+    setOpenDrawers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(drawerId)) {
+        newSet.delete(drawerId);
+      } else {
+        newSet.add(drawerId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleOption = (option: string) => {
+    setSelectedOptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(option)) {
+        newSet.delete(option);
+      } else {
+        newSet.add(option);
+      }
+      return newSet;
+    });
+  };
+
+  const sendSelectedOptions = () => {
+    if (selectedOptions.size === 0) return;
+    const concatenated = Array.from(selectedOptions).join(' + ');
+    setInput(concatenated); // Put in text box for review
+    setSelectedOptions(new Set()); // Clear selections
+    // Focus the textarea
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
+  const [dbUserId, setDbUserId] = useState<string | null>(null);
+  const [contextSuggestion, setContextSuggestion] = useState<{ message: string; memoryCount: number } | null>(null);
+  const [showSuggestion, setShowSuggestion] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {
+    user,
+    currentConversationId,
+    conversations,
+    addMessage,
+    createConversation,
+    setCurrentConversation,
+    setStreamingResponse,
+    isStreamingResponse,
+    recentMemories,
+    addRecentMemory,
+    removeRecentMemory,
+    memoryEnabled,
+    widgetFormattingEnabled,
+    importedMemory,
+    setImportedMemory,
+    confirmMemory,
+    updateMemoryItem,
+  } = useAppStore();
+
+  const currentConversation = currentConversationId
+    ? conversations[currentConversationId]
+    : null;
+
+  // Clear selections when a new widget/question appears
+  useEffect(() => {
+    if (!currentConversation?.messages) return;
+
+    const assistantMessages = currentConversation.messages.filter(m => m.role === 'assistant');
+    const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+
+    // Clear selections when we get a new assistant message
+    if (lastAssistantMessage?.id) {
+      setSelectedOptions(new Set());
+    }
+  }, [currentConversation?.messages.length]); // Only trigger on message count changes
+
+  // Fetch database user ID
+  useEffect(() => {
+    const fetchDbUserId = async () => {
+      if (!user?.email) return;
+
+      try {
+        const res = await fetch(`http://localhost:3010/api/user/by-email/${encodeURIComponent(user.email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDbUserId(data.dbUserId);
+        } else if (res.status === 404) {
+          // User not in database yet - create them
+          console.log('Creating database user for:', user.email);
+          const createRes = await fetch('http://localhost:3010/api/admin/consultants', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              firstName: user.firstName || 'User',
+              lastName: user.lastName || ''
+            })
+          });
+          if (createRes.ok) {
+            const newUser = await createRes.json();
+            setDbUserId(newUser.id);
+            console.log('✅ Database user created:', newUser.id);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch database user ID:', error);
+      }
+    };
+
+    fetchDbUserId();
+  }, [user?.email]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new messages arrive
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentConversation?.messages, recentMemories]);
+
+  useEffect(() => {
+    // Auto-resize textarea
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [input]);
+
+  // Fetch memory context suggestion when agent changes or conversation is empty
+  useEffect(() => {
+    const fetchContextSuggestion = async () => {
+      if (!dbUserId || !agentId) return;
+
+      // Show suggestion when relevant memories exist
+      const messageCount = currentConversation?.messages.length || 0;
+      // Show for first 5 messages instead of 3
+      if (messageCount >= 5) {
+        setShowSuggestion(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3010/api/memory/context-suggest/${dbUserId}/${agentId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasContext && data.message) {
+            setContextSuggestion({
+              message: data.message,
+              memoryCount: data.memoryCount
+            });
+            setShowSuggestion(true);
+          } else {
+            setShowSuggestion(false);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch context suggestion:', error);
+      }
+    };
+
+    fetchContextSuggestion();
+  }, [dbUserId, agentId, currentConversation?.messages.length]);
+
+  // Check for new memories after AI response
+  const checkForNewMemories = async (conversationId: string, messageId: string) => {
+    if (!dbUserId) return;
+
+    try {
+      // Wait 2 seconds for memory extraction to complete
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const res = await fetch(`http://localhost:3010/api/memory/history/${dbUserId}?limit=10`);
+      if (!res.ok) return;
+
+      const history = await res.json();
+      const tenSecondsAgo = new Date(Date.now() - 10000);
+
+      const recentCreations = history.filter((h: any) => {
+        const createdAt = new Date(h.created_at);
+        return h.action === 'created' && createdAt > tenSecondsAgo;
+      });
+
+      // Add to recent memories
+      recentCreations.forEach((h: any) => {
+        addRecentMemory({
+          id: h.memory_id,
+          content: h.new_content,
+          memory_type: h.memory_type || 'general',
+          importance_score: h.new_importance || 0.5,
+          conversationId,
+          messageId,
+          timestamp: new Date(h.created_at),
+        });
+      });
+    } catch (error) {
+      console.error('Failed to check for new memories:', error);
+    }
+  };
+
+  // Render backend-provided widget
+  const renderBackendWidget = (widget: any, isInteractive: boolean = true, messageId?: string) => {
+    if (!widget || !widget.type) return null;
+
+    const { type, data } = widget;
+    const widgetId = `${messageId}_${type}`;
+    const isHidden = hiddenWidgets.has(widgetId);
+
+    // NOTE: Widget wrapper removed - widgets now render directly in drawer without individual toggle buttons
+    // The drawer itself handles the toggle functionality
+
+    // Multi-select widget (existing functionality)
+    if (type === 'multi_select') {
+      return (
+        <div className="space-y-3 pt-2">
+          <p className="text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400">
+            {data.instruction || 'Select multiple options (+ to add, − to remove):'}
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            {data.options?.map((option: string, idx: number) => {
+              const isSelected = selectedOptions.has(option);
+              return (
+                <button
+                  key={idx}
+                  onClick={() => isInteractive && toggleOption(option)}
+                  disabled={isLoading || !isInteractive}
+                  className={`px-5 py-4 border-2 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md ${
+                    isSelected
+                      ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600'
+                      : 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-700 hover:border-yellow-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className={`font-bold text-lg flex-shrink-0 mt-0.5 ${
+                      isSelected ? 'text-yellow-700 dark:text-yellow-400' : 'text-yellow-600 dark:text-yellow-400'
+                    }`}>
+                      {isSelected ? '−' : '+'}
+                    </span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+                      {option}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          {selectedOptions.size > 0 && isInteractive && (
+            <button
+              onClick={() => handleSendMessage(Array.from(selectedOptions).join(' + '))}
+              disabled={isLoading}
+              className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Send Selected ({selectedOptions.size})
+            </button>
+          )}
+
+          {/* Action buttons for multi_select */}
+          {data.actionButtons && data.actionButtons.length > 0 && isInteractive && (
+            <div className="flex gap-2 mt-3">
+              {data.actionButtons.map((button: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSendMessage(button.message)}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                >
+                  {button.icon && <span className="mr-1">{button.icon}</span>}
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Quick-select widget (single choice)
+    if (type === 'quick_select') {
+      return (
+        <div className="space-y-3 pt-2">
+          <p className="text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <Sparkles className="w-3 h-3" />
+            {data.question || 'Choose one:'}
+          </p>
+          <div className="grid grid-cols-1 gap-3">
+            {data.options?.map((option: string, idx: number) => (
+              <button
+                key={idx}
+                onClick={() => isInteractive && handleSendMessage(option)}
+                disabled={isLoading || !isInteractive}
+                className="px-5 py-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-700 rounded-lg hover:border-yellow-500 transition-all text-left font-medium text-gray-800 dark:text-gray-200 disabled:opacity-50"
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+
+          {/* Action buttons for quick_select */}
+          {data.actionButtons && data.actionButtons.length > 0 && isInteractive && (
+            <div className="flex gap-2 mt-3">
+              {data.actionButtons.map((button: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSendMessage(button.message)}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                >
+                  {button.icon && <span className="mr-1">{button.icon}</span>}
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Progress tracker widget
+    if (type === 'progress_tracker') {
+      return (
+        <div className="my-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">{data.title || 'Progress'}</div>
+          <div className="flex items-center gap-2">
+            {data.steps?.map((step: string, i: number) => (
+              <div key={i} className={`flex-1 text-center py-2 rounded text-sm font-medium ${
+                i < data.current ? 'bg-green-500 text-white' :
+                i === data.current ? 'bg-purple-500 text-white' :
+                'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+              }`}>
+                {step}
+              </div>
+            ))}
+          </div>
+        </div>,
+        'Progress Tracker'
+      );
+    }
+
+    // Rating widget
+    if (type === 'rating') {
+      return (
+        <div className="my-4 flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{data.question || 'How does this sound?'}</span>
+          <div className="flex gap-1">
+            {[...Array(data.scale || 5)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => isInteractive && handleSendMessage(`Rating: ${i + 1}/${data.scale || 5}`)}
+                disabled={isLoading || !isInteractive}
+                className="text-2xl hover:scale-110 transition disabled:opacity-50"
+              >
+                ⭐
+              </button>
+            ))}
+          </div>
+        </div>,
+        'Rating'
+      );
+    }
+
+    // Checklist widget
+    if (type === 'checklist') {
+      return (
+        <div className="my-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <div className="font-medium mb-3 text-gray-800 dark:text-gray-200">{data.title || 'Checklist'}</div>
+          {data.items?.map((item: string, i: number) => (
+            <div key={i} className="flex items-center gap-2 py-1">
+              <input type="checkbox" className="rounded border-gray-300 dark:border-gray-600" />
+              <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
+            </div>
+          ))}
+        </div>,
+        'Checklist'
+      );
+    }
+
+    // Slider group widget (NEW for Value Quantifier V6)
+    if (type === 'slider_group') {
+      const [sliderValues, setSliderValues] = useState<Record<string, number>>(
+        Object.fromEntries(data.sliders?.map((s: any) => [s.id, s.defaultValue || s.min]) || [])
+      );
+
+      const formatValue = (value: number, format?: string, unit?: string) => {
+        if (format === 'currency') return `$${value.toLocaleString()}`;
+        if (format === 'percentage') return `${value}%`;
+        if (format === 'number') return value.toLocaleString();
+        return `${value}${unit || ''}`;
+      };
+
+      const handleSliderChange = (id: string, value: number) => {
+        setSliderValues(prev => ({ ...prev, [id]: value }));
+      };
+
+      // Auto-send message when slider is released
+      const handleSliderRelease = () => {
+        if (!isInteractive || isLoading) return;
+
+        // Build human-readable message from slider values
+        const messages = data.sliders?.map((slider: any) => {
+          const value = sliderValues[slider.id] || slider.defaultValue || slider.min;
+          return `${slider.label}: ${formatValue(value, slider.format, slider.unit)}`;
+        });
+
+        const prompt = messages?.join(', ') || JSON.stringify(sliderValues);
+        handleSendMessage(prompt);
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          {data.instruction && (
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              {data.instruction}
+            </p>
+          )}
+          {data.sliders?.map((slider: any) => {
+            const currentValue = sliderValues[slider.id] || slider.defaultValue || slider.min;
+            return (
+              <div key={slider.id} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {slider.label}
+                  </label>
+                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                    {formatValue(currentValue, slider.format, slider.unit)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={slider.min}
+                  max={slider.max}
+                  step={slider.step || 1}
+                  value={currentValue}
+                  onChange={(e) => isInteractive && handleSliderChange(slider.id, Number(e.target.value))}
+                  onMouseUp={handleSliderRelease}
+                  onTouchEnd={handleSliderRelease}
+                  disabled={!isInteractive || isLoading}
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 disabled:opacity-50"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span>{formatValue(slider.min, slider.format, slider.unit)}</span>
+                  <span>{formatValue(slider.max, slider.format, slider.unit)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>,
+        'Value Sliders'
+      );
+    }
+
+    // ROI calculator widget (NEW for Value Quantifier V6)
+    if (type === 'roi_calculator') {
+      const calc = data.calculations || {};
+      const chartData = data.chartData || {};
+
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Your ROI Breakdown:'}
+          </p>
+
+          {/* ROI Metrics Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-2 border-green-200 dark:border-green-700">
+              <div className="text-xs uppercase tracking-wide text-green-600 dark:text-green-400 font-semibold mb-1">
+                Total Value
+              </div>
+              <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                ${calc.totalValue?.toLocaleString() || '0'}
+              </div>
+            </div>
+
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+              <div className="text-xs uppercase tracking-wide text-blue-600 dark:text-blue-400 font-semibold mb-1">
+                Your Fee
+              </div>
+              <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                ${calc.yourFee?.toLocaleString() || '0'}
+              </div>
+            </div>
+
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border-2 border-emerald-200 dark:border-emerald-700">
+              <div className="text-xs uppercase tracking-wide text-emerald-600 dark:text-emerald-400 font-semibold mb-1">
+                Net ROI
+              </div>
+              <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                ${calc.netROI?.toLocaleString() || '0'}
+              </div>
+            </div>
+
+            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
+              <div className="text-xs uppercase tracking-wide text-purple-600 dark:text-purple-400 font-semibold mb-1">
+                ROI Multiple
+              </div>
+              <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                {calc.roiMultiple?.toFixed(1) || '0'}x
+              </div>
+            </div>
+          </div>
+
+          {/* Payback Period */}
+          {calc.paybackMonths && (
+            <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-2 border-yellow-200 dark:border-yellow-700">
+              <div className="text-xs uppercase tracking-wide text-yellow-700 dark:text-yellow-400 font-semibold mb-1">
+                Payback Period
+              </div>
+              <div className="text-xl font-bold text-yellow-800 dark:text-yellow-300">
+                {calc.paybackMonths} months
+              </div>
+            </div>
+          )}
+
+          {/* Simple Bar Chart Visualization */}
+          {chartData.labels && chartData.values && (
+            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                Visual Breakdown
+              </div>
+              <div className="space-y-3">
+                {chartData.labels.map((label: string, idx: number) => {
+                  const value = chartData.values[idx];
+                  const maxValue = Math.max(...chartData.values);
+                  const percentage = (value / maxValue) * 100;
+
+                  return (
+                    <div key={idx}>
+                      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <span>{label}</span>
+                        <span className="font-bold">${value.toLocaleString()}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                        <div
+                          className={`h-3 rounded-full transition-all ${
+                            idx === 0 ? 'bg-green-500' :
+                            idx === 1 ? 'bg-blue-500' :
+                            'bg-emerald-500'
+                          }`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {isInteractive && (
+            <button
+              onClick={() => handleSendMessage('continue')}
+              disabled={isLoading}
+              className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Continue to Outputs →
+            </button>
+          )}
+        </div>,
+        'ROI Calculator'
+      );
+    }
+
+    // Output generator widget (NEW for Value Quantifier V6) - shadcn/ui inspired cards
+    if (type === 'output_generator') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Your outputs are ready:'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {data.outputs?.map((output: any, idx: number) => (
+              <div
+                key={idx}
+                className="group relative overflow-hidden rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-blue-400 dark:hover:border-blue-600"
+              >
+                {/* Icon badge */}
+                <div className="absolute top-4 right-4 text-3xl opacity-20 group-hover:opacity-40 transition-opacity">
+                  {output.icon || '📄'}
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-2xl">
+                      {output.icon || '📄'}
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                      {output.title}
+                    </h4>
+                  </div>
+
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 min-h-[40px]">
+                    {output.description}
+                  </p>
+
+                  <button
+                    onClick={() => isInteractive && handleSendMessage(`action:${output.action}`)}
+                    disabled={isLoading || !isInteractive}
+                    className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed group-hover:scale-105 transform"
+                  >
+                    {output.buttonText || 'Download'} →
+                  </button>
+                </div>
+
+                {/* Hover effect gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            ))}
+          </div>
+
+          {data.nextAction && isInteractive && (
+            <button
+              onClick={() => handleSendMessage(data.nextAction)}
+              disabled={isLoading}
+              className="w-full mt-6 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ↻ Start New Calculator
+            </button>
+          )}
+        </div>,
+        'Output Generator'
+      );
+    }
+
+    // Memory timeline widget (NEW for Memory Insights V6)
+    if (type === 'memory_timeline') {
+      const getCategoryColor = (category: string) => {
+        const colors: Record<string, string> = {
+          win: 'border-green-400 bg-green-50 dark:bg-green-900/20',
+          learning: 'border-blue-400 bg-blue-50 dark:bg-blue-900/20',
+          challenge: 'border-orange-400 bg-orange-50 dark:bg-orange-900/20',
+          decision: 'border-purple-400 bg-purple-50 dark:bg-purple-900/20',
+          relationship: 'border-pink-400 bg-pink-50 dark:bg-pink-900/20',
+          insight: 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
+        };
+        return colors[category] || 'border-gray-400 bg-gray-50 dark:bg-gray-700';
+      };
+
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Your memory timeline:'}
+          </p>
+
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600" />
+
+            {/* Timeline items */}
+            <div className="space-y-6">
+              {data.timelineItems?.map((item: any, idx: number) => (
+                <div key={idx} className="relative pl-12">
+                  {/* Icon circle on timeline */}
+                  <div className="absolute left-0 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-lg">
+                    {item.icon || '📌'}
+                  </div>
+
+                  {/* Card */}
+                  <div className={`p-4 rounded-lg border-2 ${getCategoryColor(item.category)} shadow-sm hover:shadow-md transition-all`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </div>
+                        <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-1">
+                          {item.title}
+                        </h4>
+                      </div>
+                      {item.importance && (
+                        <div className="flex items-center gap-1 ml-2">
+                          <div className={`w-2 h-2 rounded-full ${item.importance >= 0.8 ? 'bg-red-500' : item.importance >= 0.5 ? 'bg-yellow-500' : 'bg-green-500'}`} />
+                          <span className="text-xs text-gray-500">
+                            {Math.round(item.importance * 100)}%
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {item.content && (
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {item.content}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>,
+        'Memory Timeline'
+      );
+    }
+
+    // Insight cards widget (NEW for Memory Insights V6)
+    if (type === 'insight_cards') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'AI-Extracted Insights:'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.insights?.map((insight: any, idx: number) => (
+              <div
+                key={idx}
+                className="group relative overflow-hidden rounded-xl border-2 border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-800 p-5 shadow-sm hover:shadow-xl transition-all duration-300 hover:border-purple-400 dark:hover:border-purple-500"
+              >
+                {/* Icon badge */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-xl">
+                    {insight.icon || '💡'}
+                  </div>
+                  <h4 className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                    {insight.category || 'Insight'}
+                  </h4>
+                </div>
+
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 min-h-[60px]">
+                  {insight.content}
+                </p>
+
+                {/* Confidence meter */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <span>Confidence</span>
+                    <span className="font-bold">{Math.round((insight.confidence || 0) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 transition-all"
+                      style={{ width: `${(insight.confidence || 0) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Hover gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 to-pink-50/30 dark:from-purple-900/10 dark:to-pink-900/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            ))}
+          </div>
+        </div>,
+        'AI Insights'
+      );
+    }
+
+    // Stats dashboard widget (NEW for Memory Insights V6)
+    if (type === 'stats_dashboard') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Your Analytics:'}
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {data.stats?.map((stat: any, idx: number) => (
+              <div
+                key={idx}
+                className="p-5 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all hover:border-blue-400 dark:hover:border-blue-600"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`text-3xl ${stat.color === 'purple' ? 'text-purple-500' : stat.color === 'blue' ? 'text-blue-500' : stat.color === 'green' ? 'text-green-500' : stat.color === 'orange' ? 'text-orange-500' : 'text-gray-500'}`}>
+                    {stat.icon || '📊'}
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                  {stat.value?.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  {stat.label}
+                </div>
+                {stat.trend && (
+                  <div className={`text-xs mt-2 flex items-center gap-1 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                    {stat.trend === 'up' ? '↗' : '↘'} {stat.trendValue || ''}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>,
+        'Analytics Dashboard'
+      );
+    }
+
+    // Pattern recognition widget (NEW for Memory Insights V6)
+    if (type === 'pattern_recognition') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Discovered Patterns:'}
+          </p>
+
+          <div className="space-y-4">
+            {data.patterns?.map((pattern: any, idx: number) => (
+              <div
+                key={idx}
+                className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-700 shadow-sm hover:shadow-md transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-2xl">
+                    {pattern.icon || '🔍'}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2">
+                      {pattern.title}
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                      {pattern.description}
+                    </p>
+
+                    {/* Correlation strength meter */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                        <span>Correlation Strength</span>
+                        <span className="font-bold">{pattern.strength || 'N/A'}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div
+                          className={`h-2.5 rounded-full transition-all ${
+                            pattern.strengthValue >= 0.8 ? 'bg-green-500' :
+                            pattern.strengthValue >= 0.5 ? 'bg-yellow-500' :
+                            'bg-orange-500'
+                          }`}
+                          style={{ width: `${(pattern.strengthValue || 0) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sample count */}
+                    {pattern.sampleCount && (
+                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Based on {pattern.sampleCount} memories
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>,
+        'Pattern Recognition'
+      );
+    }
+
+    // Client journey widget (NEW for Memory Insights V6)
+    if (type === 'client_journey') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Client Work Overview:'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {data.clients?.map((client: any, idx: number) => (
+              <div
+                key={idx}
+                className="p-5 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all"
+              >
+                {/* Client header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-2xl">
+                    {client.icon || '👤'}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 dark:text-gray-100">
+                      {client.name}
+                    </h4>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {client.status || 'Active'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mini timeline */}
+                <div className="space-y-2 mb-4">
+                  {client.milestones?.map((milestone: any, mIdx: number) => (
+                    <div key={mIdx} className="flex items-start gap-2">
+                      <div className="flex-shrink-0 mt-1.5 w-2 h-2 rounded-full bg-green-500" />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          {milestone.title}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(milestone.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Stats */}
+                {client.totalValue && (
+                  <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">Total Value</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">
+                        ${client.totalValue.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>,
+        'Client Journey'
+      );
+    }
+
+    // Handoff widget (NEW for V7 agent handoffs)
+    if (type === 'handoff_widget') {
+      return (
+        <div className="space-y-4 pt-4 mt-6">
+          <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border-2 border-green-300 dark:border-green-700 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-2xl">
+                ✅
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {data.title || 'Great work! You\'re all set.'}
+              </h3>
+            </div>
+
+            <p className="text-gray-700 dark:text-gray-300 mb-6">
+              {data.instruction}
+            </p>
+
+            {/* Next agent options */}
+            {data.nextAgents && data.nextAgents.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                  Ready for the next step?
+                </p>
+                {data.nextAgents.map((agent: any, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => isInteractive && handleSendMessage(`action:switch_to_${agent.id}`)}
+                    disabled={isLoading || !isInteractive}
+                    className={`w-full p-5 rounded-xl border-2 text-left transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-xl ${
+                      agent.recommended
+                        ? 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-400 dark:border-yellow-600 hover:border-yellow-500'
+                        : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 text-3xl">
+                        {agent.icon || '🎯'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-bold text-gray-900 dark:text-gray-100">
+                            {agent.name}
+                          </h4>
+                          {agent.recommended && (
+                            <span className="px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
+                              RECOMMENDED
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {agent.description}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0 text-2xl text-gray-400">
+                        →
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Save and finish option */}
+            {isInteractive && (
+              <button
+                onClick={() => handleSendMessage('save_and_finish')}
+                disabled={isLoading}
+                className="w-full mt-4 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all font-medium border-2 border-gray-300 dark:border-gray-600"
+              >
+                💾 Save and Finish Later
+              </button>
+            )}
+          </div>
+        </div>,
+        'Agent Handoff'
+      );
+    }
+
+    // Knowledge graph widget (NEW for Memory Insights V6)
+    if (type === 'knowledge_graph') {
+      return (
+        <div className="space-y-4 pt-2">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            {data.instruction || 'Knowledge Graph:'}
+          </p>
+
+          <div className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border-2 border-purple-200 dark:border-purple-700">
+            {/* Simplified visual representation */}
+            <div className="flex flex-wrap gap-3 justify-center items-center">
+              {data.nodes?.map((node: any, idx: number) => (
+                <div key={idx} className="relative">
+                  {/* Node */}
+                  <div
+                    className={`px-4 py-3 rounded-full border-2 shadow-md hover:shadow-lg transition-all cursor-pointer ${
+                      node.type === 'central'
+                        ? 'bg-purple-500 text-white border-purple-600 text-lg font-bold'
+                        : node.type === 'primary'
+                        ? 'bg-blue-500 text-white border-blue-600'
+                        : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                    }`}
+                    style={{
+                      minWidth: node.type === 'central' ? '120px' : node.type === 'primary' ? '100px' : '80px',
+                    }}
+                  >
+                    <div className="text-center">
+                      <div className="text-xl mb-1">{node.icon || '🔗'}</div>
+                      <div className="text-xs font-medium">{node.label}</div>
+                      {node.count && (
+                        <div className="text-xs opacity-75 mt-1">({node.count})</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Connection lines (simplified with visual indicators) */}
+                  {idx < data.nodes.length - 1 && (
+                    <div className="absolute top-1/2 -right-3 w-6 h-0.5 bg-gray-300 dark:bg-gray-600 transform -translate-y-1/2" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Legend */}
+            {data.legend && (
+              <div className="mt-6 pt-4 border-t border-purple-200 dark:border-purple-700">
+                <div className="flex flex-wrap gap-4 justify-center text-xs text-gray-600 dark:text-gray-400">
+                  {data.legend.map((item: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-purple-400" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {isInteractive && (
+            <button
+              onClick={() => handleSendMessage('Show me specific connections')}
+              disabled={isLoading}
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Explore Connections →
+            </button>
+          )}
+        </div>,
+        'Knowledge Graph'
+      );
+    }
+
+    return null;
+  };
+
+  const handleSendMessage = async (messageText?: string) => {
+    // Ensure messageText is a string (in case event is passed)
+    const textToSend = typeof messageText === 'string' ? messageText : input.trim();
+    const userMessage = textToSend.trim();
+    if (!userMessage || isLoading) return;
+
+    setInput('');
+
+    // Create conversation if needed (but don't send ID to backend yet for new convos)
+    let convId = currentConversationId;
+    let isNewConversation = false;
+
+    if (!convId) {
+      convId = createConversation(agentId);
+      setCurrentConversation(convId);
+      isNewConversation = true;
+    }
+
+    // Add user message
+    const userMsg = {
+      id: `msg_${Date.now()}_user`,
+      role: 'user' as const,
+      content: userMessage,
+      timestamp: new Date(),
+      agentId,
+    };
+    addMessage(convId, userMsg);
+
+    setIsLoading(true);
+    setStreamingResponse(true);
+
+    try {
+      // Streaming response
+      let assistantContent = '';
+      let widgetData: any = null;
+      const assistantMsgId = `msg_${Date.now()}_assistant`;
+
+      // Add placeholder assistant message
+      const assistantMsg = {
+        id: assistantMsgId,
+        role: 'assistant' as const,
+        content: '',
+        timestamp: new Date(),
+        agentId,
+        widget: undefined as any,
+      };
+      addMessage(convId, assistantMsg);
+
+      // Get conversation history (excluding the assistant placeholder we just added)
+      const conversationHistory = currentConversation?.messages
+        .filter(msg => msg.id !== assistantMsgId)
+        .map(msg => ({ role: msg.role, content: msg.content })) || [];
+
+      // Only send conversationId if this is an EXISTING conversation from the database
+      // For new conversations (or temp IDs), let the backend create the ID
+      const isTempId = convId?.startsWith('temp_');
+      const conversationIdToSend = (isNewConversation || isTempId) ? undefined : convId;
+
+      // Stream the response with conversation history, memory setting, and conversationId
+      const stream = apiClient.streamMessage(agentId, userMessage, conversationHistory, memoryEnabled, conversationIdToSend);
+
+      for await (const chunk of stream) {
+        // Handle different chunk types
+        if (chunk.type === 'content') {
+          assistantContent += chunk.content;
+
+          // Update the message content in the store
+          useAppStore.setState((state) => ({
+            conversations: {
+              ...state.conversations,
+              [convId!]: {
+                ...state.conversations[convId!],
+                messages: state.conversations[convId!].messages.map((msg) =>
+                  msg.id === assistantMsgId
+                    ? { ...msg, content: assistantContent }
+                    : msg
+                ),
+              },
+            },
+          }));
+        } else if (chunk.type === 'widget') {
+          // Store widget data
+          widgetData = chunk.widget;
+          console.log('📊 [WIDGET] Received from backend:', chunk.widget.type);
+
+          // Update message with widget data
+          useAppStore.setState((state) => ({
+            conversations: {
+              ...state.conversations,
+              [convId!]: {
+                ...state.conversations[convId!],
+                messages: state.conversations[convId!].messages.map((msg) =>
+                  msg.id === assistantMsgId
+                    ? { ...msg, widget: widgetData }
+                    : msg
+                ),
+              },
+            },
+          }));
+        } else if (chunk.type === 'conversation_id') {
+          // Receive the conversation ID from backend (for new conversations)
+          const backendConvId = (chunk as any).conversationId;
+          console.log('📝 [CONVERSATION] Received conversation ID from backend:', backendConvId);
+
+          // If we have a temp ID, replace it with the real database ID
+          if (isTempId && backendConvId && backendConvId !== convId) {
+            console.log(`🔄 [CONVERSATION] Replacing temp ID ${convId} with database ID ${backendConvId}`);
+
+            // Get the current conversation data
+            const tempConversation = useAppStore.getState().conversations[convId];
+
+            if (tempConversation) {
+              // Remove temp conversation and add with real ID
+              useAppStore.setState((state) => {
+                const { [convId!]: removed, ...remainingConversations } = state.conversations;
+                return {
+                  conversations: {
+                    ...remainingConversations,
+                    [backendConvId]: {
+                      ...tempConversation,
+                      id: backendConvId,
+                    },
+                  },
+                  currentConversationId: backendConvId,
+                };
+              });
+
+              // Update local convId reference for subsequent messages
+              convId = backendConvId;
+            }
+          }
+        }
+      }
+
+      // After streaming completes, check for new memories
+      await checkForNewMemories(convId, assistantMsgId);
+
+      // Explicit scroll after streaming completes and options render
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setLastFailedMessage(userMessage);
+      setShowError(true);
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error occurred');
+
+      // Add error message
+      const errorMsg = {
+        id: `msg_${Date.now()}_error`,
+        role: 'assistant' as const,
+        content:
+          'Sorry, I encountered an error processing your message. Please try again.',
+        timestamp: new Date(),
+        agentId,
+      };
+      addMessage(convId, errorMsg);
+    } finally {
+      setIsLoading(false);
+      setStreamingResponse(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  // Handler functions for memory notifications
+  const handleUndoMemory = async (memoryId: string) => {
+    try {
+      await fetch(`http://localhost:3010/api/memory/${memoryId}`, {
+        method: 'DELETE',
+      });
+      removeRecentMemory(memoryId);
+    } catch (error) {
+      console.error('Failed to undo memory:', error);
+    }
+  };
+
+  const handleEditMemory = async (
+    memoryId: string,
+    newContent: string,
+    newImportance: number
+  ) => {
+    try {
+      await fetch(`http://localhost:3010/api/memory/${memoryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: newContent,
+          importance_score: newImportance,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to edit memory:', error);
+    }
+  };
+
+  const handleTagMemory = async (memoryId: string, tags: string[]) => {
+    try {
+      await fetch(`http://localhost:3010/api/memory/${memoryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tags: tags.join(','),
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to tag memory:', error);
+    }
+  };
+
+  // Get agent data and starter prompts
+  const agentData = Object.values(ECOS_AGENTS).find(agent => agent.id === agentId);
+  const starterPrompts = agentData?.starterPrompts || [];
+
+  // Handler for using context suggestion
+  const handleUseContext = (message: string) => {
+    setInput(message);
+    setShowSuggestion(false);
+    textareaRef.current?.focus();
+  };
+
+  const handleDismissSuggestion = () => {
+    setShowSuggestion(false);
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+        {/* Memory Context Suggestion */}
+        {showSuggestion && contextSuggestion && (
+          <MemoryContextSuggestion
+            contextMessage={contextSuggestion.message}
+            memoryCount={contextSuggestion.memoryCount}
+            onUseContext={handleUseContext}
+            onDismiss={handleDismissSuggestion}
+          />
+        )}
+
+        {/* Imported Memory Preview */}
+        {importedMemory && importedMemory.items.length > 0 && (
+          <MemoryPreviewPanel
+            importedMemory={importedMemory.items}
+            onMemoryUpdate={(updatedItems) => {
+              setImportedMemory({
+                ...importedMemory,
+                items: updatedItems,
+                lastUpdated: new Date(),
+              });
+            }}
+            onConfirm={confirmMemory}
+          />
+        )}
+
+        {/* Error Banner with Retry Button */}
+        {showError && (
+          <div className="flex justify-center my-4">
+            <div className="px-6 py-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl max-w-2xl w-full">
+              <div className="flex items-start gap-4">
+                <div className="flex-1">
+                  <p className="text-red-700 dark:text-red-400 text-base font-semibold mb-2">
+                    ⚠️ Error Processing Message
+                  </p>
+                  <p className="text-red-600 dark:text-red-300 text-sm mb-3">
+                    {errorMessage || "An error occurred. Please try again."}
+                  </p>
+                  {lastFailedMessage && (
+                    <p className="text-gray-600 dark:text-gray-400 text-xs italic bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded">
+                      Message: "{lastFailedMessage.substring(0, 150)}{lastFailedMessage.length > 150 ? "..." : ""}"
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  {lastFailedMessage && (
+                    <button
+                      onClick={() => {
+                        setShowError(false);
+                        setInput(lastFailedMessage);
+                        setLastFailedMessage(null);
+                      }}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                      title="Retry this message"
+                    >
+                      Retry
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowError(false)}
+                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentConversation?.messages.length === 0 && (
+          <div className="text-center text-gray-500 dark:text-gray-400 mt-20 max-w-2xl mx-auto">
+            <div className="mb-8">
+              <div className="text-6xl mb-6">{agentData?.icon}</div>
+              <h2 className="text-3xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                {agentData?.name}
+              </h2>
+              <p className="text-base mb-8 leading-relaxed">{agentData?.description}</p>
+            </div>
+
+            {/* Starter Prompts */}
+            <div className="space-y-4">
+              <p className="text-xs uppercase tracking-wide font-semibold flex items-center justify-center gap-2 mb-6">
+                <Sparkles className="w-4 h-4" />
+                Quick Start
+              </p>
+              {starterPrompts.map((prompt, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSendMessage(prompt)}
+                  disabled={isLoading}
+                  className="w-full px-6 py-5 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-yellow-500 hover:bg-yellow-50 dark:hover:bg-gray-700 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-5 h-5 text-gray-400 group-hover:text-yellow-600 flex-shrink-0" />
+                    <span className="text-base font-medium text-gray-900 dark:text-gray-100 group-hover:text-yellow-600">
+                      {prompt}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-sm mt-8 text-gray-400">
+              Or type your own message below
+            </p>
+          </div>
+        )}
+
+        {currentConversation?.messages.map((message, messageIndex, allMessages) => {
+          // Find memories associated with this message
+          const messageMemories = recentMemories.filter(
+            (m) => m.messageId === message.id && m.conversationId === currentConversationId
+          );
+
+          // Check if this is the LAST assistant message (for interactive widgets)
+          const assistantMessages = allMessages.filter(m => m.role === 'assistant');
+          const isLastAssistantMessage = message.role === 'assistant' &&
+                                         assistantMessages[assistantMessages.length - 1]?.id === message.id;
+
+          // Parse examples from assistant messages
+          // Only parse options when message is complete (not streaming) AND it's the last message
+          const isMessageComplete = message.role === 'assistant' && !isStreamingResponse;
+
+          // Check for backend widget data AND always parse content for MULTI-SELECT
+          const hasBackendWidget = message.widget && message.widget.type;
+          const parsedContent = isMessageComplete && isLastAssistantMessage && widgetFormattingEnabled ? parseExamples(message.content) : null;
+
+
+          return (
+            <div key={message.id}>
+              {/* Message */}
+              <div
+                className={`flex ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                } message-fade-in`}
+              >
+                <div
+                  className={`max-w-3xl rounded-xl px-6 py-4 ${
+                    message.role === 'user'
+                      ? 'bg-yellow-500 text-black font-medium shadow-md'
+                      : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 shadow-sm'
+                  }`}
+                >
+                  {message.role === 'assistant' ? (
+                    <div className="space-y-4">
+                      {/* Content - just the main text, widgets moved to drawer below */}
+                      {parsedContent ? (
+                        <>
+                          {/* Main question text */}
+                          <div className="prose prose-base dark:prose-invert max-w-none leading-relaxed prose-p:my-4 prose-p:leading-7 prose-strong:text-gray-900 prose-strong:dark:text-white prose-strong:font-bold prose-ul:my-4 prose-li:my-2">
+                            <ReactMarkdown>{parsedContent.beforeExamples}</ReactMarkdown>
+                          </div>
+
+                          {/* Any text after examples */}
+                          {parsedContent.afterExamples && (
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-400 leading-relaxed mt-4">
+                              <ReactMarkdown>{parsedContent.afterExamples}</ReactMarkdown>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="prose prose-base dark:prose-invert max-w-none leading-relaxed prose-p:my-4 prose-p:leading-7 prose-strong:text-gray-900 prose-strong:dark:text-white prose-strong:font-bold prose-ul:my-4 prose-li:my-2">
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="prose prose-base dark:prose-invert max-w-none prose-p:my-2">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Memory notifications for assistant messages */}
+              {message.role === 'assistant' && messageMemories.length > 0 && (
+                <div className="mt-4">
+                  {messageMemories.map((memory) => (
+                    <MemoryNotification
+                      key={memory.id}
+                      memory={memory}
+                      onUndo={handleUndoMemory}
+                      onEdit={handleEditMemory}
+                      onTag={handleTagMemory}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* AI Suggestions Drawer (renders BELOW the message) */}
+              {message.role === 'assistant' && (parsedContent || hasBackendWidget) && isLastAssistantMessage && widgetFormattingEnabled && (
+                <div className="mt-3">
+                  {/* Toggle button */}
+                  <button
+                    onClick={() => toggleDrawer(`${message.id}_suggestions`)}
+                    className="flex items-center gap-2 w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+                  >
+                    <Sparkles className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">AI Suggestions</span>
+                    {openDrawers.has(`${message.id}_suggestions`) ?
+                      <ChevronUp className="w-4 h-4 ml-auto text-gray-500" /> :
+                      <ChevronDown className="w-4 h-4 ml-auto text-gray-500" />
+                    }
+                  </button>
+
+                  {/* Collapsible drawer content */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      openDrawers.has(`${message.id}_suggestions`) ? 'max-h-[2000px] opacity-100 mt-3' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="space-y-4">
+                      {/* Backend widgets */}
+                      {hasBackendWidget && renderBackendWidget(message.widget, isLastAssistantMessage, message.id)}
+
+                      {/* Multi-select with categories (3x3 grid) */}
+                      {parsedContent && parsedContent.format === 'multiselect' && parsedContent.categories ? (
+                        <div className="space-y-6">
+                          {parsedContent.categories.map((category, catIdx) => (
+                            <div key={catIdx} className="space-y-3">
+                              <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600 pb-2">
+                                {category.name}
+                              </h4>
+                              <div className="grid grid-cols-3 gap-3">
+                                {category.options.map((option, optIdx) => {
+                                  const isSelected = selectedOptions.has(option);
+                                  return (
+                                    <button
+                                      key={optIdx}
+                                      onClick={() => isLastAssistantMessage && toggleOption(option)}
+                                      disabled={isLoading || !isLastAssistantMessage}
+                                      className={`px-3 py-1.5 border-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-end ${
+                                        isSelected
+                                          ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600'
+                                          : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 hover:border-blue-500 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/40 dark:hover:to-indigo-900/40'
+                                      }`}
+                                    >
+                                      <div className="flex items-start gap-2">
+                                        <span className={`font-bold text-base flex-shrink-0 mt-0.5 ${
+                                          isSelected ? 'text-yellow-700 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400'
+                                        }`}>
+                                          {isSelected ? '−' : '+'}
+                                        </span>
+                                        <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-snug">
+                                          {option}
+                                        </span>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : parsedContent && parsedContent.format === 'multiselect' ? (
+                        // Fallback multi-select without categories
+                        <div className="grid grid-cols-3 gap-3">
+                          {parsedContent.examples.map((example, idx) => {
+                            const isSelected = selectedOptions.has(example);
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => isLastAssistantMessage && toggleOption(example)}
+                                disabled={isLoading || !isLastAssistantMessage}
+                                className={`px-3 py-1.5 border-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-end ${
+                                  isSelected
+                                    ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600'
+                                    : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 hover:border-blue-500 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/40 dark:hover:to-indigo-900/40'
+                                }`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <span className={`font-bold text-lg flex-shrink-0 mt-0.5 ${
+                                    isSelected ? 'text-yellow-700 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400'
+                                  }`}>
+                                    {isSelected ? '−' : '+'}
+                                  </span>
+                                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+                                    {example}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : parsedContent ? (
+                        // Regular single-select options
+                        <div className="grid grid-cols-1 gap-3">
+                          {parsedContent.examples.map((example, idx) => (
+                            <div key={idx} className="flex gap-2">
+                              <button
+                                onClick={() => isLastAssistantMessage && handleSendMessage(example)}
+                                disabled={isLoading || !isLastAssistantMessage}
+                                className="flex-1 px-5 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-500 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/40 dark:hover:to-indigo-900/40 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                              >
+                                <div className="flex items-start gap-3">
+                                  <span className="text-blue-600 dark:text-blue-400 font-bold text-lg flex-shrink-0 mt-0.5">
+                                    {idx + 1}
+                                  </span>
+                                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+                                    {example}
+                                  </span>
+                                </div>
+                              </button>
+                              {parsedContent.format === 'options' && (
+                                <button
+                                  onClick={() => isLastAssistantMessage && setInput(example)}
+                                  disabled={isLoading || !isLastAssistantMessage}
+                                  className="px-4 py-4 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                                  title="Edit before sending"
+                                >
+                                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        // Fallback: Generate intelligent suggestions based on message content
+                        <div className="space-y-3">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            Continue the conversation:
+                          </p>
+                          <div className="grid grid-cols-1 gap-3">
+                            {generateFallbackSuggestions(message.content, agentId).map((suggestion, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => isLastAssistantMessage && handleSendMessage(suggestion)}
+                                disabled={isLoading || !isLastAssistantMessage}
+                                className="flex-1 px-5 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-lg hover:border-blue-500 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/40 dark:hover:to-indigo-900/40 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                              >
+                                <div className="flex items-start gap-3">
+                                  <span className="text-blue-600 dark:text-blue-400 font-bold text-lg flex-shrink-0 mt-0.5">
+                                    {idx + 1}
+                                  </span>
+                                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+                                    {suggestion}
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Add to Message button for multi-select */}
+                      {parsedContent && parsedContent.format === 'multiselect' && selectedOptions.size > 0 && isLastAssistantMessage && (
+                        <button
+                          onClick={sendSelectedOptions}
+                          disabled={isLoading}
+                          className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Add to Message ({selectedOptions.size} selected)
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {isStreamingResponse && (
+          <div className="flex justify-start">
+            <div className="bg-white dark:bg-gray-800 rounded-xl px-6 py-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 bg-blue-600 rounded-full typing-dot"></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full typing-dot"></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full typing-dot"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input area */}
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <div className="max-w-4xl mx-auto flex gap-4">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message... (Shift+Enter for new line)"
+            className="flex-1 resize-none border border-gray-300 dark:border-gray-600 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:bg-gray-700 dark:text-white min-h-[60px] max-h-[200px] text-base leading-relaxed"
+            rows={1}
+            disabled={isLoading}
+          />
+          <button
+            onClick={() => handleSendMessage()}
+            disabled={!input.trim() || isLoading}
+            className="px-7 py-4 bg-yellow-500 text-black font-semibold rounded-xl hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
