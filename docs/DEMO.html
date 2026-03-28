@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindsetOS Agent Journey Demo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#08081a;--card:#0e0e2a;--card2:#12123a;--text:#e8e8f0;--dim:#9a9ab0;--muted:#6a6a82;--amber:#f59e0b;--cyan:#06b6d4;--border:rgba(255,255,255,0.06)}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(800px 600px at 15% 10%,rgba(245,158,11,.04),transparent),radial-gradient(600px 800px at 85% 30%,rgba(6,182,212,.03),transparent);pointer-events:none;z-index:0}
+
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:#0a0a22;border-right:1px solid var(--border);z-index:100;overflow-y:auto;padding:24px 0}
+.sidebar-brand{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.sidebar-brand h2{font-size:14px;font-weight:700;letter-spacing:2px;color:var(--amber);text-transform:uppercase}
+.sidebar-brand p{font-size:11px;color:var(--muted);margin-top:4px}
+.sidebar nav{padding:0 8px}
+.sidebar nav a{display:block;padding:8px 12px;color:var(--dim);text-decoration:none;font-size:12px;border-radius:6px;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar nav a:hover{background:rgba(245,158,11,.1);color:var(--text)}
+.sidebar .nav-section{padding:12px 12px 4px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+
+.main{margin-left:260px;padding:40px;max-width:900px;position:relative;z-index:1}
+
+.hero{text-align:center;padding:60px 0 40px}
+.hero h1{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--amber),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero .tagline{font-size:16px;color:var(--dim);margin-bottom:4px}
+.hero .date{font-size:12px;color:var(--muted)}
+
+.section{margin:48px 0}
+.section h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:20px 0}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+.stat-card .num{font-size:32px;font-weight:800;color:var(--amber)}
+.stat-card .label{font-size:12px;color:var(--dim);margin-top:4px}
+
+.persona-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0}
+.persona-card h3{color:var(--amber);font-size:18px;margin-bottom:12px}
+.persona-card p{color:var(--dim);margin:6px 0}
+
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.ladder-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;transition:all .3s}
+.ladder-item:hover{transform:translateY(-4px);border-color:var(--amber)33}
+.ladder-item .price{font-size:24px;font-weight:800;color:var(--amber)}
+.ladder-item .name{font-size:13px;color:var(--text);margin:6px 0}
+.ladder-item .desc{font-size:11px;color:var(--muted)}
+
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin:24px 0;overflow:hidden}
+.agent-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.agent-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.agent-info{flex:1}
+.agent-name{font-size:16px;font-weight:700}
+.agent-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.agent-stats{display:flex;gap:8px}
+.stat{font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:4px}
+.stat.pass{background:rgba(16,185,129,.15);color:#10B981;font-weight:700}
+.prompt-box{padding:16px 20px;background:rgba(6,182,212,.04);border-bottom:1px solid var(--border)}
+.prompt-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);margin-bottom:6px;font-weight:600}
+.prompt-box p{color:var(--dim);font-size:14px;font-style:italic}
+.response-box{padding:20px}
+.response-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:10px;font-weight:600}
+
+.chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:20px 0;overflow-x:auto}
+.chart-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+.pillar{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center}
+.pillar .num{font-size:28px;font-weight:800;color:var(--amber);margin-bottom:4px}
+.pillar .title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.pillar .desc{font-size:12px;color:var(--dim)}
+
+.footer{text-align:center;padding:48px 0;border-top:1px solid var(--border);margin-top:60px}
+.footer p{color:var(--muted);font-size:12px;margin:4px 0}
+.footer .brand{color:var(--amber);font-weight:700;font-size:14px}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:20px}
+  .hero h1{font-size:26px}
+  .ladder{grid-template-columns:repeat(2,1fr)}
+  .pillars{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <h2>MINDSET.SHOW</h2>
+    <p>Agent Journey Demo</p>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <a href="#summary">Executive Summary</a>
+    <a href="#persona">The Persona</a>
+    <a href="#ladder">Product Ladder</a>
+    <div class="nav-section">Agent Journey</div>
+    <a href="#agent-mindset-score">📊 Mindset Score Agent</a><a href="#agent-reset-guide">🔄 Reset Guide</a><a href="#agent-architecture-coach">🏗️ Architecture Coach</a><a href="#agent-inner-world-mapper">🗺️ Inner World Mapper</a><a href="#agent-practice-builder">💪 Practice Builder</a><a href="#agent-decision-framework">🔀 Decision Framework</a><a href="#agent-accountability-partner">✅ Accountability Partner</a><a href="#agent-story-excavator">📖 Story Excavator</a><a href="#agent-conversation-curator">🎧 Conversation Curator</a><a href="#agent-launch-companion">🚀 Launch Companion</a>
+    <div class="nav-section">Analytics</div>
+    <a href="#performance">Performance Metrics</a>
+    <a href="#revenue">Revenue Projection</a>
+    <a href="#architecture">Platform Architecture</a>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="hero">
+    <h1>MINDSET.SHOW</h1>
+    <div class="tagline">10 AI Agents. One Simulated Entrepreneur. Full Platform Validation.</div>
+    <div class="date">Agent Journey Demo &mdash; March 28, 2026</div>
+  </div>
+
+  <div class="section" id="summary">
+    <h2>Executive Summary</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">10/10</div><div class="label">Agents Operational</div></div>
+      <div class="stat-card"><div class="num">178s</div><div class="label">Total Response Time</div></div>
+      <div class="stat-card"><div class="num">21,964</div><div class="label">Total Characters Generated</div></div>
+      <div class="stat-card"><div class="num">100%</div><div class="label">Success Rate</div></div>
+    </div>
+    <p style="color:var(--dim);margin:16px 0">MindsetOS is an AI-powered mindset coaching platform for entrepreneurs, built on the ECOS framework. It helps high-achieving founders and business operators shift from reactive thinking to designed decision-making through 10 specialized AI agents, a structured product ladder, and a 90-day transformation architecture.</p>
+    <p style="color:var(--dim)">"Stop reacting. Start designing. Your personal operating system for how you think."</p>
+  </div>
+
+  <div class="section" id="persona">
+    <h2>The Persona: Marcus Chen</h2>
+    <div class="persona-card">
+      <h3>Marcus Chen, 35</h3>
+      <p><strong style="color:var(--text)">Business:</strong> Leadership consulting, $15K/month</p>
+      <p><strong style="color:var(--text)">Challenge:</strong> Reactive under pressure, firefighting mode, burning out</p>
+      <p><strong style="color:var(--text)">Goal:</strong> Scale to $50K/month by fixing his mental operating system</p>
+      <p><strong style="color:var(--text)">Background:</strong> Married, 2 kids. Inherited "crisis mode" thinking from his father. Says yes to everything out of scarcity fear.</p>
+      <p style="margin-top:12px;color:var(--amber);font-style:italic">"I know my strategy is fine — it's how I think when things get hard that's holding me back."</p>
+    </div>
+  </div>
+
+  <div class="section" id="ladder">
+    <h2>Product Ladder</h2>
+    <div class="ladder">
+      <div class="ladder-item">
+        <div class="price">$0</div>
+        <div class="name">The Mindset Score</div>
+        <div class="desc">5-question assessment revealing your weakest pillar</div>
+      </div>
+      <div class="ladder-item">
+        <div class="price">$47</div>
+        <div class="name">48-Hour Reset</div>
+        <div class="desc">Weekend challenge, 6 guided exercises</div>
+      </div>
+      <div class="ladder-item">
+        <div class="price">$997</div>
+        <div class="name">90-Day Architecture</div>
+        <div class="desc">Group cohort, 8-12 entrepreneurs</div>
+      </div>
+      <div class="ladder-item">
+        <div class="price">$1,997</div>
+        <div class="name">1:1 Intensive</div>
+        <div class="desc">Private sessions + group cohort</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="agents">
+    <h2>Agent Journey Results</h2>
+    <p style="color:var(--dim);margin-bottom:20px">Marcus walked through each agent in the natural customer journey sequence — from initial assessment through ongoing accountability and content discovery.</p>
+    
+    <div class="agent-card" id="agent-mindset-score">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #F59E0B22, #F59E0B11)">📊</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Mindset Score Agent</h3>
+          <span class="agent-badge" style="background:#F59E0B22;color:#F59E0B">Assessment</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">10.5s</span>
+          <span class="stat">1,035 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>Hey, I&#x27;m Marcus. 35, married, two kids. I run a leadership consulting business doing about $15K/month. I know I should be at $50K but something&#x27;s off. I react instead of respond under pressure. Can you help me figure out where I&#x27;m stuck? Let&#x27;s do the Mindset Score.</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Hey Marcus! Love that you&#x27;re here and that you already have that level of self-awareness. &quot;I react instead of respond under pressure&quot; — that&#x27;s not a small thing to notice about yourself. Most people never get there.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let&#x27;s find out exactly where the gap is.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">The Mindset Score is 5 questions. No fluff, no trick questions. Just honest answers that&#x27;ll show us which pillar is holding everything back.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Ready? Here we go.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">QUESTION 1 of 5</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">When you&#x27;re in a high-stakes moment — a tough client conversation, a deal on the line, a team conflict — what&#x27;s happening inside you in the first 10 seconds?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Pick the one that&#x27;s most true, even if it&#x27;s uncomfortable:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">A)</strong> I go blank. My mind freezes and I&#x27;m just trying to survive the moment.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">B)</strong> I feel it physically first — chest tight, jaw clenched — but I push through it.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">C)</strong> I&#x27;m already three steps ahead, thinking about what could go wrong.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">D)</strong> I notice what&#x27;s happening but I can still think clearly and choose my response.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Which one is Marcus in that moment?</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-reset-guide">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #06B6D422, #06B6D411)">🔄</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Reset Guide</h3>
+          <span class="agent-badge" style="background:#06B6D422;color:#06B6D4">Coaching</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">12.0s</span>
+          <span class="stat">1,482 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I just took the Mindset Score and my weakest pillar is Awareness. I want to do the 48-Hour Reset. Walk me through Exercise 1.</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <h3 style="color:#F59E0B;margin:20px 0 10px">Welcome to the 48-Hour Mindset Reset</h3>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Good. You know your weak point. That&#x27;s actually the first sign of awareness working, so you&#x27;re already ahead.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let&#x27;s not waste it.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">Exercise 1: The Audit</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">What this is:</strong> A clear-eyed snapshot of where you are right now, not where you wish you were or fear you are. Just what&#x27;s true.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">This exercise targets Awareness directly because most people live on autopilot, reacting to life without ever stopping to <em>observe</em> it. The Audit breaks that pattern.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Here&#x27;s what I want you to do:</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Find 20 quiet minutes. No phone, no background noise. Then answer these four questions in writing, not in your head:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">1. Where is your energy going right now?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">List the top 5 things consuming your mental and physical energy this week, work, relationships, worries, projects, anything.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">2. Which of those feel like a choice, and which feel like a trap?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Be honest. No one&#x27;s grading this.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">3. What are you tolerating?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Name 2-3 things in your life you&#x27;ve been putting up with, and quietly resenting.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">4. What would &quot;clear&quot; feel like?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Not perfect. Just clear. Describe it in 2-3 sentences.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h5 style="color:#9a9ab0;margin:12px 0 6px">A few rules:</h5>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">Write it down. Thinking it doesn&#x27;t count.</li>
+<li style="margin:4px 0;color:#9a9ab0">Don&#x27;t edit yourself. First honest answer wins.</li>
+<li style="margin:4px 0;color:#9a9ab0">Don&#x27;t fix anything yet. This is observation, not action.</li>
+</ul>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Take the time you need. Come back here when you&#x27;re done and share what came up.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">I&#x27;ll tell you what to look for in your answers before we move to Exercise 2.</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-architecture-coach">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #8B5CF622, #8B5CF611)">🏗️</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Architecture Coach</h3>
+          <span class="agent-badge" style="background:#8B5CF622;color:#8B5CF6">Coaching</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">20.0s</span>
+          <span class="stat">2,321 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I&#x27;m starting Week 1 of the 90-Day Architecture program. My Score showed I&#x27;m weak on Awareness. What should my first week look like?</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Welcome to Day 1 of your 90-Day Mindset Architecture. Starting with Awareness as your foundation is actually perfect timing, because everything else we build in this program sits on top of how clearly you can see yourself in real time.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let me lay out your Week 1 structure.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h3 style="color:#F59E0B;margin:20px 0 10px">WEEK 1 ARCHITECTURE PLAN, Awareness Foundation</h3>
+<h4 style="color:#e8e8f0;margin:16px 0 8px">What We&#x27;re Building This Week</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">The goal isn&#x27;t to change anything yet. It&#x27;s to get honest data about how your mind actually operates, not how you think it operates. Most entrepreneurs are running on autopilot and don&#x27;t know it. This week we interrupt that.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">Your Daily Practice Stack</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Morning (10 minutes)</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Start each day with a State Check-In before you touch your phone or open email.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Ask yourself three questions and write the answers down:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">1. What&#x27;s the dominant emotion I&#x27;m carrying right now?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">2. What&#x27;s the story I&#x27;m telling myself about today?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">3. Where is my attention naturally pulling?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">No judgment. Just observation. You&#x27;re building the muscle of noticing.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Throughout the Day</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Set a random alarm 2-3 times per day. When it goes off, pause for 60 seconds and ask: &quot;What am I actually thinking about right now, and is it serving me?&quot;</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Evening (5 minutes)</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">One question before bed: &quot;What pattern showed up today that I&#x27;ve seen before?&quot;</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">Your Week 1 Focus Areas</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Days 1-2, Baseline Data</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Just run the morning and evening practice. Don&#x27;t try to interpret yet. Collect raw observations.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Days 3-4, Pattern Spotting</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Start looking for repetition. What emotions keep showing up? What triggers them? What stories repeat?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Days 5-7, The Gap Work</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Notice the gap between how you want to show up and how you actually showed up. That gap is your first real data point.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">What to Bring to Greg&#x27;s First Call</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Come ready to share:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">Your 2-3 most repeated thought patterns from the week</li>
+<li style="margin:4px 0;color:#9a9ab0">One moment where you caught yourself mid-autopilot</li>
+<li style="margin:4px 0;color:#9a9ab0">Any resistance you felt to doing the practices (that resistance is data too)</li>
+</ul>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">A Honest Note</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Week 1 feels slow to most entrepreneurs. You&#x27;re wired for action and this is all observation. Stick with it. The awareness you build this week is what makes Weeks 5-8 actually work.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">What&#x27;s your current morning routine like? I want to know where we&#x27;re plugging these practices in so they actually stick.</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-inner-world-mapper">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #EC489922, #EC489911)">🗺️</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Inner World Mapper</h3>
+          <span class="agent-badge" style="background:#EC489922;color:#EC4899">Self-Awareness</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">15.5s</span>
+          <span class="stat">1,842 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I grew up with a dad who was always in crisis mode — everything was urgent, rest was lazy, and if you weren&#x27;t stressed you weren&#x27;t working hard enough. I think I inherited that. But I don&#x27;t know what else is running underneath. Can you help me map what&#x27;s actually driving my decisions?</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">What you just shared takes real self-awareness. Most people never even notice the water they&#x27;re swimming in, let alone name it. The fact that you can already trace one thread back to your father, that&#x27;s not nothing. That&#x27;s the beginning of the map.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let&#x27;s go deeper together.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">What you&#x27;ve already surfaced:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">You inherited what I&#x27;d call a <strong style="color:#e8e8f0">Stress = Productivity equation.</strong> Your nervous system learned early that calm is dangerous, urgency is safety, and rest is a moral failure. That&#x27;s not a mindset quirk. That&#x27;s a survival strategy that made complete sense in your childhood environment.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">The problem is, it followed you into your business, where it&#x27;s probably running decisions you think are strategic.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Before we go further, I want to sit with one question:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">When things are actually going <em>well</em> in your business, what happens inside you?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Not what you do. What you <em>feel.</em></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Because for people who grew up in crisis-as-normal households, sustained calm or success often triggers something unexpected. Sometimes it&#x27;s guilt. Sometimes it&#x27;s suspicion, like &quot;this can&#x27;t last.&quot; Sometimes it&#x27;s a compulsive need to find the next problem to solve.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Take your time with that. There&#x27;s no right answer here.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">And while you&#x27;re thinking, here are a few threads I want to pull on with you as we build your map:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">The rest guilt pattern</strong> - what does doing nothing feel like in your body?</li>
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">Decision-making under pressure</strong> - do you actually think more clearly in crisis, or do you *prefer* it because it feels familiar?</li>
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">Your relationship with success</strong> - is there a ceiling you keep bumping against?</li>
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">Who you become under stress</strong> - is that version of you someone you chose, or someone you inherited?</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">We&#x27;ll go one thread at a time.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Start with that first question. When things are going well, what happens inside?</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-practice-builder">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #10B98122, #10B98111)">💪</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Practice Builder</h3>
+          <span class="agent-badge" style="background:#10B98122;color:#10B981">Coaching</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">27.8s</span>
+          <span class="stat">4,133 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>My weakest pillar is Awareness. I have about 10 minutes in the morning before the kids wake up and maybe 5 minutes before bed. I need a daily mindset routine that fits into my real life, not some fantasy schedule. What would you build for me?</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <h3 style="color:#F59E0B;margin:20px 0 10px">YOUR DAILY AWARENESS PRACTICE — Mindset Builder</h3>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Pillar:</strong> Awareness | <strong style="color:#e8e8f0">Time Available:</strong> 10 min morning + 5 min evening | <strong style="color:#e8e8f0">Built for:</strong> Real life, not fantasy</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">WHY AWARENESS FIRST</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Low awareness means you&#x27;re reacting instead of leading. You&#x27;re making decisions from autopilot, not intention. In business, this shows up as scattered focus, saying yes to the wrong things, and feeling busy but not moving forward. When you sharpen awareness, you start seeing your patterns, your blind spots, and your actual leverage points. That&#x27;s when things shift.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">YOUR 10-MINUTE MORNING BLOCK</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><em>Before the kids wake up. Coffee optional, phone face-down mandatory.</em></p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 1-2: The Body Scan (Awareness Anchor)</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Sit down. Close your eyes. Ask yourself one question:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;Where am I right now, honestly?&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Not where you want to be. Where you actually are. Notice tension, tiredness, excitement, dread. Name it. You can&#x27;t lead your day if you don&#x27;t know where you&#x27;re starting from.</p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 3-5: The One Thing Intention</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Open your eyes. Write down or say out loud:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;The most important thing I will move forward today is ___.&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">One thing. Not a list. This trains your brain to prioritize instead of scatter. Over time, this single habit compounds into clearer decision-making across your whole business.</p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 6-8: The Pattern Check</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Ask yourself:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;What pattern showed up yesterday that I want to interrupt today?&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Maybe you avoided a hard conversation. Maybe you checked your phone instead of doing deep work. Maybe you said yes when you meant no. Name the pattern. Naming it gives you power over it.</p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 9-10: Set Your Awareness Word</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Pick one word that will be your lens for the day. Examples: <em>present, deliberate, honest, clear, grounded.</em> Write it somewhere visible. This word becomes a mental trigger every time you see it.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">YOUR MIDDAY CHECK-IN CUE</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><em>No extra time needed. Attach this to something you already do.</em></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Trigger:</strong> The moment you sit down for lunch, pour a coffee, or hit a transition between tasks.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">The 60-Second Pause:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Take one breath. Ask yourself:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;Am I still on my one thing, or have I drifted?&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">No judgment. Just notice. Awareness isn&#x27;t about being perfect, it&#x27;s about catching yourself faster. The faster you catch the drift, the less time you lose to it.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">YOUR 5-MINUTE EVENING REFLECTION</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><em>After kids are down. Before you pick up your phone.</em></p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 1-2: The Honest Recap</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Ask yourself:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;What did I actually do today versus what I intended?&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Write 2-3 sentences. Be honest, not harsh. This is data, not a report card.</p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 3-4: The Awareness Win</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Ask yourself:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;When did I catch myself today? When did I notice a pattern, a reaction, or a choice in real time?&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Even one moment counts. This is how you build the muscle. You&#x27;re training yourself to notice faster and faster.</p>
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Minute 5: Tomorrow&#x27;s Seed</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Finish with one sentence:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">&quot;Tomorrow I want to be more aware of ___.&quot;</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">One thing. Plant it before you sleep. Your brain works on it overnight.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">THE PROGRESSION PLAN</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><em>Build it over 4 weeks so it sticks.</em></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Week | Focus | What Changes |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">|------|-------|--------------|</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Week 1 | Just show up | Do the routine even if it feels awkward or forced |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Week 2 | Go deeper | Add one line of journaling to your evening reflection |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Week 3 | Connect patterns | Start linking what you notice to specific business decisions |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Week 4 | Teach it | Explain one awareness insight to someone in your life or business |</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">THE BUSINESS OUTCOME YOU&#x27;RE BUILDING TOWARD</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">When awareness becomes a daily practice, here&#x27;s what changes in your business:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">You stop reacting to clients and start leading them</li>
+<li style="margin:4px 0;color:#9a9ab0">You catch bad decisions before they cost you money or time</li>
+<li style="margin:4px 0;color:#9a9ab0">You recognize what&#x27;s actually working instead of guessing</li>
+<li style="margin:4px 0;color:#9a9ab0">You show up to sales conversations grounded, not desperate</li>
+<li style="margin:4px 0;color:#9a9ab0">You build the kind of self-trust that makes bold moves feel possible</li>
+</ul>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Mindset is a practice, not a personality. You build it deliberately, like a muscle.</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Start tomorrow morning. Ten minutes. One question. That&#x27;s it.</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-decision-framework">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #3B82F622, #3B82F611)">🔀</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Decision Framework</h3>
+          <span class="agent-badge" style="background:#3B82F622;color:#3B82F6">Strategy</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">14.9s</span>
+          <span class="stat">1,652 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I just got an offer to take on a huge corporate client — it would double my revenue but require me to hire two people and completely restructure how I deliver. Part of me is excited, part of me is terrified. I can feel myself going into reactive mode. Walk me through making this decision clearly.</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Good. The fact that you <em>know</em> you&#x27;re going reactive is the first sign you&#x27;re ready to make this well.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let&#x27;s slow the turbulence down. I&#x27;ll walk you through each step of the DESIGN framework. Your job right now is just to answer honestly.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">STEP 1: DEFINE</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">What is the actual decision here?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">It sounds like the surface decision is &quot;take the client or don&#x27;t.&quot; But I want to make sure we&#x27;re solving the right problem.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">A few clarifying questions:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">Is this a yes/no decision, or a yes/not yet/yes but differently decision?</strong> Have you explored whether you could negotiate scope, timeline, or delivery structure before committing?</li>
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">What&#x27;s the deadline?</strong> How much time do you actually have to decide?</li>
+<li style="margin:4px 0;color:#9a9ab0"><strong style="color:#e8e8f0">What does &quot;completely restructure how I deliver&quot; mean specifically?</strong> New systems, new team, new offer, all three?</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Answer what you can. Even partial answers help us move forward.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">STEP 2: EXAMINE</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">What data do you actually have?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Before we go further, I want to inventory what&#x27;s real vs. assumed. We&#x27;ll get to this fully once you&#x27;ve answered Step 1, but start thinking about:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">What are the contract terms?</li>
+<li style="margin:4px 0;color:#9a9ab0">What&#x27;s the actual revenue number and timeline?</li>
+<li style="margin:4px 0;color:#9a9ab0">Do you have hiring leads, or would you be starting from scratch?</li>
+<li style="margin:4px 0;color:#9a9ab0">What&#x27;s your current delivery capacity and how stretched are you now?</li>
+</ul>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">STEP 3: SEPARATE</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Emotions vs. Facts</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">You named two emotions already: excited and terrified. That&#x27;s useful data, not noise. We&#x27;ll map those out and make sure neither one is driving the wheel alone.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">We move through each step together. Start with Step 1: <strong style="color:#e8e8f0">What is the real decision, and what&#x27;s your deadline?</strong></p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-accountability-partner">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #05966922, #05966911)">✅</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Accountability Partner</h3>
+          <span class="agent-badge" style="background:#05966922;color:#059669">Accountability</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">18.4s</span>
+          <span class="stat">2,375 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>It&#x27;s Monday morning. I&#x27;ve been doing my mindset practice for 2 weeks now. Last week I caught myself going reactive twice — once in a client call and once with my wife. Both times I paused instead of reacting, which is new for me. But I skipped my evening reflection on Thursday and Friday. Help me set my intentions for this week.</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <h3 style="color:#F59E0B;margin:20px 0 10px">Good Morning. Let&#x27;s Set You Up Right. 🌅</h3>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">First, I want to name what you just told me, because it matters more than you might realize.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Two weeks in. Two real-world pauses. That&#x27;s not small.</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Most people do mindset work in a vacuum and wonder why nothing changes. You caught yourself <em>mid-trigger</em>, in live situations, with a client and with your wife, and you chose differently. That&#x27;s the whole game. That&#x27;s what we&#x27;re here for.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">The Thursday/Friday skips? We&#x27;ll talk about those. But we&#x27;re not starting there.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">Your Wins to Anchor This Week</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Before we set intentions, I want you to actually <em>sit with</em> these two moments:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">The client call pause</li>
+<li style="margin:4px 0;color:#9a9ab0">The wife pause</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Quick question before we go further:</strong> In those moments, what did the pause actually feel like? Was it a breath? A physical sensation? Did you notice something shift? I&#x27;m asking because that feeling is your new compass, and I want you to know it by name.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">This Week&#x27;s Intention Framework</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Based on where you are (2 weeks in, reactive patterns starting to crack), here are <strong style="color:#e8e8f0">3 intentions I&#x27;d suggest for this week:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">1. NOTICE BEFORE THE PAUSE</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Last week you caught it at the pause. This week, see if you can notice the <em>trigger</em> a half-second earlier. What does your body do right before you go reactive? Jaw tighten? Chest close? Name it this week.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">2. PROTECT THE REFLECTION HABIT</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Thursday and Friday are telling you something. What happens those days? Energy drop, schedule chaos, you&#x27;re just done? We&#x27;re not adding willpower, we&#x27;re finding the <em>why</em> so we can design around it.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">3. ONE CONSCIOUS CONVERSATION</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Pick one conversation this week, with a client, your wife, a colleague, where you go in <em>with an intention</em> instead of just showing up. Decide how you want to <em>be</em> before it starts.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">On Thursday and Friday</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">I&#x27;m going to be gently firm here.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Skipping reflection doesn&#x27;t undo your progress. But it does leave the day unprocessed, and unprocessed days stack up. Two skips in a row is a pattern worth watching, not judging.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">This week, I want you to try something small:</strong> Set a 5-minute alarm at 8pm Thursday and Friday. Not to do a full reflection. Just to open the conversation with yourself. Five minutes counts.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">So tell me, which of these three intentions lands strongest for you right now? And what happened in that pause on the client call?</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-story-excavator">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #F9731622, #F9731611)">📖</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Story Excavator</h3>
+          <span class="agent-badge" style="background:#F9731622;color:#F97316">Self-Awareness</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">14.3s</span>
+          <span class="stat">1,601 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I keep saying yes to everything even when I know I should say no. I think it&#x27;s connected to this deep fear that if I turn work away, it&#x27;ll all dry up. My mom lost her business when I was 12 and I watched our family go from comfortable to scrambling. Where do I even start unpacking this?</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">You&#x27;ve already started. What you just said, that&#x27;s not a small thing to name. Most people carry that scene their whole lives without ever connecting it to the pattern they&#x27;re living right now.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Let me sit with you here for a moment.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">You were 12. You watched something solid become uncertain, almost overnight. And a 12-year-old doesn&#x27;t have the tools to process that philosophically. They just learn. They adapt. They make a quiet decision, often without words, something like: <em>&quot;I will never let that happen. I will always say yes. I will keep everything coming in.&quot;</em></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">That decision probably protected you for a long time. It made you hardworking, available, dependable. It built something real.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">But now it&#x27;s running your business, and you didn&#x27;t exactly hire it for that role.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Can I ask you a few things to help us go deeper?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">First, about that moment:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">When your mom&#x27;s business fell, what did you watch her do? Did she fight, go quiet, ask for help, disappear into work? I&#x27;m curious what her response to scarcity looked like, because we often inherit not just the fear, but the <em>strategy</em> we watched someone use to survive it.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">And then this:</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">When you say yes to something you know you should turn down, what does the &quot;no&quot; feel like in your body before you override it? Is it guilt? A kind of dread? Something that feels almost like danger?</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">I want to help you name this story precisely, because a precise name gives you something to work with. A vague fear runs the show. A named story can be examined, questioned, and eventually, rewritten.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Take your time. There&#x27;s no rush here.</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-conversation-curator">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #14B8A622, #14B8A611)">🎧</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Conversation Curator</h3>
+          <span class="agent-badge" style="background:#14B8A622;color:#14B8A6">Content</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">16.4s</span>
+          <span class="stat">1,977 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>I&#x27;m dealing with imposter syndrome this week. A competitor who I think is less qualified than me just landed a massive deal and I&#x27;m spiraling. I know logically I&#x27;m good at what I do but emotionally I feel like a fraud. Is there an episode that might help me reframe this?</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Oh, this one hits deep. And the fact that you can name it, &quot;I know logically I&#x27;m good, but emotionally I feel like a fraud&quot;, that gap <em>right there</em> is exactly what we need to close.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">What you&#x27;re describing isn&#x27;t really imposter syndrome in the classic sense. It&#x27;s an <strong style="color:#e8e8f0">identity crisis triggered by comparison</strong>. Your logic knows your worth. Your identity hasn&#x27;t caught up yet.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">🎧 Your Episode Match: **&quot;Identity Before Strategy&quot; (Season 1)**</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">This is the one. Here&#x27;s why it&#x27;s right for <em>your specific situation</em>:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Most people try to fix imposter syndrome with <strong style="color:#e8e8f0">more evidence</strong>, more wins, more credentials, more proof. But that&#x27;s a strategy layer fix for an identity layer problem. This episode goes to the root.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Key Timestamps to Jump To:</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">[08:14], The Comparison Trap</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Why watching someone &quot;less qualified&quot; win doesn&#x27;t mean you&#x27;re losing. The market doesn&#x27;t reward qualification, it rewards <em>positioning</em>. This reframe alone might stop the spiral.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">[19:40], Who Were You Before the Doubt?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">A guided reflection on the identity you held <em>before</em> you started measuring yourself against others. This is where the emotional shift usually happens for listeners.</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">[31:22], The Fraud Feeling Is a Signal, Not a Verdict</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">The episode reframes imposter syndrome as your nervous system detecting a gap between where you are and where you <em>know</em> you&#x27;re capable of being. That&#x27;s not fraud. That&#x27;s <strong style="color:#e8e8f0">growth pressure</strong>.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h5 style="color:#9a9ab0;margin:12px 0 6px">Your Core Takeaway:</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">&gt; &quot;You don&#x27;t need more proof you&#x27;re good. You need a stronger relationship with who you already are.&quot;</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h5 style="color:#9a9ab0;margin:12px 0 6px">One Question to Sit With After You Listen:</h5>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><em>When did you first decide you had to earn the right to take up space in your industry?</em></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">That answer usually points to the inherited story underneath all of this.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Want me to pull a second episode? <strong style="color:#e8e8f0">&quot;The Stories We Inherit&quot;</strong> might be the perfect follow-up, especially if this comparison pattern shows up repeatedly in your life, not just this week.</p>
+      </div>
+    </div>
+    <div class="agent-card" id="agent-launch-companion">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:linear-gradient(135deg, #6B728022, #6B728011)">🚀</div>
+        <div class="agent-info">
+          <h3 class="agent-name">Launch Companion</h3>
+          <span class="agent-badge" style="background:#6B728022;color:#6B7280">Admin</span>
+        </div>
+        <div class="agent-stats">
+          <span class="stat">28.3s</span>
+          <span class="stat">3,546 chars</span>
+          <span class="stat pass">PASS</span>
+        </div>
+      </div>
+      <div class="prompt-box">
+        <div class="prompt-label">Marcus asked:</div>
+        <p>Greg here. I need to prep for next week&#x27;s cohort call. We have 10 participants in the current Architecture cohort — 3 are crushing it, 4 are steady, and 3 have gone quiet in the last week. I also need to plan my LinkedIn content for the week and check where we are against our Month 4 revenue target of $8K.</p>
+      </div>
+      <div class="response-box">
+        <div class="response-label">Agent responded:</div>
+        <h3 style="color:#F59E0B;margin:20px 0 10px">LAUNCH COMPANION BRIEF, Week of [Current Week]</h3>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">MindsetOS Architecture Cohort + Revenue + Content</strong></p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">🔴 PRIORITY 1: AT-RISK MEMBERS (3 Quiet Participants)</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">These three going quiet in Week [X] is your early warning signal. Here&#x27;s the re-engagement play before the call:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Before the Call (Today/Tomorrow)</strong></p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">Send a personal 1:1 voice note or short video to each, NOT a group message</li>
+<li style="margin:4px 0;color:#9a9ab0">Frame it as curiosity, not check-in: *&quot;Hey [Name], I&#x27;ve been thinking about your situation with [specific detail you remember]. Had an idea I wanted to run by you before Thursday&#x27;s call...&quot;*</li>
+<li style="margin:4px 0;color:#9a9ab0">Goal: get a reply, not a commitment</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">On the Call</strong></p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">Open with a win-share round so quiet members hear momentum from the crushers</li>
+<li style="margin:4px 0;color:#9a9ab0">Create a low-stakes re-entry moment, ask them a specific question you already know they can answer</li>
+<li style="margin:4px 0;color:#9a9ab0">Avoid calling them out publicly, create a safe on-ramp back in</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Flag for Follow-Up</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Do you have notes on WHY they might be quiet? Common patterns to check:</p>
+<ul style="margin:8px 0;padding-left:20px">
+<li style="margin:4px 0;color:#9a9ab0">[ ] Implementation stuck / confused</li>
+<li style="margin:4px 0;color:#9a9ab0">[ ] Life got busy (external)</li>
+<li style="margin:4px 0;color:#9a9ab0">[ ] Lost belief in the process</li>
+<li style="margin:4px 0;color:#9a9ab0">[ ] Comparing themselves to others and feeling behind</li>
+</ul>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">Which of these feels most likely for your three?</strong> That changes the approach significantly.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">🟡 PRIORITY 2: COHORT CALL STRUCTURE</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Here&#x27;s a suggested 60-minute architecture for next week:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Time | Segment | Purpose |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">|------|---------|---------|</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| 0-10 min | Win Round | Momentum + re-entry for quiet members |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| 10-25 min | Teaching Block | One concept, tied to where most are stuck |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| 25-45 min | Hot Seat | Feature one of your 3 crushers (models the path) |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| 45-55 min | Implementation Sprint | Everyone writes their next ONE action |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| 55-60 min | Close + Accountability Pair | Pair quiet members with steady members |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">What&#x27;s the core teaching topic for this call?</strong> Once I know that, I can help you build the actual content block.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">🟢 PRIORITY 3: LINKEDIN CONTENT PLAN, THIS WEEK</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Tied to your Five Ones Formula, here&#x27;s a 5-post week:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Day | Format | Angle |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">|-----|--------|-------|</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Monday | Story post | A cohort win (anonymized) from a crusher, proof of concept |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Tuesday | Insight post | One mindset shift your Architecture cohort keeps hitting |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Wednesday | Engagement question | &quot;What&#x27;s the #1 thing stopping architects from scaling?&quot; |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Thursday | Behind-the-scenes | What happens on a live cohort call (builds trust + curiosity) |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">| Friday | Soft CTA | &quot;If you&#x27;re an architect ready to [outcome], here&#x27;s what&#x27;s open...&quot; |</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7"><strong style="color:#e8e8f0">One audience question:</strong> Is your LinkedIn content targeting architects specifically, or a broader audience of service-based business owners? That changes the language and hooks significantly.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">💰 PRIORITY 4: MONTH 4 REVENUE CHECK</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">You&#x27;re in Growth phase territory, targeting <strong style="color:#e8e8f0">$8K for Month 4.</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">To give you a real projection, I need three quick numbers:</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">1. <strong style="color:#e8e8f0">What&#x27;s already collected or confirmed this month?</strong> ($X in the bank / signed)</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">2. <strong style="color:#e8e8f0">What&#x27;s in your pipeline right now?</strong> (Any pending proposals, trial conversations, discovery calls booked?)</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">3. <strong style="color:#e8e8f0">How many days left in the month?</strong></p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">Once I have those, I&#x27;ll map your gap, your conversion rate needed, and the fastest lever to pull to hit $8K.</p>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.06);margin:16px 0">
+<h4 style="color:#e8e8f0;margin:16px 0 8px">YOUR NEXT 3 MOVES</h4>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">1. <strong style="color:#e8e8f0">Right now:</strong> Send personal outreach to your 3 quiet cohort members before 24 hours pass</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">2. <strong style="color:#e8e8f0">Today:</strong> Tell me the teaching topic for the call so I can build your content block</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">3. <strong style="color:#e8e8f0">Today:</strong> Drop your current revenue numbers so we can run the projection</p>
+<p style="margin:8px 0;color:#c8c8d8;line-height:1.7">What do you want to tackle first, Greg?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="performance">
+    <h2>Performance Metrics</h2>
+    <div class="chart-container">
+      <div class="chart-title">Response Time by Agent (seconds)</div>
+      <svg viewBox="0 0 600 400" style="width:100%;height:auto">
+        <rect x="160" y="30" width="129.85865724381625" height="24" rx="4" fill="#F59E0B44" stroke="#F59E0B" stroke-width="1"/><text x="155" y="46" text-anchor="end" fill="#9a9ab0" font-size="11">Mindset Score Agent</text><text x="294.85865724381625" y="46" fill="#e8e8f0" font-size="11">10.5s</text><rect x="160" y="66" width="148.40989399293287" height="24" rx="4" fill="#06B6D444" stroke="#06B6D4" stroke-width="1"/><text x="155" y="82" text-anchor="end" fill="#9a9ab0" font-size="11">Reset Guide</text><text x="313.4098939929329" y="82" fill="#e8e8f0" font-size="11">12.0s</text><rect x="160" y="102" width="247.34982332155477" height="24" rx="4" fill="#8B5CF644" stroke="#8B5CF6" stroke-width="1"/><text x="155" y="118" text-anchor="end" fill="#9a9ab0" font-size="11">Architecture Coach</text><text x="412.34982332155477" y="118" fill="#e8e8f0" font-size="11">20.0s</text><rect x="160" y="138" width="191.69611307420496" height="24" rx="4" fill="#EC489944" stroke="#EC4899" stroke-width="1"/><text x="155" y="154" text-anchor="end" fill="#9a9ab0" font-size="11">Inner World Mapper</text><text x="356.69611307420496" y="154" fill="#e8e8f0" font-size="11">15.5s</text><rect x="160" y="174" width="343.8162544169611" height="24" rx="4" fill="#10B98144" stroke="#10B981" stroke-width="1"/><text x="155" y="190" text-anchor="end" fill="#9a9ab0" font-size="11">Practice Builder</text><text x="508.8162544169611" y="190" fill="#e8e8f0" font-size="11">27.8s</text><rect x="160" y="210" width="184.2756183745583" height="24" rx="4" fill="#3B82F644" stroke="#3B82F6" stroke-width="1"/><text x="155" y="226" text-anchor="end" fill="#9a9ab0" font-size="11">Decision Framework</text><text x="349.2756183745583" y="226" fill="#e8e8f0" font-size="11">14.9s</text><rect x="160" y="246" width="227.56183745583039" height="24" rx="4" fill="#05966944" stroke="#059669" stroke-width="1"/><text x="155" y="262" text-anchor="end" fill="#9a9ab0" font-size="11">Accountability Partn</text><text x="392.5618374558304" y="262" fill="#e8e8f0" font-size="11">18.4s</text><rect x="160" y="282" width="176.85512367491168" height="24" rx="4" fill="#F9731644" stroke="#F97316" stroke-width="1"/><text x="155" y="298" text-anchor="end" fill="#9a9ab0" font-size="11">Story Excavator</text><text x="341.8551236749117" y="298" fill="#e8e8f0" font-size="11">14.3s</text><rect x="160" y="318" width="202.82685512367487" height="24" rx="4" fill="#14B8A644" stroke="#14B8A6" stroke-width="1"/><text x="155" y="334" text-anchor="end" fill="#9a9ab0" font-size="11">Conversation Curator</text><text x="367.8268551236749" y="334" fill="#e8e8f0" font-size="11">16.4s</text><rect x="160" y="354" width="350.0" height="24" rx="4" fill="#6B728044" stroke="#6B7280" stroke-width="1"/><text x="155" y="370" text-anchor="end" fill="#9a9ab0" font-size="11">Launch Companion</text><text x="515.0" y="370" fill="#e8e8f0" font-size="11">28.3s</text>
+      </svg>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">Response Length by Agent (characters)</div>
+      <svg viewBox="0 0 600 400" style="width:100%;height:auto">
+        <rect x="160" y="30" width="87.64819743527704" height="24" rx="4" fill="#F59E0B44" stroke="#F59E0B" stroke-width="1"/><text x="155" y="46" text-anchor="end" fill="#9a9ab0" font-size="11">Mindset Score Agent</text><text x="252.64819743527704" y="46" fill="#e8e8f0" font-size="11">1,035</text><rect x="160" y="66" width="125.50205661746914" height="24" rx="4" fill="#06B6D444" stroke="#06B6D4" stroke-width="1"/><text x="155" y="82" text-anchor="end" fill="#9a9ab0" font-size="11">Reset Guide</text><text x="290.5020566174691" y="82" fill="#e8e8f0" font-size="11">1,482</text><rect x="160" y="102" width="196.5521413017179" height="24" rx="4" fill="#8B5CF644" stroke="#8B5CF6" stroke-width="1"/><text x="155" y="118" text-anchor="end" fill="#9a9ab0" font-size="11">Architecture Coach</text><text x="361.55214130171794" y="118" fill="#e8e8f0" font-size="11">2,321</text><rect x="160" y="138" width="155.9883861601742" height="24" rx="4" fill="#EC489944" stroke="#EC4899" stroke-width="1"/><text x="155" y="154" text-anchor="end" fill="#9a9ab0" font-size="11">Inner World Mapper</text><text x="320.9883861601742" y="154" fill="#e8e8f0" font-size="11">1,842</text><rect x="160" y="174" width="350.0" height="24" rx="4" fill="#10B98144" stroke="#10B981" stroke-width="1"/><text x="155" y="190" text-anchor="end" fill="#9a9ab0" font-size="11">Practice Builder</text><text x="515.0" y="190" fill="#e8e8f0" font-size="11">4,133</text><rect x="160" y="210" width="139.89837890152432" height="24" rx="4" fill="#3B82F644" stroke="#3B82F6" stroke-width="1"/><text x="155" y="226" text-anchor="end" fill="#9a9ab0" font-size="11">Decision Framework</text><text x="304.8983789015243" y="226" fill="#e8e8f0" font-size="11">1,652</text><rect x="160" y="246" width="201.12509073312364" height="24" rx="4" fill="#05966944" stroke="#059669" stroke-width="1"/><text x="155" y="262" text-anchor="end" fill="#9a9ab0" font-size="11">Accountability Partn</text><text x="366.12509073312367" y="262" fill="#e8e8f0" font-size="11">2,375</text><rect x="160" y="282" width="135.57948221630778" height="24" rx="4" fill="#F9731644" stroke="#F97316" stroke-width="1"/><text x="155" y="298" text-anchor="end" fill="#9a9ab0" font-size="11">Story Excavator</text><text x="300.5794822163078" y="298" fill="#e8e8f0" font-size="11">1,601</text><rect x="160" y="318" width="167.4207597386886" height="24" rx="4" fill="#14B8A644" stroke="#14B8A6" stroke-width="1"/><text x="155" y="334" text-anchor="end" fill="#9a9ab0" font-size="11">Conversation Curator</text><text x="332.4207597386886" y="334" fill="#e8e8f0" font-size="11">1,977</text><rect x="160" y="354" width="300.2903459956448" height="24" rx="4" fill="#6B728044" stroke="#6B7280" stroke-width="1"/><text x="155" y="370" text-anchor="end" fill="#9a9ab0" font-size="11">Launch Companion</text><text x="465.2903459956448" y="370" fill="#e8e8f0" font-size="11">3,546</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section" id="revenue">
+    <h2>12-Month Revenue Projection</h2>
+    <div class="chart-container">
+      <svg viewBox="0 0 700 320" style="width:100%;height:auto">
+        <defs>
+          <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="60" y1="30" x2="60" y2="280" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="60" y1="280" x2="670" y2="280" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <line x1="60" y1="180" x2="670" y2="180" stroke="rgba(255,255,255,0.03)" stroke-width="1" stroke-dasharray="4"/>
+        <line x1="60" y1="80" x2="670" y2="80" stroke="rgba(255,255,255,0.03)" stroke-width="1" stroke-dasharray="4"/>
+        <!-- Labels -->
+        <text x="55" y="284" text-anchor="end" fill="#6a6a82" font-size="10">$0</text>
+        <text x="55" y="184" text-anchor="end" fill="#6a6a82" font-size="10">$20K</text>
+        <text x="55" y="84" text-anchor="end" fill="#6a6a82" font-size="10">$40K</text>
+        <text x="55" y="34" text-anchor="end" fill="#6a6a82" font-size="10">$50K</text>
+        <text x="60" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M1</text><text x="115" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M2</text><text x="170" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M3</text><text x="225" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M4</text><text x="280" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M5</text><text x="335" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M6</text><text x="390" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M7</text><text x="445" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M8</text><text x="500" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M9</text><text x="555" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M10</text><text x="610" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M11</text><text x="665" y="298" text-anchor="middle" fill="#6a6a82" font-size="10">M12</text>
+        <!-- Area -->
+        <path d="M60,270 L115,262.5 L170,255 L225,240 L280,225 L335,205 L390,190 L445,160 L500,130 L555,105 L610,70 L665,30 L665,280 L60,280 Z" fill="url(#revGrad)"/>
+        <!-- Line -->
+        <path d="M60,270 L115,262.5 L170,255 L225,240 L280,225 L335,205 L390,190 L445,160 L500,130 L555,105 L610,70 L665,30" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Dots -->
+        <circle cx="60" cy="270" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="115" cy="262.5" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="170" cy="255" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="225" cy="240" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="280" cy="225" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="335" cy="205" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="390" cy="190" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="445" cy="160" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="500" cy="130" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="555" cy="105" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="610" cy="70" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/><circle cx="665" cy="30" r="4" fill="#F59E0B" stroke="#08081a" stroke-width="2"/>
+        <!-- Phase labels -->
+        <rect x="60" y="305" width="165" height="20" rx="3" fill="rgba(6,182,212,0.1)"/>
+        <text x="142" y="318" text-anchor="middle" fill="#06B6D4" font-size="9" font-weight="600">FOUNDATION</text>
+        <rect x="225" y="305" width="165" height="20" rx="3" fill="rgba(245,158,11,0.1)"/>
+        <text x="307" y="318" text-anchor="middle" fill="#F59E0B" font-size="9" font-weight="600">GROWTH</text>
+        <rect x="390" y="305" width="165" height="20" rx="3" fill="rgba(139,92,246,0.1)"/>
+        <text x="472" y="318" text-anchor="middle" fill="#8B5CF6" font-size="9" font-weight="600">SCALE</text>
+        <rect x="555" y="305" width="110" height="20" rx="3" fill="rgba(16,185,129,0.1)"/>
+        <text x="610" y="318" text-anchor="middle" fill="#10B981" font-size="9" font-weight="600">LEVERAGE</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section" id="architecture">
+    <h2>Platform Architecture</h2>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="num">1</div>
+        <div class="title">Mindset is a Practice</div>
+        <div class="desc">Not a personality. You build it deliberately, like a muscle.</div>
+      </div>
+      <div class="pillar">
+        <div class="num">2</div>
+        <div class="title">Inner World Runs Outer</div>
+        <div class="desc">Results are downstream of thinking. Fix the source.</div>
+      </div>
+      <div class="pillar">
+        <div class="num">3</div>
+        <div class="title">One Conversation Changes Everything</div>
+        <div class="desc">The right insight at the right moment rewires years.</div>
+      </div>
+    </div>
+    <div style="margin:24px 0">
+      <p style="color:var(--dim);font-size:14px;margin:8px 0"><strong style="color:var(--text)">Tech Stack:</strong> ECOS Framework &bull; Node.js + PostgreSQL + pgvector &bull; Next.js 14 &bull; OpenAI + OpenRouter &bull; Railway &bull; Stripe</p>
+      <p style="color:var(--dim);font-size:14px;margin:8px 0"><strong style="color:var(--text)">Onboarding Flow:</strong> Mindset Score (free) &rarr; 48-Hour Reset ($47) &rarr; 90-Day Architecture ($997) &rarr; 1:1 Intensive ($1,997)</p>
+      <p style="color:var(--dim);font-size:14px;margin:8px 0"><strong style="color:var(--text)">Target Audience:</strong> Entrepreneurs 30-45 &bull; $80K-$250K income &bull; High achievers running on fumes &bull; AU, ZA, SEA</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="brand">Powered by ECOS &mdash; Expert Consulting Operating System</div>
+    <p>Strategy by Greg &bull; Platform by MindsetOS &bull; AI by ECOS</p>
+    <p>10 AI Agents &bull; 10/10 Operational &bull; March 28, 2026</p>
+  </div>
+</div>
+
+</body>
+</html>
