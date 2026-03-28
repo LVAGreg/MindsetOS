@@ -1333,6 +1333,144 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
     // Output generator widget (NEW for Value Quantifier V6) - shadcn/ui inspired cards
 
+    // ── Gamification: Score Card ──
+    if (type === 'score_card') {
+      const points = data?.points ?? 0;
+      const label = data?.label ?? 'Points';
+      const title = data?.title ?? 'Score';
+      const badges = data?.badges ?? [];
+      const subtitle = data?.subtitle ?? '';
+      return (
+        <div className="my-3 p-5 rounded-2xl border-2 border-amber-300 dark:border-amber-600 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 dark:from-amber-900/20 dark:via-yellow-900/15 dark:to-orange-900/10 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">{title}</h4>
+            {badges.length > 0 && (
+              <div className="flex gap-1">
+                {badges.map((b: string, i: number) => (
+                  <span key={i} className="text-lg" title={b}>{b === 'gold' ? '🥇' : b === 'silver' ? '🥈' : b === 'bronze' ? '🥉' : '⭐'}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="text-center py-2">
+            <div className="text-5xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{points.toLocaleString()}</div>
+            <div className="text-sm font-medium text-amber-700/70 dark:text-amber-400/70 mt-1">{label}</div>
+            {subtitle && <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">{subtitle}</div>}
+          </div>
+        </div>
+      );
+    }
+
+    // ── Gamification: Progress Ring ──
+    if (type === 'progress_ring') {
+      const current = data?.current ?? 0;
+      const max = data?.max ?? 100;
+      const label = data?.label ?? 'Progress';
+      const color = data?.color ?? 'emerald';
+      const pct = Math.min(100, Math.round((current / max) * 100));
+      const r = 54;
+      const circ = 2 * Math.PI * r;
+      const offset = circ - (pct / 100) * circ;
+      const colorMap: Record<string, string> = {
+        emerald: 'stroke-emerald-500', blue: 'stroke-blue-500', purple: 'stroke-purple-500',
+        amber: 'stroke-amber-500', rose: 'stroke-rose-500', indigo: 'stroke-indigo-500',
+      };
+      const textColorMap: Record<string, string> = {
+        emerald: 'text-emerald-600 dark:text-emerald-400', blue: 'text-blue-600 dark:text-blue-400',
+        purple: 'text-purple-600 dark:text-purple-400', amber: 'text-amber-600 dark:text-amber-400',
+        rose: 'text-rose-600 dark:text-rose-400', indigo: 'text-indigo-600 dark:text-indigo-400',
+      };
+      return (
+        <div className="my-3 p-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md">
+          <h4 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 text-center">{label}</h4>
+          <div className="flex justify-center">
+            <div className="relative w-32 h-32">
+              <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r={r} fill="none" stroke="currentColor" strokeWidth="8" className="text-gray-200 dark:text-gray-700" />
+                <circle cx="60" cy="60" r={r} fill="none" strokeWidth="8" strokeLinecap="round"
+                  className={colorMap[color] || 'stroke-emerald-500'}
+                  strokeDasharray={circ} strokeDashoffset={offset}
+                  style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-2xl font-black tabular-nums ${textColorMap[color] || 'text-emerald-600 dark:text-emerald-400'}`}>{pct}%</span>
+                <span className="text-[10px] text-gray-400">{current}/{max}</span>
+              </div>
+            </div>
+          </div>
+          {data?.subtitle && <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">{data.subtitle}</p>}
+        </div>
+      );
+    }
+
+    // ── Gamification: Streak Tracker ──
+    if (type === 'streak_tracker') {
+      const days = data?.days ?? 0;
+      const label = data?.label ?? 'Day Streak';
+      const icon = data?.icon ?? '🔥';
+      const milestone = data?.milestone ?? null;
+      const pctToMilestone = milestone ? Math.min(100, Math.round((days / milestone) * 100)) : null;
+      return (
+        <div className="my-3 p-5 rounded-2xl border-2 border-orange-300 dark:border-orange-700 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/15 shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">{icon}</div>
+            <div className="flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-black text-orange-600 dark:text-orange-400 tabular-nums">{days}</span>
+                <span className="text-sm font-medium text-orange-700/70 dark:text-orange-400/70">{label}</span>
+              </div>
+              {milestone && pctToMilestone !== null && (
+                <div className="mt-2">
+                  <div className="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 mb-1">
+                    <span>Next milestone: {milestone} days</span>
+                    <span>{pctToMilestone}%</span>
+                  </div>
+                  <div className="h-2 bg-orange-200 dark:bg-orange-900/40 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" style={{ width: `${pctToMilestone}%`, transition: 'width 1s ease-out' }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Gamification: Achievement Badge ──
+    if (type === 'achievement_badge') {
+      const title = data?.title ?? 'Achievement Unlocked';
+      const icon = data?.icon ?? '⭐';
+      const description = data?.description ?? '';
+      const rarity = data?.rarity ?? 'common';
+      const rarityStyles: Record<string, string> = {
+        common: 'border-gray-300 dark:border-gray-600 from-gray-50 to-slate-50 dark:from-gray-800 dark:to-slate-800',
+        rare: 'border-blue-400 dark:border-blue-600 from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/15',
+        epic: 'border-purple-400 dark:border-purple-600 from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/15',
+        legendary: 'border-amber-400 dark:border-amber-500 from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/15',
+      };
+      const rarityLabel: Record<string, string> = {
+        common: 'text-gray-500', rare: 'text-blue-600 dark:text-blue-400',
+        epic: 'text-purple-600 dark:text-purple-400', legendary: 'text-amber-600 dark:text-amber-400',
+      };
+      return (
+        <div className={`my-3 p-5 rounded-2xl border-2 bg-gradient-to-br shadow-lg ${rarityStyles[rarity] || rarityStyles.common}`}>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-white/80 dark:bg-gray-900/50 flex items-center justify-center text-3xl shadow-inner border border-white/50 dark:border-gray-700">
+              {icon}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-gray-900 dark:text-white">{title}</h4>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${rarityLabel[rarity] || rarityLabel.common}`}>{rarity}</span>
+              </div>
+              {description && <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{description}</p>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   };
 
