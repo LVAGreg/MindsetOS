@@ -11,33 +11,33 @@ import {
   CreditCard,
   Loader2,
   Users,
-  Building2,
+  GraduationCap,
 } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-f747.up.railway.app';
 
-type AgencyPlan = 'agency5' | 'agency10';
+type PracticePlan = 'practice5' | 'practice10';
 
-const PLAN_DETAILS: Record<AgencyPlan, { name: string; price: number; accounts: number; desc: string }> = {
-  agency5: {
-    name: 'Agency 5',
+const PLAN_DETAILS: Record<PracticePlan, { name: string; price: number; accounts: number; desc: string }> = {
+  practice5: {
+    name: 'Practice 5',
     price: 297,
     accounts: 5,
-    desc: '5 client sub-accounts + custom agents + all AI agents',
+    desc: '5 coaching clients + custom agents + all AI agents',
   },
-  agency10: {
-    name: 'Agency 10',
+  practice10: {
+    name: 'Practice 10',
     price: 397,
     accounts: 10,
-    desc: '10 client sub-accounts + custom agents + all AI agents',
+    desc: '10 coaching clients + custom agents + all AI agents',
   },
 };
 
 const INCLUDED = [
-  'All 14+ MindsetOS AI agents',
+  'All 10+ MindsetOS AI coaching agents',
   'Multi-client management with instant switching',
-  'Per-client AI memory, brand voice & playbooks',
-  'Custom Agent Creator \u2014 build your own agents',
+  'Per-client AI memory, coaching notes & exercises',
+  'Custom Agent Creator \u2014 build your own coaching agents',
   'Granular memory controls (4 categories)',
   'Per-client knowledge base uploads',
   'Agent activation controls per client',
@@ -45,12 +45,12 @@ const INCLUDED = [
   'Fair-use monthly token allowance',
 ];
 
-function AgencyCheckoutInner() {
+function CoachingPracticeCheckoutInner() {
   const searchParams = useSearchParams();
-  const initialPlan = (searchParams.get('plan') as AgencyPlan) || 'agency5';
+  const initialPlan = (searchParams.get('plan') as PracticePlan) || 'practice5';
 
-  const [plan, setPlan] = useState<AgencyPlan>(
-    initialPlan === 'agency10' ? 'agency10' : 'agency5'
+  const [plan, setPlan] = useState<PracticePlan>(
+    initialPlan === 'practice10' ? 'practice10' : 'practice5'
   );
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -131,7 +131,7 @@ function AgencyCheckoutInner() {
             <span className="text-lg font-bold text-gray-900">
               Mindset<span style={{ color: '#fcc824' }}>OS</span>
               <span className="text-gray-400 font-normal mx-1.5">/</span>
-              Agency
+              Coaching Practice
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -212,11 +212,11 @@ function AgencyCheckoutInner() {
 
               {/* Plan Toggle */}
               <div>
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Choose your Agency plan</h3>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Choose your Coaching Practice plan</h3>
                 <div className="space-y-2">
                   <label
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      plan === 'agency5'
+                      plan === 'practice5'
                         ? 'border-indigo-500 bg-indigo-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -224,29 +224,29 @@ function AgencyCheckoutInner() {
                     <input
                       type="radio"
                       name="plan"
-                      value="agency5"
-                      checked={plan === 'agency5'}
-                      onChange={() => setPlan('agency5')}
+                      value="practice5"
+                      checked={plan === 'practice5'}
+                      onChange={() => setPlan('practice5')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      plan === 'agency5' ? 'border-indigo-500' : 'border-gray-300'
+                      plan === 'practice5' ? 'border-indigo-500' : 'border-gray-300'
                     }`}>
-                      {plan === 'agency5' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />}
+                      {plan === 'practice5' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />}
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-gray-900 flex items-center gap-2">
                         $297/mo
-                        <span className="text-xs font-normal text-gray-500">Agency 5</span>
+                        <span className="text-xs font-normal text-gray-500">Practice 5</span>
                       </div>
-                      <div className="text-xs text-gray-500">5 client sub-accounts &middot; Billed monthly</div>
+                      <div className="text-xs text-gray-500">5 client coaching clients &middot; Billed monthly</div>
                     </div>
                     <Users className="w-5 h-5 text-gray-400" />
                   </label>
 
                   <label
                     className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      plan === 'agency10'
+                      plan === 'practice10'
                         ? 'border-indigo-500 bg-indigo-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -254,23 +254,23 @@ function AgencyCheckoutInner() {
                     <input
                       type="radio"
                       name="plan"
-                      value="agency10"
-                      checked={plan === 'agency10'}
-                      onChange={() => setPlan('agency10')}
+                      value="practice10"
+                      checked={plan === 'practice10'}
+                      onChange={() => setPlan('practice10')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      plan === 'agency10' ? 'border-indigo-500' : 'border-gray-300'
+                      plan === 'practice10' ? 'border-indigo-500' : 'border-gray-300'
                     }`}>
-                      {plan === 'agency10' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />}
+                      {plan === 'practice10' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />}
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-gray-900 flex items-center gap-2">
                         $397/mo
                         <span className="ml-1 inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">BEST VALUE</span>
-                        <span className="text-xs font-normal text-gray-500">Agency 10</span>
+                        <span className="text-xs font-normal text-gray-500">Practice 10</span>
                       </div>
-                      <div className="text-xs text-gray-500">10 client sub-accounts &middot; Billed monthly</div>
+                      <div className="text-xs text-gray-500">10 client coaching clients &middot; Billed monthly</div>
                     </div>
                     <Users className="w-5 h-5 text-gray-400" />
                   </label>
@@ -343,16 +343,16 @@ function AgencyCheckoutInner() {
           <div className="order-1 lg:order-2">
             <div className="lg:sticky lg:top-24">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-full text-xs text-indigo-700 font-bold uppercase tracking-wide mb-4">
-                <Building2 className="w-3.5 h-3.5" />
-                Agency Tier
+                <GraduationCap className="w-3.5 h-3.5" />
+                Coaching Practice
               </div>
 
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Scale your consulting with AI-powered client workspaces.
+                Scale your coaching practice with AI-powered client workspaces.
               </h2>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Every client gets their own AI memory, brand voice, playbooks, and knowledge base.
-                Plus the power to create custom agents around your frameworks.
+                Every client gets their own AI memory, coaching notes, exercises, and knowledge base.
+                Plus the power to create custom coaching agents around your methodologies.
               </p>
 
               {/* What's included */}
@@ -374,12 +374,12 @@ function AgencyCheckoutInner() {
               <div className="bg-indigo-50 rounded-xl p-5 border border-indigo-100">
                 <h3 className="text-sm font-bold text-indigo-900 mb-3">Quick plan comparison:</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className={`p-3 rounded-lg border text-center ${plan === 'agency5' ? 'border-indigo-400 bg-white' : 'border-indigo-200 bg-indigo-50/50'}`}>
+                  <div className={`p-3 rounded-lg border text-center ${plan === 'practice5' ? 'border-indigo-400 bg-white' : 'border-indigo-200 bg-indigo-50/50'}`}>
                     <div className="text-lg font-bold text-gray-900">$297</div>
                     <div className="text-xs text-gray-600">5 clients /mo</div>
                     <div className="text-[10px] text-gray-400">$59.40/client</div>
                   </div>
-                  <div className={`p-3 rounded-lg border text-center ${plan === 'agency10' ? 'border-indigo-400 bg-white' : 'border-indigo-200 bg-indigo-50/50'}`}>
+                  <div className={`p-3 rounded-lg border text-center ${plan === 'practice10' ? 'border-indigo-400 bg-white' : 'border-indigo-200 bg-indigo-50/50'}`}>
                     <div className="text-lg font-bold text-gray-900">$397</div>
                     <div className="text-xs text-gray-600">10 clients /mo</div>
                     <div className="text-[10px] text-gray-400">$39.70/client</div>
@@ -415,10 +415,10 @@ function AgencyCheckoutInner() {
   );
 }
 
-export default function AgencyCheckoutPage() {
+export default function CoachingPracticeCheckoutPage() {
   return (
     <Suspense>
-      <AgencyCheckoutInner />
+      <CoachingPracticeCheckoutInner />
     </Suspense>
   );
 }

@@ -431,7 +431,7 @@ export default function LandingPage() {
                 Mindset Arena
               </a>
               <a href="/agency" className="text-gray-400 hover:text-[#ffc82c] transition-colors text-sm">
-                Agency Tier
+                Coaching Practice
               </a>
             </div>
           </div>

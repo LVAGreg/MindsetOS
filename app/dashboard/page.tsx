@@ -39,6 +39,7 @@ import {
   Wand2,
   Settings2,
   Building2,
+  GraduationCap,
 } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS, AgentId } from '@/lib/store';
 import { apiClient, API_URL } from '@/lib/api-client';
@@ -1057,12 +1058,12 @@ function DashboardContent() {
                         </div>
                       )}
 
-                      {/* Agency Tools Section - agency/admin only */}
+                      {/* Coaching Practice Tools Section - agency/admin only */}
                       {(effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin') && (
                         <div className="border-t border-gray-200 dark:border-gray-700">
                           <div className="px-4 py-2">
                             <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                              Agency Tools
+                              Practice Tools
                             </p>
                           </div>
                           <button
@@ -1199,15 +1200,15 @@ function DashboardContent() {
                         </button>
                       </div>
 
-                      {/* Agency Upgrade — show for non-agency users */}
+                      {/* Coaching Practice Upgrade — show for non-agency users */}
                       {effectiveUser && effectiveUser.role !== 'agency' && effectiveUser.role !== 'admin' && (
                         <div className="border-t border-gray-200 dark:border-gray-700">
                           <button
                             onClick={() => { router.push('/agency'); setShowUserMenu(false); }}
                             className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 text-sm"
                           >
-                            <Building2 className="w-4 h-4" />
-                            <span>Upgrade to Agency</span>
+                            <GraduationCap className="w-4 h-4" />
+                            <span>Upgrade to Coaching Practice</span>
                           </button>
                         </div>
                       )}
@@ -1389,7 +1390,7 @@ function DashboardContent() {
                   const isAgency = effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin';
 
                   // Group core agents by category, sort by sort_order
-                  const CATEGORY_ORDER = ['Getting Started', 'Strategy & Foundations', 'Marketing & Content', 'Events & LinkedIn', 'Sales & Voice', 'Research & Support', 'Agency Tools'];
+                  const CATEGORY_ORDER = ['Getting Started', 'Strategy & Foundations', 'Marketing & Content', 'Events & LinkedIn', 'Sales & Voice', 'Research & Support', 'Practice Tools'];
                   const coreByCategory: Record<string, typeof coreAgents> = {};
                   coreAgents.forEach(a => {
                     const cat = a.category || 'General';

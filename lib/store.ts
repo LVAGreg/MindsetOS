@@ -416,7 +416,7 @@ export const MINDSET_AGENTS = {
     description: 'Build custom AI agents for your mindset coaching for entrepreneurs practice',
     icon: '🪄',
     color: 'bg-purple-500',
-    tags: ['agency'],
+    tags: ['practice'],
     popularity: 0,
     releaseDate: '2026-03-25',
     workflowStep: 99,

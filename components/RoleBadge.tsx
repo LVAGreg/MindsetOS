@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Zap, Crown, Clock, Building2 } from 'lucide-react';
+import { Shield, Zap, Crown, Clock, GraduationCap } from 'lucide-react';
 
 export type UserRole = 'user' | 'power_user' | 'agency' | 'admin' | 'trial';
 
@@ -31,9 +31,9 @@ const roleConfig = {
     iconColor: 'text-purple-600'
   },
   agency: {
-    icon: Building2,
+    icon: GraduationCap,
     color: 'indigo',
-    label: 'Agency',
+    label: 'Coaching Practice',
     bgColor: 'bg-indigo-100',
     textColor: 'text-indigo-700',
     borderColor: 'border-indigo-300',

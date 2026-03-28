@@ -473,7 +473,7 @@ export default function TrialV3A() {
               <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline">Greg</a></span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
-              <Link href="/agency" className="hover:text-white transition-colors">Agency Tier</Link>
+              <Link href="/agency" className="hover:text-white transition-colors">Coaching Practice</Link>
               <Link href="/join" className="hover:text-white transition-colors">Join</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
               <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>

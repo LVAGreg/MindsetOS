@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, ArrowRight, Sparkles, Users, Building2, Video, ExternalLink, Bot } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, Users, GraduationCap, Video, ExternalLink, Bot } from 'lucide-react';
 
 const CIRCLE_URL = 'https://www.mindset.show/'; // TODO: Update with actual invite link
 
-export default function AgencyCheckoutSuccessPage() {
+export default function CoachingPracticeCheckoutSuccessPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -22,7 +22,7 @@ export default function AgencyCheckoutSuccessPage() {
           <span className="text-lg font-bold text-gray-900">
             Mindset<span style={{ color: '#fcc824' }}>OS</span>
             <span className="text-gray-400 font-normal mx-1.5">/</span>
-            Agency
+            Coaching Practice
           </span>
         </div>
       </div>
@@ -34,7 +34,7 @@ export default function AgencyCheckoutSuccessPage() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-            Welcome to Agency Tier!
+            Welcome to Coaching Practice!
           </h1>
           <p className="text-lg text-gray-600">
             Multi-client management, custom agents, and per-client AI memory are now unlocked.
@@ -51,10 +51,10 @@ export default function AgencyCheckoutSuccessPage() {
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-bold text-green-600 uppercase tracking-wide">Step 1 — Done</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-1">Your Agency Access Is Live</h3>
+              <h3 className="font-bold text-gray-900 mb-1">Your Coaching Practice Is Live</h3>
               <p className="text-sm text-gray-600 mb-3">
-                All 14+ AI agents are unlocked, plus multi-client management, per-client AI memory,
-                and the Custom Agent Creator. Your account has been upgraded to Agency tier.
+                All 10+ AI coaching agents are unlocked, plus multi-client management, per-client AI memory,
+                and the Custom Agent Creator. Your account has been upgraded to Coaching Practice tier.
               </p>
               <Link
                 href="/dashboard"
@@ -113,7 +113,7 @@ export default function AgencyCheckoutSuccessPage() {
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl" />
           <div className="relative flex items-start gap-4">
             <div className="w-10 h-10 bg-[#fcc824] rounded-xl flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-5 h-5 text-black" />
+              <GraduationCap className="w-5 h-5 text-black" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -121,7 +121,7 @@ export default function AgencyCheckoutSuccessPage() {
               </div>
               <h3 className="font-bold text-gray-900 text-lg mb-1">Get Your Community &amp; Content Access</h3>
               <p className="text-sm text-gray-600 mb-2">
-                Your Agency Tier includes full Client Fast Start access — training modules, coaching calls,
+                Your Coaching Practice tier includes full Client Fast Start access — training modules, coaching calls,
                 implementation support, and the MindsetOS community.
               </p>
               <a

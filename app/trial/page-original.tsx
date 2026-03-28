@@ -392,7 +392,7 @@ export default function TrialLandingPage() {
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
               <Link href="/agency" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                Agency Tier
+                Coaching Practice
               </Link>
               <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors">
                 Terms
