@@ -238,19 +238,19 @@ function DashboardContent() {
             }, 500);
           }
 
-          // If onboarding not completed, force user to client-onboarding agent
+          // If onboarding not completed, start with Mindset Score
           if (!status.completed) {
-            console.log('⚠️ [ONBOARDING] Not completed - redirecting to client-onboarding agent');
-            setCurrentAgent('CLIENT_ONBOARDING');
-            // Create conversation with client-onboarding agent
-            const newConvId = createConversation('client-onboarding');
+            console.log('⚠️ [ONBOARDING] Not completed - redirecting to Mindset Score agent');
+            setCurrentAgent('MINDSET_SCORE');
+            // Create conversation with mindset-score agent
+            const newConvId = createConversation('mindset-score');
             setCurrentConversation(newConvId);
           } else {
             console.log('✅ [ONBOARDING] Completed - all agents should be unlocked');
-            // If user completed onboarding but is still on Client Onboarding agent, switch to MindsetAI
-            if (currentAgent === 'CLIENT_ONBOARDING') {
-              console.log('🔄 [ONBOARDING] Switching from Client Onboarding to MindsetAI');
-              setCurrentAgent('GENERAL');
+            // If user completed onboarding but has no agent set, switch to Mindset Score
+            if (currentAgent === 'MINDSET_SCORE' && !currentConversationId) {
+              console.log('🔄 [ONBOARDING] Setting default agent to Mindset Score');
+              setCurrentAgent('MINDSET_SCORE');
             }
           }
         }
@@ -265,7 +265,7 @@ function DashboardContent() {
   // Set MindsetAI as default agent if no agent selected (only after onboarding check)
   useEffect(() => {
     if (!currentAgent && hasHydrated) {
-      setCurrentAgent('GENERAL');
+      setCurrentAgent('MINDSET_SCORE');
     }
   }, [currentAgent, hasHydrated, setCurrentAgent]);
 

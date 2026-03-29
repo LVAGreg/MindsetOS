@@ -2,428 +2,166 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ConversationHistory, MessageNode } from '../types/conversation';
 
-// Agent types matching backend
+// Agent types matching MindsetOS backend agents
 export const MINDSET_AGENTS = {
-  GENERAL: {
-    id: 'ecos-super-agent',
-    name: 'MindsetAI',
-    description: 'Complete MindsetOS system with RAG knowledge retrieval and memory management. Your main mindset coaching AI.',
-    icon: '🎓',
-    color: 'bg-gray-500',
-    tags: ['popular'],
-    popularity: 1250,
-    releaseDate: '2024-09-01',
+  MINDSET_SCORE: {
+    id: 'mindset-score',
+    name: 'Mindset Score Agent',
+    description: 'Your starting point — take the 5-question Mindset Score to reveal your weakest pillar and get your personalized roadmap.',
+    icon: '📊',
+    color: 'bg-amber-500',
+    tags: ['popular', 'workflow'],
+    popularity: 1500,
+    releaseDate: '2026-01-01',
     workflowStep: 1,
     starterPrompts: [
-      "Help me understand the MindsetOS workflow",
-      "What's the best way to start building my mindset coaching for entrepreneurs?",
-      "Explain how all the agents work together"
+      "Take my Mindset Score",
+      "What's my weakest mindset pillar?",
+      "Start my personalized mindset assessment"
     ]
   },
-  CLIENT_ONBOARDING: {
-    id: 'client-onboarding',
-    name: 'Client Onboarding',
-    description: 'Build your complete mindset profile - personalized setup for your coaching journey',
-    icon: '👋',
-    color: 'bg-teal-500',
-    tags: ['workflow', 'popular'],
-    popularity: 980,
-    releaseDate: '2024-09-10',
+  RESET_GUIDE: {
+    id: 'reset-guide',
+    name: 'Reset Guide',
+    description: 'Your 48-Hour Mindset Reset facilitator — 6 guided exercises over a weekend that interrupt your reactive patterns.',
+    icon: '🔄',
+    color: 'bg-cyan-500',
+    tags: ['popular', 'quick-win'],
+    popularity: 1200,
+    releaseDate: '2026-01-01',
     workflowStep: 2,
     starterPrompts: [
-      "Let's begin!",
-      "Help me set up my mindset profile",
-      "Guide me through onboarding"
+      "Start my 48-Hour Reset",
+      "Guide me through the weekend challenge",
+      "I need a mindset pattern interrupt"
     ]
   },
-  MONEY_MODEL_MAKER: {
-    id: 'money-model-maker',
-    name: 'Money Model Mapper',
-    description: 'Define your PEOPLE, PROMISE, and 3 PRINCIPLES',
-    icon: '💰',
-    color: 'bg-blue-500',
-    tags: ['workflow', 'popular'],
-    popularity: 1450,
-    releaseDate: '2024-08-15',
+  ARCHITECTURE_COACH: {
+    id: 'architecture-coach',
+    name: 'Architecture Coach',
+    description: 'Your 90-day companion for the Mindset Architecture cohort — guides daily practice, tracks progress, prepares you for weekly calls.',
+    icon: '🏗️',
+    color: 'bg-purple-500',
+    tags: ['workflow', 'advanced'],
+    popularity: 900,
+    releaseDate: '2026-01-01',
     workflowStep: 3,
     starterPrompts: [
-      "Help me clarify who I help",
-      "I need to define my big promise",
-      "What are the 3 principles for my money model?"
+      "Help me prepare for this week's cohort call",
+      "Track my 90-day progress",
+      "Guide me through the Architecture layers"
     ]
   },
-  MMM_5IN30: {
-    id: 'mmm-5in30',
-    name: 'MONEY MODEL MAPPER (5in30)',
-    description: 'Create A High Converting Offer Using The Money Model Framework',
-    icon: '💎',
-    color: 'bg-cyan-500',
-    tags: ['workflow', 'new'],
-    popularity: 1500,
-    releaseDate: '2025-11-12',
-    workflowStep: 3,
-    starterPrompts: [
-      "Help me build my Money Model",
-      "I want to create a high-converting offer",
-      "Guide me through the Money Model framework"
-    ]
-  },
-  FAST_FIX_FINDER: {
-    id: 'fast-fix-finder',
-    name: 'Fast Fix Finder',
-    description: 'Create your quick-win IN OFFER',
-    icon: '⚡',
-    color: 'bg-yellow-500',
-    tags: ['workflow', 'quick-win'],
-    popularity: 720,
-    releaseDate: '2024-08-20',
+  PRACTICE_BUILDER: {
+    id: 'practice-builder',
+    name: 'Practice Builder',
+    description: 'Creates your personalized 5-10 minute daily mindset routine based on your weakest pillar and available time.',
+    icon: '💪',
+    color: 'bg-emerald-500',
+    tags: ['popular', 'workflow'],
+    popularity: 1100,
+    releaseDate: '2026-01-01',
     workflowStep: 4,
     starterPrompts: [
-      "Help me create a quick-win offer",
-      "What should my IN OFFER be?",
-      "I need a fast-selling entry offer"
+      "Build my daily mindset practice",
+      "I have 5 minutes — create my routine",
+      "Design a practice for my weakest pillar"
     ]
   },
-  OFFER_PROMO_PRINTER: {
-    id: 'offer-promo-printer',
-    name: 'The Offer Invitation Architect',
-    description: 'Generate your promotional invitation (6 Ps)',
-    icon: '📢',
-    color: 'bg-purple-500',
-    tags: ['workflow', 'content'],
-    popularity: 890,
-    releaseDate: '2024-09-05',
+  STORY_EXCAVATOR: {
+    id: 'story-excavator',
+    name: 'Story Excavator',
+    description: 'Uncovers the 5-7 core stories that are actually running your decisions — inherited narratives from family, culture, and early experiences.',
+    icon: '📖',
+    color: 'bg-orange-500',
+    tags: ['workflow', 'advanced'],
+    popularity: 850,
+    releaseDate: '2026-01-01',
     workflowStep: 5,
     starterPrompts: [
-      "Create a promotional invitation for my offer",
-      "Help me write the 6 Ps for my offer",
-      "Generate compelling copy for my offer"
+      "Help me excavate my core stories",
+      "What narratives are running my decisions?",
+      "Uncover my inherited belief patterns"
     ]
   },
-  PROMO_PLANNER: {
-    id: 'promo-planner',
-    name: 'LinkedIn Events Builder Buddy',
-    description: 'Build your 10-day campaign (30 messages)',
-    icon: '📅',
-    color: 'bg-green-500',
-    tags: ['workflow', 'content', 'popular'],
-    popularity: 1120,
-    releaseDate: '2024-09-12',
+  LAUNCH_COMPANION: {
+    id: 'launch-companion',
+    name: 'Launch Companion',
+    description: "Greg's personal strategy assistant — call prep, cohort dashboards, content calendars, and platform insights.",
+    icon: '🚀',
+    color: 'bg-gray-500',
+    tags: ['advanced'],
+    popularity: 300,
+    releaseDate: '2026-01-01',
     workflowStep: 6,
     starterPrompts: [
-      "Build a 10-day campaign for my offer",
-      "I need 30 messages for my promotion",
-      "Create a complete campaign strategy"
+      "Prep me for today's cohort call",
+      "Show me my dashboard metrics",
+      "Help with this week's content calendar"
     ]
   },
-  QUALIFICATION_CALL_BUILDER: {
-    id: 'qualification-call-builder',
-    name: 'Qualification Call Builder',
-    description: 'Create your EXPERT sales script',
-    icon: '📞',
-    color: 'bg-red-500',
-    tags: ['workflow'],
-    popularity: 650,
-    releaseDate: '2024-09-18',
+  ACCOUNTABILITY_PARTNER: {
+    id: 'accountability-partner',
+    name: 'Accountability Partner',
+    description: 'Your daily check-in companion — morning intentions, evening reflections, weekly reviews, and streak tracking.',
+    icon: '✅',
+    color: 'bg-green-500',
+    tags: ['popular', 'workflow'],
+    popularity: 1300,
+    releaseDate: '2026-01-01',
     workflowStep: 7,
     starterPrompts: [
-      "Help me create a qualification call script",
-      "Build my EXPERT sales process",
-      "I need a conversion script for calls"
+      "Morning check-in",
+      "Evening reflection",
+      "Weekly review"
     ]
   },
-  LINKEDIN_EVENTS_BUILDER: {
-    id: 'linkedin-events-builder',
-    name: 'LinkedIn Events Builder',
-    description: 'Design compelling event topics (WHAT-WHAT-HOW)',
-    icon: '🎯',
-    color: 'bg-indigo-500',
-    tags: ['workflow', 'lead-gen'],
-    popularity: 540,
-    releaseDate: '2024-09-20',
+  CONVERSATION_CURATOR: {
+    id: 'conversation-curator',
+    name: 'Conversation Curator',
+    description: 'Your podcast matchmaker — recommends specific Mindset.Show episodes based on your current challenge.',
+    icon: '🎧',
+    color: 'bg-teal-500',
+    tags: ['content'],
+    popularity: 700,
+    releaseDate: '2026-01-01',
     workflowStep: 8,
     starterPrompts: [
-      "Help me create a LinkedIn event topic",
-      "Design an event using WHAT-WHAT-HOW",
-      "I need a compelling event idea"
+      "Find me an episode about [challenge]",
+      "What should I listen to this week?",
+      "Recommend episodes for self-sabotage"
     ]
   },
-  LINKEDIN_EVENTS_BUILDER_V2: {
-    id: 'linkedin-events-builder-v2',
-    name: 'LinkedIn Events Builder v2',
-    description: 'High-converting events with multi-select and sharp positioning',
-    icon: '🎯',
-    color: 'bg-purple-500',
-    tags: ['advanced', 'lead-gen'],
-    popularity: 420,
-    releaseDate: '2024-10-05',
-    starterPrompts: [
-      "Create a high-converting LinkedIn event",
-      "Build event with 3x3 audience selection",
-      "Design magnetic event that fills"
-    ]
-  },
-  LINKEDIN_EVENTS_BUILDER_V3: {
-    id: 'linkedin-events-builder-v3',
-    name: 'LinkedIn Events Builder v3',
-    description: 'Mega Prompt Edition - Educational 6-step event creation with Greg\'s voice',
-    icon: '✨',
-    color: 'bg-gradient-to-r from-indigo-500 to-purple-500',
-    tags: ['advanced', 'lead-gen'],
-    popularity: 380,
-    releaseDate: '2024-10-10',
-    starterPrompts: [
-      "Create event that fills and converts",
-      "Build LinkedIn event with mega prompt guidance",
-      "Design NOW-worthy event with educational support"
-    ]
-  },
-  LINKEDIN_EVENTS_BUILDER_V6: {
-    id: 'linkedin-events-builder-v6',
-    name: 'LinkedIn Events Builder V6',
-    description: 'Widget-Optimized - Progress tracker, rating widgets, 100% widget accuracy',
-    icon: '🎨',
-    color: 'bg-gradient-to-r from-purple-600 to-pink-600',
-    tags: ['new', 'advanced', 'lead-gen'],
-    popularity: 290,
-    releaseDate: '2025-10-12',
-    starterPrompts: [
-      "Build LinkedIn event with intelligent widgets",
-      "Create event with progress tracker",
-      "Design event with rating feedback system"
-    ]
-  },
-  MONEY_MODEL_MAKER_V2: {
-    id: 'money-model-makerv2',
-    name: 'Money Model Maker v2',
-    description: 'High-converting offer creation with Big Promise + 3 Principles',
-    icon: '💎',
-    color: 'bg-emerald-500',
-    tags: ['advanced'],
-    popularity: 680,
-    releaseDate: '2024-09-25',
-    starterPrompts: [
-      "Help me build a high-converting Money Model",
-      "Create my Big Promise and 3 Principles",
-      "I need a compelling offer framework"
-    ],
-  },
-  MONEY_MODEL_MAKER_V3: {
-    id: 'money-model-makerv3',
-    name: 'Money Model Maker v3',
-    description: 'Interactive multi-choice offer builder with edit capabilities',
-    icon: '💠',
-    color: 'bg-cyan-500',
-    tags: ['advanced'],
-    popularity: 510,
-    releaseDate: '2024-10-02',
-    starterPrompts: [
-      "Build Money Model with multiple choices",
-      "Create offer with interactive options",
-      "Guide me step-by-step with choices"
-    ],
-  },
-  MONEY_MODEL_MAKER_V4: {
-    id: 'money-model-makerv4',
-    name: 'Money Model Maker v4',
-    description: '3x3 multi-select grid builder with yellow highlights',
-    icon: '🌟',
-    color: 'bg-yellow-500',
-    tags: ['advanced'],
-    popularity: 470,
-    releaseDate: '2024-10-08',
-    starterPrompts: [
-      "Build Money Model with 3x3 grid selections",
-      "Create offer with multi-select categories",
-      "Guide me with beautiful grid choices"
-    ],
-  },
-  MONEY_MODEL_MAKER_V5: {
-    id: 'money-model-makerv5',
-    name: 'Money Model Maker v5',
-    description: 'Mega prompt intelligence - flexible formats, sharp Greg voice',
-    icon: '⚡',
-    color: 'bg-gradient-to-r from-purple-500 to-pink-500',
-    tags: ['advanced', 'popular'],
-    popularity: 830,
-    releaseDate: '2024-10-15',
-    starterPrompts: [
-      "Build Money Model with intelligent formatting",
-      "Create offer with mega prompt style",
-      "Sharp strategic Money Model guidance"
-    ],
-  },
-  VALUE_QUANTIFIER_V6: {
-    id: 'value-quantifier-v6',
-    name: 'Value Quantifier V6',
-    description: 'ROI Calculator - Turn "too expensive" into "when can we start?" in 5-10 minutes',
-    icon: '🧮',
-    color: 'bg-gradient-to-r from-green-600 to-emerald-600',
-    tags: ['new', 'quick-win', 'popular'],
-    popularity: 1340,
-    releaseDate: '2025-10-20',
-    starterPrompts: [
-      "Build my ROI calculator",
-      "Create client proposal with ROI proof",
-      "Calculate value of my services"
-    ]
-  },
-  MEMORY_INSIGHTS_V6: {
-    id: 'memory-insights-v6',
-    name: 'Memory Insights V6',
-    description: 'Beautiful memory visualization - Transform stored memories into stunning visual insights',
-    tags: ['new', 'advanced'],
-    popularity: 240,
-    releaseDate: '2025-10-25',
-    icon: '🧠',
-    color: 'bg-gradient-to-r from-purple-600 to-pink-600',
-    starterPrompts: [
-      "Show me my memory insights",
-      "Visualize my mindset coaching journey",
-      "Find patterns in my memories"
-    ]
-  },
-  MINDSET_SUPER_AGENT: {
-    id: 'ecos-super-agent',
-    name: 'MindsetOS Super Agent',
-    description: 'Complete MindsetOS system with RAG knowledge retrieval and memory management. Your main mindset coaching AI.',
-    tags: ['new', 'advanced', 'workflow'],
-    popularity: 1500,
-    releaseDate: '2025-11-27',
-    icon: '🚀',
-    color: 'bg-orange-500',
-    starterPrompts: [
-      "Let's GO!",
-      "Help me build my complete mindset coaching system",
-      "Guide me through the entire MindsetOS workflow"
-    ]
-  },
-  DEEP_RESEARCH_EXPERT: {
-    id: 'deep-research-expert',
-    name: 'Deep Research Expert',
-    description: 'Comprehensive deep research with citations using Perplexity Sonar. Perfect for market research, competitor analysis, and strategic insights.',
-    tags: ['new', 'research', 'analysis'],
-    popularity: 1200,
-    releaseDate: '2025-12-06',
-    icon: '🔬',
-    color: 'bg-purple-600',
-    starterPrompts: [
-      "Research my industry trends and competitors",
-      "Find the latest insights on [topic]",
-      "Analyze the market for my mindset coaching niche",
-      "Deep dive into [subject] with citations"
-    ]
-  },
-  CONTENT_CATALYST: {
-    id: 'content-catalyst',
-    name: 'Content Catalyst',
-    description: 'Generate strategic content ideas using your saved research, memories, and all MindsetOS agent knowledge combined.',
-    tags: ['new', 'content', 'marketing'],
-    popularity: 1100,
-    releaseDate: '2025-12-06',
-    icon: '✍️',
-    color: 'bg-pink-500',
-    starterPrompts: [
-      "Generate content ideas aligned with my Money Model",
-      "Create a content calendar for LinkedIn",
-      "Help me write thought leadership content",
-      "Suggest email newsletter topics based on my research"
-    ]
-  },
-  FIVE_ONES_FORMULA: {
-    id: 'five-ones-formula',
-    name: 'The Five Ones Formula',
-    description: 'Build your personalised LinkedIn strategy in under 5 minutes',
-    icon: '🎯',
-    color: 'bg-amber-500',
-    tags: ['new', 'workflow', 'strategy'],
-    popularity: 1400,
-    releaseDate: '2026-03-23',
+  DECISION_FRAMEWORK: {
+    id: 'decision-framework',
+    name: 'Decision Framework Agent',
+    description: 'Real-time decision support using the DESIGN process — when pressure hits, this agent slows you down so you choose well.',
+    icon: '🔀',
+    color: 'bg-blue-500',
+    tags: ['workflow', 'popular'],
+    popularity: 1000,
+    releaseDate: '2026-01-01',
     workflowStep: 9,
     starterPrompts: [
-      "Build my Five Ones Formula",
-      "Help me create my LinkedIn strategy",
-      "I want to find my Perfect Future Client"
+      "Help me think through this decision",
+      "I'm facing a tough choice — walk me through DESIGN",
+      "I keep making the same reactive decision"
     ]
   },
-  AUTHORITY_CONTENT_ENGINE: {
-    id: 'authority-content-engine',
-    name: 'Authority Content Engine',
-    description: 'Turn one idea into three pieces of LinkedIn content ready to publish',
-    icon: '✍️',
-    color: 'bg-violet-500',
-    tags: ['new', 'content', 'marketing'],
-    popularity: 1350,
-    releaseDate: '2026-03-23',
+  INNER_WORLD_MAPPER: {
+    id: 'inner-world-mapper',
+    name: 'Inner World Mapper',
+    description: 'Self-awareness excavation — maps your beliefs, inherited stories, self-talk patterns, and decision defaults into a 4-layer Inner World Map.',
+    icon: '🗺️',
+    color: 'bg-pink-500',
+    tags: ['workflow', 'advanced'],
+    popularity: 800,
+    releaseDate: '2026-01-01',
     workflowStep: 10,
     starterPrompts: [
-      "Turn my idea into 3 pieces of content",
-      "Help me write LinkedIn posts",
-      "I need a short post, long post, and video script"
-    ]
-  },
-  DAILY_LEAD_SEQUENCE: {
-    id: 'daily-lead-sequence',
-    name: 'Daily Lead Sequence Builder',
-    description: 'Create 4-part outreach sequences that generate leads on LinkedIn',
-    icon: '📨',
-    color: 'bg-sky-500',
-    tags: ['new', 'lead-gen', 'outreach'],
-    popularity: 1300,
-    releaseDate: '2026-03-23',
-    workflowStep: 11,
-    starterPrompts: [
-      "Build my Daily Lead Sequence",
-      "Create my 4-message LinkedIn outreach",
-      "I need connection request and follow-up messages"
-    ]
-  },
-  EASY_EVENT_ARCHITECT: {
-    id: 'easy-event-architect',
-    name: 'Easy Event Architect',
-    description: 'Build easy event outlines to generate leads and bookings',
-    icon: '🎪',
-    color: 'bg-emerald-500',
-    tags: ['new', 'lead-gen', 'events'],
-    popularity: 1250,
-    releaseDate: '2026-03-23',
-    workflowStep: 12,
-    starterPrompts: [
-      "Design my LinkedIn Conversion Event",
-      "Build my event blueprint",
-      "Help me create an event that converts"
-    ]
-  },
-  PROFILE_POWER_UP: {
-    id: 'profile-power-up',
-    name: 'The Profile Power-Up',
-    description: 'Get your complete LinkedIn profile written in minutes',
-    icon: '💼',
-    color: 'bg-pink-500',
-    tags: ['new', 'linkedin', 'profile'],
-    popularity: 1200,
-    releaseDate: '2026-03-23',
-    workflowStep: 13,
-    starterPrompts: [
-      "Write my LinkedIn profile",
-      "Power up my LinkedIn presence",
-      "Help me create a client-attracting profile"
-    ]
-  },
-  AGENT_CREATOR: {
-    id: 'agent-creator',
-    name: 'Agent Creator',
-    description: 'Build custom AI agents for your mindset coaching for entrepreneurs practice',
-    icon: '🪄',
-    color: 'bg-purple-500',
-    tags: ['practice'],
-    popularity: 0,
-    releaseDate: '2026-03-25',
-    workflowStep: 99,
-    starterPrompts: [
-      "I want to build a custom agent",
-      "Help me create an agent for my clients",
-      "Let's design a new AI assistant"
+      "Map my inner world",
+      "What beliefs are running my decisions?",
+      "Create my 4-layer Inner World Map"
     ]
   },
 } as const;
@@ -742,7 +480,7 @@ export const useAppStore = create<AppState>()(
       setImpersonationSession: (session) => set({ impersonationSession: session }),
 
       // Agent state
-      currentAgent: 'general' as AgentId | null,
+      currentAgent: 'MINDSET_SCORE' as AgentId | null,
       setCurrentAgent: (agentId) =>
         set({ currentAgent: agentId }),
 
@@ -765,7 +503,7 @@ export const useAppStore = create<AppState>()(
                 ...state.conversations,
                 [conversationId]: {
                   id: conversationId,
-                  agentId: 'general',
+                  agentId: 'mindset-score',
                   title: 'New Conversation',
                   history: {
                     currentId: message.id,
