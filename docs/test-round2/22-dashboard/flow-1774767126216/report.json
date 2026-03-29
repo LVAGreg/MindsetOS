@@ -1,0 +1,50 @@
+{
+  "name": "MindsetOS Dashboard Exploration - Login",
+  "timestamp": "2026-03-29T06:52:27.217Z",
+  "steps": [
+    {
+      "step": 1,
+      "action": "goto",
+      "status": "pass",
+      "screenshot": "/data/workspace/ECOS/apps/mindset-os/docs/test-round2/22-dashboard/flow-1774767126216/01_goto.png"
+    },
+    {
+      "step": 2,
+      "action": "fill",
+      "status": "pass",
+      "screenshot": "/data/workspace/ECOS/apps/mindset-os/docs/test-round2/22-dashboard/flow-1774767126216/02_fill.png"
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "status": "pass",
+      "screenshot": "/data/workspace/ECOS/apps/mindset-os/docs/test-round2/22-dashboard/flow-1774767126216/03_fill.png"
+    },
+    {
+      "step": 4,
+      "action": "wait",
+      "status": "pass"
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "status": "pass",
+      "screenshot": "/data/workspace/ECOS/apps/mindset-os/docs/test-round2/22-dashboard/flow-1774767126216/05_click.png"
+    },
+    {
+      "step": 6,
+      "action": "wait",
+      "status": "pass",
+      "screenshot": "/data/workspace/ECOS/apps/mindset-os/docs/test-round2/22-dashboard/flow-1774767126216/06_wait.png"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "type": "console",
+      "text": "Failed to load resource: the server responded with a status of 401 ()",
+      "timestamp": 1774767132019
+    }
+  ],
+  "passed": 6,
+  "failed": 0
+}

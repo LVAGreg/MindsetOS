@@ -773,17 +773,17 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0d1117]">
+        <div className="text-center animate-float-up-1">
+          <div className="w-14 h-14 border-[3px] border-[#fcc824]/20 border-t-[#fcc824] rounded-full animate-spin mx-auto mb-5" />
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-500 tracking-wide">Loading MindsetOS</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-gray-900 relative">
+    <div className="h-screen flex bg-gray-50 dark:bg-[#0d1117] relative">
       {/* Trial Expired Popup */}
       <TrialExpiredPopup
         membershipTier={user?.membershipTier}
@@ -792,9 +792,9 @@ function DashboardContent() {
 
       {/* Trial Days Remaining Banner */}
       {user?.membershipTier === 'trial' && user?.trialExpiresAt && new Date(user.trialExpiresAt) > new Date() && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-center py-1.5 text-sm font-medium shadow-md">
-          Free trial: {Math.max(0, Math.ceil((new Date(user.trialExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days left &mdash;{' '}
-          <a href="/join" className="underline font-bold hover:text-amber-900">Upgrade now</a>
+        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#fcc824] via-amber-400 to-[#fcc824] text-black text-center py-1.5 text-[13px] font-semibold shadow-lg shadow-amber-500/10">
+          <span className="opacity-80">Free trial:</span> {Math.max(0, Math.ceil((new Date(user.trialExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days left &mdash;{' '}
+          <a href="/join" className="underline font-bold hover:text-amber-900 transition-colors">Upgrade now</a>
         </div>
       )}
 
@@ -804,16 +804,16 @@ function DashboardContent() {
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden"
           onClick={toggleSidebar}
         />
       )}
 
       {/* Sidebar - Expanded */}
       {isSidebarOpen && (
-        <div key={`sidebar-${viewAsKey}`} className="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 flex flex-col md:relative absolute inset-y-0 left-0 z-30">
+        <div key={`sidebar-${viewAsKey}`} className="w-[280px] bg-white dark:bg-[#0d1117] border-r border-gray-200 dark:border-white/[0.06] text-gray-900 dark:text-gray-100 flex flex-col md:relative absolute inset-y-0 left-0 z-30">
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <div className="p-4 border-b border-gray-200 dark:border-white/[0.06] bg-gray-50/80 dark:bg-[#0d1117]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <MindsetOSLogo size="lg" />
@@ -821,10 +821,10 @@ function DashboardContent() {
               {/* Collapse Button */}
               <button
                 onClick={toggleSidebar}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-lg transition-all duration-200"
                 title="Collapse sidebar"
               >
-                <PanelLeftClose className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <PanelLeftClose className="w-5 h-5 text-gray-400 dark:text-gray-500" />
               </button>
             </div>
 
@@ -833,7 +833,7 @@ function DashboardContent() {
           {/* Sidebar Content - Organized Sections */}
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {/* New Chat */}
-            <div className="px-3 py-2">
+            <div className="px-3 pt-3 pb-1">
               <button
                 onClick={() => {
                   if (currentAgentData) {
@@ -844,11 +844,13 @@ function DashboardContent() {
                     setShowAgentBrowser(true);
                   }
                 }}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 border border-gray-200 dark:border-white/[0.08] hover:border-[#fcc824]/30 dark:hover:border-[#fcc824]/20 hover:bg-[#fcc824]/[0.04] text-gray-700 dark:text-gray-300 group"
                 title={currentAgentData ? `New chat with ${currentAgentData.name}` : "Select an agent"}
               >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">New Chat</span>
+                <div className="w-7 h-7 rounded-lg bg-[#fcc824]/10 flex items-center justify-center group-hover:bg-[#fcc824]/15 transition-colors">
+                  <Plus className="w-4 h-4 text-[#fcc824]" />
+                </div>
+                <span className="text-sm font-semibold">New Chat</span>
               </button>
             </div>
 
@@ -940,25 +942,25 @@ function DashboardContent() {
           </div>
 
           {/* Sidebar Footer - User Menu with Settings */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <div className="p-3 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50/80 dark:bg-[#0d1117]">
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-xl transition-all duration-200"
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${viewAsUser ? 'bg-gradient-to-br from-blue-400 to-indigo-500' : 'bg-gradient-to-br from-yellow-400 to-orange-500'}`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm ${viewAsUser ? 'bg-gradient-to-br from-blue-400 to-indigo-500' : 'bg-gradient-to-br from-[#fcc824] to-amber-600'}`}>
                   {(effectiveUser?.name?.[0] || effectiveUser?.email?.[0] || 'U').toUpperCase()}
                 </div>
                 <div className="flex-1 text-left min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {viewAsUser ? `👁 ${effectiveUser?.name || effectiveUser?.email}` : (user?.name || user?.email)}
+                  <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    {viewAsUser ? `${effectiveUser?.name || effectiveUser?.email}` : (user?.name || user?.email)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-500 truncate capitalize">
                     {effectiveUser?.role?.replace('_', ' ') || ''}
                     {viewAsUser && <span className="text-blue-400 ml-1">(viewing as)</span>}
                   </p>
                 </div>
-                <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0" />
               </button>
 
               {showUserMenu && (
@@ -967,7 +969,7 @@ function DashboardContent() {
                     className="fixed inset-0 z-10"
                     onClick={() => setShowUserMenu(false)}
                   />
-                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 max-h-[80vh] overflow-y-auto">
+                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-[#161b22] rounded-xl shadow-2xl shadow-black/20 border border-gray-200 dark:border-white/[0.08] z-20 max-h-[80vh] overflow-y-auto">
                     <div className="py-1">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -1228,12 +1230,12 @@ function DashboardContent() {
 
       {/* Sidebar - Collapsed (Hidden on mobile) */}
       {!isSidebarOpen && (
-        <div className="hidden md:flex w-16 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col py-4">
+        <div className="hidden md:flex w-[60px] bg-white dark:bg-[#0d1117] sidebar-collapsed-border flex-col py-3">
           {/* Logo at Top */}
-          <div className="px-2 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="px-2 pb-3 border-b border-gray-200 dark:border-white/[0.06]">
             <button
               onClick={toggleSidebar}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-xl transition-all duration-200 w-full"
               title="Expand sidebar"
             >
               <MindsetOSLogo size="sm" showIcon={false} />
@@ -1241,34 +1243,34 @@ function DashboardContent() {
           </div>
 
           {/* Middle Menu Icons */}
-          <div className="flex-1 flex flex-col items-center gap-2 py-4 overflow-y-auto">
+          <div className="flex-1 flex flex-col items-center gap-1 py-3 overflow-y-auto">
             {/* Start New Chat */}
             <button
               onClick={() => setShowAgentBrowser(true)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2.5 hover:bg-[#fcc824]/[0.08] rounded-xl transition-all duration-200 group"
               title="Start New Chat"
             >
-              <Plus className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Plus className="w-5 h-5 text-gray-500 dark:text-gray-500 group-hover:text-[#fcc824] transition-colors" />
             </button>
 
             {/* Search */}
             <button
               onClick={() => setShowConversationBrowser(true)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2.5 hover:bg-white/[0.04] rounded-xl transition-all duration-200 group"
               title="Search"
             >
-              <Search className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Search className="w-5 h-5 text-gray-500 dark:text-gray-500 group-hover:text-gray-300 transition-colors" />
             </button>
           </div>
 
           {/* User Profile at Bottom */}
-          <div className="px-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-2 pt-3 border-t border-gray-200 dark:border-white/[0.06]">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full relative"
+              className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-all duration-200 w-full relative"
               title={user?.name || user?.email || 'User menu'}
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#fcc824] to-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-xs mx-auto shadow-sm">
                 {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
               </div>
             </button>
@@ -1279,7 +1281,7 @@ function DashboardContent() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Header - Compact with Agent Selector and Search */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800/50 px-4 py-1.5 flex items-center gap-3">
+        <header className="bg-white/80 dark:bg-[#0d1117]/90 header-glass border-b border-gray-200 dark:border-white/[0.06] px-4 py-1.5 flex items-center gap-3">
           {/* Admin User Switcher — Admin only, appears first */}
           <AdminUserSwitcher />
 
@@ -1289,45 +1291,54 @@ function DashboardContent() {
           {/* Agent Selector - Opens Agent Browser - Left Aligned */}
           <button
             onClick={() => setShowAgentBrowser(!showAgentBrowser)}
-            className="flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-all shadow-sm hover:shadow-md"
+            className="flex items-center gap-2.5 px-3.5 py-2 border rounded-xl transition-all duration-200 hover:shadow-md group"
             style={{
               background: currentAgentData?.accent_color
-                ? `linear-gradient(135deg, ${currentAgentData.accent_color}15, ${currentAgentData.accent_color}08)`
-                : 'linear-gradient(to right, rgb(254 252 232), rgb(254 249 195))',
-              borderColor: currentAgentData?.accent_color || '#ffc82c',
+                ? `linear-gradient(135deg, ${currentAgentData.accent_color}08, transparent)`
+                : undefined,
+              borderColor: currentAgentData?.accent_color
+                ? `${currentAgentData.accent_color}40`
+                : 'rgba(252,200,36,0.3)',
             }}
           >
-            {currentAgent ? (
-              <AgentIcon
-                agentId={currentAgent}
-                className="w-5 h-5"
-                style={{ color: currentAgentData?.accent_color || '#f8c824' }}
-              />
-            ) : (
-              <Users className="w-5 h-5" style={{ color: '#ffc82c' }} />
-            )}
-            <div className="flex-1 text-left">
-              <div
-                className="text-[10px] font-semibold uppercase tracking-wide leading-none"
-                style={{ color: currentAgentData?.accent_color || '#f8c824' }}
-              >
-                Browse Agents
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{
+                background: `${currentAgentData?.accent_color || '#fcc824'}15`,
+              }}
+            >
+              {currentAgent ? (
+                <AgentIcon
+                  agentId={currentAgent}
+                  className="w-4.5 h-4.5"
+                  style={{ color: currentAgentData?.accent_color || '#fcc824' }}
+                />
+              ) : (
+                <Users className="w-4.5 h-4.5" style={{ color: '#fcc824' }} />
+              )}
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <div className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate">
+                {currentAgentData?.name || 'Select Agent'}
               </div>
-              <div className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
-                {currentAgentData?.name ? `Active: ${currentAgentData.name}` : 'No Agent Selected'}
+              <div
+                className="text-[10px] font-medium uppercase tracking-wider leading-none mt-0.5"
+                style={{ color: currentAgentData?.accent_color || '#fcc824' }}
+              >
+                {currentAgentData ? 'Active' : 'Browse Agents'}
               </div>
             </div>
-            <Users className="w-4 h-4" style={{ color: currentAgentData?.accent_color || '#ffc82c' }} />
+            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
           </button>
 
           {/* Search Conversations - Moved from sidebar */}
           <button
             onClick={() => setShowConversationBrowser(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg transition-all"
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-white/[0.04] hover:bg-gray-200 dark:hover:bg-white/[0.07] border border-gray-200 dark:border-white/[0.08] rounded-xl transition-all duration-200"
             title="Search conversations"
           >
-            <Search className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search</span>
+            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <span className="text-[13px] font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Search</span>
           </button>
 
           {/* Spacer to push notification bell to right */}

@@ -80,23 +80,23 @@ export default function AgentCard({
   const getTagStyle = (tag: string) => {
     switch (tag) {
       case 'popular':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20';
       case 'new':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        return 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20';
       case 'workflow':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20';
       case 'advanced':
-        return 'bg-purple-100 text-purple-700 border-purple-200';
+        return 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20';
       case 'quick-win':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20';
       case 'content':
-        return 'bg-pink-100 text-pink-700 border-pink-200';
+        return 'bg-pink-50 dark:bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-500/20';
       case 'lead-gen':
-        return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+        return 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20';
       case 'trial':
-        return 'bg-amber-100 text-amber-700 border-amber-300';
+        return 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-500/20';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/[0.08]';
     }
   };
 
@@ -125,12 +125,12 @@ export default function AgentCard({
 
   return (
     <div
-      className={`group relative bg-white dark:bg-gray-800 rounded-xl p-4 border-2 transition-all duration-300 ${
+      className={`group relative rounded-xl p-4 border transition-all duration-300 ${
         locked
-          ? 'border-gray-200 dark:border-gray-700 opacity-75 cursor-default'
+          ? 'bg-white dark:bg-[#111827] border-gray-200 dark:border-white/[0.06] opacity-60 cursor-default'
           : isTrialAgent
-            ? 'border-amber-300 dark:border-amber-600 hover:shadow-xl hover:scale-105 cursor-pointer ring-2 ring-amber-200 dark:ring-amber-800'
-            : 'border-gray-200 dark:border-gray-700 hover:shadow-xl hover:scale-105 cursor-pointer'
+            ? 'bg-white dark:bg-[#111827] border-amber-300 dark:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5 cursor-pointer ring-1 ring-amber-200 dark:ring-amber-500/20'
+            : 'bg-white dark:bg-[#111827] border-gray-200 dark:border-white/[0.08] hover:shadow-xl dark:hover:shadow-black/40 hover:-translate-y-0.5 cursor-pointer'
       }`}
       style={{
         '--accent-color': accent_color,
@@ -173,22 +173,23 @@ export default function AgentCard({
       {/* Agent Icon */}
       <div className="flex flex-col items-center text-center mt-4 mb-3">
         <div
-          className="w-14 h-14 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300"
+          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm"
           style={{
-            background: `linear-gradient(135deg, ${accent_color}10, ${accent_color}05)`,
-            border: `2px solid ${accent_color}30`,
+            background: `linear-gradient(135deg, ${accent_color}18, ${accent_color}08)`,
+            border: `1.5px solid ${accent_color}35`,
+            boxShadow: `0 4px 16px ${accent_color}15`,
           }}
         >
-          <AgentIcon agentId={id} className="w-8 h-8" style={{ color: accent_color }} />
+          <AgentIcon agentId={id} className="w-7 h-7" style={{ color: accent_color }} />
         </div>
 
         {/* Agent Name */}
-        <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">
+        <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-white mb-1.5 line-clamp-2 leading-snug">
           {name}
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3 min-h-[32px]">
+        <p className="text-xs text-gray-500 dark:text-gray-500 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">
           {description}
         </p>
       </div>

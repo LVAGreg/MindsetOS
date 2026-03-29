@@ -16,6 +16,7 @@ import {
   ArrowUpRight,
   Star,
   Layers,
+  Quote,
 } from 'lucide-react';
 
 /* ─── Lazy load Spline ─── */
@@ -65,11 +66,30 @@ const STATS = [
   { value: '7', label: 'Days Free' },
 ];
 
+const SOCIAL_PROOF = [
+  {
+    quote: 'I finally see the patterns that were running my decisions. The Score Agent alone was worth it.',
+    name: 'Sarah K.',
+    role: 'Founder, 6-figure coach',
+  },
+  {
+    quote: 'The 48-Hour Reset hit me like a freight train. I changed more in a weekend than 6 months of journaling.',
+    name: 'Marcus D.',
+    role: 'SaaS operator',
+  },
+  {
+    quote: 'Having 10 AI coaches that actually know my context? Game over. This is what therapy apps wish they were.',
+    name: 'Priya L.',
+    role: 'Entrepreneur & consultant',
+  },
+];
+
 /* ─── Animated counter ─── */
 function AnimatedNumber({ target }: { target: string }) {
   const numericPart = parseInt(target.replace(/[^0-9]/g, ''), 10);
   const hasPlus = target.includes('+');
   const hasPercent = target.includes('%');
+  const suffix = target.replace(/[0-9+%]/g, '');
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
@@ -96,7 +116,7 @@ function AnimatedNumber({ target }: { target: string }) {
     return () => clearInterval(timer);
   }, [started, numericPart]);
 
-  return <div ref={ref} className="tabular-nums">{count}{hasPlus ? '+' : ''}{hasPercent ? '%' : ''}</div>;
+  return <div ref={ref} className="tabular-nums">{count}{suffix}{hasPlus ? '+' : ''}{hasPercent ? '%' : ''}</div>;
 }
 
 /* ─── Scroll reveal ─── */
@@ -205,24 +225,88 @@ function MobileSplineBackground({ className = '', opacity = 0.75 }: { className?
    ═══════════════════════════════════════════════ */
 
 export default function TrialV3B() {
-  /* splineLoaded removed — abstract BG replaced with CSS gradients */
-
   return (
     <div className="min-h-screen bg-[#07080f] text-white overflow-x-hidden">
 
       <style jsx global>{`
+        /* ── Ambient motion ── */
         @keyframes orb-float-1 { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-20px) scale(1.05); } 66% { transform: translate(-20px,15px) scale(0.95); } }
         @keyframes orb-float-2 { 0%, 100% { transform: translate(0,0) scale(1); } 33% { transform: translate(-25px,20px) scale(0.95); } 66% { transform: translate(15px,-30px) scale(1.08); } }
+        @keyframes orb-float-3 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px,20px) scale(1.04); } }
         @keyframes grid-pan { 0% { transform: translate(0,0); } 100% { transform: translate(60px,60px); } }
-        @keyframes text-glow { 0%, 100% { text-shadow: 0 0 20px rgba(252,200,36,0.3), 0 0 60px rgba(252,200,36,0.1); } 50% { text-shadow: 0 0 30px rgba(252,200,36,0.5), 0 0 80px rgba(252,200,36,0.2); } }
-        @keyframes border-glow { 0%, 100% { border-color: rgba(252,200,36,0.15); } 50% { border-color: rgba(252,200,36,0.35); } }
+
+        /* ── Text effects ── */
+        @keyframes text-glow {
+          0%, 100% { text-shadow: 0 0 20px rgba(252,200,36,0.3), 0 0 60px rgba(252,200,36,0.1); }
+          50% { text-shadow: 0 0 30px rgba(252,200,36,0.5), 0 0 80px rgba(252,200,36,0.2); }
+        }
+        @keyframes border-glow {
+          0%, 100% { border-color: rgba(252,200,36,0.12); box-shadow: 0 0 12px rgba(252,200,36,0.04); }
+          50% { border-color: rgba(252,200,36,0.3); box-shadow: 0 0 20px rgba(252,200,36,0.08); }
+        }
+
+        /* ── Hero stagger load ── */
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .anim-hero-1 { animation: fade-in-up 0.8s 0.2s ease-out both; }
-        .anim-hero-2 { animation: fade-in-up 0.8s 0.4s ease-out both; }
-        .anim-hero-3 { animation: fade-in-up 0.8s 0.6s ease-out both; }
-        .anim-hero-4 { animation: fade-in-up 0.8s 0.8s ease-out both; }
+        .anim-hero-1 { animation: fade-in-up 0.8s 0.15s ease-out both; }
+        .anim-hero-2 { animation: fade-in-up 0.8s 0.35s ease-out both; }
+        .anim-hero-3 { animation: fade-in-up 0.8s 0.55s ease-out both; }
+        .anim-hero-4 { animation: fade-in-up 0.8s 0.75s ease-out both; }
+
+        /* ── Utility classes ── */
         .glow-text { animation: text-glow 3s ease-in-out infinite; }
         .glow-border { animation: border-glow 3s ease-in-out infinite; }
+
+        /* ── Shimmer for accent text ── */
+        @keyframes shimmer-slide {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .shimmer-gold {
+          background: linear-gradient(90deg, #fcc824 0%, #ffe082 40%, #fcc824 60%, #f59e0b 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmer-slide 6s linear infinite;
+        }
+
+        /* ── Pulse ring on stat numbers ── */
+        @keyframes stat-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(252,200,36,0.15); }
+          50% { box-shadow: 0 0 0 6px rgba(252,200,36,0); }
+        }
+
+        /* ── Dot grid pattern ── */
+        .dot-grid {
+          background-image: radial-gradient(circle at 1px 1px, rgba(252,200,36,0.15) 1px, transparent 0);
+          background-size: 32px 32px;
+        }
+
+        /* ── Card shine on hover ── */
+        @keyframes card-shine {
+          0% { left: -100%; }
+          100% { left: 200%; }
+        }
+        .hover-shine:hover::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(252,200,36,0.04), transparent);
+          animation: card-shine 0.8s ease-out forwards;
+          pointer-events: none;
+        }
+
+        /* ── Smooth section scroll behavior ── */
+        html { scroll-behavior: smooth; }
+
+        /* ── Timeline connector pulse ── */
+        @keyframes line-pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.7; }
+        }
       `}</style>
 
       {/* ── NAVIGATION ── */}
@@ -232,7 +316,7 @@ export default function TrialV3B() {
             <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">Sign in</Link>
+            <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300">Sign in</Link>
             <Link href="/register/trial" className="group relative px-5 py-2.5 text-sm font-bold rounded-full transition-all duration-300 hover:-translate-y-0.5 bg-[#fcc824] text-black hover:bg-[#f0be1e] shadow-[0_0_20px_rgba(252,200,36,0.25)] hover:shadow-[0_0_30px_rgba(252,200,36,0.4)]">
               Start Free Trial <ArrowRight className="inline-block w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
             </Link>
@@ -240,12 +324,12 @@ export default function TrialV3B() {
         </div>
       </nav>
 
-      {/* ── HERO — text left, ROBOT right ── */}
+      {/* ── HERO -- text left, ROBOT right ── */}
       <section className="relative min-h-[100vh] lg:min-h-[105vh] flex items-center overflow-x-clip">
-        {/* Background — CSS mesh gradient (no Spline abstract scene) */}
+        {/* Background -- CSS mesh gradient */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Subtle grid lines */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
+          <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: 'linear-gradient(rgba(252,200,36,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(252,200,36,0.6) 1px, transparent 1px)',
             backgroundSize: '60px 60px', animation: 'grid-pan 20s linear infinite',
           }} />
@@ -264,14 +348,14 @@ export default function TrialV3B() {
         </div>
 
         {/* Bottom fade to page bg */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#07080f] to-transparent z-[1]" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#07080f] to-transparent z-[1]" />
 
         {/* Mobile: Robot positioned BEHIND hero text as background element */}
         <MobileSplineBackground className="absolute inset-0 z-[1] lg:hidden" opacity={0.75} />
         {/* Mobile: dark overlay on top of robot for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#07080f]/10 via-transparent to-[#07080f]/40 z-[1] lg:hidden" />
 
-        <div className="relative z-[2] max-w-7xl mx-auto px-5 sm:px-8 pt-24 w-full">
+        <div className="relative z-[2] max-w-7xl mx-auto px-5 sm:px-8 pt-28 lg:pt-24 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Left: text (7 cols) */}
             <div className="lg:col-span-7">
@@ -283,9 +367,9 @@ export default function TrialV3B() {
                 <span className="text-sm font-semibold text-gray-300 tracking-wide">7-day free trial &mdash; no credit card required</span>
               </div>
 
-              <h1 className="anim-hero-2 text-[2.75rem] sm:text-6xl lg:text-[5rem] font-black leading-[1.02] tracking-tight mb-7">
+              <h1 className="anim-hero-2 text-[2.75rem] sm:text-6xl lg:text-[5rem] font-black leading-[1.02] tracking-tighter mb-7">
                 Your AI-powered{' '}<br className="hidden sm:block" />
-                <span className="text-[#fcc824] glow-text">mindset coaching engine</span>
+                <span className="shimmer-gold">mindset coaching engine</span>
               </h1>
 
               <p className="anim-hero-3 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed mb-10">
@@ -294,7 +378,7 @@ export default function TrialV3B() {
               </p>
 
               <div className="anim-hero-4 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/register/trial" className="group relative inline-flex items-center gap-2.5 px-8 py-4 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.25)] hover:shadow-[0_0_50px_rgba(252,200,36,0.4)] hover:-translate-y-1">
+                <Link href="/register/trial" className="group relative inline-flex items-center gap-2.5 px-8 py-4 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.25)] hover:shadow-[0_0_50px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98]">
                   Start building — free <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <div className="flex items-center gap-5 text-sm text-gray-500 sm:mt-3.5">
@@ -304,7 +388,7 @@ export default function TrialV3B() {
               </div>
             </div>
 
-            {/* Right: Robot (5 cols) — desktop only in grid */}
+            {/* Right: Robot (5 cols) -- desktop only in grid */}
             <div className="hidden lg:flex lg:col-span-5 anim-hero-3 justify-center">
               <RobotScene className="h-[600px] w-full" />
             </div>
@@ -313,13 +397,15 @@ export default function TrialV3B() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="relative py-6 border-y border-white/[0.06] bg-white/[0.02] backdrop-blur-sm">
+      <section className="relative py-10 sm:py-12 border-y border-white/[0.06] bg-gradient-to-r from-white/[0.01] via-white/[0.03] to-white/[0.01] backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-0 md:divide-x divide-white/[0.06]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-white/[0.08]">
             {STATS.map((stat, i) => (
-              <div key={i} className="md:px-8 first:md:pl-0 last:md:pr-0 text-center md:text-left">
-                <div className="text-3xl sm:text-4xl font-black tracking-tighter text-white"><AnimatedNumber target={stat.value} /></div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-[0.15em] mt-0.5">{stat.label}</div>
+              <div key={i} className="md:px-10 first:md:pl-0 last:md:pr-0 text-center md:text-left group">
+                <div className="text-4xl sm:text-5xl font-black tracking-tighter text-white transition-colors duration-300 group-hover:text-[#fcc824]">
+                  <AnimatedNumber target={stat.value} />
+                </div>
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-[0.18em] mt-1.5">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -327,30 +413,45 @@ export default function TrialV3B() {
       </section>
 
       {/* ── PIPELINE ── */}
-      <section className="relative py-24 sm:py-32">
+      <section className="relative py-28 sm:py-36">
+        {/* Section ambient glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#fcc824]/[0.03] blur-[200px] pointer-events-none" />
+        {/* Dot grid texture */}
+        <div className="absolute inset-0 dot-grid opacity-[0.03] pointer-events-none" />
+
         <div className="relative max-w-6xl mx-auto px-5 sm:px-8">
           <RevealSection>
             <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
                 <Layers className="w-3.5 h-3.5" /> 4-Phase Journey
               </div>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5">From reactive thinking to{' '}<span className="text-[#fcc824]">designed mindset</span></h2>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6">
+                From reactive thinking to{' '}<span className="text-[#fcc824]">designed mindset</span>
+              </h2>
               <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">10 specialized AI coaches organized into 4 transformation stages.</p>
             </div>
           </RevealSection>
 
           <div className="relative">
-            <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-px bg-gradient-to-b from-[#fcc824]/30 via-[#fcc824]/10 to-transparent hidden md:block" />
-            <div className="space-y-8">
+            {/* Timeline line */}
+            <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-px hidden md:block overflow-hidden">
+              <div className="w-full h-full bg-gradient-to-b from-[#fcc824]/40 via-[#fcc824]/15 to-transparent" style={{ animation: 'line-pulse 4s ease-in-out infinite' }} />
+            </div>
+
+            <div className="space-y-6">
               {WORKFLOW_STAGES.map((stage, stageIdx) => (
-                <RevealSection key={stageIdx} delay={stageIdx * 100}>
+                <RevealSection key={stageIdx} delay={stageIdx * 120}>
                   <div className="relative md:pl-20">
+                    {/* Timeline node */}
                     <div className="hidden md:flex absolute left-0 top-8 w-12 sm:w-16 h-12 sm:h-16 items-center justify-center">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-black text-white border border-white/10"
-                        style={{ backgroundColor: `${stage.accent}20`, borderColor: `${stage.accent}30` }}>{stage.phaseNum}</div>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-black text-white border transition-all duration-300 hover:scale-110"
+                        style={{ backgroundColor: `${stage.accent}18`, borderColor: `${stage.accent}30`, boxShadow: `0 0 20px ${stage.accent}10` }}>
+                        {stage.phaseNum}
+                      </div>
                     </div>
-                    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm overflow-hidden hover:border-white/[0.12] transition-all duration-500 hover:bg-white/[0.04]">
+
+                    {/* Stage card */}
+                    <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm overflow-hidden hover:border-white/[0.12] transition-all duration-500 hover:bg-white/[0.04] hover-shine hover:shadow-[0_4px_40px_rgba(0,0,0,0.3)]">
                       <div className="flex items-center gap-4 px-6 py-5 border-b border-white/[0.04]">
                         <div className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{ backgroundColor: `${stage.accent}20` }}>{stage.phaseNum}</div>
                         <h3 className="text-lg font-extrabold tracking-tight uppercase" style={{ color: stage.accent }}>{stage.phase}</h3>
@@ -358,8 +459,8 @@ export default function TrialV3B() {
                       </div>
                       <div className="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {stage.agents.map((agent, agentIdx) => (
-                          <div key={agentIdx} className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.04] hover:border-white/[0.1] hover:bg-white/[0.06] transition-all duration-300 hover:-translate-y-0.5">
-                            <span className="text-2xl flex-shrink-0 mt-0.5">{agent.icon}</span>
+                          <div key={agentIdx} className="group/agent relative flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.04] hover:border-white/[0.1] hover:bg-white/[0.06] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)]">
+                            <span className="text-2xl flex-shrink-0 mt-0.5 transition-transform duration-300 group-hover/agent:scale-110">{agent.icon}</span>
                             <div className="min-w-0">
                               <div className="text-sm font-bold text-white leading-snug">{agent.name}</div>
                               <div className="text-xs text-gray-500 mt-1 leading-relaxed">{agent.desc}</div>
@@ -384,27 +485,41 @@ export default function TrialV3B() {
         </div>
       </section>
 
+      {/* ── Section divider gradient ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
+
       {/* ── HOW IT WORKS ── */}
-      <section className="relative py-24 sm:py-32 overflow-hidden">
+      <section className="relative py-28 sm:py-36 overflow-hidden">
+        {/* Ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-500/[0.04] blur-[200px] pointer-events-none" />
+        <div className="absolute bottom-0 right-[10%] w-[300px] h-[300px] rounded-full bg-[#fcc824]/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-3 10s ease-in-out infinite' }} />
+
         <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
           <RevealSection>
-            <div className="text-center mb-16">
+            <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6"><Zap className="w-3.5 h-3.5" /> Three Steps</div>
-              <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Zero to clarity{' '}<span className="text-[#fcc824]">in one session</span></h2>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter">Zero to clarity{' '}<span className="text-[#fcc824]">in one session</span></h2>
             </div>
           </RevealSection>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {[
               { num: '01', title: 'Sign up in 30 seconds', desc: 'No credit card. No setup wizard. Just your email and you\'re in.', icon: Zap },
               { num: '02', title: 'Chat with your coaches', desc: 'Mindset Score Agent assesses your baseline. Other coaches build practices, map patterns, and design routines.', icon: MessageSquare },
               { num: '03', title: 'Walk away with a system', desc: 'Your personalized mindset architecture — daily practices, pattern interrupts, and accountability built in.', icon: Target },
             ].map((step, i) => (
               <RevealSection key={i} delay={i * 150}>
-                <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 sm:p-10 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-500 overflow-hidden">
-                  <div className="absolute -top-4 -right-4 text-[120px] font-black leading-none text-white/[0.02] group-hover:text-[#fcc824]/[0.05] transition-colors duration-500 select-none pointer-events-none">{step.num}</div>
+                <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 sm:p-10 hover:border-[#fcc824]/20 hover:bg-white/[0.04] transition-all duration-500 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)]">
+                  {/* Large background number */}
+                  <div className="absolute -top-6 -right-4 text-[140px] font-black leading-none text-white/[0.02] group-hover:text-[#fcc824]/[0.06] transition-all duration-700 select-none pointer-events-none">{step.num}</div>
+                  {/* Connector line between cards (desktop) */}
+                  {i < 2 && (
+                    <div className="hidden md:block absolute top-1/2 -right-4 lg:-right-5 w-8 lg:w-10 h-px bg-gradient-to-r from-white/10 to-transparent z-10" />
+                  )}
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/20 flex items-center justify-center mb-6 group-hover:bg-[#fcc824]/15 transition-colors"><step.icon className="w-6 h-6 text-[#fcc824]" /></div>
+                    <div className="w-14 h-14 rounded-2xl bg-[#fcc824]/10 border border-[#fcc824]/20 flex items-center justify-center mb-7 group-hover:bg-[#fcc824]/15 group-hover:border-[#fcc824]/30 group-hover:shadow-[0_0_24px_rgba(252,200,36,0.1)] transition-all duration-500">
+                      <step.icon className="w-6 h-6 text-[#fcc824]" />
+                    </div>
                     <h3 className="text-xl font-extrabold mb-3 tracking-tight">{step.title}</h3>
                     <p className="text-gray-400 leading-relaxed text-[15px]">{step.desc}</p>
                   </div>
@@ -415,16 +530,68 @@ export default function TrialV3B() {
         </div>
       </section>
 
+      {/* ── Section divider gradient ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+      {/* ── SOCIAL PROOF ── */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        {/* Ambient glow */}
+        <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-[#fcc824]/[0.03] blur-[180px] pointer-events-none" style={{ animation: 'orb-float-2 9s ease-in-out infinite' }} />
+        <div className="absolute bottom-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
+          <RevealSection>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
+                <Users className="w-3.5 h-3.5" /> Early Adopters
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tighter">
+                Entrepreneurs are already{' '}<span className="text-[#fcc824]">designing their thinking</span>
+              </h2>
+            </div>
+          </RevealSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {SOCIAL_PROOF.map((testimonial, i) => (
+              <RevealSection key={i} delay={i * 120}>
+                <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 hover:border-white/[0.1] hover:bg-white/[0.04] transition-all duration-500 hover:-translate-y-1">
+                  {/* Quote icon */}
+                  <Quote className="w-8 h-8 text-[#fcc824]/20 mb-5 group-hover:text-[#fcc824]/30 transition-colors duration-500" />
+                  <p className="text-[15px] text-gray-300 leading-relaxed mb-8 font-medium">&ldquo;{testimonial.quote}&rdquo;</p>
+                  <div className="mt-auto flex items-center gap-3">
+                    {/* Avatar placeholder */}
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#fcc824]/20 to-[#f97316]/20 border border-white/[0.08] flex items-center justify-center text-sm font-bold text-[#fcc824]">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-white">{testimonial.name}</div>
+                      <div className="text-xs text-gray-500">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </div>
+              </RevealSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Section divider gradient ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/15 to-transparent" />
+
       {/* ── WHY MINDSET OS ── */}
-      <section className="relative py-24 sm:py-32">
+      <section className="relative py-28 sm:py-36">
+        {/* Background texture */}
+        <div className="absolute inset-0 dot-grid opacity-[0.02] pointer-events-none" />
+        <div className="absolute top-[30%] right-[5%] w-[400px] h-[400px] rounded-full bg-[#fcc824]/[0.02] blur-[180px] pointer-events-none" style={{ animation: 'orb-float-1 11s ease-in-out infinite' }} />
+
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-20 items-start">
             <div className="lg:col-span-3">
               <RevealSection>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6"><Star className="w-3.5 h-3.5" /> Why MindsetOS</div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-12">Built for mindset coaches who are{' '}<span className="text-[#fcc824]">done guessing</span></h2>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mb-14">Built for mindset coaches who are{' '}<span className="text-[#fcc824]">done guessing</span></h2>
               </RevealSection>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   { icon: Target, title: 'Clarity', text: 'Know exactly what patterns drive you, what triggers you, and how to rewire it.' },
                   { icon: TrendingUp, title: 'Momentum', text: 'Build practices that stick — based on frameworks proven across hundreds of entrepreneurs.' },
@@ -434,7 +601,9 @@ export default function TrialV3B() {
                 ].map((item, i) => (
                   <RevealSection key={i} delay={i * 80}>
                     <div className="group flex items-start gap-4 p-5 rounded-xl border border-transparent hover:border-white/[0.06] hover:bg-white/[0.02] transition-all duration-300">
-                      <div className="w-11 h-11 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#fcc824]/15 transition-colors"><item.icon className="w-5 h-5 text-[#fcc824]" /></div>
+                      <div className="w-11 h-11 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#fcc824]/15 group-hover:border-[#fcc824]/30 group-hover:shadow-[0_0_16px_rgba(252,200,36,0.08)] transition-all duration-500">
+                        <item.icon className="w-5 h-5 text-[#fcc824]" />
+                      </div>
                       <div>
                         <div className="text-sm font-extrabold text-white uppercase tracking-wider mb-1">{item.title}</div>
                         <div className="text-[15px] text-gray-400 leading-relaxed">{item.text}</div>
@@ -445,21 +614,28 @@ export default function TrialV3B() {
               </div>
             </div>
 
+            {/* Sticky pricing/trial card */}
             <div className="lg:col-span-2 lg:sticky lg:top-24">
               <RevealSection delay={200}>
-                <div className="relative rounded-3xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-8 sm:p-10 overflow-hidden">
+                <div className="relative rounded-3xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.02] backdrop-blur-xl p-8 sm:p-10 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
+                  {/* Card glow accents */}
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#fcc824]/10 rounded-full blur-[80px] pointer-events-none" />
                   <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px] pointer-events-none" />
                   <div className="relative">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fcc824]/10 border border-[#fcc824]/20 text-[#fcc824] text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3.5 h-3.5" /> Free 7-day trial</div>
                     <h3 className="text-2xl font-black tracking-tight mb-2">Everything included.</h3>
                     <p className="text-gray-500 mb-8">No credit card. No strings.</p>
-                    <div className="space-y-3 mb-8">
+                    <div className="space-y-3.5 mb-8">
                       {['7 days of full, unrestricted access', 'All 10 MindsetOS AI coaches unlocked', 'Complete mindset architecture pipeline', 'Conversation history saved', 'AI-powered sessions with every coach', 'No credit card required to start'].map((item, i) => (
-                        <div key={i} className="flex items-center gap-3"><CheckCircle className="w-4 h-4 text-[#fcc824] flex-shrink-0" /><span className="text-sm text-gray-300">{item}</span></div>
+                        <div key={i} className="flex items-center gap-3">
+                          <div className="w-5 h-5 rounded-full bg-[#fcc824]/10 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle className="w-3.5 h-3.5 text-[#fcc824]" />
+                          </div>
+                          <span className="text-sm text-gray-300">{item}</span>
+                        </div>
                       ))}
                     </div>
-                    <Link href="/register/trial" className="group w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-extrabold rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.2)] hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:-translate-y-0.5">
+                    <Link href="/register/trial" className="group w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-extrabold rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.2)] hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:-translate-y-0.5 hover:scale-[1.01] active:scale-[0.98]">
                       Start your free trial <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Link>
                     <p className="text-center text-xs text-gray-600 mt-4">Takes less than 30 seconds to set up</p>
@@ -471,9 +647,14 @@ export default function TrialV3B() {
         </div>
       </section>
 
+      {/* ── Section divider gradient ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
       {/* ── FINAL CTA with ROBOT reappearing ── */}
-      <section className="relative py-28 sm:py-36 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full bg-[#fcc824]/[0.06] blur-[200px] pointer-events-none" />
+      <section className="relative py-32 sm:py-40 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-[#fcc824]/[0.05] blur-[200px] pointer-events-none" />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-2 12s ease-in-out infinite' }} />
 
         {/* Mobile: Robot behind CTA text */}
         <MobileSplineBackground className="absolute inset-0 lg:hidden" opacity={0.5} />
@@ -481,7 +662,7 @@ export default function TrialV3B() {
 
         <div className="relative z-[2] max-w-7xl mx-auto px-5 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Robot reappears — desktop only */}
+            {/* Left: Robot reappears -- desktop only */}
             <div className="hidden lg:block">
               <RevealSection>
                 <RobotScene className="h-[450px] w-full" />
@@ -491,7 +672,7 @@ export default function TrialV3B() {
             {/* Right: CTA text */}
             <div className="text-center lg:text-left relative z-[2]">
               <RevealSection>
-                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-[1.1]">
+                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6 leading-[1.08]">
                   Stop running your mind
                   <span className="text-[#fcc824]"> on autopilot.</span>
                 </h2>
@@ -499,7 +680,7 @@ export default function TrialV3B() {
                   Entrepreneurs are already using MindsetOS to design how they think, build daily practices,
                   and make better decisions under pressure. Your 7-day trial starts now.
                 </p>
-                <Link href="/register/trial" className="group inline-flex items-center gap-3 px-10 py-5 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1">
+                <Link href="/register/trial" className="group inline-flex items-center gap-3 px-10 py-5 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98]">
                   Start your free trial <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
                 <p className="text-sm text-gray-600 mt-6 font-medium">No credit card &middot; Cancel anytime &middot; Full access for 7 days</p>
@@ -510,22 +691,26 @@ export default function TrialV3B() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="py-10 border-t border-white/[0.04] bg-[#050610]">
+      <footer className="relative py-12 border-t border-white/[0.06] bg-[#050610]">
+        {/* Subtle top glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[2px] bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <MindsetOSLogo size="xs" variant="light" />
-              <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline">Greg</a></span>
+              <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline transition-colors duration-300">Greg</a></span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
-              <Link href="/agency" className="hover:text-white transition-colors">Coaching Practice</Link>
-              <Link href="/join" className="hover:text-white transition-colors">Join</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-              <a href="https://www.linkedin.com/in/gregmindset/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Contact</a>
+              <Link href="/agency" className="hover:text-white transition-colors duration-300">Coaching Practice</Link>
+              <Link href="/join" className="hover:text-white transition-colors duration-300">Join</Link>
+              <Link href="/terms" className="hover:text-white transition-colors duration-300">Terms</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors duration-300">Privacy</Link>
+              <a href="https://www.linkedin.com/in/gregmindset/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-300">Contact</a>
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-white/[0.04] text-center"><p className="text-xs text-gray-700">&copy; 2026 MindsetOS. All rights reserved.</p></div>
+          <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
+            <p className="text-xs text-gray-700">&copy; 2026 MindsetOS. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

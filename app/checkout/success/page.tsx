@@ -15,7 +15,7 @@ export default function CheckoutSuccessPage() {
           <MindsetOSLogo size="md" variant="dark" />
           <span className="text-lg font-bold text-gray-900">
             <span className="text-gray-400 font-normal mx-1.5">+</span>
-            Client Fast Start
+            Mindset Architecture
           </span>
         </div>
       </div>

@@ -3,3 +3,8 @@ node_modules
 .git
 *.md
 scripts
+docs
+.claude
+*.backup
+*.png
+*.jpg

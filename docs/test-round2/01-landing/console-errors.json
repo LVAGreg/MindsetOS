@@ -1,0 +1,26 @@
+{
+  "consoleMessages": [
+    {
+      "type": "log",
+      "text": "🔄 [PERSIST] Hydration complete, state: {hasUser: false, userEmail: undefined, isAuthenticated: false, currentAgent: general, currentConversation: null}"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f9c00156800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f9c00156800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f9c00156800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x1f9c00156800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ],
+  "errors": [],
+  "networkFailures": []
+}
