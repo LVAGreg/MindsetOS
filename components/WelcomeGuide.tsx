@@ -12,7 +12,7 @@ const STEPS = [
   {
     id: 'agents',
     title: 'Your AI Agents Live Here',
-    description: 'Tap this button to browse and switch between all your expert agents — Money Model Mapper, Offer Invitation Architect, and more.',
+    description: 'Tap this button to browse and switch between all your mindset coaches — Mindset Score, Reset Guide, Practice Builder, and more.',
     position: 'top-left' as const,
     arrowDirection: 'up' as const,
   },
@@ -26,7 +26,7 @@ const STEPS = [
   {
     id: 'start',
     title: 'Ready to Go!',
-    description: "Pick an agent and start chatting. Each one is trained on proven frameworks to help you build, promote, and sell your expertise.",
+    description: "Pick a coach and start chatting. Each one is trained on proven frameworks to help you assess, interrupt patterns, and design your mindset.",
     position: 'center' as const,
     arrowDirection: 'none' as const,
   },

@@ -397,7 +397,7 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Money Model Maker"
+                  placeholder="e.g., Mindset Score Agent"
                 />
               </div>
 
@@ -538,7 +538,7 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                   value={conversationStarter1}
                   onChange={(e) => setConversationStarter1(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Help me define my Money Model"
+                  placeholder="e.g., Help me take my Mindset Score"
                 />
               </div>
 

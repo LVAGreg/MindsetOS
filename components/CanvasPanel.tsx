@@ -33,9 +33,9 @@ const TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'script',    label: 'Script'        },
   { value: 'email',     label: 'Email'         },
   { value: 'code',      label: 'Code'          },
-  { value: 'money-model', label: 'Money Model' },
-  { value: 'offer',     label: 'Offer'         },
-  { value: 'event',     label: 'Event Plan'    },
+  { value: 'mindset-score', label: 'Mindset Score' },
+  { value: 'practice',  label: 'Practice Plan'  },
+  { value: 'exercise',  label: 'Exercise'       },
 ];
 
 interface BrowseArtifact {

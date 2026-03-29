@@ -51,7 +51,7 @@ export default function TrialRegisterPage() {
       setTrialInfo({
         expiresAt: result.trial?.expiresAt,
         daysRemaining: result.trial?.daysRemaining || 7,
-        trialAgent: result.trial?.trialAgent || 'Money Model Mapper',
+        trialAgent: result.trial?.trialAgent || 'Mindset Score Agent',
       });
       setRegistrationComplete(true);
     } catch (err: any) {
@@ -176,13 +176,13 @@ export default function TrialRegisterPage() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#fcc824' }} />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Build your offer foundation in minutes
+                  Build your mindset foundation in minutes
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#fcc824' }} />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Guided workflows from offer to client conversion
+                  Guided workflows from self-awareness to daily practice
                 </span>
               </div>
             </div>

@@ -116,7 +116,7 @@ export default function CheckoutSuccessPage() {
               <h3 className="font-bold text-gray-900 mb-1">Join Your First Live Coaching Call</h3>
               <p className="text-sm text-gray-600">
                 Once you&apos;re in the community, check the schedule for the next live coaching session.
-                Bring your Money Model or offer draft — coaches give direct, actionable feedback.
+                Bring your Mindset Score or practice plan — coaches give direct, actionable feedback.
               </p>
             </div>
           </div>
@@ -129,8 +129,8 @@ export default function CheckoutSuccessPage() {
             <h3 className="font-bold text-white text-sm">Recommended First Move</h3>
           </div>
           <p className="text-sm text-gray-300 mb-4">
-            Open MindsetOS → Start a conversation with the <strong className="text-white">Money Model Mapper</strong> →
-            Build your offer foundation in minutes. Then take it to coaching for feedback.
+            Open MindsetOS → Start a conversation with the <strong className="text-white">Mindset Score Agent</strong> →
+            Get your baseline assessment in minutes. Then take it to coaching for feedback.
           </p>
           <Link
             href="/dashboard"

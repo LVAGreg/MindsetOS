@@ -23,7 +23,7 @@ export const MINDSET_AGENTS = {
   CLIENT_ONBOARDING: {
     id: 'client-onboarding',
     name: 'Client Onboarding',
-    description: 'Build your complete business profile - 11 questions, 5 sections',
+    description: 'Build your complete mindset profile - personalized setup for your coaching journey',
     icon: '👋',
     color: 'bg-teal-500',
     tags: ['workflow', 'popular'],
@@ -32,7 +32,7 @@ export const MINDSET_AGENTS = {
     workflowStep: 2,
     starterPrompts: [
       "Let's begin!",
-      "Help me build my business profile",
+      "Help me set up my mindset profile",
       "Guide me through onboarding"
     ]
   },

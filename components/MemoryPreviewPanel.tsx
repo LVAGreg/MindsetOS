@@ -74,16 +74,18 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
   const getSourceName = (source: string) => {
     const names: Record<string, string> = {
       'client-onboarding': 'Client Onboarding',
-      'money-model-maker': 'Money Model Maker',
-      'mmm-5in30': 'Money Model Mapper (5in30)',
-      'fast-fix-finder': 'Fast Fix Finder',
-      'offer-promo-printer': 'Offer Promo Printer',
-      'offer-invitation-architect': 'The Offer Invitation Architect',
-      'presentation-printer': 'Presentation Printer',
-      'linkedin-events-builder-buddy': 'LinkedIn Events Builder Buddy',
-      'promo-planner': 'Promo Planner',
+      'mindset-score': 'Mindset Score Agent',
+      'reset-guide': 'Reset Guide',
+      'architecture-coach': 'Architecture Coach',
+      'inner-world-mapper': 'Inner World Mapper',
+      'practice-builder': 'Practice Builder',
+      'decision-framework': 'Decision Framework Agent',
+      'accountability-partner': 'Accountability Partner',
+      'story-excavator': 'Story Excavator',
+      'conversation-curator': 'Conversation Curator',
+      'launch-companion': 'Launch Companion',
     };
-    return names[source] || 'Previous Agent';
+    return names[source] || 'Previous Coach';
   };
 
   return (

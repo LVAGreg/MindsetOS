@@ -18,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <Script id="theme-initializer" strategy="beforeInteractive">
           {`
             (function() {

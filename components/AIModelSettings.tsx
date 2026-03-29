@@ -118,11 +118,11 @@ export default function AIModelSettings() {
                 <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   💬 Chat Agents
                   <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
-                    (All 6 MindsetOS agents)
+                    (All 10 MindsetOS coaches)
                   </span>
                 </h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Powers Money Model Mapper, Offer Invitation Architect, and all other agent conversations
+                  Powers Mindset Score Agent, Reset Guide, Architecture Coach, and all other coach conversations
                 </p>
               </div>
               <ModelSelector

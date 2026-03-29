@@ -175,8 +175,8 @@ export default function CoachingPracticeCheckoutSuccessPage() {
             <h3 className="font-bold text-white text-sm">Recommended First Move</h3>
           </div>
           <p className="text-sm text-gray-300 mb-4">
-            Open MindsetOS → Create your first client profile → Run <strong className="text-white">Client Onboarding</strong> for
-            that client → Then <strong className="text-white">Money Model Mapper</strong> to nail their foundation.
+            Open MindsetOS → Create your first client profile → Run <strong className="text-white">Mindset Score Agent</strong> for
+            that client → Then <strong className="text-white">Practice Builder</strong> to design their daily routine.
           </p>
           <Link
             href="/dashboard"

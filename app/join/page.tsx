@@ -19,18 +19,18 @@ const CHECKOUT_URL = '/checkout';
 const WHAT_YOU_GET = [
   {
     icon: BookOpen,
-    title: '12 AI-Powered Implementation Modules',
-    desc: 'Built for easy execution, fast outcomes. Not theory — action.',
+    title: '10 AI-Powered Mindset Coaches',
+    desc: 'Built for entrepreneurs. Not theory — practice, patterns, and daily transformation.',
   },
   {
     icon: FileText,
-    title: 'Plug-and-Play Offer Frameworks & Templates',
-    desc: 'Never guess or start from scratch. Proven templates that convert.',
+    title: 'Proven Mindset Frameworks & Templates',
+    desc: 'Never guess or start from scratch. The 3-Layer Architecture that actually works.',
   },
   {
     icon: Sparkles,
-    title: 'AI Agents Trained on Offers That Actually Convert',
-    desc: 'Speed up clarity, messaging, and implementation with AI that understands mindset coaching.',
+    title: 'AI Coaches Trained on Real Mindset Science',
+    desc: 'Speed up self-awareness, pattern interruption, and daily practice with AI that gets it.',
   },
   {
     icon: Video,
@@ -39,13 +39,13 @@ const WHAT_YOU_GET = [
   },
   {
     icon: Target,
-    title: 'A Clear Path From Idea to Offer to Income',
-    desc: 'A clear plan, a repeatable process, and 5-figure opportunities.',
+    title: 'A Clear Path From Reactive to Designed',
+    desc: 'A clear plan, a repeatable practice, and a mind that works for you — not against you.',
   },
   {
     icon: FileText,
     title: 'Implementation Workbook',
-    desc: 'Templates, scripts, frameworks, and real examples to get you winning clients immediately.',
+    desc: 'Templates, exercises, frameworks, and real examples to start transforming immediately.',
   },
 ];
 
@@ -205,19 +205,19 @@ export default function JoinPage() {
                 <span style={{ color: '#fcc824' }}>Build It For You</span>
               </h2>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                These aren't generic chatbots. Each agent is trained on the exact frameworks inside the Client Fast Start
-                — so they build your offer, write your promos, plan your campaigns, and script your sales calls
-                while you focus on delivery.
+                These aren't generic chatbots. Each coach is trained on proven mindset frameworks
+                — so they assess your patterns, build daily practices, map your inner world, and design
+                your operating system while you focus on showing up.
               </p>
               <div className="space-y-3">
                 {[
-                  'Money Model Mapper — Build your offer foundation',
-                  'Offer Invitation Architect — Write promos that convert',
-                  'Presentation Printer — Design expert presentations',
-                  'Qualification Call Builder — Sales scripts that close',
-                  'LinkedIn Events Builder — Fill your event pipeline',
-                  'MindsetAI Super Agent — On-demand mindset coaching guidance',
-                  '+ 8 more specialist agents',
+                  'Mindset Score Agent — Assess your baseline across 3 pillars',
+                  'Reset Guide — 48-hour weekend challenge with 6 exercises',
+                  'Architecture Coach — 90-day transformation companion',
+                  'Practice Builder — Personalized daily mindset routines',
+                  'Accountability Partner — Daily check-ins and streak tracking',
+                  'Inner World Mapper — Map beliefs, stories, and self-talk',
+                  '+ 4 more specialist coaches',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#fcc824' }} />

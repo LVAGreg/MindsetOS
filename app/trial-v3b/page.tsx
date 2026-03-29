@@ -289,8 +289,8 @@ export default function TrialV3B() {
               </h1>
 
               <p className="anim-hero-3 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed mb-10">
-                14 AI agents that build your offer, write your promotions, craft your sales scripts,
-                and convert leads — all inside one system.
+                10 AI coaches that assess your mindset, build daily practices, map your patterns,
+                and architect lasting change — all inside one system.
               </p>
 
               <div className="anim-hero-4 flex flex-col sm:flex-row items-start gap-4">
@@ -333,10 +333,10 @@ export default function TrialV3B() {
           <RevealSection>
             <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
-                <Layers className="w-3.5 h-3.5" /> 5-Phase Pipeline
+                <Layers className="w-3.5 h-3.5" /> 4-Phase Journey
               </div>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5">From blank page to{' '}<span className="text-[#fcc824]">paying clients</span></h2>
-              <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">14 specialized agents organized into 5 workflow stages.</p>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5">From reactive thinking to{' '}<span className="text-[#fcc824]">designed mindset</span></h2>
+              <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">10 specialized AI coaches organized into 4 transformation stages.</p>
             </div>
           </RevealSection>
 
@@ -377,7 +377,7 @@ export default function TrialV3B() {
           <RevealSection delay={200}>
             <div className="mt-16 flex justify-center">
               <Link href="/register/trial" className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-white font-bold text-lg transition-all duration-300 hover:bg-white/[0.1] hover:border-[#fcc824]/30 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(252,200,36,0.1)]">
-                <Sparkles className="w-5 h-5 text-[#fcc824]" /> Unlock all 14 agents — free for 7 days <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <Sparkles className="w-5 h-5 text-[#fcc824]" /> Unlock all 10 coaches — free for 7 days <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
           </RevealSection>
@@ -391,14 +391,14 @@ export default function TrialV3B() {
           <RevealSection>
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6"><Zap className="w-3.5 h-3.5" /> Three Steps</div>
-              <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Zero to framework{' '}<span className="text-[#fcc824]">in one session</span></h2>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight">Zero to clarity{' '}<span className="text-[#fcc824]">in one session</span></h2>
             </div>
           </RevealSection>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { num: '01', title: 'Sign up in 30 seconds', desc: 'No credit card. No setup wizard. Just your email and you\'re in.', icon: Zap },
-              { num: '02', title: 'Chat with your agents', desc: 'Money Model Mapper builds your offer foundation. Other agents handle promotions, scripts, content.', icon: MessageSquare },
-              { num: '03', title: 'Walk away with a system', desc: 'PEOPLE + PROMISE + PRINCIPLES framework, sales scripts, promo campaigns — all ready to deploy.', icon: Target },
+              { num: '02', title: 'Chat with your coaches', desc: 'Mindset Score Agent assesses your baseline. Other coaches build practices, map patterns, and design routines.', icon: MessageSquare },
+              { num: '03', title: 'Walk away with a system', desc: 'Your personalized mindset architecture — daily practices, pattern interrupts, and accountability built in.', icon: Target },
             ].map((step, i) => (
               <RevealSection key={i} delay={i * 150}>
                 <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 sm:p-10 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-500 overflow-hidden">
@@ -426,8 +426,8 @@ export default function TrialV3B() {
               </RevealSection>
               <div className="space-y-4">
                 {[
-                  { icon: Target, title: 'Clarity', text: 'Know exactly who you help, what you promise, and how to articulate it.' },
-                  { icon: TrendingUp, title: 'Velocity', text: 'Build offers that sell — based on frameworks proven across 87+ coaches.' },
+                  { icon: Target, title: 'Clarity', text: 'Know exactly what patterns drive you, what triggers you, and how to rewire it.' },
+                  { icon: TrendingUp, title: 'Momentum', text: 'Build practices that stick — based on frameworks proven across hundreds of entrepreneurs.' },
                   { icon: MessageSquare, title: 'AI Guidance', text: 'Agents that walk you through each step. Not just text generators.' },
                   { icon: Users, title: 'Community', text: 'Join coaches already scaling with systematic, repeatable processes.' },
                   { icon: Shield, title: 'Privacy', text: 'Enterprise-grade security. Your data, your business, your control.' },
@@ -455,7 +455,7 @@ export default function TrialV3B() {
                     <h3 className="text-2xl font-black tracking-tight mb-2">Everything included.</h3>
                     <p className="text-gray-500 mb-8">No credit card. No strings.</p>
                     <div className="space-y-3 mb-8">
-                      {['7 days of full, unrestricted access', 'All 14 MindsetOS AI agents unlocked', 'Complete offer-to-client pipeline', 'Conversation history saved', 'AI-powered sessions with every agent', 'No credit card required to start'].map((item, i) => (
+                      {['7 days of full, unrestricted access', 'All 10 MindsetOS AI coaches unlocked', 'Complete mindset architecture pipeline', 'Conversation history saved', 'AI-powered sessions with every coach', 'No credit card required to start'].map((item, i) => (
                         <div key={i} className="flex items-center gap-3"><CheckCircle className="w-4 h-4 text-[#fcc824] flex-shrink-0" /><span className="text-sm text-gray-300">{item}</span></div>
                       ))}
                     </div>
@@ -492,12 +492,12 @@ export default function TrialV3B() {
             <div className="text-center lg:text-left relative z-[2]">
               <RevealSection>
                 <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-[1.1]">
-                  Stop building your business
-                  <span className="text-[#fcc824]"> from scratch.</span>
+                  Stop running your mind
+                  <span className="text-[#fcc824]"> on autopilot.</span>
                 </h2>
                 <p className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
-                  87+ coaches already use MindsetOS to systematically build offers, run promotions,
-                  and convert clients. Your 7-day trial starts now.
+                  Entrepreneurs are already using MindsetOS to design how they think, build daily practices,
+                  and make better decisions under pressure. Your 7-day trial starts now.
                 </p>
                 <Link href="/register/trial" className="group inline-flex items-center gap-3 px-10 py-5 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1">
                   Start your free trial <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
