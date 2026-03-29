@@ -307,7 +307,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-8">
+      <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
         <div className="max-w-6xl mx-auto flex items-center justify-center h-64">
           <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full" />
         </div>
@@ -317,7 +317,7 @@ export default function ProfilePage() {
 
   if (error && !profile) {
     return (
-      <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-8">
+      <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg">
             <AlertCircle className="h-5 w-5" />
@@ -335,7 +335,7 @@ export default function ProfilePage() {
   return (
     <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700/50 px-8 py-4">
+      <div className="sticky top-0 z-10 bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700/50 px-4 sm:px-8 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -349,7 +349,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-8 pt-6 pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 pb-8">
 
         {/* Takeover Notice */}
         {takeoverStatus?.isTakenOver && takeoverStatus.takeover && (
@@ -802,7 +802,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {saving ? (
                   <>
@@ -825,7 +825,7 @@ export default function ProfilePage() {
           style={{ borderColor: '#6366F140', background: 'linear-gradient(135deg, #6366F108, #6366F103)' }}
         >
           <form onSubmit={handleSaveBrandVoice}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-6 w-6 text-indigo-500" />
                 <div>
@@ -837,7 +837,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Enable/Disable Toggle */}
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer self-start sm:self-auto">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {brandVoiceData.isEnabled ? 'Enabled' : 'Disabled'}
                 </span>
@@ -1022,7 +1022,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {saving ? (
                   <>

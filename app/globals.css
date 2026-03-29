@@ -2,35 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   MindsetOS Design System — CSS Custom Properties
+   Dark mode is always-on (class applied in layout.tsx)
+   ============================================================ */
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+  /* ── Backgrounds ───────────────────────────────────────── */
+  --color-base:            #09090f;  /* body bg — deep warm near-black */
+  --color-dark:            #0d0d18;  /* sidebar, panel backgrounds */
+  --color-surface:         #12121f;  /* card / module surfaces */
+  --color-surface-raised:  #181828;  /* dropdowns, elevated cards */
+  --color-surface-high:    #1e1e30;  /* tooltips, highest elevation */
+
+  /* ── Borders ───────────────────────────────────────────── */
+  --color-border:          #1e1e30;  /* default border */
+  --color-border-subtle:   #161624;  /* hairline / section dividers */
+  --color-border-bright:   #2a2a42;  /* focused / active state borders */
+
+  /* ── Text ──────────────────────────────────────────────── */
+  --color-text:            #ededf5;  /* primary — warm white, not pure */
+  --color-text-secondary:  #9090a8;  /* secondary / metadata */
+  --color-text-tertiary:   #5a5a72;  /* placeholder, disabled */
+
+  /* ── Brand blue/violet ─────────────────────────────────── */
+  --color-blue:            #4f6ef7;  /* primary — intelligent, calm */
+  --color-blue-light:      #7b92ff;  /* hover / highlight */
+  --color-blue-dim:        #3a54d4;  /* pressed / active */
+  --color-violet:          #7c5bf6;  /* accent — breakthrough moments */
+  --color-violet-light:    #a07ef9;  /* violet hover */
+
+  /* ── Semantic states ───────────────────────────────────── */
+  --color-success:         #22c55e;
+  --color-warning:         #f59e0b;
+  --color-error:           #ef4444;
+
+  /* ── Amber — upgrade CTAs, trial banners only ──────────── */
+  --color-amber:           #f59e0b;
+  --color-amber-bright:    #fcc824;
+  --color-amber-dark:      #d97706;
+
+  /* ── Typography ────────────────────────────────────────── */
+  --font-heading:          'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:             'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono:             'JetBrains Mono', 'Fira Code', monospace;
 }
 
-.dark {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 17, 24, 39;
-  --background-end-rgb: 17, 24, 39;
-}
+@layer base {
+  html {
+    color-scheme: dark;
+  }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  body {
+    background-color: var(--color-base);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Subtle SVG noise grain — adds depth, breaks flatness */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 300px 300px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgba(79, 110, 247, 0.25);
+    color: #ffffff;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .heading-tight {
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  .heading-tighter {
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
 }
 
-/* Custom scrollbar */
+/* ── Scrollbar — dark-first, always ─────────────────────── */
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
@@ -40,26 +112,12 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Light mode scrollbar */
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.08);
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.15);
-}
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-}
-.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.13);
 }
 
 /* Message animations */
@@ -112,21 +170,38 @@ body {
    MindsetOS Premium Design System
    ============================================ */
 
-/* Branding Utilities */
+/* ── Branding Utilities ──────────────────────────────────── */
+
+/* Primary gradient — blue to violet */
 .mindset-gradient {
+  background: linear-gradient(135deg, #4f6ef7 0%, #7c5bf6 100%);
+}
+
+/* Amber gradient — upgrade CTAs only */
+.mindset-gradient-amber {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
+/* Gradient text — indigo-violet for hero headings */
+.gradient-text-brand {
+  background: linear-gradient(135deg, #7b92ff 0%, #4f6ef7 40%, #7c5bf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .mindset-text {
-  color: #f59e0b;
+  color: var(--color-blue-light);
 }
 
 .mindset-border {
-  border-color: #f59e0b;
+  border-color: var(--color-blue);
 }
 
 .mindset-glow {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(6, 182, 212, 0.05);
+  box-shadow:
+    0 0 24px rgba(79, 110, 247, 0.14),
+    0 0 64px rgba(124, 91, 246, 0.06);
 }
 
 /* Checkout page section animations */
@@ -145,21 +220,20 @@ body {
   animation: checkoutFadeUp 0.6s ease-out both;
 }
 
-/* Premium Sidebar Background */
+/* ── Sidebar ─────────────────────────────────────────────── */
 .mindset-sidebar {
-  background-color: #0a0a1a;
-  background-image: radial-gradient(rgba(245, 158, 11, 0) 49%, rgba(245, 158, 11, 0.08) 100%),
-    radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 60%),
-    linear-gradient(#050510 0%, #0a0a1a 40%, #0a0a1a 100%);
-  background-position: 0px 0px, 0px 0px, 0px 0px;
+  background-color: var(--color-dark);
+  background-image:
+    radial-gradient(ellipse 500px 600px at 50% 100%, rgba(79, 110, 247, 0.045) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 300px at 80% 20%, rgba(124, 91, 246, 0.03) 0%, transparent 60%);
   background-repeat: no-repeat;
-  background-size: 100%, 100%, 100%;
+  background-size: 100%, 100%;
 }
 
-/* Dashboard Premium Background — ambient gradient orbs */
+/* ── Dashboard ambient background ───────────────────────── */
 .dashboard-bg {
   position: relative;
-  background-color: #111827;
+  background-color: var(--color-base);
 }
 
 .dashboard-bg::before {
@@ -169,9 +243,9 @@ body {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 600px 400px at 10% 20%, rgba(252, 200, 36, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 85% 60%, rgba(6, 182, 212, 0.03) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 300px at 50% 90%, rgba(139, 92, 246, 0.02) 0%, transparent 70%);
+    radial-gradient(ellipse 700px 500px at 8%  15%, rgba(79, 110, 247, 0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 600px 600px at 88% 55%, rgba(124, 91, 246, 0.04) 0%, transparent 65%),
+    radial-gradient(ellipse 450px 350px at 50% 92%, rgba(79, 110, 247, 0.03) 0%, transparent 65%);
 }
 
 /* Dot Grid pattern overlay */
@@ -205,14 +279,8 @@ body {
 .agent-card-glow:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-.dark .agent-card-glow:hover {
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
+    0 4px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(79, 110, 247, 0.12);
 }
 
 /* Premium section divider */
@@ -234,16 +302,18 @@ body {
   bottom: 25%;
   width: 3px;
   border-radius: 0 4px 4px 0;
-  background: #fcc824;
+  background: var(--color-blue);
 }
 
-/* Header glassmorphism */
+/* ── Header glassmorphism ────────────────────────────────── */
 .header-glass {
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background-color: rgba(9, 9, 15, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
 }
 
-/* Welcome section gradient text */
+/* ── Gradient text — amber (CTAs / upgrade only) ─────────── */
 .gradient-text-amber {
   background: linear-gradient(135deg, #fcc824 0%, #f59e0b 50%, #d97706 100%);
   -webkit-background-clip: text;
@@ -251,7 +321,16 @@ body {
   background-clip: text;
 }
 
-/* Premium button glow on hover */
+/* ── Button glow — blue primary ──────────────────────────── */
+.btn-glow-blue {
+  transition: all 0.25s ease;
+}
+.btn-glow-blue:hover {
+  box-shadow: 0 0 22px rgba(79, 110, 247, 0.28), 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* ── Button glow — amber (legacy alias, upgrade CTAs) ────── */
 .btn-glow-amber {
   transition: all 0.3s ease;
 }
@@ -260,12 +339,9 @@ body {
   transform: translateY(-1px);
 }
 
-/* Collapsed sidebar subtle border glow */
+/* ── Collapsed sidebar border ────────────────────────────── */
 .sidebar-collapsed-border {
-  border-right: 1px solid rgba(31, 41, 55, 1);
-}
-.dark .sidebar-collapsed-border {
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid var(--color-border);
 }
 
 /* Agent browser category label */
@@ -278,7 +354,7 @@ body {
   transition: all 0.2s ease;
 }
 .toggle-premium:focus-visible {
-  outline: 2px solid #fcc824;
+  outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }
 
@@ -293,4 +369,324 @@ body {
   .agent-card-glow:hover {
     transform: none;
   }
+}
+
+/* ============================================
+   MindsetOS Premium Chat Interface
+   ============================================ */
+
+/* ── Chat area background ────────────────────────────────── */
+.chat-area-bg {
+  position: relative;
+  background-color: var(--color-base);
+}
+
+.chat-area-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Subtle blue/violet orbs — intelligent, calm */
+  background:
+    radial-gradient(ellipse 700px 500px at 15% 10%, rgba(79, 110, 247, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 600px at 80% 70%, rgba(124, 91, 246, 0.025) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 400px at 50% 95%, rgba(79, 110, 247, 0.02) 0%, transparent 70%);
+}
+
+/* Dot-grid overlay at micro opacity — adds depth without noise */
+.chat-area-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.018) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* All chat content sits above the decorative layers */
+.chat-content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Agent message bubble — glassmorphic panel */
+.msg-agent {
+  background: rgba(18, 18, 31, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.025) inset;
+  transition: box-shadow 0.2s ease;
+}
+
+.msg-agent:hover {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(79, 110, 247, 0.08) inset;
+}
+
+/* User message bubble — blue-violet identity */
+.msg-user {
+  background: linear-gradient(135deg, rgba(79, 110, 247, 0.13) 0%, rgba(124, 91, 246, 0.09) 100%);
+  border: 1px solid rgba(79, 110, 247, 0.22);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(79, 110, 247, 0.06);
+}
+
+/* Streaming / typing indicator — calm breathing pulse */
+@keyframes breathe {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 0.8; transform: scale(1); }
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-blue-light);
+  animation: breathe 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.35s; }
+.typing-dot:nth-child(3) { animation-delay: 0.70s; }
+
+/* Input area — dark glass panel */
+.chat-input-area {
+  background: rgba(9, 9, 15, 0.88);
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Input field itself */
+.chat-textarea {
+  background: rgba(18, 18, 31, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(237, 237, 245, 0.92);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-textarea:focus {
+  outline: none;
+  border-color: rgba(79, 110, 247, 0.45);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.07), 0 0 20px rgba(79, 110, 247, 0.05);
+}
+
+.chat-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+/* Send button — brand blue */
+.send-btn {
+  background: linear-gradient(135deg, #4f6ef7 0%, #7c5bf6 100%);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.send-btn:hover:not(:disabled) {
+  box-shadow: 0 0 22px rgba(79, 110, 247, 0.35), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Icon action buttons on agent messages */
+.msg-action-btn {
+  color: rgba(255, 255, 255, 0.22);
+  transition: color 0.15s ease, background 0.15s ease;
+  border-radius: 6px;
+  padding: 5px;
+}
+
+.msg-action-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Starter prompt cards */
+.starter-prompt-card {
+  background: rgba(18, 18, 31, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  transition: all 0.2s ease;
+}
+
+.starter-prompt-card:hover {
+  background: rgba(79, 110, 247, 0.08);
+  border-color: rgba(79, 110, 247, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(79, 110, 247, 0.12) inset;
+}
+
+/* Premium prose inside agent messages */
+.chat-prose {
+  --tw-prose-body: rgba(237, 237, 245, 0.9);
+  --tw-prose-headings: rgba(255, 255, 255, 0.96);
+  --tw-prose-bold: rgba(255, 255, 255, 0.96);
+  --tw-prose-links: #7b92ff;
+  --tw-prose-code: #e2e8f0;
+  --tw-prose-pre-bg: rgba(0, 0, 0, 0.35);
+  --tw-prose-bullets: rgba(79, 110, 247, 0.65);
+  --tw-prose-hr: rgba(255, 255, 255, 0.05);
+  --tw-prose-quotes: rgba(237, 237, 245, 0.7);
+  --tw-prose-quote-borders: rgba(79, 110, 247, 0.35);
+}
+
+/* Agent message heading accent line */
+.chat-prose h2 {
+  border-left: 3px solid rgba(79, 110, 247, 0.5);
+  padding-left: 12px;
+  margin-left: -12px;
+}
+
+/* Inline code styling in chat */
+.chat-prose code:not(pre code) {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #e2e8f0;
+}
+
+/* Code block styling in chat */
+.chat-prose pre {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+/* Streaming response — subtle left-edge glow shows it's live */
+.msg-agent-streaming {
+  border-left: 2px solid rgba(79, 110, 247, 0.5);
+  animation: streamingPulse 2s ease-in-out infinite;
+}
+
+@keyframes streamingPulse {
+  0%, 100% { border-left-color: rgba(79, 110, 247, 0.3); }
+  50% { border-left-color: rgba(79, 110, 247, 0.75); }
+}
+
+/* Quick-start / empty state headline */
+.chat-welcome-headline {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(229,231,235,0.75) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Quick-add option buttons */
+.quick-add-btn {
+  background: rgba(18, 18, 31, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  transition: all 0.2s ease;
+}
+
+.quick-add-btn:hover:not(:disabled) {
+  background: rgba(79, 110, 247, 0.09);
+  border-color: rgba(79, 110, 247, 0.26);
+  transform: translateY(-1px);
+}
+
+/* Error banner */
+.chat-error-banner {
+  background: rgba(127, 29, 29, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+/* Thin separator line between message groups */
+.msg-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04) 50%, transparent);
+  margin: 4px 0;
+}
+
+/* ============================================
+   Mobile Responsiveness — Core Fixes
+   ============================================ */
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Minimum 16px font on inputs to prevent iOS auto-zoom on focus */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* iOS safe-area inset bottom padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ──────────────────────────────────────────────
+   DashboardSidebar — Mobile Slide-In Animation
+   ────────────────────────────────────────────── */
+
+/* Slide the sidebar in from the left on mobile */
+@keyframes sidebarSlideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Applied to the sidebar wrapper on mobile */
+@media (max-width: 767px) {
+  .sidebar-slide-in {
+    animation: sidebarSlideIn 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+/* Sidebar studio background — deep navy with ambient warmth */
+.sidebar-studio {
+  background-color: #080c14;
+  background-image:
+    radial-gradient(ellipse 280px 220px at -10% 0%, rgba(252, 200, 36, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 240px 300px at 110% 85%, rgba(6, 182, 212, 0.025) 0%, transparent 70%);
+}
+
+/* Sidebar nav item hover — ultra-subtle, premium feel */
+.sidebar-nav-item {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Active nav item left indicator */
+.sidebar-nav-item-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 2.5px;
+  border-radius: 0 3px 3px 0;
+  background: #fcc824;
 }

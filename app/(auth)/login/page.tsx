@@ -339,10 +339,10 @@ export default function LoginPage() {
                 <p className="text-sm text-gray-500">
                   Don&apos;t have an account?{' '}
                   <Link
-                    href="/register"
+                    href="/register/trial"
                     className="font-semibold text-[#fcc824] hover:text-[#fdd84e] transition-colors duration-200"
                   >
-                    Sign up
+                    Sign up free
                   </Link>
                 </p>
               </div>

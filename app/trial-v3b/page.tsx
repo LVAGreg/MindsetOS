@@ -17,6 +17,11 @@ import {
   Star,
   Layers,
   Quote,
+  Brain,
+  BarChart3,
+  ChevronRight,
+  Clock,
+  Flame,
 } from 'lucide-react';
 
 /* ─── Lazy load Spline ─── */
@@ -25,6 +30,74 @@ const Spline = lazy(() => import('@splinetool/react-spline'));
 const SPLINE_ROBOT_URL = 'https://prod.spline.design/eMGivaKFmAnLq1NK/scene.splinecode';
 
 /* ─── DATA ─── */
+
+const MINDSET_PILLARS = [
+  {
+    score: 68,
+    label: 'Reactivity',
+    color: '#f97316',
+    desc: 'How often your lizard brain is running the show',
+  },
+  {
+    score: 82,
+    label: 'Decision Quality',
+    color: '#fcc824',
+    desc: 'How clear-headed you are under real pressure',
+  },
+  {
+    score: 51,
+    label: 'Pattern Awareness',
+    color: '#8b5cf6',
+    desc: 'How well you see the loops you keep running',
+  },
+];
+
+const PRODUCT_LADDER = [
+  {
+    tier: 'FREE',
+    price: '$0',
+    name: 'The Mindset Score',
+    desc: '5 questions. 3 pillar scores. A clear picture of exactly where your thinking is costing you.',
+    cta: 'Get Your Score',
+    href: '/register/trial',
+    accent: '#fcc824',
+    highlight: true,
+    details: ['5-question AI assessment', 'Personalised pillar breakdown', 'Instant coaching recommendations'],
+  },
+  {
+    tier: 'ENTRY',
+    price: '$47',
+    name: 'The 48-Hour Reset',
+    desc: 'A weekend challenge with 6 structured exercises that interrupts reactive patterns and installs new defaults.',
+    cta: 'Learn More',
+    href: '/checkout',
+    accent: '#f97316',
+    highlight: false,
+    details: ['6 guided mindset exercises', '48-hour structured challenge', 'Pattern interrupt + new practice'],
+  },
+  {
+    tier: 'CORE',
+    price: '$997',
+    name: '90-Day Architecture',
+    desc: 'Group cohort. 8–12 entrepreneurs. Systematic mindset redesign over 90 days with AI coaching between sessions.',
+    cta: 'View Cohort',
+    href: '/checkout',
+    accent: '#10b981',
+    highlight: false,
+    details: ['Group cohort (8–12 people)', 'AI coaching between sessions', '90-day accountability system'],
+  },
+  {
+    tier: 'PREMIUM',
+    price: '$1,997',
+    name: 'Architecture Intensive',
+    desc: 'Everything in the cohort, plus 1:1 direct access to Greg. For founders who need to move fast and go deep.',
+    cta: 'Apply Now',
+    href: '/checkout',
+    accent: '#8b5cf6',
+    highlight: false,
+    details: ['Everything in 90-Day cohort', '1:1 sessions with Greg', 'Private Slack access'],
+  },
+];
 
 const WORKFLOW_STAGES = [
   {
@@ -68,19 +141,25 @@ const STATS = [
 
 const SOCIAL_PROOF = [
   {
-    quote: 'I finally see the patterns that were running my decisions. The Score Agent alone was worth it.',
+    quote: 'I finally see the patterns that were running my decisions. The Score alone changed what I focused on for the next month.',
     name: 'Sarah K.',
     role: 'Founder, 6-figure coach',
+    initial: 'S',
+    color: '#fcc824',
   },
   {
-    quote: 'The 48-Hour Reset hit me like a freight train. I changed more in a weekend than 6 months of journaling.',
+    quote: 'The 48-Hour Reset hit me like a freight train. I changed more in one weekend than six months of journaling.',
     name: 'Marcus D.',
-    role: 'SaaS operator',
+    role: 'SaaS operator, $2M ARR',
+    initial: 'M',
+    color: '#f97316',
   },
   {
-    quote: 'Having 10 AI coaches that actually know my context? Game over. This is what therapy apps wish they were.',
+    quote: "I've done therapy, journaling, coaching. MindsetOS is the first thing that gave me a system, not just insight.",
     name: 'Priya L.',
     role: 'Entrepreneur & consultant',
+    initial: 'P',
+    color: '#8b5cf6',
   },
 ];
 
@@ -117,6 +196,37 @@ function AnimatedNumber({ target }: { target: string }) {
   }, [started, numericPart]);
 
   return <div ref={ref} className="tabular-nums">{count}{suffix}{hasPlus ? '+' : ''}{hasPercent ? '%' : ''}</div>;
+}
+
+/* ─── Animated score bar ─── */
+function ScoreBar({ score, color, delay = 0 }: { score: number; color: string; delay?: number }) {
+  const [width, setWidth] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const timer = setTimeout(() => setWidth(score), delay);
+    return () => clearTimeout(timer);
+  }, [started, score, delay]);
+
+  return (
+    <div ref={ref} className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
+      <div
+        className="h-full rounded-full transition-all duration-1000 ease-out"
+        style={{ width: `${width}%`, backgroundColor: color }}
+      />
+    </div>
+  );
 }
 
 /* ─── Scroll reveal ─── */
@@ -307,6 +417,13 @@ export default function TrialV3B() {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.7; }
         }
+
+        /* ── Highlighted ladder card ── */
+        @keyframes ladder-pulse {
+          0%, 100% { box-shadow: 0 0 0 1px rgba(252,200,36,0.2), 0 0 40px rgba(252,200,36,0.08); }
+          50% { box-shadow: 0 0 0 1px rgba(252,200,36,0.35), 0 0 60px rgba(252,200,36,0.14); }
+        }
+        .ladder-highlight { animation: ladder-pulse 3s ease-in-out infinite; }
       `}</style>
 
       {/* ── NAVIGATION ── */}
@@ -316,9 +433,9 @@ export default function TrialV3B() {
             <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300">Sign in</Link>
+            <Link href="/login" className="inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300">Sign in</Link>
             <Link href="/register/trial" className="group relative px-5 py-2.5 text-sm font-bold rounded-full transition-all duration-300 hover:-translate-y-0.5 bg-[#fcc824] text-black hover:bg-[#f0be1e] shadow-[0_0_20px_rgba(252,200,36,0.25)] hover:shadow-[0_0_30px_rgba(252,200,36,0.4)]">
-              Start Free Trial <ArrowRight className="inline-block w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
+              Get Your Score Free <ArrowRight className="inline-block w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
         </div>
@@ -364,26 +481,27 @@ export default function TrialV3B() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fcc824] opacity-60"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#fcc824]"></span>
                 </span>
-                <span className="text-sm font-semibold text-gray-300 tracking-wide">7-day free trial &mdash; no credit card required</span>
+                <span className="text-sm font-semibold text-gray-300 tracking-wide">Free Mindset Score &mdash; takes 3 minutes</span>
               </div>
 
-              <h1 className="anim-hero-2 text-[2.75rem] sm:text-6xl lg:text-[5rem] font-black leading-[1.02] tracking-tighter mb-7">
-                Your AI-powered{' '}<br className="hidden sm:block" />
-                <span className="shimmer-gold">mindset coaching engine</span>
+              <h1 className="anim-hero-2 text-[2rem] xs:text-[2.75rem] sm:text-6xl lg:text-[5rem] font-black leading-[1.05] tracking-tighter mb-6 sm:mb-7">
+                You&apos;ve optimised everything<br className="hidden sm:block" />
+                except{' '}
+                <span className="shimmer-gold">your mind.</span>
               </h1>
 
               <p className="anim-hero-3 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed mb-10">
-                10 AI coaches that assess your mindset, build daily practices, map your patterns,
-                and architect lasting change — all inside one system.
+                Most entrepreneurs have systemised their business and ignored their operating system.
+                MindsetOS gives you a score, a plan, and 10 AI coaches to actually fix it.
               </p>
 
               <div className="anim-hero-4 flex flex-col sm:flex-row items-start gap-4">
-                <Link href="/register/trial" className="group relative inline-flex items-center gap-2.5 px-8 py-4 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.25)] hover:shadow-[0_0_50px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98]">
-                  Start building — free <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <Link href="/register/trial" className="group relative inline-flex items-center gap-2.5 px-6 sm:px-8 py-4 bg-[#fcc824] text-black font-extrabold text-base sm:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.25)] hover:shadow-[0_0_50px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center sm:justify-start">
+                  Get your Mindset Score &mdash; free <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <div className="flex items-center gap-5 text-sm text-gray-500 sm:mt-3.5">
-                  <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> Full access</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> Cancel anytime</span>
+                <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-sm text-gray-500 sm:mt-3.5">
+                  <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> No credit card</span>
+                  <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> 3 minutes</span>
                 </div>
               </div>
             </div>
@@ -402,7 +520,7 @@ export default function TrialV3B() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-white/[0.08]">
             {STATS.map((stat, i) => (
               <div key={i} className="md:px-10 first:md:pl-0 last:md:pr-0 text-center md:text-left group">
-                <div className="text-4xl sm:text-5xl font-black tracking-tighter text-white transition-colors duration-300 group-hover:text-[#fcc824]">
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white transition-colors duration-300 group-hover:text-[#fcc824]">
                   <AnimatedNumber target={stat.value} />
                 </div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-[0.18em] mt-1.5">{stat.label}</div>
@@ -412,8 +530,186 @@ export default function TrialV3B() {
         </div>
       </section>
 
+      {/* ── MINDSET SCORE SECTION ── */}
+      <section className="relative py-24 sm:py-32 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-[#fcc824]/[0.04] blur-[200px] pointer-events-none" />
+        <div className="absolute inset-0 dot-grid opacity-[0.02] pointer-events-none" />
+
+        <div className="relative max-w-6xl mx-auto px-5 sm:px-8">
+          <RevealSection>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
+                <BarChart3 className="w-3.5 h-3.5" /> Your Free Starting Point
+              </div>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6">
+                Know your number.<br />
+                <span className="text-[#fcc824]">Fix the right thing.</span>
+              </h2>
+              <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                Most entrepreneurs work harder. MindsetOS shows you which pillar is actually holding you back &mdash; then gives you a plan.
+              </p>
+            </div>
+          </RevealSection>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Score mockup */}
+            <RevealSection>
+              <div className="relative rounded-3xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm p-8 sm:p-10 overflow-hidden">
+                <div className="absolute -top-16 -right-16 w-32 h-32 bg-[#fcc824]/10 rounded-full blur-[60px] pointer-events-none" />
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/20 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-[#fcc824]" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-white">Your Mindset Score</div>
+                    <div className="text-xs text-gray-500">Example report</div>
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  {MINDSET_PILLARS.map((pillar, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-300">{pillar.label}</span>
+                        <span className="text-sm font-black tabular-nums" style={{ color: pillar.color }}>{pillar.score}/100</span>
+                      </div>
+                      <ScoreBar score={pillar.score} color={pillar.color} delay={i * 200} />
+                      <p className="text-xs text-gray-600 mt-1.5">{pillar.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 p-4 rounded-xl bg-[#fcc824]/[0.06] border border-[#fcc824]/10">
+                  <div className="text-xs font-bold text-[#fcc824] uppercase tracking-wider mb-2">Your personalised insight</div>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    Your biggest leverage point right now is <strong className="text-white">Pattern Awareness</strong>. You&apos;re reacting before you even know you&apos;ve been triggered. Start with the Story Excavator.
+                  </p>
+                </div>
+              </div>
+            </RevealSection>
+
+            {/* What you get */}
+            <RevealSection delay={150}>
+              <div className="space-y-6">
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight">
+                  5 questions.<br />
+                  <span className="text-[#fcc824]">Clarity that takes months to get elsewhere.</span>
+                </h3>
+                <p className="text-gray-400 leading-relaxed">
+                  The Mindset Score isn&apos;t a personality quiz. It&apos;s a diagnostic. It measures the three pillars that determine how you perform under real pressure &mdash; and tells you exactly where to start.
+                </p>
+                <div className="space-y-4">
+                  {[
+                    { icon: Clock, text: 'Takes 3 minutes to complete' },
+                    { icon: Target, text: 'Pillar-by-pillar breakdown with scores' },
+                    { icon: MessageSquare, text: 'Personalised coaching recommendations' },
+                    { icon: Sparkles, text: 'AI coach activation based on your results' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3.5">
+                      <div className="w-9 h-9 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/15 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-4 h-4 text-[#fcc824]" />
+                      </div>
+                      <span className="text-[15px] text-gray-300 font-medium">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/register/trial" className="group inline-flex items-center gap-2.5 px-7 py-3.5 bg-[#fcc824] text-black font-extrabold rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(252,200,36,0.2)] hover:shadow-[0_0_40px_rgba(252,200,36,0.35)] hover:-translate-y-0.5 text-[15px]">
+                  Get your free Mindset Score <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </RevealSection>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Section divider ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
+
+      {/* ── PRODUCT LADDER ── */}
+      <section className="relative py-28 sm:py-36 overflow-hidden">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-[#fcc824]/[0.03] blur-[200px] pointer-events-none" />
+
+        <div className="relative max-w-6xl mx-auto px-5 sm:px-8">
+          <RevealSection>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
+                <TrendingUp className="w-3.5 h-3.5" /> The Journey
+              </div>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6">
+                Start free. Go as deep<br />
+                <span className="text-[#fcc824]">as you need to.</span>
+              </h2>
+              <p className="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
+                Most people start with the free Score and never look back. Some go all the way.
+              </p>
+            </div>
+          </RevealSection>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PRODUCT_LADDER.map((tier, i) => (
+              <RevealSection key={i} delay={i * 100}>
+                <div className={`relative h-full rounded-2xl border overflow-hidden transition-all duration-500 hover:-translate-y-1 flex flex-col ${
+                  tier.highlight
+                    ? 'ladder-highlight bg-[#fcc824]/[0.06] border-[#fcc824]/25'
+                    : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]'
+                }`}>
+                  {tier.highlight && (
+                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#fcc824] to-transparent" />
+                  )}
+                  <div className="p-6 sm:p-7 flex flex-col h-full">
+                    <div className="flex items-start justify-between mb-5">
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: tier.accent }}>{tier.tier}</div>
+                        <div className="text-2xl font-black tracking-tight text-white">{tier.price}</div>
+                      </div>
+                      {tier.highlight && (
+                        <div className="px-2.5 py-1 rounded-full bg-[#fcc824]/10 border border-[#fcc824]/20 text-[10px] font-black uppercase tracking-wider text-[#fcc824]">
+                          Start Here
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-[15px] font-extrabold text-white mb-3 leading-snug">{tier.name}</h3>
+                    <p className="text-[13px] text-gray-500 leading-relaxed mb-6 flex-1">{tier.desc}</p>
+                    <div className="space-y-2 mb-6">
+                      {tier.details.map((d, di) => (
+                        <div key={di} className="flex items-center gap-2">
+                          <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tier.accent }} />
+                          <span className="text-[12px] text-gray-400">{d}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <Link href={tier.href}
+                      className={`group flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                        tier.highlight
+                          ? 'bg-[#fcc824] text-black hover:bg-[#f0be1e] hover:shadow-[0_0_20px_rgba(252,200,36,0.3)]'
+                          : 'bg-white/[0.05] border border-white/[0.08] text-gray-300 hover:bg-white/[0.1] hover:text-white'
+                      }`}>
+                      {tier.cta} <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </div>
+                </div>
+              </RevealSection>
+            ))}
+          </div>
+
+          <RevealSection delay={400}>
+            <div className="hidden lg:flex items-center justify-center gap-0 mt-6 text-xs text-gray-700 font-semibold uppercase tracking-wider">
+              <span>Free</span>
+              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <span>$47</span>
+              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <span>$997</span>
+              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <span>$1,997</span>
+              <span className="ml-4 text-gray-600">&mdash; your pace, your call.</span>
+            </div>
+          </RevealSection>
+        </div>
+      </section>
+
+      {/* ── Section divider ── */}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/15 to-transparent" />
+
       {/* ── PIPELINE ── */}
-      <section className="relative py-28 sm:py-36">
+      <section className="relative py-16 sm:py-28 lg:py-36">
         {/* Section ambient glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-[#fcc824]/[0.03] blur-[200px] pointer-events-none" />
         {/* Dot grid texture */}
@@ -423,12 +719,12 @@ export default function TrialV3B() {
           <RevealSection>
             <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
-                <Layers className="w-3.5 h-3.5" /> 4-Phase Journey
+                <Layers className="w-3.5 h-3.5" /> 4-Phase System
               </div>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6">
-                From reactive thinking to{' '}<span className="text-[#fcc824]">designed mindset</span>
+              <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black tracking-tighter mb-6">
+                From reactive thinking to{' '}<span className="text-[#fcc824]">designed operating system</span>
               </h2>
-              <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">10 specialized AI coaches organized into 4 transformation stages.</p>
+              <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">10 AI coaches. One through-line. Built to move you from chaos to clarity to compounding.</p>
             </div>
           </RevealSection>
 
@@ -489,7 +785,7 @@ export default function TrialV3B() {
       <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
 
       {/* ── HOW IT WORKS ── */}
-      <section className="relative py-28 sm:py-36 overflow-hidden">
+      <section className="relative py-16 sm:py-28 lg:py-36 overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-500/[0.04] blur-[200px] pointer-events-none" />
         <div className="absolute bottom-0 right-[10%] w-[300px] h-[300px] rounded-full bg-[#fcc824]/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-3 10s ease-in-out infinite' }} />
@@ -498,15 +794,15 @@ export default function TrialV3B() {
           <RevealSection>
             <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6"><Zap className="w-3.5 h-3.5" /> Three Steps</div>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter">Zero to clarity{' '}<span className="text-[#fcc824]">in one session</span></h2>
+              <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black tracking-tighter">Clarity in{' '}<span className="text-[#fcc824]">one session.</span></h2>
             </div>
           </RevealSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {[
-              { num: '01', title: 'Sign up in 30 seconds', desc: 'No credit card. No setup wizard. Just your email and you\'re in.', icon: Zap },
-              { num: '02', title: 'Chat with your coaches', desc: 'Mindset Score Agent assesses your baseline. Other coaches build practices, map patterns, and design routines.', icon: MessageSquare },
-              { num: '03', title: 'Walk away with a system', desc: 'Your personalized mindset architecture — daily practices, pattern interrupts, and accountability built in.', icon: Target },
+              { num: '01', title: 'Take the Mindset Score', desc: '5 questions. 3 pillar scores. You\'ll know exactly what\'s dragging you down and where to start — in under 3 minutes.', icon: BarChart3 },
+              { num: '02', title: 'Chat with your coach', desc: 'MindsetOS routes you to the right AI coach based on your score. It knows your context from the first message.', icon: MessageSquare },
+              { num: '03', title: 'Walk away with a system', desc: "Not a PDF. Not a framework. An actual operating system — daily practices, pattern interrupts, and accountability built in.", icon: Target },
             ].map((step, i) => (
               <RevealSection key={i} delay={i * 150}>
                 <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 sm:p-10 hover:border-[#fcc824]/20 hover:bg-white/[0.04] transition-all duration-500 overflow-hidden hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)]">
@@ -534,7 +830,7 @@ export default function TrialV3B() {
       <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
       {/* ── SOCIAL PROOF ── */}
-      <section className="relative py-24 sm:py-32 overflow-hidden">
+      <section className="relative py-14 sm:py-24 lg:py-32 overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-[#fcc824]/[0.03] blur-[180px] pointer-events-none" style={{ animation: 'orb-float-2 9s ease-in-out infinite' }} />
         <div className="absolute bottom-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" />
@@ -543,10 +839,11 @@ export default function TrialV3B() {
           <RevealSection>
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6">
-                <Users className="w-3.5 h-3.5" /> Early Adopters
+                <Users className="w-3.5 h-3.5" /> From the field
               </div>
-              <h2 className="text-3xl sm:text-5xl font-black tracking-tighter">
-                Entrepreneurs are already{' '}<span className="text-[#fcc824]">designing their thinking</span>
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter">
+                What it feels like<br />
+                <span className="text-[#fcc824]">when the system works.</span>
               </h2>
             </div>
           </RevealSection>
@@ -554,14 +851,19 @@ export default function TrialV3B() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {SOCIAL_PROOF.map((testimonial, i) => (
               <RevealSection key={i} delay={i * 120}>
-                <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 hover:border-white/[0.1] hover:bg-white/[0.04] transition-all duration-500 hover:-translate-y-1">
-                  {/* Quote icon */}
-                  <Quote className="w-8 h-8 text-[#fcc824]/20 mb-5 group-hover:text-[#fcc824]/30 transition-colors duration-500" />
+                <div className="group relative h-full rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-500 hover:-translate-y-1">
+                  {/* Stars */}
+                  <div className="flex gap-1 mb-5">
+                    {[...Array(5)].map((_, s) => (
+                      <Star key={s} className="w-3.5 h-3.5 fill-[#fcc824] text-[#fcc824]" />
+                    ))}
+                  </div>
+                  <Quote className="w-7 h-7 text-white/[0.08] mb-4 group-hover:text-[#fcc824]/20 transition-colors duration-500" />
                   <p className="text-[15px] text-gray-300 leading-relaxed mb-8 font-medium">&ldquo;{testimonial.quote}&rdquo;</p>
                   <div className="mt-auto flex items-center gap-3">
-                    {/* Avatar placeholder */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#fcc824]/20 to-[#f97316]/20 border border-white/[0.08] flex items-center justify-center text-sm font-bold text-[#fcc824]">
-                      {testimonial.name.charAt(0)}
+                    <div className="w-10 h-10 rounded-full border border-white/[0.08] flex items-center justify-center text-sm font-black"
+                      style={{ background: `linear-gradient(135deg, ${testimonial.color}20, ${testimonial.color}08)`, color: testimonial.color }}>
+                      {testimonial.initial}
                     </div>
                     <div>
                       <div className="text-sm font-bold text-white">{testimonial.name}</div>
@@ -579,7 +881,7 @@ export default function TrialV3B() {
       <div className="h-px bg-gradient-to-r from-transparent via-[#fcc824]/15 to-transparent" />
 
       {/* ── WHY MINDSET OS ── */}
-      <section className="relative py-28 sm:py-36">
+      <section className="relative py-16 sm:py-28 lg:py-36">
         {/* Background texture */}
         <div className="absolute inset-0 dot-grid opacity-[0.02] pointer-events-none" />
         <div className="absolute top-[30%] right-[5%] w-[400px] h-[400px] rounded-full bg-[#fcc824]/[0.02] blur-[180px] pointer-events-none" style={{ animation: 'orb-float-1 11s ease-in-out infinite' }} />
@@ -589,15 +891,15 @@ export default function TrialV3B() {
             <div className="lg:col-span-3">
               <RevealSection>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs font-bold uppercase tracking-[0.2em] text-[#fcc824] mb-6"><Star className="w-3.5 h-3.5" /> Why MindsetOS</div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mb-14">Built for mindset coaches who are{' '}<span className="text-[#fcc824]">done guessing</span></h2>
+                <h2 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tighter mb-8 sm:mb-14">Built for entrepreneurs<br /><span className="text-[#fcc824]">who are done running on fumes.</span></h2>
               </RevealSection>
               <div className="space-y-3">
                 {[
-                  { icon: Target, title: 'Clarity', text: 'Know exactly what patterns drive you, what triggers you, and how to rewire it.' },
-                  { icon: TrendingUp, title: 'Momentum', text: 'Build practices that stick — based on frameworks proven across hundreds of entrepreneurs.' },
-                  { icon: MessageSquare, title: 'AI Guidance', text: 'Agents that walk you through each step. Not just text generators.' },
-                  { icon: Users, title: 'Community', text: 'Join coaches already scaling with systematic, repeatable processes.' },
-                  { icon: Shield, title: 'Privacy', text: 'Enterprise-grade security. Your data, your business, your control.' },
+                  { icon: Flame, title: 'Cuts through burnout', text: "Not another productivity tool. MindsetOS addresses the upstream cause — how you think when pressure hits." },
+                  { icon: Target, title: 'Precision, not platitudes', text: "The Score tells you which pillar to fix first. You don't have to guess. You don't have to do everything." },
+                  { icon: MessageSquare, title: 'Context-aware coaching', text: 'Every AI coach knows your score, your history, and your patterns. Day one feels like week four.' },
+                  { icon: Users, title: 'Community of builders', text: "Join a cohort of entrepreneurs doing the real work — not the performative hustle." },
+                  { icon: Shield, title: 'Your data stays yours', text: 'Enterprise-grade encryption. No selling to third parties. Your inner world is private.' },
                 ].map((item, i) => (
                   <RevealSection key={i} delay={i * 80}>
                     <div className="group flex items-start gap-4 p-5 rounded-xl border border-transparent hover:border-white/[0.06] hover:bg-white/[0.02] transition-all duration-300">
@@ -622,11 +924,11 @@ export default function TrialV3B() {
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#fcc824]/10 rounded-full blur-[80px] pointer-events-none" />
                   <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px] pointer-events-none" />
                   <div className="relative">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fcc824]/10 border border-[#fcc824]/20 text-[#fcc824] text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3.5 h-3.5" /> Free 7-day trial</div>
-                    <h3 className="text-2xl font-black tracking-tight mb-2">Everything included.</h3>
-                    <p className="text-gray-500 mb-8">No credit card. No strings.</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fcc824]/10 border border-[#fcc824]/20 text-[#fcc824] text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3.5 h-3.5" /> Free &mdash; no card needed</div>
+                    <h3 className="text-2xl font-black tracking-tight mb-2">Get your Mindset Score.</h3>
+                    <p className="text-gray-500 mb-8">3 minutes. Real answers. No fluff.</p>
                     <div className="space-y-3.5 mb-8">
-                      {['7 days of full, unrestricted access', 'All 10 MindsetOS AI coaches unlocked', 'Complete mindset architecture pipeline', 'Conversation history saved', 'AI-powered sessions with every coach', 'No credit card required to start'].map((item, i) => (
+                      {['Your 3-pillar score breakdown', 'Personalised coaching path', '10 AI coaches activated', 'Conversation history saved', '7-day full access trial', 'No credit card to start'].map((item, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-[#fcc824]/10 flex items-center justify-center flex-shrink-0">
                             <CheckCircle className="w-3.5 h-3.5 text-[#fcc824]" />
@@ -636,9 +938,9 @@ export default function TrialV3B() {
                       ))}
                     </div>
                     <Link href="/register/trial" className="group w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-extrabold rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.2)] hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:-translate-y-0.5 hover:scale-[1.01] active:scale-[0.98]">
-                      Start your free trial <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                      Get your free Mindset Score <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Link>
-                    <p className="text-center text-xs text-gray-600 mt-4">Takes less than 30 seconds to set up</p>
+                    <p className="text-center text-xs text-gray-600 mt-4">Takes less than 3 minutes</p>
                   </div>
                 </div>
               </RevealSection>
@@ -651,7 +953,7 @@ export default function TrialV3B() {
       <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
       {/* ── FINAL CTA with ROBOT reappearing ── */}
-      <section className="relative py-32 sm:py-40 overflow-hidden">
+      <section className="relative py-20 sm:py-32 lg:py-40 overflow-hidden">
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-[#fcc824]/[0.05] blur-[200px] pointer-events-none" />
         <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-2 12s ease-in-out infinite' }} />
@@ -672,18 +974,17 @@ export default function TrialV3B() {
             {/* Right: CTA text */}
             <div className="text-center lg:text-left relative z-[2]">
               <RevealSection>
-                <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter mb-6 leading-[1.08]">
-                  Stop running your mind
-                  <span className="text-[#fcc824]"> on autopilot.</span>
+                <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black tracking-tighter mb-6 leading-[1.08]">
+                  Your mind is the last system
+                  <span className="text-[#fcc824]"> you haven&apos;t built.</span>
                 </h2>
-                <p className="text-lg sm:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
-                  Entrepreneurs are already using MindsetOS to design how they think, build daily practices,
-                  and make better decisions under pressure. Your 7-day trial starts now.
+                <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-8 sm:mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
+                  Get your Mindset Score in 3 minutes. Understand the patterns running your decisions. Start building a system that runs itself.
                 </p>
-                <Link href="/register/trial" className="group inline-flex items-center gap-3 px-10 py-5 bg-[#fcc824] text-black font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98]">
-                  Start your free trial <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <Link href="/register/trial" className="group inline-flex items-center gap-3 px-7 sm:px-10 py-4 sm:py-5 bg-[#fcc824] text-black font-extrabold text-base sm:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center">
+                  Get your free Mindset Score <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
-                <p className="text-sm text-gray-600 mt-6 font-medium">No credit card &middot; Cancel anytime &middot; Full access for 7 days</p>
+                <p className="text-sm text-gray-600 mt-6 font-medium">No credit card &middot; 3 minutes &middot; Full 7-day access</p>
               </RevealSection>
             </div>
           </div>

@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /c/
+Disallow: /profile/
+Disallow: /notifications/
+Disallow: /power-user/
+Disallow: /assets/
+Disallow: /outcomes/
+Disallow: /feedback/
+Disallow: /ai-browser-test/
+
+Sitemap: https://mindset.show/sitemap.xml
