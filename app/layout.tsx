@@ -164,6 +164,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://mindset-os-backend-production.up.railway.app" />
         <Script id="theme-initializer" strategy="beforeInteractive">
           {`
             (function() {
