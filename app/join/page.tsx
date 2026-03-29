@@ -593,7 +593,7 @@ export default function JoinPage() {
               },
               {
                 q: 'Can I cancel?',
-                a: 'Yes. Cancel anytime if you\'re on the weekly plan. Or lock in the best price with the $750 upfront option.',
+                a: 'Yes. Cancel anytime if you\'re on the weekly plan. Or lock in the best price with the $397 upfront option.',
               },
               {
                 q: 'How is this different from other coaching programs?',

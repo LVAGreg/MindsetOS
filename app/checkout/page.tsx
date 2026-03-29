@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import Link from 'next/link';
 import {
@@ -75,7 +76,7 @@ const BONUSES = [
   { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
-type PricingPlan = 'weekly' | 'upfront';
+type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10';
 
 /* ------------------------------------------------------------------ */
 /*  Checkout Steps Indicator                                          */
@@ -107,29 +108,22 @@ function StepsIndicator() {
 /* ------------------------------------------------------------------ */
 /*  Main Checkout Page                                                */
 /* ------------------------------------------------------------------ */
-export default function CheckoutPage() {
-  const [plan, setPlan] = useState<PricingPlan>('weekly');
+function CheckoutPageInner() {
+  const searchParams = useSearchParams();
+  const planParam = searchParams.get('plan') as PricingPlan | null;
+  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10'];
+  const initialPlan: PricingPlan = planParam && validPlans.includes(planParam) ? planParam : 'weekly';
+
+  const [plan, setPlan] = useState<PricingPlan>(initialPlan);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [coupon, setCoupon] = useState('');
-  const [couponApplied, setCouponApplied] = useState(false);
-  const [couponError, setCouponError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const price = plan === 'weekly' ? 47 : 397;
-
-  const handleApplyCoupon = () => {
-    setCouponError('');
-    setCouponApplied(false);
-    if (!coupon.trim()) {
-      setCouponError('Please enter a coupon code');
-      return;
-    }
-    setCouponError('Invalid coupon code');
-  };
+  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397 };
+  const price = priceMap[plan];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -152,7 +146,6 @@ export default function CheckoutPage() {
           lastName,
           email,
           phone,
-          coupon: couponApplied ? coupon : undefined,
         }),
       });
 
@@ -344,28 +337,6 @@ export default function CheckoutPage() {
                   </label>
                 </div>
                 <p className="text-[11px] text-white/20 text-right mt-2">All prices in USD</p>
-              </section>
-
-              {/* --- Coupon --- */}
-              <section className="checkout-section-animate" style={{ animationDelay: '0.3s' }}>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Coupon code"
-                    value={coupon}
-                    onChange={(e) => { setCoupon(e.target.value); setCouponError(''); setCouponApplied(false); }}
-                    className="flex-1 px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 transition-all duration-300"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyCoupon}
-                    className="px-5 py-3 bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.08] text-white/70 hover:text-white font-medium rounded-xl transition-all duration-300 text-sm"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {couponError && <p className="text-red-400 text-xs mt-1.5">{couponError}</p>}
-                {couponApplied && <p className="text-emerald-400 text-xs mt-1.5">Coupon applied!</p>}
               </section>
 
               {/* --- Order Summary Card --- */}
@@ -574,5 +545,13 @@ export default function CheckoutPage() {
 
       {/* Animations are defined in globals.css under .checkout-section-animate */}
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0a1a]" />}>
+      <CheckoutPageInner />
+    </Suspense>
   );
 }

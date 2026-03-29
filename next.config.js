@@ -45,6 +45,11 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: '/pricing', destination: '/join', permanent: false },
+    ];
+  },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
     return [
