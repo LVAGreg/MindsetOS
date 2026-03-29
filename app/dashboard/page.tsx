@@ -813,7 +813,7 @@ function DashboardContent() {
   // Get current agent data from database-fetched agents (displayAgents)
   // Fallback to hardcoded MINDSET_AGENTS for compatibility with older agents
   const currentAgentData = currentAgent
-    ? (currentAgent === 'MINDSET_SUPER_AGENT'
+    ? ((currentAgent as string) === 'MINDSET_SUPER_AGENT'
         ? displayAgents.find(a => a.id === 'mindset-super-agent')
         : // Try to find by mapped ID from MINDSET_AGENTS first
           displayAgents.find(a => a.id === MINDSET_AGENTS[currentAgent as AgentId]?.id)
@@ -1194,7 +1194,7 @@ function DashboardContent() {
           ) : currentAgent ? (
             <ChatWindow
               key={`chat-${currentAgent}-${currentConversationId || 'new'}`}
-              agentId={currentAgent === 'MINDSET_SUPER_AGENT'
+              agentId={(currentAgent as string) === 'MINDSET_SUPER_AGENT'
                 ? 'mindset-super-agent'
                 : MINDSET_AGENTS[currentAgent as AgentId]?.id || currentAgent.toLowerCase().replace(/_/g, '-')
               }
