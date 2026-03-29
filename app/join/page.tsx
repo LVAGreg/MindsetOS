@@ -442,7 +442,7 @@ export default function JoinPage() {
               <Link href="/agency" className="hover:text-gray-900 dark:hover:text-white transition-colors">
                 Coaching Practice
               </Link>
-              <Link href="/trial" className="hover:text-gray-900 dark:hover:text-white transition-colors">
+              <Link href="/trial-v3b" className="hover:text-gray-900 dark:hover:text-white transition-colors">
                 Free Trial
               </Link>
               <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors">
