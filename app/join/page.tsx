@@ -90,7 +90,7 @@ export default function JoinPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MindsetOSLogo size="md" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Client Fast Start</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Mindset Architecture</span>
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -103,7 +103,7 @@ export default function JoinPage() {
               href={CHECKOUT_URL}
               className="px-4 py-2 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-semibold rounded-lg transition-colors text-sm"
             >
-              Get Started &mdash; $87/wk
+              Get Started &mdash; $47/wk
             </a>
           </div>
         </div>
@@ -115,19 +115,19 @@ export default function JoinPage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-full text-sm text-amber-700 dark:text-amber-400 font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              AI-Powered &middot; Coach-Supported &middot; Built for Consultants
+              AI-Powered &middot; Coach-Supported &middot; Built for Entrepreneurs
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-              Go From Idea to{' '}
-              <span style={{ color: '#fcc824' }}>Paying Clients</span>{' '}
-              — Faster Than You Thought Possible
+              Stop Reacting. Start{' '}
+              <span style={{ color: '#fcc824' }}>Designing</span>{' '}
+              — Your Mind Is The Operating System
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-              The Client Fast Start gives you AI agents that do the heavy lifting, proven frameworks that
+              The Mindset Architecture gives you 10 AI mindset coaches, proven frameworks that
               remove the guesswork, and live coaching that keeps you on track. Everything you need
-              to build your offer and start signing clients.
+              to rewire reactive patterns and design a mind that works for you.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
@@ -135,12 +135,12 @@ export default function JoinPage() {
                 href={CHECKOUT_URL}
                 className="px-8 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center gap-2 text-lg transform hover:scale-105"
               >
-                Join Client Fast Start &mdash; $87/wk
+                Join Mindset Architecture &mdash; $47/wk
                 <ArrowRight className="w-5 h-5" />
               </a>
             </div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              or save with the $750 upfront option (12 weeks)
+              or save with the $397 upfront option
             </span>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function JoinPage() {
                 Included: Full AI Agent Access
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                12+ AI Agents That{' '}
+                10 AI Coaches That{' '}
                 <span style={{ color: '#fcc824' }}>Build It For You</span>
               </h2>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
@@ -233,10 +233,10 @@ export default function JoinPage() {
               </h3>
               <div className="space-y-4">
                 {[
-                  { step: '1', text: 'AI agents build your offer, promos, and scripts in minutes' },
-                  { step: '2', text: 'Implementation modules show you exactly how to deploy them' },
-                  { step: '3', text: 'Live coaches review your work and sharpen your strategy' },
-                  { step: '4', text: 'You launch, get feedback, and iterate to paying clients' },
+                  { step: '1', text: 'AI coaches assess your mindset patterns and build your baseline score' },
+                  { step: '2', text: 'The 48-Hour Reset rewires your reactive triggers in one weekend' },
+                  { step: '3', text: 'Daily practice routines + accountability keep you building' },
+                  { step: '4', text: 'The 90-Day Architecture designs your complete operating system' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="w-7 h-7 bg-[#fcc824] rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-black">
@@ -304,7 +304,7 @@ export default function JoinPage() {
 
             <div className="relative">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                Join the Client Fast Start
+                Join the Mindset Architecture
               </h2>
               <p className="text-gray-400 mb-6 max-w-lg mx-auto">
                 Training course + AI agents + live coaching + bonuses worth $7,250. Everything you need to go from idea to income.
@@ -314,26 +314,26 @@ export default function JoinPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto mb-8">
                 <div className="bg-white/10 border-2 border-amber-400/50 rounded-xl p-4 text-center">
                   <div className="text-xs text-amber-400 font-bold uppercase tracking-wide mb-1">Weekly</div>
-                  <div className="text-3xl font-bold text-white">$87<span className="text-lg text-gray-400">/wk</span></div>
+                  <div className="text-3xl font-bold text-white">$47<span className="text-lg text-gray-400">/wk</span></div>
                   <div className="text-xs text-gray-400 mt-1">Billed weekly</div>
                 </div>
                 <div className="bg-white/10 border border-gray-600 rounded-xl p-4 text-center relative">
                   <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-green-500 text-white text-[10px] font-bold rounded-full">
-                    SAVE $294
+                    BEST VALUE
                   </div>
-                  <div className="text-xs text-gray-300 font-bold uppercase tracking-wide mb-1">12-Week Upfront</div>
-                  <div className="text-3xl font-bold text-white">$750</div>
+                  <div className="text-xs text-gray-300 font-bold uppercase tracking-wide mb-1">Full Access</div>
+                  <div className="text-3xl font-bold text-white">$397</div>
                   <div className="text-xs text-gray-400 mt-1">One payment</div>
                 </div>
               </div>
 
               <div className="space-y-2.5 text-left max-w-sm mx-auto mb-8">
                 {[
-                  '12 AI-powered implementation modules',
-                  'All 12+ expert AI agents — fully unlocked',
-                  'Weekly live coaching sessions',
-                  'Plug-and-play templates & frameworks',
-                  'MindsetOS community + implementation support',
+                  'All 10 AI mindset coaches — fully unlocked',
+                  '48-Hour Mindset Reset challenge',
+                  '90-Day Mindset Architecture program',
+                  'Daily practice routines + accountability',
+                  'MindsetOS community + coaching support',
                   'Bonuses worth $7,250',
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
@@ -347,7 +347,7 @@ export default function JoinPage() {
                 href={CHECKOUT_URL}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl text-lg transform hover:scale-105"
               >
-                Join Client Fast Start &mdash; $87/wk
+                Join Mindset Architecture &mdash; $47/wk
                 <ArrowRight className="w-5 h-5" />
               </a>
 
@@ -385,7 +385,7 @@ export default function JoinPage() {
               },
               {
                 q: 'How is this different from other coaching programs?',
-                a: 'Most programs give you theory and leave you to figure out implementation. Client Fast Start gives you AI agents that do the implementation, coaches who review it, and a community that keeps you accountable.',
+                a: 'Most programs give you theory and leave you to figure it out. Mindset Architecture gives you AI coaches that build your daily practice, map your patterns, and design your system — plus real coaching and a community that keeps you accountable.',
               },
             ].map((faq, i) => (
               <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
@@ -404,17 +404,17 @@ export default function JoinPage() {
             Stop Figuring It Out Alone.
           </h2>
           <p className="text-lg text-gray-300 mb-8">
-            AI builds it. Coaches sharpen it. You launch it. That's the Client Fast Start.
+            AI maps it. Coaches sharpen it. You design it. That's the Mindset Architecture.
           </p>
           <a
             href={CHECKOUT_URL}
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl text-lg transform hover:scale-105"
           >
-            Join Now &mdash; $87/wk
+            Join Now &mdash; $47/wk
             <ArrowRight className="w-5 h-5" />
           </a>
           <p className="text-sm text-gray-500 mt-4">
-            Cancel anytime &middot; Or save with $750 upfront
+            Cancel anytime &middot; Or save with $397 upfront
           </p>
         </div>
       </section>
@@ -426,7 +426,7 @@ export default function JoinPage() {
             <div className="flex items-center gap-2">
               <MindsetOSLogo size="xs" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                Client Fast Start &mdash; powered by{' '}
+                Mindset Architecture &mdash; powered by{' '}
                 <a
                   href="https://mindset.show"
                   target="_blank"
