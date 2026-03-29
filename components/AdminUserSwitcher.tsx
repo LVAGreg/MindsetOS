@@ -44,7 +44,7 @@ export function AdminUserSwitcher() {
   useEffect(() => {
     if (open && users.length === 0 && !loading) {
       setLoading(true);
-      apiClient.get('/api/admin/users')
+      apiClient.get('/api/admin/users?limit=500')
         .then((data: AdminUser[] | { users: AdminUser[] }) => {
           // Handle both response formats: plain array or { users: [...] }
           const userList = Array.isArray(data) ? data : (data.users || []);
