@@ -1,0 +1,161 @@
+{
+  "models": {
+    "openai/gpt-5": {
+      "name": "GPT-5",
+      "provider": "OpenAI",
+      "ranking": 1,
+      "tier": 3,
+      "input_cost_per_1m": 10.00,
+      "output_cost_per_1m": 30.00,
+      "speed": "medium",
+      "quality": "exceptional",
+      "use_cases": ["chat_agents", "memory_extraction", "memory_optimization"],
+      "openrouter_id": "openai/gpt-5",
+      "description": "Next-gen reasoning, frontier model performance"
+    },
+    "anthropic/claude-sonnet-4.6": {
+      "name": "Claude Sonnet 4.6",
+      "provider": "Anthropic",
+      "ranking": 2,
+      "tier": 3,
+      "input_cost_per_1m": 3.00,
+      "output_cost_per_1m": 15.00,
+      "speed": "medium",
+      "quality": "excellent",
+      "use_cases": ["chat_agents", "memory_extraction", "memory_optimization"],
+      "openrouter_id": "anthropic/claude-3.5-sonnet",
+      "description": "Most capable reasoning, best for complex conversations"
+    },
+    "google/gemini-2.0-flash-exp": {
+      "name": "Gemini 2.0 Flash",
+      "provider": "Google",
+      "ranking": 3,
+      "tier": 1,
+      "input_cost_per_1m": 0.00,
+      "output_cost_per_1m": 0.00,
+      "speed": "very-fast",
+      "quality": "excellent",
+      "use_cases": ["chat_agents", "memory_extraction", "memory_optimization"],
+      "openrouter_id": "google/gemini-2.0-flash-exp:free",
+      "description": "FREE! Excellent quality, extremely fast responses"
+    },
+    "x-ai/grok-beta": {
+      "name": "Grok Beta",
+      "provider": "xAI",
+      "ranking": 4,
+      "tier": 3,
+      "input_cost_per_1m": 5.00,
+      "output_cost_per_1m": 15.00,
+      "speed": "medium",
+      "quality": "very-good",
+      "use_cases": ["chat_agents"],
+      "openrouter_id": "x-ai/grok-beta",
+      "description": "Real-time knowledge, conversational style"
+    },
+    "google/gemini-pro-1.5": {
+      "name": "Gemini Pro 1.5",
+      "provider": "Google",
+      "ranking": 5,
+      "tier": 2,
+      "input_cost_per_1m": 1.25,
+      "output_cost_per_1m": 5.00,
+      "speed": "fast",
+      "quality": "excellent",
+      "use_cases": ["chat_agents", "memory_extraction"],
+      "openrouter_id": "google/gemini-pro-1.5",
+      "description": "Large context window, great for long conversations"
+    },
+    "openai/gpt-4o": {
+      "name": "GPT-4o",
+      "provider": "OpenAI",
+      "ranking": 6,
+      "tier": 2,
+      "input_cost_per_1m": 2.50,
+      "output_cost_per_1m": 10.00,
+      "speed": "medium",
+      "quality": "excellent",
+      "use_cases": ["chat_agents", "memory_extraction"],
+      "openrouter_id": "openai/gpt-4o",
+      "description": "Balanced performance and cost"
+    },
+    "openai/gpt-5-mini": {
+      "name": "GPT-5 Mini",
+      "provider": "OpenAI",
+      "ranking": 7,
+      "tier": 1,
+      "input_cost_per_1m": 0.30,
+      "output_cost_per_1m": 1.20,
+      "speed": "very-fast",
+      "quality": "very-good",
+      "use_cases": ["chat_agents", "memory_extraction", "memory_optimization"],
+      "openrouter_id": "openai/gpt-5-mini",
+      "description": "Next-gen mini model, excellent value"
+    },
+    "openai/gpt-4o-mini": {
+      "name": "GPT-4o Mini",
+      "provider": "OpenAI",
+      "ranking": 8,
+      "tier": 1,
+      "input_cost_per_1m": 0.15,
+      "output_cost_per_1m": 0.60,
+      "speed": "very-fast",
+      "quality": "good",
+      "use_cases": ["chat_agents", "memory_extraction", "memory_optimization"],
+      "openrouter_id": "openai/gpt-4o-mini",
+      "description": "Fast and cost-effective for routine tasks"
+    },
+    "anthropic/claude-3-opus": {
+      "name": "Claude 3 Opus",
+      "provider": "Anthropic",
+      "ranking": 9,
+      "tier": 3,
+      "input_cost_per_1m": 15.00,
+      "output_cost_per_1m": 75.00,
+      "speed": "slow",
+      "quality": "excellent",
+      "use_cases": ["chat_agents"],
+      "openrouter_id": "anthropic/claude-3-opus",
+      "description": "Most powerful Claude model, highest quality"
+    },
+    "meta-llama/llama-3.1-70b-instruct": {
+      "name": "Llama 3.1 70B",
+      "provider": "Meta",
+      "ranking": 10,
+      "tier": 1,
+      "input_cost_per_1m": 0.52,
+      "output_cost_per_1m": 0.75,
+      "speed": "fast",
+      "quality": "good",
+      "use_cases": ["memory_extraction", "memory_optimization"],
+      "openrouter_id": "meta-llama/llama-3.1-70b-instruct",
+      "description": "Open source, good quality at low cost"
+    }
+  },
+  "default_selections": {
+    "chat_agents": "anthropic/claude-sonnet-4.6",
+    "memory_extraction": "openai/gpt-4o-mini",
+    "memory_optimization": "openai/gpt-4o-mini"
+  },
+  "fallback_models": {
+    "chat_agents": ["anthropic/claude-sonnet-4.6", "openai/gpt-5", "openai/gpt-4o", "google/gemini-2.0-flash-exp"],
+    "memory_extraction": ["openai/gpt-4o-mini", "google/gemini-2.0-flash-exp"],
+    "memory_optimization": ["openai/gpt-4o-mini", "google/gemini-2.0-flash-exp"]
+  },
+  "component_descriptions": {
+    "chat_agents": {
+      "name": "Chat Agents",
+      "description": "Powers all 6 ECOS agent conversations (Money Model Maker, Fast Fix Finder, etc.)",
+      "priority": "quality"
+    },
+    "memory_extraction": {
+      "name": "Memory Extraction",
+      "description": "Analyzes conversations and extracts important memories",
+      "priority": "speed"
+    },
+    "memory_optimization": {
+      "name": "Memory Optimization",
+      "description": "Intelligently merges and enhances memories",
+      "priority": "balance"
+    }
+  }
+}

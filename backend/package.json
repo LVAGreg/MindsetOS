@@ -1,0 +1,30 @@
+{
+  "name": "mindset-os-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node real-backend.cjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.3.1",
+    "express-rate-limit": "^7.1.5",
+    "formidable": "^3.5.1",
+    "google-auth-library": "^9.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.6.0",
+    "marked": "^11.1.1",
+    "multer": "^1.4.5-lts.1",
+    "multiparty": "^4.2.3",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^6.9.8",
+    "openai": "^4.20.1",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.11.3",
+    "stripe": "^14.14.0",
+    "tiktoken": "^1.0.12",
+    "uuid": "^9.0.0",
+    "ws": "^8.16.0"
+  }
+}
