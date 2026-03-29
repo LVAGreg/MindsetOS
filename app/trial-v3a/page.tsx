@@ -2,7 +2,7 @@
 
 import { Suspense, lazy, useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   CheckCircle,
@@ -223,8 +223,7 @@ export default function TrialV3A() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-[#07080f]/70 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link href="/trial-v3a" className="flex items-center gap-2.5 group">
-            <Image src="/mindset-os-logo.png" alt="MindsetOS" width={30} height={30} className="object-contain" />
-            <span className="text-lg font-extrabold tracking-tight">Mindset<span className="text-[#fcc824]">OS</span></span>
+            <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">Sign in</Link>
@@ -469,7 +468,7 @@ export default function TrialV3A() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Image src="/mindset-os-logo.png" alt="MindsetOS" width={24} height={24} className="object-contain" />
+              <MindsetOSLogo size="xs" variant="light" />
               <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline">Greg</a></span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">

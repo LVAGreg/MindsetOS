@@ -2,7 +2,7 @@
 
 import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   CheckCircle,
@@ -27,47 +27,41 @@ const SPLINE_ROBOT_URL = 'https://prod.spline.design/eMGivaKFmAnLq1NK/scene.spli
 
 const WORKFLOW_STAGES = [
   {
-    phase: 'Foundation', phaseNum: '01', accent: '#f59e0b',
+    phase: 'Awareness', phaseNum: '01', accent: '#f59e0b',
     agents: [
-      { name: '5 One Formula', icon: '🎯', desc: 'Your one offer, one audience, one outcome framework' },
-      { name: 'The Profile Power-up', icon: '⚡', desc: 'Optimize your professional profile for authority' },
-      { name: 'Money Model Mapper', icon: '💰', desc: 'Build your PEOPLE + PROMISE + PRINCIPLES' },
+      { name: 'Mindset Score Agent', icon: '📊', desc: '5-question assessment with personalized pillar scores' },
+      { name: 'Inner World Mapper', icon: '🗺️', desc: 'Map your beliefs, stories, and self-talk patterns' },
+      { name: 'Story Excavator', icon: '🔍', desc: 'Uncover the 5-7 core narratives running your life' },
     ],
   },
   {
-    phase: 'Offer Design', phaseNum: '02', accent: '#f97316',
+    phase: 'Interruption', phaseNum: '02', accent: '#f97316',
     agents: [
-      { name: 'The Offer Invitation Architect', icon: '📣', desc: 'Promotional invitations via the 6 Ps framework' },
-      { name: 'Presentation Printer', icon: '🎯', desc: 'High-impact presentations & event content' },
+      { name: 'Reset Guide', icon: '🔄', desc: '48-hour weekend challenge with 6 transformative exercises' },
+      { name: 'Decision Framework Agent', icon: '🎯', desc: 'The DESIGN process for decisions under pressure' },
     ],
   },
   {
-    phase: 'Promotion', phaseNum: '03', accent: '#eab308',
+    phase: 'Architecture', phaseNum: '03', accent: '#eab308',
     agents: [
-      { name: 'LI Events Builder Buddy', icon: '📅', desc: 'WHAT-WHAT-HOW event topics' },
-      { name: 'Email Promo Engine', icon: '📧', desc: 'High-converting email campaigns' },
-      { name: 'Daily Lead Sequence Builder', icon: '📋', desc: 'Systematic daily outreach sequences' },
+      { name: 'Practice Builder', icon: '🧘', desc: 'Personalized 5-10 min daily mindset routines' },
+      { name: 'Accountability Partner', icon: '🤝', desc: 'Daily check-ins, reflections, and streak tracking' },
+      { name: 'Architecture Coach', icon: '🏗️', desc: '90-day cohort companion for deep transformation' },
     ],
   },
   {
-    phase: 'Conversion', phaseNum: '04', accent: '#10b981',
+    phase: 'Integration', phaseNum: '04', accent: '#10b981',
     agents: [
-      { name: 'Qualification Call Builder', icon: '📞', desc: 'Conversion-ready sales scripts' },
-      { name: 'Authority Engine', icon: '👑', desc: 'Position yourself as the go-to mindset coach' },
-    ],
-  },
-  {
-    phase: 'Events', phaseNum: '05', accent: '#8b5cf6',
-    agents: [
-      { name: 'Easy Event Architect', icon: '🏗️', desc: 'Design and plan high-impact events' },
+      { name: 'Conversation Curator', icon: '🎧', desc: 'Podcast episode matching for your growth edge' },
+      { name: 'Launch Companion', icon: '🚀', desc: 'Strategic planning and mindset implementation' },
     ],
   },
 ];
 
 const STATS = [
-  { value: '87+', label: 'Active Coaches' },
-  { value: '14', label: 'AI Agents' },
-  { value: '30%', label: 'Avg. Conversion' },
+  { value: '10', label: 'AI Coaches' },
+  { value: '3', label: 'Mindset Pillars' },
+  { value: '48h', label: 'First Reset' },
   { value: '7', label: 'Days Free' },
 ];
 
@@ -235,8 +229,7 @@ export default function TrialV3B() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-[#07080f]/70 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link href="/trial-v3b" className="flex items-center gap-2.5 group">
-            <Image src="/mindset-os-logo.png" alt="MindsetOS" width={30} height={30} className="object-contain" />
-            <span className="text-lg font-extrabold tracking-tight">Mindset<span className="text-[#fcc824]">OS</span></span>
+            <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors">Sign in</Link>
@@ -521,7 +514,7 @@ export default function TrialV3B() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Image src="/mindset-os-logo.png" alt="MindsetOS" width={24} height={24} className="object-contain" />
+              <MindsetOSLogo size="xs" variant="light" />
               <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline">Greg</a></span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">

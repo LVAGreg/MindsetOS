@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   Check,
@@ -134,14 +134,7 @@ export default function LandingPage() {
       {/* Logo at top */}
       <div className="w-full pt-6 pb-4">
         <div className="flex justify-center">
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={32}
-            priority
-            className="object-contain dark:brightness-0 dark:invert"
-          />
+          <MindsetOSLogo size="lg" variant="light" />
         </div>
       </div>
 

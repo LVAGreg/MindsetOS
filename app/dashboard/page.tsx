@@ -57,6 +57,7 @@ import { ClientProfileSwitcher } from '@/components/ClientProfileSwitcher';
 import { AdminUserSwitcher } from '@/components/AdminUserSwitcher';
 import { ResearchPanel } from '@/components/ResearchPanel';
 import TrialExpiredPopup from '@/components/TrialExpiredPopup';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import WelcomeGuide from '@/components/WelcomeGuide';
 import { CanvasPanel } from '@/components/CanvasPanel';
 
@@ -815,12 +816,7 @@ function DashboardContent() {
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img
-                  src="/mindset-os-logo.png"
-                  alt="MindsetOS Logo"
-                  className="h-12 w-auto dark:brightness-0 dark:invert"
-                />
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">MindsetOS</span>
+                <MindsetOSLogo size="lg" />
               </div>
               {/* Collapse Button */}
               <button
@@ -1240,11 +1236,7 @@ function DashboardContent() {
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
               title="Expand sidebar"
             >
-              <img
-                src="/mindset-os-logo.png"
-                alt="MindsetOS Logo"
-                className="h-8 w-auto dark:brightness-0 dark:invert mx-auto"
-              />
+              <MindsetOSLogo size="sm" showIcon={false} />
             </button>
           </div>
 
@@ -1530,11 +1522,7 @@ function DashboardContent() {
             <div className="h-full flex items-center justify-center p-8">
               <div className="text-center max-w-2xl">
                 <div className="mb-6 flex justify-center">
-                  <img
-                    src="/mindset-os-logo.png"
-                    alt="MindsetOS Logo"
-                    className="h-24 w-auto dark:brightness-0 dark:invert"
-                  />
+                  <MindsetOSLogo size="xl" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                   Welcome to MindsetOS

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   CheckCircle,
@@ -84,15 +84,8 @@ export default function CoachingPracticeLandingPage() {
       <nav className="border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS"
-              width={40}
-              height={40}
-              className="object-contain"
-            />
+            <MindsetOSLogo size="md" />
             <span className="text-xl font-bold text-gray-900 dark:text-white">
-              Mindset<span style={{ color: '#fcc824' }}>OS</span>
               <span className="text-gray-400 font-normal mx-1.5">/</span>
               Coaching Practice
             </span>
@@ -443,13 +436,7 @@ export default function CoachingPracticeLandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Image
-                src="/mindset-os-logo.png"
-                alt="MindsetOS"
-                width={24}
-                height={24}
-                className="object-contain"
-              />
+              <MindsetOSLogo size="xs" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Coaching Practice &mdash; powered by{' '}
                 <a

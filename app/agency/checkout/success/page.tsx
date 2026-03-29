@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { CheckCircle, ArrowRight, Sparkles, Users, GraduationCap, Video, ExternalLink, Bot } from 'lucide-react';
 
 const CIRCLE_URL = 'https://www.mindset.show/'; // TODO: Update with actual invite link
@@ -12,15 +12,8 @@ export default function CoachingPracticeCheckoutSuccessPage() {
       {/* Header */}
       <div className="border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center gap-3">
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS"
-            width={36}
-            height={36}
-            className="object-contain"
-          />
+          <MindsetOSLogo size="md" variant="dark" />
           <span className="text-lg font-bold text-gray-900">
-            Mindset<span style={{ color: '#fcc824' }}>OS</span>
             <span className="text-gray-400 font-normal mx-1.5">/</span>
             Coaching Practice
           </span>

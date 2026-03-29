@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, Suspense, FormEvent } from 'react';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -121,15 +121,8 @@ function CoachingPracticeCheckoutInner() {
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS"
-              width={40}
-              height={40}
-              className="object-contain"
-            />
+            <MindsetOSLogo size="md" variant="dark" />
             <span className="text-lg font-bold text-gray-900">
-              Mindset<span style={{ color: '#fcc824' }}>OS</span>
               <span className="text-gray-400 font-normal mx-1.5">/</span>
               Coaching Practice
             </span>

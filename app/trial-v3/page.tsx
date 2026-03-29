@@ -2,7 +2,7 @@
 
 import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   CheckCircle,
@@ -263,10 +263,7 @@ export default function TrialV3Page() {
       <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-[#07080f]/70 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link href="/trial-v3" className="flex items-center gap-2.5 group">
-            <Image src="/mindset-os-logo.png" alt="MindsetOS" width={30} height={30} className="object-contain" />
-            <span className="text-lg font-extrabold tracking-tight">
-              Mindset<span className="text-[#fcc824]">OS</span>
-            </span>
+            <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
             <Link
@@ -704,7 +701,7 @@ export default function TrialV3Page() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Image src="/mindset-os-logo.png" alt="MindsetOS" width={24} height={24} className="object-contain" />
+              <MindsetOSLogo size="xs" variant="light" />
               <span className="text-sm text-gray-500">
                 MindsetOS &mdash; powered by{' '}
                 <a

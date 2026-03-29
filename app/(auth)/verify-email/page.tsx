@@ -3,8 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Loader2, ArrowLeft, Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 
 function VerifyEmailForm() {
   const searchParams = useSearchParams();
@@ -68,23 +68,7 @@ function VerifyEmailForm() {
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
         <div className="w-full pt-6 pb-4">
           <div className="flex justify-center">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain hidden dark:block"
-            />
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain block dark:hidden"
-              style={{ filter: 'brightness(0)' }}
-            />
+            <MindsetOSLogo size="lg" variant="auto" />
           </div>
         </div>
 
@@ -111,23 +95,7 @@ function VerifyEmailForm() {
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
         <div className="w-full pt-6 pb-4">
           <div className="flex justify-center">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain hidden dark:block"
-            />
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain block dark:hidden"
-              style={{ filter: 'brightness(0)' }}
-            />
+            <MindsetOSLogo size="lg" variant="auto" />
           </div>
         </div>
 
@@ -171,23 +139,7 @@ function VerifyEmailForm() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
       <div className="w-full pt-6 pb-4">
         <div className="flex justify-center">
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={32}
-            priority
-            className="object-contain hidden dark:block"
-          />
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={32}
-            priority
-            className="object-contain block dark:hidden"
-            style={{ filter: 'brightness(0)' }}
-          />
+          <MindsetOSLogo size="lg" variant="auto" />
         </div>
       </div>
 

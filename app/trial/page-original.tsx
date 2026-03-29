@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   CheckCircle,
@@ -123,14 +123,7 @@ export default function TrialLandingPage() {
       <nav className="border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS"
-              width={40}
-              height={40}
-              className="object-contain"
-            />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">MindsetOS</span>
+            <MindsetOSLogo size="lg" variant="auto" />
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -370,13 +363,7 @@ export default function TrialLandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Image
-                src="/mindset-os-logo.png"
-                alt="MindsetOS"
-                width={24}
-                height={24}
-                className="object-contain"
-              />
+              <MindsetOSLogo size="xs" variant="auto" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 MindsetOS &mdash; powered by{' '}
                 <a

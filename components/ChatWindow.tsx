@@ -13,6 +13,7 @@ import { MemoryBadge } from './MemoryBadge';
 import VoiceDictation from './VoiceDictation';
 import AssetsPanel from './AssetsPanel';
 import ForkNavigation from './ForkNavigation';
+import MindsetOSLogo from './MindsetOSLogo';
 import MessageEditModal from './MessageEditModal';
 import ConversationStats from './ConversationStats';
 import { buildMessageChain, MessageNode } from '../types/conversation';
@@ -2728,12 +2729,8 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             <div className="mb-8">
               {/* MindsetOS Logo for default agents */}
               {(agentId === 'general' || agentId === 'mindset-super-agent' || agentId === 'client-onboarding') ? (
-                <div className="mb-6">
-                  <img
-                    src="/mindset-os-logo.png"
-                    alt="MindsetOS"
-                    className="h-16 w-auto mx-auto mb-4"
-                  />
+                <div className="mb-6 flex justify-center">
+                  <MindsetOSLogo size="lg" />
                 </div>
               ) : (
                 <div className="text-6xl mb-6">{agentData?.icon}</div>

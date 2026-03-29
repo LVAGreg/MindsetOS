@@ -26,6 +26,7 @@ import {
   Terminal,
   Shield,
 } from 'lucide-react';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -176,11 +177,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {/* Logo & Title */}
             <div className="flex items-center gap-3">
               <Link href="/admin" className="flex items-center gap-2">
-                <img
-                  src="/mindset-os-logo.png"
-                  alt="MindsetOS Logo"
-                  className="w-8 h-8 object-contain"
-                />
+                <MindsetOSLogo size="sm" />
                 <div className="hidden sm:block">
                   <h1 className="text-lg font-bold text-gray-900 dark:text-white">Admin</h1>
                 </div>

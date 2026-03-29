@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Loader2, ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -48,23 +48,7 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="w-full pt-6 pb-4">
           <div className="flex justify-center">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain hidden dark:block"
-            />
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS Logo"
-              width={80}
-              height={32}
-              priority
-              className="object-contain block dark:hidden"
-              style={{ filter: 'brightness(0)' }}
-            />
+            <MindsetOSLogo size="lg" variant="auto" />
           </div>
         </div>
 
@@ -107,23 +91,7 @@ export default function ForgotPasswordPage() {
       {/* Logo */}
       <div className="w-full pt-6 pb-4">
         <div className="flex justify-center">
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={32}
-            priority
-            className="object-contain hidden dark:block"
-          />
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={32}
-            priority
-            className="object-contain block dark:hidden"
-            style={{ filter: 'brightness(0)' }}
-          />
+          <MindsetOSLogo size="lg" variant="auto" />
         </div>
       </div>
 

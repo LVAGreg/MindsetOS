@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
-import Image from 'next/image';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import Link from 'next/link';
 import {
   CheckCircle,
@@ -41,33 +41,33 @@ function SenjaTestimonials() {
 
 const WHAT_YOU_GET = [
   {
-    title: '12 Short, AI-Powered Implementation Modules',
-    desc: 'Built for easy execution, fast outcomes',
+    title: 'Full Access to 10 AI Mindset Coaching Agents',
+    desc: 'Mindset Score, Reset Guide, Architecture Coach, Practice Builder, and 6 more \u2014 all fully unlocked',
   },
   {
-    title: 'Plug-and-Play Offer Frameworks and Templates',
-    desc: "So you're never guessing or starting from scratch",
+    title: 'The 48-Hour Mindset Reset Challenge',
+    desc: '6 guided exercises to interrupt reactive patterns and design your operating system',
   },
   {
-    title: 'Full Access to MindsetOS \u2014 12+ AI Agents Trained on Offers That Actually Convert',
-    desc: 'The same AI you\u2019ve been using \u2014 now fully unlocked, and even more powerful with the training and frameworks behind it',
+    title: 'Personalized Daily Mindset Practice',
+    desc: 'AI-built 5-10 minute routines tailored to your specific growth edge',
   },
   {
-    title: 'Weekly LIVE Coaching with Experienced Coaches',
-    desc: 'No help desks. No generic answers.',
+    title: '90-Day Architecture Program Access',
+    desc: 'Group cohort companion with accountability tracking and milestone celebrations',
   },
   {
-    title: 'A Clear Path From Idea \u2192 Offer \u2192 Income',
-    desc: 'A clear plan, a repeatable process, and 5-figure opportunities',
+    title: 'A Clear Path From Reactive \u2192 Intentional \u2192 Designed',
+    desc: 'Awareness, interruption, and architecture \u2014 the 3-layer system that changes everything',
   },
 ];
 
 const BONUSES = [
-  { name: 'Access to the MindsetOS Community', value: '$1,000' },
-  { name: 'Access to MindsetOS Coaching', value: '$2,000' },
-  { name: 'Access to Private Implementation Support', value: '$2,250' },
-  { name: '2-Day LIVE MindsetOS Intensive Ticket', value: '$500' },
-  { name: 'Arena Pass \u2014 MindsetOS Advantage Workshops & Resources', value: '$1,500' },
+  { name: 'Access to the MindsetOS Community', value: '$500' },
+  { name: 'Personalized Mindset Score Report', value: '$200' },
+  { name: 'Story Excavator Deep-Dive Session', value: '$300' },
+  { name: 'Decision Framework Toolkit', value: '$250' },
+  { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
 type PricingPlan = 'weekly' | 'upfront';
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   // Card fields removed — payment is handled by Stripe Checkout redirect
 
-  const price = plan === 'weekly' ? 87 : 750;
+  const price = plan === 'weekly' ? 47 : 397;
 
   const handleApplyCoupon = () => {
     setCouponError('');
@@ -148,17 +148,10 @@ export default function CheckoutPage() {
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
-              src="/mindset-os-logo.png"
-              alt="MindsetOS"
-              width={40}
-              height={40}
-              className="object-contain"
-            />
+            <MindsetOSLogo size="md" variant="dark" />
             <span className="text-lg font-bold text-gray-900">
-              Mindset<span style={{ color: '#fcc824' }}>OS</span>
               <span className="text-gray-400 font-normal mx-1.5">+</span>
-              Client Fast Start
+              Mindset Architecture
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -245,11 +238,11 @@ export default function CheckoutPage() {
               <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                 <h3 className="text-sm font-bold text-gray-900 mb-3">Today&apos;s payment:</h3>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-gray-700">Client Fast Start</span>
+                  <span className="text-gray-700">Mindset Architecture</span>
                   <span className="font-bold text-gray-900">${price}</span>
                 </div>
                 {plan === 'weekly' && (
-                  <p className="text-xs text-gray-500">Then $87/wk billed weekly</p>
+                  <p className="text-xs text-gray-500">Then $47/wk billed weekly</p>
                 )}
               </div>
 
@@ -278,8 +271,8 @@ export default function CheckoutPage() {
                       {plan === 'weekly' && <div className="w-2.5 h-2.5 rounded-full bg-[#fcc824]" />}
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-gray-900">$87.00/wk</div>
-                      <div className="text-xs text-gray-500">$87.00 USD today, then $87.00 USD weekly</div>
+                      <div className="font-bold text-gray-900">$47.00/wk</div>
+                      <div className="text-xs text-gray-500">$47.00 USD today, then $47.00 USD weekly</div>
                     </div>
                   </label>
 
@@ -305,10 +298,10 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-gray-900">
-                        $750.00
-                        <span className="ml-2 inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">SAVE $294</span>
+                        $397.00
+                        <span className="ml-2 inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">SAVE $167</span>
                       </div>
-                      <div className="text-xs text-gray-500">Upfront Payment of $750 USD = 12 Weeks (Save $294)</div>
+                      <div className="text-xs text-gray-500">Upfront Payment of $397 USD = 12 Weeks (Save $167)</div>
                     </div>
                   </label>
                 </div>

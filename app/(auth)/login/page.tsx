@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
+import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { apiClient } from '@/lib/api-client';
 import { useAppStore } from '@/lib/store';
 
@@ -123,14 +123,7 @@ export default function LoginPage() {
       {/* Logo at top */}
       <div className="w-full pt-6 pb-2">
         <div className="flex justify-center">
-          <Image
-            src="/mindset-os-logo.png"
-            alt="MindsetOS Logo"
-            width={80}
-            height={80}
-            priority
-            className="object-contain"
-          />
+          <MindsetOSLogo size="lg" variant="dark" />
         </div>
       </div>
 
