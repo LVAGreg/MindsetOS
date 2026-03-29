@@ -59,7 +59,9 @@ import { ResearchPanel } from '@/components/ResearchPanel';
 import TrialExpiredPopup from '@/components/TrialExpiredPopup';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import WelcomeGuide from '@/components/WelcomeGuide';
+import FirstTimeModal from '@/components/FirstTimeModal';
 import { CanvasPanel } from '@/components/CanvasPanel';
+import DashboardSidebar from '@/components/DashboardSidebar';
 
 // Compact agent row for Browse Agents view
 function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, userRole }: {
@@ -295,11 +297,13 @@ function DashboardContent() {
     }
   }, [currentConversation, router, hasHydrated, user]);
 
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [v7Agents, setV7Agents] = useState<any[]>([]);
   const [showConversationBrowser, setShowConversationBrowser] = useState(false);
   const [showAgentBrowser, setShowAgentBrowser] = useState(false);
+  // Sidebar active section state for new DashboardSidebar
+  const [sidebarSection, setSidebarSection] = useState<'home' | 'agents' | 'playbook' | 'conversations' | 'profile' | null>('home');
+  const [hasMindsetScore, setHasMindsetScore] = useState(false);
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const [selectedView, setSelectedView] = useState<'all' | 'starred' | 'project' | null>('all');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
@@ -317,8 +321,9 @@ function DashboardContent() {
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
   const [unreadFeedbackCount, setUnreadFeedbackCount] = useState(0);
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
+  const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
 
-  // Show welcome guide for new users who haven't seen it, or via ?guide=true URL param
+  // Show first-time modal for brand new users, welcome guide for returning-but-unseen
   useEffect(() => {
     if (!user || !hasHydrated) return;
     const params = new URLSearchParams(window.location.search);
@@ -328,9 +333,29 @@ function DashboardContent() {
     }
     const hasSeenGuide = localStorage.getItem('mindset_os_welcome_guide_seen');
     if (!hasSeenGuide) {
-      setShowWelcomeGuide(true);
+      // Check if truly first time (no conversations yet) → show richer FirstTimeModal
+      const hasSeenFirstTime = localStorage.getItem('mindset_os_first_time_modal_seen');
+      if (!hasSeenFirstTime) {
+        setShowFirstTimeModal(true);
+      } else {
+        setShowWelcomeGuide(true);
+      }
     }
   }, [user, hasHydrated]);
+
+  const dismissFirstTimeModal = () => {
+    setShowFirstTimeModal(false);
+    localStorage.setItem('mindset_os_first_time_modal_seen', 'true');
+    localStorage.setItem('mindset_os_welcome_guide_seen', 'true');
+  };
+
+  const handleStartMindsetScore = () => {
+    dismissFirstTimeModal();
+    // Use handleSelectAgent which resolves agent keys correctly for both static and dynamic agents
+    // This runs after the component has initialized agents, so displayAgents may not be populated yet.
+    // Fall back to URL param approach which is always reliable.
+    router.push('/dashboard?agent=mindset-score');
+  };
 
   const dismissWelcomeGuide = () => {
     setShowWelcomeGuide(false);
@@ -363,6 +388,33 @@ function DashboardContent() {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
+
+  // Check if user has completed the Mindset Score (for sidebar CTA)
+  useEffect(() => {
+    const checkMindsetScore = async () => {
+      if (!user) return;
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+        const response = await fetch(`${API_URL}/api/conversations?agentId=mindset-score&limit=1`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const convList = Array.isArray(data) ? data : (data.conversations || []);
+          setHasMindsetScore(convList.length > 0);
+        }
+      } catch {
+        // fail silently — CTA defaults to visible
+      }
+    };
+    checkMindsetScore();
+  }, [user]);
+
+  // Sync sidebarSection with showAgentBrowser
+  useEffect(() => {
+    if (showAgentBrowser) setSidebarSection('agents');
+  }, [showAgentBrowser]);
 
   // Fetch V7 agents on mount
   useEffect(() => {
@@ -783,7 +835,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-[#0d1117] relative">
+    <div className="h-screen flex bg-gray-50 dark:bg-[#0d1117] relative dark:dashboard-bg">
       {/* Trial Expired Popup */}
       <TrialExpiredPopup
         membershipTier={user?.membershipTier}
@@ -798,490 +850,110 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* Welcome Guide for new users */}
+      {/* First-time modal — shown to brand new users, directs to Mindset Score */}
+      <FirstTimeModal
+        show={showFirstTimeModal}
+        onDismiss={dismissFirstTimeModal}
+        onStartMindsetScore={handleStartMindsetScore}
+      />
+
+      {/* Welcome Guide for returning-but-unseen users */}
       <WelcomeGuide show={showWelcomeGuide} onDismiss={dismissWelcomeGuide} />
 
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 md:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
 
-      {/* Sidebar - Expanded */}
-      {isSidebarOpen && (
-        <div key={`sidebar-${viewAsKey}`} className="w-[280px] bg-white dark:bg-[#0d1117] border-r border-gray-200 dark:border-white/[0.06] text-gray-900 dark:text-gray-100 flex flex-col md:relative absolute inset-y-0 left-0 z-30">
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-white/[0.06] bg-gray-50/80 dark:bg-[#0d1117]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <MindsetOSLogo size="lg" />
-              </div>
-              {/* Collapse Button */}
-              <button
-                onClick={toggleSidebar}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-lg transition-all duration-200"
-                title="Collapse sidebar"
-              >
-                <PanelLeftClose className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              </button>
-            </div>
+      {/* ── DashboardSidebar (new, replaces old expanded + collapsed sidebars) ── */}
+      <DashboardSidebar
+        key={`sidebar-${viewAsKey}`}
+        activeSection={sidebarSection}
+        onSectionChange={(section) => {
+          setSidebarSection(section);
+          if (section === 'agents') setShowAgentBrowser(true);
+          else if (section === 'conversations') setShowConversationBrowser(true);
+          else if (section === 'playbook') {
+            // Playbook is surfaced in the sidebar children slot below
+          }
+        }}
+        onNewChat={() => {
+          if (currentAgentData) handleNewConversation();
+          else setShowAgentBrowser(true);
+        }}
+        onSearch={() => setShowConversationBrowser(true)}
+        onLogout={handleLogout}
+        hasMindsetScore={hasMindsetScore}
+        unreadFeedbackCount={unreadFeedbackCount}
+        onFeedbackClick={() => setShowFeedbackModal(true)}
+        viewAsUser={viewAsUser}
+      >
+        {/* Conversation history + playbook injected as children */}
+        {currentAgentData && (
+          <CollapsibleSection
+            title="This Agent"
+            icon={<MessageSquare className="w-4 h-4" />}
+            defaultOpen={true}
+            isCollapsed={false}
+          >
+            <ConversationHistory
+              currentAgentData={currentAgentData}
+              filterStarred={false}
+              allAgents={displayAgents}
+              onConversationSelect={() => setShowAgentBrowser(false)}
+            />
+          </CollapsibleSection>
+        )}
+        <CollapsibleSection
+          title="Playbook"
+          icon={<BookOpen className="w-4 h-4" />}
+          defaultOpen={false}
+          isCollapsed={false}
+        >
+          <PlaybookList />
+        </CollapsibleSection>
+        <CollapsibleSection
+          title="Starred"
+          icon={<Star className="w-4 h-4" />}
+          defaultOpen={false}
+          isCollapsed={false}
+        >
+          <ConversationHistory
+            currentAgentData={null}
+            filterStarred={true}
+            allAgents={displayAgents}
+            onConversationSelect={() => setShowAgentBrowser(false)}
+          />
+        </CollapsibleSection>
+        <CollapsibleSection
+          title="Recent"
+          icon={<Clock className="w-4 h-4" />}
+          defaultOpen={false}
+          isCollapsed={false}
+        >
+          <ConversationHistory
+            currentAgentData={null}
+            filterStarred={false}
+            allAgents={displayAgents}
+            onConversationSelect={() => setShowAgentBrowser(false)}
+          />
+        </CollapsibleSection>
+      </DashboardSidebar>
 
-          </div>
-
-          {/* Sidebar Content - Organized Sections */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {/* New Chat */}
-            <div className="px-3 pt-3 pb-1">
-              <button
-                onClick={() => {
-                  if (currentAgentData) {
-                    // Create new conversation with current agent
-                    handleNewConversation();
-                  } else {
-                    // No agent selected, open agent browser
-                    setShowAgentBrowser(true);
-                  }
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 border border-gray-200 dark:border-white/[0.08] hover:border-[#fcc824]/30 dark:hover:border-[#fcc824]/20 hover:bg-[#fcc824]/[0.04] text-gray-700 dark:text-gray-300 group"
-                title={currentAgentData ? `New chat with ${currentAgentData.name}` : "Select an agent"}
-              >
-                <div className="w-7 h-7 rounded-lg bg-[#fcc824]/10 flex items-center justify-center group-hover:bg-[#fcc824]/15 transition-colors">
-                  <Plus className="w-4 h-4 text-[#fcc824]" />
-                </div>
-                <span className="text-sm font-semibold">New Chat</span>
-              </button>
-            </div>
-
-            {/* Research Section - Collapsible - Admin/Power User only */}
-            {(effectiveUser?.role === 'admin' || effectiveUser?.role === 'power_user') && (
-              <CollapsibleSection
-                title="Research"
-                icon={<Search className="w-4 h-4" />}
-                defaultOpen={false}
-                isCollapsed={false}
-              >
-                <ResearchPanel isCollapsed={false} />
-              </CollapsibleSection>
-            )}
-
-            {/* Projects Section - Collapsible */}
-            <CollapsibleSection
-              title="Projects"
-              icon={<Folder className="w-4 h-4" />}
-              defaultOpen={false}
-              isCollapsed={false}
-            >
-              <ProjectList
-                onSelectProject={(projectId) => {
-                  setConversationBrowserProjectId(projectId);
-                  setShowConversationBrowser(true);
-                }}
-                selectedProjectId={selectedProjectId}
-                onCreateNew={() => setShowNewProjectDialog(true)}
-              />
-            </CollapsibleSection>
-
-            {/* Playbook - Saved Plays */}
-            <CollapsibleSection
-              title="Playbook"
-              icon={<BookOpen className="w-4 h-4" />}
-              defaultOpen={false}
-              isCollapsed={false}
-            >
-              <PlaybookList />
-            </CollapsibleSection>
-
-            {/* This Agent's Conversations - Collapsible */}
-            {currentAgentData && (
-              <CollapsibleSection
-                title="This Agent"
-                icon={<MessageSquare className="w-4 h-4" />}
-                defaultOpen={true}
-                isCollapsed={false}
-              >
-                <ConversationHistory
-                  currentAgentData={currentAgentData}
-                  filterStarred={false}
-                  allAgents={displayAgents}
-                  onConversationSelect={() => setShowAgentBrowser(false)}
-                />
-              </CollapsibleSection>
-            )}
-
-            {/* Starred Conversations - Collapsible */}
-            <CollapsibleSection
-              title="Starred"
-              icon={<Star className="w-4 h-4" />}
-              defaultOpen={false}
-              isCollapsed={false}
-            >
-              <ConversationHistory
-                currentAgentData={null}
-                filterStarred={true}
-                allAgents={displayAgents}
-                onConversationSelect={() => setShowAgentBrowser(false)}
-              />
-            </CollapsibleSection>
-
-            {/* Recent Conversations (All Agents) - Collapsible */}
-            <CollapsibleSection
-              title="Recent"
-              icon={<Clock className="w-4 h-4" />}
-              defaultOpen={false}
-              isCollapsed={false}
-            >
-              <ConversationHistory
-                currentAgentData={null}
-                filterStarred={false}
-                allAgents={displayAgents}
-                onConversationSelect={() => setShowAgentBrowser(false)}
-              />
-            </CollapsibleSection>
-          </div>
-
-          {/* Sidebar Footer - User Menu with Settings */}
-          <div className="p-3 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50/80 dark:bg-[#0d1117]">
-            <div className="relative">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-xl transition-all duration-200"
-              >
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm ${viewAsUser ? 'bg-gradient-to-br from-blue-400 to-indigo-500' : 'bg-gradient-to-br from-[#fcc824] to-amber-600'}`}>
-                  {(effectiveUser?.name?.[0] || effectiveUser?.email?.[0] || 'U').toUpperCase()}
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate">
-                    {viewAsUser ? `${effectiveUser?.name || effectiveUser?.email}` : (user?.name || user?.email)}
-                  </p>
-                  <p className="text-[11px] text-gray-500 dark:text-gray-500 truncate capitalize">
-                    {effectiveUser?.role?.replace('_', ' ') || ''}
-                    {viewAsUser && <span className="text-blue-400 ml-1">(viewing as)</span>}
-                  </p>
-                </div>
-                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0" />
-              </button>
-
-              {showUserMenu && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowUserMenu(false)}
-                  />
-                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-[#161b22] rounded-xl shadow-2xl shadow-black/20 border border-gray-200 dark:border-white/[0.08] z-20 max-h-[80vh] overflow-y-auto">
-                    <div className="py-1">
-                      {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        {viewAsUser ? (
-                          <>
-                            <p className="text-xs text-blue-400 font-semibold">Viewing as</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                              {effectiveUser?.name || effectiveUser?.email}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{effectiveUser?.role?.replace('_', ' ')}</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                              {user?.email}
-                            </p>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Profile Section */}
-                      <button
-                        onClick={() => { router.push('/profile'); setShowUserMenu(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                      >
-                        <User className="w-4 h-4" />
-                        <span>Edit Profile</span>
-                      </button>
-
-                      {/* Admin Section - admin/power_user only */}
-                      {(effectiveUser?.role === 'admin' || effectiveUser?.role === 'power_user') && (
-                        <div className="border-t border-gray-200 dark:border-gray-700">
-                          <div className="px-4 py-2">
-                            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                              Administration
-                            </p>
-                          </div>
-
-                          {effectiveUser?.role === 'admin' && (
-                            <>
-                              <button
-                                onClick={() => { router.push('/admin'); setShowUserMenu(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                              >
-                                <BarChart3 className="w-4 h-4" />
-                                <span>Dashboard</span>
-                                <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                              </button>
-                              <button
-                                onClick={() => { router.push('/admin/users'); setShowUserMenu(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                              >
-                                <Users className="w-4 h-4" />
-                                <span>Users</span>
-                                <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                              </button>
-                              <button
-                                onClick={() => { router.push('/admin/invite-codes'); setShowUserMenu(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                              >
-                                <Ticket className="w-4 h-4" />
-                                <span>Invite Codes</span>
-                                <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                              </button>
-                              <button
-                                onClick={() => { router.push('/admin/emails'); setShowUserMenu(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                              >
-                                <Mail className="w-4 h-4" />
-                                <span>Email Templates</span>
-                                <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                              </button>
-                              <button
-                                onClick={() => { router.push('/admin/feedback'); setShowUserMenu(false); }}
-                                className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                              >
-                                <MessageCircle className="w-4 h-4" />
-                                <span>Feedback Management</span>
-                                <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Coaching Practice Tools Section - agency/admin only */}
-                      {(effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin') && (
-                        <div className="border-t border-gray-200 dark:border-gray-700">
-                          <div className="px-4 py-2">
-                            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                              Practice Tools
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => { router.push('/dashboard/clients'); setShowUserMenu(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                          >
-                            <Building2 className="w-4 h-4" />
-                            <span>Clients</span>
-                            <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                          </button>
-                          <button
-                            onClick={() => { router.push('/dashboard/team'); setShowUserMenu(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                          >
-                            <Users className="w-4 h-4" />
-                            <span>Team</span>
-                            <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                          </button>
-                          <button
-                            onClick={() => { router.push('/dashboard/my-agents'); setShowUserMenu(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                          >
-                            <Sparkles className="w-4 h-4" />
-                            <span>My Agents</span>
-                            <ChevronRight className="w-3 h-3 ml-auto text-gray-400" />
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Preferences Section */}
-                      <div className="border-t border-gray-200 dark:border-gray-700">
-                        <div className="px-4 py-2">
-                          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                            Preferences
-                          </p>
-                        </div>
-
-                        {/* Dark Mode Toggle */}
-                        <div className="px-4 py-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                              {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-                              <span>Dark Mode</span>
-                            </div>
-                            <button
-                              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-300'}`}
-                            >
-                              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Widget Toggle - Available to all users */}
-                        {user && (
-                          <div className="px-4 py-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                <Sparkles className="w-4 h-4" />
-                                <span>Widgets</span>
-                              </div>
-                              <button
-                                onClick={() => setWidgetFormattingEnabled(!widgetFormattingEnabled)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${widgetFormattingEnabled ? 'bg-purple-600' : 'bg-gray-300'}`}
-                              >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${widgetFormattingEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Memory Toggle - Admin/Power User only */}
-                        {effectiveUser && (effectiveUser.role === 'admin' || effectiveUser.role === 'power_user') && (
-                          <div className="px-4 py-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                <Brain className="w-4 h-4" />
-                                <span title="Memories are always captured. Toggle controls whether they're included in AI context.">
-                                  Memory Context
-                                </span>
-                              </div>
-                              <button
-                                onClick={() => setMemoryEnabled(!memoryEnabled)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${memoryEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
-                                title={memoryEnabled ? 'Including memories in AI context' : 'Memories captured but not included in context'}
-                              >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${memoryEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Playbook toggle */}
-                        {user && (
-                          <div className="px-4 py-2">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                <PanelRightOpen className="w-4 h-4" />
-                                <span title="Enable Playbook panel for saving and formatting AI outputs">
-                                  Playbook
-                                </span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  const newVal = !canvasEnabled;
-                                  const store = useAppStore.getState();
-                                  store.setCanvasEnabled(newVal);
-                                }}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${canvasEnabled ? 'bg-[#fcc824]' : 'bg-gray-300'}`}
-                                title={canvasEnabled ? 'Playbook enabled' : 'Playbook disabled'}
-                              >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${canvasEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Feedback */}
-                      <div className="border-t border-gray-200 dark:border-gray-700">
-                        <button
-                          onClick={() => { setShowFeedbackModal(true); setShowUserMenu(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>Send Feedback</span>
-                        </button>
-                        <button
-                          onClick={() => { router.push('/feedback'); setShowUserMenu(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                          <span>My Feedback</span>
-                        </button>
-                      </div>
-
-                      {/* Coaching Practice Upgrade — show for non-agency users */}
-                      {effectiveUser && effectiveUser.role !== 'agency' && effectiveUser.role !== 'admin' && (
-                        <div className="border-t border-gray-200 dark:border-gray-700">
-                          <button
-                            onClick={() => { router.push('/agency'); setShowUserMenu(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 text-sm"
-                          >
-                            <GraduationCap className="w-4 h-4" />
-                            <span>Upgrade to Coaching Practice</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Sign Out */}
-                      <button
-                        onClick={handleLogout}
-                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 dark:text-red-400 border-t border-gray-200 dark:border-gray-700"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign out</span>
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Sidebar - Collapsed (Hidden on mobile) */}
-      {!isSidebarOpen && (
-        <div className="hidden md:flex w-[60px] bg-white dark:bg-[#0d1117] sidebar-collapsed-border flex-col py-3">
-          {/* Logo at Top */}
-          <div className="px-2 pb-3 border-b border-gray-200 dark:border-white/[0.06]">
-            <button
-              onClick={toggleSidebar}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.04] rounded-xl transition-all duration-200 w-full"
-              title="Expand sidebar"
-            >
-              <MindsetOSLogo size="sm" showIcon={false} />
-            </button>
-          </div>
-
-          {/* Middle Menu Icons */}
-          <div className="flex-1 flex flex-col items-center gap-1 py-3 overflow-y-auto">
-            {/* Start New Chat */}
-            <button
-              onClick={() => setShowAgentBrowser(true)}
-              className="p-2.5 hover:bg-[#fcc824]/[0.08] rounded-xl transition-all duration-200 group"
-              title="Start New Chat"
-            >
-              <Plus className="w-5 h-5 text-gray-500 dark:text-gray-500 group-hover:text-[#fcc824] transition-colors" />
-            </button>
-
-            {/* Search */}
-            <button
-              onClick={() => setShowConversationBrowser(true)}
-              className="p-2.5 hover:bg-white/[0.04] rounded-xl transition-all duration-200 group"
-              title="Search"
-            >
-              <Search className="w-5 h-5 text-gray-500 dark:text-gray-500 group-hover:text-gray-300 transition-colors" />
-            </button>
-          </div>
-
-          {/* User Profile at Bottom */}
-          <div className="px-2 pt-3 border-t border-gray-200 dark:border-white/[0.06]">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-all duration-200 w-full relative"
-              title={user?.name || user?.email || 'User menu'}
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-[#fcc824] to-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-xs mx-auto shadow-sm">
-                {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
-              </div>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Legacy collapsed sidebar removed — DashboardSidebar handles collapsed state */}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Header - Compact with Agent Selector and Search */}
-        <header className="bg-white/80 dark:bg-[#0d1117]/90 header-glass border-b border-gray-200 dark:border-white/[0.06] px-4 py-1.5 flex items-center gap-3">
+        <header className="bg-white/80 dark:bg-[#0d1117]/90 header-glass border-b border-gray-200 dark:border-white/[0.06] px-3 sm:px-4 py-1.5 flex items-center gap-2 sm:gap-3">
+          {/* Mobile hamburger — only visible on mobile when sidebar is closed */}
+          {!isSidebarOpen && (
+            <button
+              onClick={toggleSidebar}
+              className="flex md:hidden min-w-[44px] min-h-[44px] items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 flex-shrink-0"
+              title="Open sidebar"
+              aria-label="Open sidebar"
+            >
+              <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            </button>
+          )}
+
           {/* Admin User Switcher — Admin only, appears first */}
           <AdminUserSwitcher />
 
@@ -1291,7 +963,7 @@ function DashboardContent() {
           {/* Agent Selector - Opens Agent Browser - Left Aligned */}
           <button
             onClick={() => setShowAgentBrowser(!showAgentBrowser)}
-            className="flex items-center gap-2.5 px-3.5 py-2 border rounded-xl transition-all duration-200 hover:shadow-md group"
+            className="flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3.5 py-2 border rounded-xl transition-all duration-200 hover:shadow-md group min-w-0 max-w-[180px] sm:max-w-none"
             style={{
               background: currentAgentData?.accent_color
                 ? `linear-gradient(135deg, ${currentAgentData.accent_color}08, transparent)`
@@ -1367,13 +1039,13 @@ function DashboardContent() {
         <div className="flex-1 overflow-hidden flex">
           <div className="flex-1 min-w-0">
           {showAgentBrowser ? (
-            <div className="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 px-6 py-5">
+            <div className="h-full overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-[#0d1117] px-3 sm:px-6 py-4 sm:py-5">
               <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Browse Agents</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Select an agent to start a conversation</p>
+                    <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">Browse Agents</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-0.5">Choose a coach to begin your session</p>
                   </div>
                   {(effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin') && (
                     <button
@@ -1530,23 +1202,217 @@ function DashboardContent() {
               conversationId={currentConversationId ?? undefined}
             />
           ) : (
-            <div className="h-full flex items-center justify-center p-8">
-              <div className="text-center max-w-2xl">
-                <div className="mb-6 flex justify-center">
-                  <MindsetOSLogo size="xl" />
+            /* ===== WELCOME HOME SCREEN ===== */
+            <div className="h-full overflow-y-auto custom-scrollbar">
+              <div className="relative min-h-full">
+                {/* Ambient background orbs */}
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 dark:bg-amber-500/[0.04] rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute top-32 right-1/4 w-72 h-72 bg-cyan-500/4 dark:bg-cyan-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute bottom-20 left-1/3 w-64 h-64 bg-violet-500/4 dark:bg-violet-500/[0.02] rounded-full blur-[100px] pointer-events-none" />
+
+                {/* Content */}
+                <div className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-16">
+
+                  {/* ---- Greeting ---- */}
+                  <div className="mb-10 animate-float-up-1">
+                    <p className="text-xs font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400/70 mb-2">
+                      Your operating system
+                    </p>
+                    <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white leading-tight mb-3">
+                      Good to see you{user?.firstName ? `, ${user.firstName}` : ''}.
+                    </h1>
+                    <p className="text-base text-gray-500 dark:text-gray-500 leading-relaxed max-w-lg">
+                      Your mind runs your business. Let&rsquo;s make sure it&rsquo;s running at full capacity today.
+                    </p>
+                  </div>
+
+                  {/* ---- Mindset Score CTA ---- */}
+                  <div className="mb-10 animate-float-up-2">
+                    <button
+                      onClick={() => {
+                        const scoreAgent = displayAgents.find(a => a.id === 'mindset-score');
+                        if (scoreAgent && !scoreAgent.locked) {
+                          handleSelectAgent('mindset-score');
+                        } else {
+                          setShowAgentBrowser(true);
+                        }
+                      }}
+                      className="group w-full relative overflow-hidden rounded-2xl border border-amber-300/50 dark:border-amber-500/20 p-6 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-500/10"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(252,200,36,0.07) 0%, rgba(252,200,36,0.02) 60%, transparent 100%)',
+                      }}
+                    >
+                      <div
+                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                        style={{ background: 'linear-gradient(135deg, rgba(252,200,36,0.05) 0%, transparent 60%)' }}
+                      />
+                      <div className="relative z-10 flex items-center gap-5">
+                        <div
+                          className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(252,200,36,0.15), rgba(252,200,36,0.06))',
+                            border: '1.5px solid rgba(252,200,36,0.3)',
+                            boxShadow: '0 4px 16px rgba(252,200,36,0.12)',
+                          }}
+                        >
+                          <Brain className="w-8 h-8 text-amber-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500/60 dark:text-amber-400/50 mb-1">
+                            Free Assessment
+                          </p>
+                          <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white mb-1">
+                            Take Your Mindset Score
+                          </h2>
+                          <p className="text-sm text-gray-500 dark:text-gray-500 leading-relaxed">
+                            5 questions. See which pillar needs work &mdash; and exactly where to start.
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 hidden sm:block">
+                          <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#fcc824] text-black text-sm font-bold rounded-xl transition-all group-hover:bg-[#f5c200] group-hover:shadow-md group-hover:shadow-amber-500/15">
+                            Start
+                            <Sparkles className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* ---- Your Coaches grid ---- */}
+                  {displayAgents.filter(a => !a.locked && a.id !== 'mindset-score').length > 0 && (
+                    <div className="mb-10 animate-float-up-3">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
+                          Your Coaches
+                        </h2>
+                        <button
+                          onClick={() => setShowAgentBrowser(true)}
+                          className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                        >
+                          Browse all
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {displayAgents
+                          .filter(a => !a.locked && !a.isCustom && a.id !== 'mindset-score')
+                          .slice(0, 6)
+                          .map((agent) => (
+                            <button
+                              key={agent.id}
+                              onClick={() => handleSelectAgent(agent.id)}
+                              className="group relative flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#111827] hover:shadow-lg dark:hover:shadow-black/40 hover:-translate-y-0.5 transition-all duration-200 text-center"
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = `${agent.accent_color}45`;
+                                e.currentTarget.style.boxShadow = `0 8px 24px ${agent.accent_color}14`;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = '';
+                                e.currentTarget.style.boxShadow = '';
+                              }}
+                            >
+                              <div
+                                className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"
+                                style={{
+                                  background: `linear-gradient(135deg, ${agent.accent_color}18, ${agent.accent_color}08)`,
+                                  border: `1.5px solid ${agent.accent_color}30`,
+                                }}
+                              >
+                                <AgentIcon agentId={agent.id} className="w-5 h-5" style={{ color: agent.accent_color }} />
+                              </div>
+                              <p className="text-xs font-bold tracking-tight text-gray-900 dark:text-white leading-snug line-clamp-2">
+                                {agent.name}
+                              </p>
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ---- Recent conversations ---- */}
+                  {(() => {
+                    const recentConvs = Object.values(conversations)
+                      .filter((c: any) => c.messages && c.messages.length > 0)
+                      .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                      .slice(0, 4);
+                    if (recentConvs.length === 0) return null;
+                    return (
+                      <div className="animate-float-up-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
+                            Continue where you left off
+                          </h2>
+                          <button
+                            onClick={() => setShowConversationBrowser(true)}
+                            className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                          >
+                            View all
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="space-y-2">
+                          {recentConvs.map((conv: any) => {
+                            const agent = displayAgents.find(a => a.id === conv.agentId);
+                            const lastMsg = conv.messages?.[conv.messages.length - 1];
+                            return (
+                              <button
+                                key={conv.id}
+                                onClick={() => {
+                                  if (agent) setCurrentAgent(conv.agentId as AgentId);
+                                  setCurrentConversation(conv.id);
+                                }}
+                                className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#111827] hover:border-gray-300 dark:hover:border-white/[0.12] hover:shadow-md dark:hover:shadow-black/30 transition-all duration-200 text-left"
+                              >
+                                <div
+                                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                                  style={{
+                                    background: `${agent?.accent_color || '#fcc824'}14`,
+                                    border: `1.5px solid ${agent?.accent_color || '#fcc824'}22`,
+                                  }}
+                                >
+                                  {agent ? (
+                                    <AgentIcon agentId={agent.id} className="w-4 h-4" style={{ color: agent.accent_color }} />
+                                  ) : (
+                                    <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-600" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-600 mb-0.5">
+                                    {agent?.name || conv.agentId}
+                                  </p>
+                                  <p className="text-sm text-gray-800 dark:text-gray-300 truncate font-medium leading-snug">
+                                    {conv.title || lastMsg?.content?.slice(0, 60) || 'Conversation'}
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-500 flex-shrink-0 transition-colors" />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* ---- Empty state (no agents yet) ---- */}
+                  {displayAgents.length === 0 && (
+                    <div className="text-center py-16 animate-float-up-3">
+                      <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
+                        <Brain className="w-8 h-8 text-amber-500" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Setting up your coaches</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6 max-w-sm mx-auto">
+                        Your AI mindset coaches are loading. This takes just a moment.
+                      </p>
+                      <button
+                        onClick={() => setShowAgentBrowser(true)}
+                        className="px-5 py-2.5 bg-[#fcc824] text-black text-sm font-bold rounded-xl hover:bg-[#f5c200] transition-colors shadow-sm"
+                      >
+                        Browse Agents
+                      </button>
+                    </div>
+                  )}
+
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  Welcome to MindsetOS
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg leading-relaxed">
-                  MindsetOS — Mindset Operating System. MindsetAI is ready to help you build your mindset coaching practice systematically.
-                </p>
-                <button
-                  onClick={() => setShowAgentBrowser(true)}
-                  className="px-6 py-3 bg-[#ffc82c] text-black rounded-xl hover:bg-[#f8c824] transition-colors shadow-md hover:shadow-lg font-semibold"
-                >
-                  Choose Your Agent
-                </button>
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, Star, Trash2, Pencil, Copy, Check, Search, X, Tag } from 'lucide-react';
+import { FileText, Star, Trash2, Pencil, Copy, Check, Search, X, Tag, BookOpen, Lightbulb } from 'lucide-react';
 import { fetchArtifacts, deleteArtifact, updateArtifact } from '@/lib/api-client';
 import { useAppStore } from '@/lib/store';
 
@@ -209,11 +209,32 @@ export function PlaybookList() {
           Loading plays...
         </div>
       ) : plays.length === 0 ? (
-        <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
-          {hasFilters
-            ? 'No plays match your filters.'
-            : 'No plays saved yet. Use "Save as Play" on any response.'}
-        </div>
+        hasFilters ? (
+          <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
+            No plays match your filters.
+          </div>
+        ) : (
+          /* On-brand empty state for no saved plays */
+          <div className="px-3 py-4">
+            <div
+              className="rounded-xl border border-dashed p-3.5 text-center"
+              style={{ borderColor: '#8b5cf650', background: '#8b5cf606' }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
+                style={{ background: '#8b5cf614', border: '1.5px solid #8b5cf630' }}
+              >
+                <BookOpen className="w-4 h-4" style={{ color: '#8b5cf6' }} />
+              </div>
+              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                Your playbook is empty
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                Your insights will appear here as you work with your coaches. Hit &ldquo;Save as Play&rdquo; on any response.
+              </p>
+            </div>
+          </div>
+        )
       ) : (
         <div className="space-y-0.5">
           {sorted.map(play => (

@@ -1,6 +1,6 @@
 'use client';
 
-import { MessageSquare, Star, List } from 'lucide-react';
+import { MessageSquare, Star, List, BarChart2, ArrowRight } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { format, formatDistanceToNow, isToday, isYesterday, isThisWeek } from 'date-fns';
 import { useState } from 'react';
@@ -298,10 +298,62 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
       {/* Conversation list */}
       <div className="w-full">
         {agentConversations.length === 0 ? (
-          <div className="p-4 text-center">
-            <MessageSquare className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-            <p className="text-xs text-gray-600 dark:text-gray-300">No conversations</p>
-          </div>
+          filterStarred === true ? (
+            /* Starred empty state */
+            <div className="px-3 py-4 text-center">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 flex items-center justify-center mx-auto mb-2.5">
+                <Star className="w-4 h-4 text-amber-400" />
+              </div>
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Nothing starred yet</p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                Star any conversation to pin it here for quick access.
+              </p>
+            </div>
+          ) : currentAgentData ? (
+            /* This Agent empty state — encourage first message */
+            <div className="px-3 py-4 text-center">
+              <div className="w-9 h-9 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.06] flex items-center justify-center mx-auto mb-2.5">
+                <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              </div>
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">No sessions yet</p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                Start a conversation to see it here.
+              </p>
+            </div>
+          ) : (
+            /* Recent / All empty state — first-time nudge toward Mindset Score */
+            <div className="px-3 py-4">
+              <div
+                className="rounded-xl border border-dashed p-3.5 text-center"
+                style={{ borderColor: '#f59e0b50', background: '#f59e0b06' }}
+              >
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
+                  style={{ background: '#f59e0b14', border: '1.5px solid #f59e0b30' }}
+                >
+                  <BarChart2 className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                </div>
+                <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                  Start with your Mindset Score
+                </p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                  Free, 5 questions, 3 minutes. Find out exactly where to focus first.
+                </p>
+                <button
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.location.href = '/dashboard?agent=mindset-score';
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: 'linear-gradient(135deg, #fcc824, #f59e0b)' }}
+                >
+                  Take the score
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <div className="space-y-3">
             {/* For starred or recent (not expanded): show simple list */}

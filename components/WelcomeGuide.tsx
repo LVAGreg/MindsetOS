@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, ArrowUp, ArrowLeft, Sparkles, ChevronRight } from 'lucide-react';
+import { X, ArrowUp, ArrowLeft, Sparkles, ChevronRight, BarChart2, ArrowRight } from 'lucide-react';
 
 interface WelcomeGuideProps {
   show: boolean;
   onDismiss: () => void;
+  onStartMindsetScore?: () => void;
 }
 
 const STEPS = [
@@ -32,7 +33,7 @@ const STEPS = [
   },
 ];
 
-export default function WelcomeGuide({ show, onDismiss }: WelcomeGuideProps) {
+export default function WelcomeGuide({ show, onDismiss, onStartMindsetScore }: WelcomeGuideProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -171,7 +172,7 @@ export default function WelcomeGuide({ show, onDismiss }: WelcomeGuideProps) {
         </div>
       )}
 
-      {/* Step 2: Center — ready to go */}
+      {/* Step 2: Center — ready to go + Mindset Score CTA */}
       {step.id === 'start' && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-300">
@@ -181,12 +182,24 @@ export default function WelcomeGuide({ show, onDismiss }: WelcomeGuideProps) {
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white text-2xl mb-2">{step.title}</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">{step.description}</p>
-              <button
-                onClick={handleNext}
-                className="px-8 py-3 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                Let&apos;s Go!
-              </button>
+              <div className="flex flex-col gap-3">
+                {onStartMindsetScore && (
+                  <button
+                    onClick={() => { onStartMindsetScore(); }}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  >
+                    <BarChart2 className="w-4 h-4" />
+                    Start with Mindset Score
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  onClick={handleNext}
+                  className={`${onStartMindsetScore ? 'text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 py-1' : 'px-8 py-3 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105'}`}
+                >
+                  {onStartMindsetScore ? 'Skip for now' : 'Let\'s Go!'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

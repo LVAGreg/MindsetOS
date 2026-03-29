@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Send, Loader2, Sparkles, ChevronUp, ChevronDown, Square, Paperclip, X, FileText, Mic, ThumbsUp, ThumbsDown, Copy, Check, Edit2, RefreshCw, Phone, PanelRightOpen } from 'lucide-react';
+import { Send, Loader2, Sparkles, ChevronUp, ChevronDown, Square, Paperclip, X, FileText, Mic, ThumbsUp, ThumbsDown, Copy, Check, Edit2, RefreshCw, Phone, PanelRightOpen, BarChart2, ArrowRight } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
 import ReactMarkdown from 'react-markdown';
@@ -2649,9 +2649,9 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-full chat-area-bg">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 space-y-4 sm:space-y-6 chat-content-layer">
         {/* Conversation Stats - Hidden from user view (admin only in /admin/analytics) */}
         {/* {currentConversationId && <ConversationStats conversationId={currentConversationId} />} */}
 
@@ -2683,18 +2683,18 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
         {/* Error Banner with Retry Button */}
         {showError && (
           <div className="flex justify-center my-4">
-            <div className="px-6 py-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl max-w-2xl w-full">
+            <div className="px-6 py-4 chat-error-banner rounded-xl max-w-2xl w-full">
               <div className="flex items-start gap-4">
                 <div className="flex-1">
-                  <p className="text-red-700 dark:text-red-400 text-base font-semibold mb-2">
-                    ⚠️ Error Processing Message
+                  <p className="text-red-400 text-base font-semibold mb-2">
+                    Something went wrong
                   </p>
-                  <p className="text-red-600 dark:text-red-300 text-sm mb-3">
+                  <p className="text-red-300/80 text-sm mb-3">
                     {errorMessage || "An error occurred. Please try again."}
                   </p>
                   {lastFailedMessage && (
-                    <p className="text-gray-600 dark:text-gray-400 text-xs italic bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded">
-                      Message: "{lastFailedMessage.substring(0, 150)}{lastFailedMessage.length > 150 ? "..." : ""}"
+                    <p className="text-gray-400 text-xs italic bg-black/20 px-3 py-2 rounded-lg border border-white/05">
+                      "{lastFailedMessage.substring(0, 150)}{lastFailedMessage.length > 150 ? "..." : ""}"
                     </p>
                   )}
                 </div>
@@ -2706,7 +2706,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                         setInput(lastFailedMessage);
                         setLastFailedMessage(null);
                       }}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                      className="px-4 py-2 bg-red-600/80 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
                       title="Retry this message"
                     >
                       Retry
@@ -2714,7 +2714,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   )}
                   <button
                     onClick={() => setShowError(false)}
-                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors"
+                    className="px-4 py-2 bg-white/08 hover:bg-white/12 text-gray-300 text-sm font-medium rounded-lg transition-colors"
                   >
                     Dismiss
                   </button>
@@ -2725,95 +2725,114 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
         )}
 
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 dark:text-gray-400 mt-20 max-w-2xl mx-auto">
-            <div className="mb-8">
+          <div className="text-center mt-8 sm:mt-20 max-w-lg mx-auto px-2 animate-float-up-1">
+            <div className="mb-10">
               {/* MindsetOS Logo for default agents */}
               {(agentId === 'general' || agentId === 'mindset-super-agent' || agentId === 'client-onboarding') ? (
-                <div className="mb-6 flex justify-center">
+                <div className="mb-7 flex justify-center">
                   <MindsetOSLogo size="lg" />
                 </div>
               ) : (
-                <div className="text-6xl mb-6">{agentData?.icon}</div>
+                <div className="text-6xl mb-7 opacity-90">{agentData?.icon}</div>
               )}
 
               {/* Custom greeting for default agents */}
-              {(agentId === 'general' || agentId === 'mindset-super-agent') ? (
+              {(agentId === 'general' || agentId === 'mindset-super-agent' || agentId === 'ecos-super-agent') ? (
                 <>
-                  <h2 className="text-3xl font-bold mb-3 text-gray-900 dark:text-gray-100">
-                    What Are We Building Today?
+                  <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
+                    What's running your mind right now?
                   </h2>
-                  <p className="text-base mb-8 leading-relaxed">
-                    I'm MindsetAI - your mindset coaching assistant. Ask me anything about building your offers, campaigns, or coaching business.
+                  <p className="text-base mb-5 leading-relaxed text-gray-500">
+                    MindsetOS helps you stop reacting and start designing how you think. Not sure where to begin? The Mindset Score takes 3 minutes and tells you exactly where to focus.
                   </p>
+                  {/* Mindset Score CTA card */}
+                  <button
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.location.href = '/dashboard?agent=mindset-score';
+                      }
+                    }}
+                    className="flex items-center gap-3 w-full max-w-sm mx-auto mb-6 px-4 py-3.5 rounded-xl text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(252,200,36,0.12), rgba(245,158,11,0.08))',
+                      border: '1.5px solid rgba(252,200,36,0.35)',
+                    }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: '#fcc82420', border: '1px solid #fcc82440' }}
+                    >
+                      <BarChart2 className="w-5 h-5" style={{ color: '#f59e0b' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">Mindset Score — Free</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">5 questions &middot; 3 minutes &middot; know where you stand</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#f59e0b] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                  </button>
                 </>
               ) : agentId === 'client-onboarding' ? (
                 <>
-                  <h2 className="text-3xl font-bold mb-3 text-gray-900 dark:text-gray-100">
-                    Welcome to MindsetOS!
+                  <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
+                    Welcome to MindsetOS
                   </h2>
-                  <p className="text-base mb-8 leading-relaxed">
-                    Let's get you set up. I'll ask a few quick questions to personalize your experience.
+                  <p className="text-base mb-8 leading-relaxed text-gray-500">
+                    Let's personalize your experience. I'll ask a few quick questions to personalize your experience.
                   </p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-3xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+                  <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
                     {agentData?.name}
                   </h2>
-                  <p className="text-base mb-8 leading-relaxed">{agentData?.description}</p>
+                  <p className="text-base mb-5 leading-relaxed text-gray-500">{agentData?.description}</p>
                 </>
               )}
             </div>
 
             {/* Starter Prompts - Simplified for onboarding */}
-            <div className="space-y-4">
+            <div className="space-y-3 animate-float-up-2">
               {agentId === 'client-onboarding' ? (
                 /* Single button for onboarding */
                 <button
                   onClick={() => handleSendMessage("Let's get started with onboarding!")}
                   disabled={isLoading}
-                  className="w-full px-6 py-5 bg-yellow-500 border-2 border-yellow-500 rounded-xl hover:bg-yellow-600 hover:border-yellow-600 transition-all text-center group disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="send-btn w-full px-6 py-4 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center justify-center gap-3">
-                    <Sparkles className="w-5 h-5 text-black flex-shrink-0" />
-                    <span className="text-lg font-bold text-black">
-                      Get Started With Onboarding
-                    </span>
+                    <Sparkles className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-base font-bold">Get Started</span>
                   </div>
                 </button>
               ) : isVoiceAgent ? (
                 /* Voice Call button for voice agents */
                 <button
                   onClick={() => setShowVoiceChat(true)}
-                  className="w-full px-6 py-5 bg-gradient-to-r from-green-500 to-emerald-600 border-2 border-green-500 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all text-center group shadow-lg hover:shadow-xl"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-emerald-700/80 to-teal-700/80 border border-emerald-500/25 rounded-xl hover:from-emerald-600/80 hover:to-teal-600/80 transition-all text-center shadow-lg"
                 >
                   <div className="flex items-center justify-center gap-3">
-                    <Phone className="w-6 h-6 text-white flex-shrink-0" />
-                    <span className="text-lg font-bold text-white">
-                      Start Voice Call
-                    </span>
+                    <Phone className="w-5 h-5 text-white flex-shrink-0" />
+                    <span className="text-base font-bold text-white">Start Voice Session</span>
                   </div>
-                  <p className="text-sm text-white/80 mt-2">
-                    Have a live conversation with AI-powered voice
-                  </p>
+                  <p className="text-xs text-white/50 mt-1.5">Real-time AI voice conversation</p>
                 </button>
               ) : (
                 /* Regular starter prompts for other agents */
                 <>
-                  <p className="text-xs uppercase tracking-wide font-semibold flex items-center justify-center gap-2 mb-6">
-                    <Sparkles className="w-4 h-4" />
-                    Quick Start
+                  <p className="text-xs uppercase tracking-widest font-semibold text-gray-600 flex items-center justify-center gap-2 mb-5">
+                    <Sparkles className="w-3 h-3 text-amber-500/60" />
+                    Begin here
                   </p>
                   {starterPrompts.map((prompt, index) => (
                     <button
                       key={index}
                       onClick={() => handleSendMessage(prompt)}
                       disabled={isLoading}
-                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-yellow-500 hover:bg-yellow-50 dark:hover:bg-gray-700 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                      className="starter-prompt-card w-full px-5 py-3.5 rounded-xl text-left group disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-gray-400 group-hover:text-yellow-600 flex-shrink-0" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-yellow-600">
+                        <Sparkles className="w-4 h-4 text-amber-500/40 group-hover:text-amber-400 flex-shrink-0 transition-colors duration-200" />
+                        <span className="text-sm font-medium text-gray-400 group-hover:text-gray-200 transition-colors duration-200">
                           {prompt}
                         </span>
                       </div>
@@ -2824,8 +2843,8 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             </div>
 
             {agentId !== 'client-onboarding' && !isVoiceAgent && (
-              <p className="text-sm mt-8 text-gray-400">
-                Or type your own message below
+              <p className="text-xs mt-7 text-gray-600 tracking-wide">
+                or type your own message below
               </p>
             )}
           </div>
@@ -2858,76 +2877,72 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                 } message-fade-in`}
               >
                 <div
-                  className={`max-w-3xl rounded-xl px-6 py-2 group ${
+                  className={`max-w-[90vw] sm:max-w-3xl rounded-2xl px-5 sm:px-6 py-4 group ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-[#ffc82c]/20 dark:to-[#f8c824]/20 border-2 border-[#ffc82c] dark:border-[#ffc82c] text-gray-900 dark:text-white font-medium shadow-sm'
-                      : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 shadow-sm'
+                      ? 'msg-user text-white font-medium'
+                      : ('msg-agent text-gray-100 ' + (isStreamingResponse && isLastAssistantMessage ? 'msg-agent-streaming' : ''))
                   }`}
                 >
                   {message.role === 'assistant' ? (
                     <div className="space-y-4">
                       {/* Content - render FULL message content (no parsing/splitting) */}
-                      <div className="prose prose-base dark:prose-invert max-w-none leading-relaxed prose-p:my-2 prose-p:leading-7 prose-strong:text-gray-900 prose-strong:dark:text-white prose-strong:font-bold prose-ul:my-2 prose-li:my-1 prose-h1:text-xl prose-h1:font-bold prose-h1:mb-3 prose-h1:mt-4 prose-h2:text-xl prose-h2:font-bold prose-h2:mb-2 prose-h2:mt-3 prose-h3:text-base prose-h3:font-semibold prose-h3:mb-2 prose-h3:mt-3 prose-hr:my-2">
+                      <div className="chat-prose prose prose-base prose-invert max-w-none leading-relaxed prose-p:my-2.5 prose-p:leading-7 prose-strong:font-bold prose-ul:my-2 prose-li:my-1 prose-h1:text-xl prose-h1:font-bold prose-h1:mb-3 prose-h1:mt-4 prose-h2:text-xl prose-h2:font-bold prose-h2:mb-2 prose-h2:mt-3 prose-h3:text-base prose-h3:font-semibold prose-h3:mb-2 prose-h3:mt-3 prose-hr:my-3">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanStructuredOutput(message.content, widgetFormattingEnabled)}</ReactMarkdown>
                       </div>
 
-                      {/* Message Actions - Always visible */}
+                      {/* Message Actions — appear on hover, subtle */}
                       {!isStreamingResponse && (
-                        <div className="flex items-center gap-1 mt-2">
+                        <div className="flex items-center gap-0.5 mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           {/* Copy button */}
                           <button
                             onClick={() => handleCopyMessage(message.id, message.content)}
-                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                            className="msg-action-btn"
                             title="Copy message"
                           >
                             {copiedMessageId === message.id ? (
-                              <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
                             ) : (
-                              <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                              <Copy className="w-3.5 h-3.5" />
                             )}
                           </button>
 
                           {/* Thumbs up */}
                           <button
                             onClick={() => handleFeedback(message.id, 'up')}
-                            className={`p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors ${
-                              messageFeedback[message.id] === 'up' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
-                            }`}
+                            className={`msg-action-btn ${messageFeedback[message.id] === 'up' ? 'text-emerald-400' : ''}`}
                             title="Good response"
                           >
-                            <ThumbsUp className="w-4 h-4" />
+                            <ThumbsUp className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Thumbs down */}
                           <button
                             onClick={() => handleFeedback(message.id, 'down')}
-                            className={`p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors ${
-                              messageFeedback[message.id] === 'down' ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
-                            }`}
+                            className={`msg-action-btn ${messageFeedback[message.id] === 'down' ? 'text-red-400' : ''}`}
                             title="Bad response"
                           >
-                            <ThumbsDown className="w-4 h-4" />
+                            <ThumbsDown className="w-3.5 h-3.5" />
                           </button>
 
-                          {/* Regenerate button - only for saved assistant messages */}
+                          {/* Regenerate button */}
                           {message.role === 'assistant' && isValidUUID(message.id) && (
                             <button
                               onClick={() => handleRegenerateMessage(message.id)}
-                              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-gray-500 dark:text-gray-400"
+                              className="msg-action-btn"
                               title="Regenerate response"
                             >
-                              <RefreshCw className="w-4 h-4" />
+                              <RefreshCw className="w-3.5 h-3.5" />
                             </button>
                           )}
 
-                          {/* Open in Playbook button */}
+                          {/* Open in Playbook */}
                           {canvasEnabled && message.content.length > 100 && (
                             <button
                               onClick={() => openCanvas(message.content, message.id, agentId)}
-                              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-gray-400 hover:text-[#fcc824] dark:hover:text-[#fcc824]"
+                              className="msg-action-btn hover:text-amber-400"
                               title="Save as Play"
                             >
-                              <PanelRightOpen className="w-4 h-4" />
+                              <PanelRightOpen className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
@@ -2936,7 +2951,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   ) : (
                     <div className="space-y-2">
                       {/* User message content */}
-                      <div className="prose prose-base max-w-none text-gray-900 dark:text-gray-100 prose-p:my-2 prose-p:text-gray-900 prose-p:dark:text-gray-100 prose-h1:text-xl prose-h1:font-bold prose-h1:mb-3 prose-h1:mt-4 prose-h2:text-xl prose-h2:font-bold prose-h2:mb-2 prose-h2:mt-3 prose-h3:text-base prose-h3:font-semibold prose-h3:mb-2 prose-h3:mt-3 prose-hr:my-2">
+                      <div className="prose prose-base prose-invert max-w-none prose-p:my-1.5 prose-p:leading-relaxed prose-h1:text-xl prose-h1:font-bold prose-h2:text-lg prose-h2:font-semibold prose-h3:text-base prose-h3:font-semibold prose-strong:text-white">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                       </div>
 
@@ -2986,9 +3001,9 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               {message.role === 'assistant' && (quickAddOptions?.length >= 2 || hasBackendWidget) && isLastAssistantMessage && widgetFormattingEnabled && (
                 <div className="mt-3">
                   {/* Header */}
-                  <div className="flex items-center gap-2 px-4 py-2 mb-3">
-                    <Sparkles className="w-4 h-4 text-yellow-500" />
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Quick Add</span>
+                  <div className="flex items-center gap-2 px-1 py-2 mb-2">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400/70" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Respond</span>
                   </div>
 
                   {/* Quick Add Options from Backend Widget Agent */}
@@ -3005,13 +3020,13 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                               key={idx}
                               onClick={() => isLastAssistantMessage && handleSendMessage(option)}
                               disabled={isLoading || !isLastAssistantMessage}
-                              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-yellow-50 to-indigo-50 dark:from-yellow-900/20 dark:to-indigo-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg hover:border-yellow-500 hover:from-yellow-100 hover:to-indigo-100 dark:hover:from-yellow-900/40 dark:hover:to-indigo-900/40 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                              className="quick-add-btn w-full px-4 py-3 rounded-xl text-left group disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <div className="flex items-start gap-3">
-                                <span className="text-yellow-600 dark:text-yellow-400 font-bold text-lg flex-shrink-0 mt-0.5">
+                                <span className="text-amber-400/70 font-bold text-sm flex-shrink-0 mt-0.5 tabular-nums">
                                   {idx + 1}
                                 </span>
-                                <span className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
+                                <span className="text-sm font-medium text-gray-300 leading-relaxed">
                                   {option}
                                 </span>
                               </div>
@@ -3028,12 +3043,12 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
         })}
 
         {isStreamingResponse && (
-          <div className="flex justify-start">
-            <div className="bg-white dark:bg-gray-800 rounded-xl px-6 py-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-              <div className="flex space-x-1 text-xl">
-                <div className="text-yellow-600 dark:text-yellow-500 thinking-arrow">↗</div>
-                <div className="text-yellow-600 dark:text-yellow-500 thinking-arrow">↗</div>
-                <div className="text-yellow-600 dark:text-yellow-500 thinking-arrow">↗</div>
+          <div className="flex justify-start message-fade-in">
+            <div className="msg-agent rounded-2xl px-6 py-4">
+              <div className="flex items-center gap-2">
+                <div className="typing-dot" />
+                <div className="typing-dot" />
+                <div className="typing-dot" />
               </div>
             </div>
           </div>
@@ -3043,7 +3058,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
       </div>
 
       {/* Input area */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+      <div className="chat-input-area p-3 sm:p-6 pb-[env(safe-area-inset-bottom,12px)] sm:pb-6">
         <div className="max-w-4xl mx-auto">
           {/* File attachment previews */}
           {attachedFiles.length > 0 && (
@@ -3051,7 +3066,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               {attachedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600"
+                  className="flex items-center gap-2 bg-white/07 px-3 py-2 rounded-lg border border-white/10"
                 >
                   <span className="text-lg">{getFileIcon(file.type)}</span>
                   <span className="text-sm text-gray-700 dark:text-gray-300 max-w-[150px] truncate">{file.name}</span>
@@ -3101,14 +3116,14 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
           {/* Status Message Indicator (e.g., summarization progress) */}
           {statusMessage && (
-            <div className="mb-3 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg flex items-start gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line">{statusMessage}</div>
+            <div className="mb-3 px-4 py-2.5 bg-white/04 border border-white/08 rounded-xl flex items-start gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-gray-300 whitespace-pre-line">{statusMessage}</div>
             </div>
           )}
 
           {/* Input row */}
-          <div className="flex gap-4">
+          <div className="flex gap-2 sm:gap-4">
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -3123,7 +3138,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading || uploading}
-              className="px-4 py-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="min-w-[44px] px-3 sm:px-4 py-3 sm:py-4 bg-white/06 text-gray-400 rounded-xl hover:bg-white/10 hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center gap-2 border border-white/06"
               title="Attach files (PDF, DOCX, TXT, MD)"
             >
               <Paperclip className="w-5 h-5" />
@@ -3151,11 +3166,11 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               value={input}
               onChange={(e) => !isViewOnly && setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isViewOnly ? '👁️ View-only mode — request edit access to send messages' : 'Type your message... (Shift+Enter for new line)'}
-              className={`flex-1 resize-none border rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white min-h-[60px] max-h-[200px] text-base leading-relaxed ${
+              placeholder={isViewOnly ? 'View-only mode — request edit access to send messages' : "What's on your mind?"}
+              className={`flex-1 resize-none rounded-xl px-4 sm:px-5 py-3.5 sm:py-4 min-h-[44px] sm:min-h-[56px] max-h-[200px] text-base leading-relaxed ${
                 isViewOnly
-                  ? 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10 cursor-not-allowed text-gray-400'
-                  : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700'
+                  ? 'border border-blue-800/50 bg-blue-900/10 cursor-not-allowed text-gray-500'
+                  : 'chat-textarea'
               }`}
               rows={1}
               disabled={isLoading || isViewOnly}
@@ -3165,11 +3180,11 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             {(isLoading || isStreamingResponse) && (
               <button
                 onClick={handleStopGeneration}
-                className="px-6 py-4 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2"
+                className="min-w-[44px] px-3 sm:px-6 py-3 sm:py-4 bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-xl transition-colors flex items-center gap-2 border border-red-500/30"
                 title="Stop generating"
               >
                 <Square className="w-5 h-5" />
-                <span>Stop</span>
+                <span className="hidden sm:inline">Stop</span>
               </button>
             )}
 
@@ -3180,13 +3195,13 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             <button
               onClick={() => handleSendMessage()}
               disabled={isViewOnly || (!input.trim() && attachedFiles.length === 0) || isLoading || uploading}
-              className="px-7 py-4 bg-yellow-500 text-black font-semibold rounded-xl hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="send-btn min-w-[44px] px-4 sm:px-7 py-3 sm:py-4 rounded-xl flex items-center gap-2"
               title={isViewOnly ? 'View-only mode — request edit access to send messages' : undefined}
             >
               {uploading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="text-sm">Uploading...</span>
+                  <span className="hidden sm:inline text-sm">Uploading...</span>
                 </>
               ) : isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
