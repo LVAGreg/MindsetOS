@@ -1082,7 +1082,12 @@ function DashboardContent() {
                   const isAgency = effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin';
 
                   // Group core agents by category, sort by sort_order
-                  const CATEGORY_ORDER = ['Getting Started', 'Strategy & Foundations', 'Marketing & Content', 'Events & LinkedIn', 'Sales & Voice', 'Research & Support', 'Practice Tools'];
+                  const CATEGORY_ORDER = ['Getting Started', 'mindset', 'performance', 'sales', 'Strategy & Foundations', 'Marketing & Content', 'Events & LinkedIn', 'Sales & Voice', 'Research & Support', 'Practice Tools'];
+                  const CATEGORY_LABELS: Record<string, string> = {
+                    'mindset': 'Mindset Work',
+                    'performance': 'Performance',
+                    'sales': 'Pipeline & Outreach',
+                  };
                   const coreByCategory: Record<string, typeof coreAgents> = {};
                   coreAgents.forEach(a => {
                     const cat = a.category || 'General';
@@ -1131,7 +1136,7 @@ function DashboardContent() {
                           {categoryOrder.map(category => (
                             <div key={category}>
                               <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-1">
-                                {category}
+                                {CATEGORY_LABELS[category] || category}
                               </h2>
                               <div className="space-y-1.5">
                                 {coreByCategory[category].map((agent) => (
