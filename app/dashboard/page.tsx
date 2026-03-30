@@ -62,6 +62,7 @@ import WelcomeGuide from '@/components/WelcomeGuide';
 import FirstTimeModal from '@/components/FirstTimeModal';
 import { CanvasPanel } from '@/components/CanvasPanel';
 import DashboardSidebar from '@/components/DashboardSidebar';
+import { CoworkModal } from '@/components/CoworkModal';
 
 // Compact agent row for Browse Agents view
 function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, userRole }: {
@@ -322,6 +323,7 @@ function DashboardContent() {
   const [unreadFeedbackCount, setUnreadFeedbackCount] = useState(0);
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(false);
   const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
+  const [showCoworkModal, setShowCoworkModal] = useState(false);
 
   // Show first-time modal for brand new users, welcome guide for returning-but-unseen
   useEffect(() => {
@@ -361,6 +363,18 @@ function DashboardContent() {
     setShowWelcomeGuide(false);
     localStorage.setItem('mindset_os_welcome_guide_seen', 'true');
   };
+
+  // ⌘⇧W (Mac) / Ctrl+Shift+W (Win/Linux) → Cowork Instruction Generator
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'W' && e.shiftKey && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setShowCoworkModal(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Fetch unread feedback reply count
   useEffect(() => {
@@ -859,6 +873,9 @@ function DashboardContent() {
 
       {/* Welcome Guide for returning-but-unseen users */}
       <WelcomeGuide show={showWelcomeGuide} onDismiss={dismissWelcomeGuide} />
+
+      {/* Cowork Instruction Generator — ⌘⇧W / Ctrl+Shift+W */}
+      {showCoworkModal && <CoworkModal onClose={() => setShowCoworkModal(false)} />}
 
 
       {/* ── DashboardSidebar (new, replaces old expanded + collapsed sidebars) ── */}

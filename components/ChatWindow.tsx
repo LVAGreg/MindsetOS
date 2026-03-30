@@ -986,6 +986,40 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
     // NOTE: Widget wrapper removed - widgets now render directly in drawer without individual toggle buttons
     // The drawer itself handles the toggle functionality
 
+    // Agent handoff suggestion card
+    if (type === 'agent_handoff') {
+      const agents: { id: string; name: string; slug: string }[] = data?.agents || [];
+      if (agents.length === 0) return null;
+      return (
+        <div className="mt-4 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/50 dark:bg-indigo-900/10 p-4">
+          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">
+            Suggested Next Step{agents.length > 1 ? 's' : ''}
+          </p>
+          <div className="space-y-2">
+            {agents.map(agent => (
+              <button
+                key={agent.id}
+                onClick={() => {
+                  window.location.href = `/dashboard?agent=${agent.slug}`;
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-700/50 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-sm transition-all text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{agent.name}</span>
+                </div>
+                <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-0.5 transition-transform">
+                  Open →
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     // Multi-select widget (existing functionality)
     if (type === 'multi_select') {
       return (
