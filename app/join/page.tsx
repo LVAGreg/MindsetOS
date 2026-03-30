@@ -515,22 +515,34 @@ export default function JoinPage() {
               </p>
 
               {/* Pricing options */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+                {/* $47 Reset option */}
+                <a href="/buy/reset" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
+                  <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">48-Hr Reset</div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">$47</div>
+                  <div className="text-xs text-gray-500 mt-1.5">One payment</div>
+                </a>
                 {/* Weekly option */}
-                <div className="group relative bg-white/[0.08] border-2 border-[#fcc824]/50 rounded-2xl p-6 text-center transition-all duration-300 hover:border-[#fcc824] hover:bg-white/[0.12]" style={{ animation: 'join-pulse-glow 3s ease-in-out infinite' }}>
+                <div className="group relative bg-white/[0.08] border-2 border-[#fcc824]/50 rounded-2xl p-5 text-center transition-all duration-300 hover:border-[#fcc824] hover:bg-white/[0.12]" style={{ animation: 'join-pulse-glow 3s ease-in-out infinite' }}>
                   <div className="text-xs text-[#fcc824] font-bold uppercase tracking-widest mb-2">Weekly</div>
-                  <div className="text-4xl font-extrabold text-white tracking-tight">$47<span className="text-lg font-medium text-gray-400">/wk</span></div>
-                  <div className="text-xs text-gray-400 mt-2">Billed weekly</div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">$47<span className="text-base font-medium text-gray-400">/wk</span></div>
+                  <div className="text-xs text-gray-400 mt-1.5">Billed weekly</div>
                 </div>
-                {/* Full access option */}
-                <div className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-6 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1]">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg">
+                {/* 90-Day Architecture */}
+                <a href="/checkout?plan=architecture_997" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap">
                     BEST VALUE
                   </div>
-                  <div className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-2">Full Access</div>
-                  <div className="text-4xl font-extrabold text-white tracking-tight">$397</div>
-                  <div className="text-xs text-gray-400 mt-2">One payment</div>
-                </div>
+                  <div className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-2">90-Day Cohort</div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">$997</div>
+                  <div className="text-xs text-gray-500 mt-1.5">Group program</div>
+                </a>
+                {/* 1:1 Intensive */}
+                <a href="/checkout?plan=intensive_1997" className="group relative bg-white/[0.06] border border-violet-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-violet-400 hover:bg-white/[0.1] block">
+                  <div className="text-xs text-violet-400 font-bold uppercase tracking-widest mb-2">1:1 Intensive</div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
+                  <div className="text-xs text-gray-500 mt-1.5">Private add-on</div>
+                </a>
               </div>
 
               <div className="space-y-3 text-left max-w-sm mx-auto mb-10">
