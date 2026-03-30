@@ -85,6 +85,15 @@ export default function ProfilePage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
 
+  // BYOK state
+  const [tokenUsage, setTokenUsage] = useState<{ quota: number; used: number; pct_used: number; resets_at: string | null; byok_enabled: boolean } | null>(null);
+  const [byokKey, setByokKey] = useState('');
+  const [byokEnabled, setByokEnabled] = useState(false);
+  const [savingByok, setSavingByok] = useState(false);
+  const [byokSuccess, setByokSuccess] = useState(false);
+  const [byokError, setByokError] = useState<string | null>(null);
+  const [showByokKey, setShowByokKey] = useState(false);
+
   // Core memories form state
   const [coreMemoriesData, setCoreMemoriesData] = useState<CoreMemories>({
     fullName: '',
@@ -168,6 +177,15 @@ export default function ProfilePage() {
       } catch (coreMemErr: any) {
         // Core memories might not exist yet (user hasn't completed onboarding)
         console.log('Core memories not found (user may not have completed onboarding)');
+      }
+
+      // Load token usage + BYOK
+      try {
+        const tu = await apiClient.get('/api/tokens/usage');
+        setTokenUsage(tu);
+        setByokEnabled(tu.byok_enabled || false);
+      } catch {
+        // Table may not exist yet (pre-migration)
       }
 
       // Load brand voice profile
@@ -302,6 +320,29 @@ export default function ProfilePage() {
       setError(err instanceof Error ? err.message : 'Failed to reset memory');
     } finally {
       setResetting(false);
+    }
+  };
+
+  const handleSaveByok = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingByok(true);
+    setByokError(null);
+    setByokSuccess(false);
+    try {
+      const payload: Record<string, unknown> = { byok_enabled: byokEnabled };
+      if (byokKey.trim()) payload.openrouter_api_key = byokKey.trim();
+      await apiClient.post('/api/tokens/byok', payload);
+      setByokSuccess(true);
+      setByokKey('');
+      // Reload token usage to reflect new state
+      const tu = await apiClient.get('/api/tokens/usage');
+      setTokenUsage(tu);
+      setByokEnabled(tu.byok_enabled || false);
+      setTimeout(() => setByokSuccess(false), 3000);
+    } catch (err: any) {
+      setByokError(err.message || 'Failed to save API key');
+    } finally {
+      setSavingByok(false);
     }
   };
 
@@ -1040,7 +1081,113 @@ export default function ProfilePage() {
           </form>
         </div>}
 
+        {/* Token Usage + BYOK Card */}
+        {tokenUsage && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Key className="h-5 w-5 text-indigo-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Usage &amp; API Key</h2>
+            </div>
 
+            {/* Usage bar */}
+            {!tokenUsage.byok_enabled && (
+              <div className="mb-5">
+                <div className="flex items-center justify-between text-sm mb-1.5">
+                  <span className="text-gray-600 dark:text-gray-400">Monthly tokens used</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {tokenUsage.used.toLocaleString()} / {tokenUsage.quota.toLocaleString()}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all ${
+                      tokenUsage.pct_used >= 90 ? 'bg-red-500' :
+                      tokenUsage.pct_used >= 70 ? 'bg-amber-500' : 'bg-indigo-500'
+                    }`}
+                    style={{ width: `${Math.min(tokenUsage.pct_used, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  {tokenUsage.pct_used}% used
+                  {tokenUsage.resets_at && ` · Resets ${new Date(tokenUsage.resets_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                </p>
+              </div>
+            )}
+
+            {tokenUsage.byok_enabled && (
+              <div className="mb-5 flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-400">
+                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                Using your own OpenRouter API key — no monthly token limit
+              </div>
+            )}
+
+            {/* BYOK form */}
+            <form onSubmit={handleSaveByok} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Your OpenRouter API Key
+                </label>
+                <div className="relative">
+                  <input
+                    type={showByokKey ? 'text' : 'password'}
+                    value={byokKey}
+                    onChange={e => setByokKey(e.target.value)}
+                    placeholder="sk-or-v1-••••••••••••••••"
+                    className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowByokKey(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Get your key at <span className="font-mono">openrouter.ai/settings/keys</span>. Your key is stored encrypted and never shared.
+                </p>
+              </div>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={byokEnabled}
+                    onChange={e => setByokEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                </div>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Use my own API key (removes monthly token limit)</span>
+              </label>
+
+              {byokError && (
+                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                  <AlertCircle className="w-4 h-4" /> {byokError}
+                </div>
+              )}
+              {byokSuccess && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <CheckCircle className="w-4 h-4" /> Saved
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={savingByok}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-60 transition-colors"
+              >
+                {savingByok ? (
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save API Settings
+              </button>
+            </form>
+          </div>
+        )}
 
       </div>
     </div>
