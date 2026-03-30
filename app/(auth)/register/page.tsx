@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Loader2, CheckCircle, Ticket, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { apiClient } from '@/lib/api-client';
+import posthog from 'posthog-js';
 
 /* ── password helpers ────────────────────────────────────── */
 function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
@@ -114,6 +115,10 @@ function RegisterForm() {
         inviteCode: formData.inviteCode,
       });
 
+      try {
+        posthog.identify(formData.email, { email: formData.email, role: 'trial' });
+        posthog.capture('trial_started', { source: 'register' });
+      } catch {}
       setRegistrationComplete(true);
     } catch (err: any) {
       setError(

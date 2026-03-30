@@ -5,7 +5,7 @@ const router = Router();
 // API v1 routes will be added here
 router.get('/', (_req, res) => {
   res.json({
-    message: 'ECOS API v1',
+    message: 'MindsetOS API v1',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',

@@ -48,7 +48,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
     setCurrentConversation(conversation.id);
 
     // Update the current agent to match the conversation's agent
-    // Convert lowercase-hyphenated ID to uppercase key (e.g., 'money-model-maker' -> 'MONEY_MODEL_MAKER')
+    // Convert lowercase-hyphenated ID to uppercase key (e.g., 'mindset-score' -> 'MINDSET_SCORE')
     const agentKey = conversation.agentId.toUpperCase().replace(/-/g, '_');
     setCurrentAgent(agentKey as Parameters<typeof setCurrentAgent>[0]);
 

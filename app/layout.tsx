@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Script from 'next/script';
+import { PostHogProvider } from '@/components/PostHogProvider';
 
 // Heading + body: Plus Jakarta Sans — modern, confident, clean
 const plusJakarta = Plus_Jakarta_Sans({
@@ -181,7 +182,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${plusJakarta.className} ${plusJakarta.variable} ${plusJakartaHeading.variable} ${jetbrainsMono.variable}`}>{children}</body>
+      <body className={`${plusJakarta.className} ${plusJakarta.variable} ${plusJakartaHeading.variable} ${jetbrainsMono.variable}`}><PostHogProvider>{children}</PostHogProvider></body>
     </html>
   );
 }

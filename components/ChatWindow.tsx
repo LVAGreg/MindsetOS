@@ -2737,7 +2737,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               )}
 
               {/* Custom greeting for default agents */}
-              {(agentId === 'general' || agentId === 'mindset-super-agent' || agentId === 'ecos-super-agent') ? (
+              {(agentId === 'general' || agentId === 'mindset-super-agent') ? (
                 <>
                   <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
                     What's running your mind right now?

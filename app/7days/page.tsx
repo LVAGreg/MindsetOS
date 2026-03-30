@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 export default function SevenDaysPage() {
   const [firstName, setFirstName] = useState('');
@@ -9,6 +10,10 @@ export default function SevenDaysPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    try { posthog.capture('lead_magnet_viewed', { source: '7days' }); } catch {}
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +33,7 @@ export default function SevenDaysPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+      try { posthog.capture('lead_magnet_submitted', { source: '7days' }); } catch {}
       setSubmitted(true);
     } catch (err: any) {
       setFormError(err.message);

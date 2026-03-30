@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import posthog from 'posthog-js';
 
 // ─────────────────────────────────────────────
 // DATA
@@ -157,6 +158,11 @@ export default function QuizPage() {
     if (selectedOption) return; // prevent double-click
     setSelectedOption(optionType);
 
+    // Fire quiz_started on the first answer
+    if (step === 0) {
+      try { posthog.capture('quiz_started', { source: 'quiz' }); } catch {}
+    }
+
     setTimeout(() => {
       const newAnswers = [...answers, optionType];
       setAnswers(newAnswers);
@@ -167,6 +173,7 @@ export default function QuizPage() {
         setResultType(dominant);
         setDirection('forward');
         setStep(7);
+        try { posthog.capture('quiz_completed', { thinking_style: dominant, score: newAnswers.length, source: 'quiz' }); } catch {}
       } else {
         setDirection('forward');
         setStep(s => s + 1);
@@ -193,6 +200,7 @@ export default function QuizPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+      try { posthog.capture('lead_magnet_submitted', { source: 'quiz', thinking_style: resultType }); } catch {}
       setSubmitted(true);
     } catch (err: any) {
       setFormError(err.message);

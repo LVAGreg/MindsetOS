@@ -59,11 +59,11 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
 
   // Get unique source agents for color coding
   const sourceColors: Record<string, string> = {
-    'client-onboarding': 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700',
-    'money-model-maker': 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700',
-    'fast-fix-finder': 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700',
-    'offer-promo-printer': 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700',
-    'promo-planner': 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700',
+    'mindset-score': 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700',
+    'reset-guide': 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700',
+    'architecture-coach': 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700',
+    'inner-world-mapper': 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700',
+    'accountability-partner': 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700',
     'default': 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-700',
   };
 
@@ -73,7 +73,7 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
 
   const getSourceName = (source: string) => {
     const names: Record<string, string> = {
-      'client-onboarding': 'Client Onboarding',
+      'client-onboarding': 'Welcome Guide',
       'mindset-score': 'Mindset Score Agent',
       'reset-guide': 'Reset Guide',
       'architecture-coach': 'Architecture Coach',

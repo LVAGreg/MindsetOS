@@ -19,7 +19,7 @@ const startServer = async () => {
 
     // Start server
     const server = app.listen(config.port, () => {
-      logger.info(`🚀 ECOS Backend server running on port ${config.port}`);
+      logger.info(`🚀 MindsetOS Backend server running on port ${config.port}`);
       logger.info(`📍 Environment: ${config.nodeEnv}`);
       logger.info(`🔗 Frontend URL: ${config.frontendUrl}`);
       logger.info(`🏥 Health check: http://localhost:${config.port}/health`);

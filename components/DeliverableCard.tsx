@@ -49,13 +49,13 @@ export function DeliverableCard({ title, content, agentId, timestamp, icon }: De
   // Get agent color based on agentId
   const getAgentColor = (id: string) => {
     const colors: Record<string, string> = {
-      'client-onboarding': 'teal',
-      'money-model-maker': 'blue',
-      'fast-fix-finder': 'yellow',
-      'offer-promo-printer': 'purple',
-      'promo-planner': 'green',
-      'qualification-call-builder': 'red',
-      'linkedin-events-builder': 'indigo',
+      'mindset-score': 'teal',
+      'reset-guide': 'blue',
+      'architecture-coach': 'yellow',
+      'inner-world-mapper': 'purple',
+      'accountability-partner': 'green',
+      'practice-builder': 'red',
+      'story-excavator': 'indigo',
     };
     return colors[id] || 'gray';
   };

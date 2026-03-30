@@ -14,19 +14,18 @@ export function QuickAgentSwitcher({ currentAgentId, onAgentChange }: QuickAgent
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter to only show the 6 core MindsetOS agents (exclude GENERAL and CLIENT_ONBOARDING)
+  // Filter to only show the core MindsetOS agents (exclude GENERAL and CLIENT_ONBOARDING)
   const agentSequence = [
-    'money-model-maker',
-    'fast-fix-finder',
-    'offer-promo-printer',
-    'promo-planner',
-    'qualification-call-builder',
-    'linkedin-events-builder-buddy',
-    'five-ones-formula',
-    'authority-content-engine',
-    'daily-lead-sequence',
-    'easy-event-architect',
-    'profile-power-up'
+    'mindset-score',
+    'reset-guide',
+    'architecture-coach',
+    'inner-world-mapper',
+    'practice-builder',
+    'decision-framework',
+    'accountability-partner',
+    'story-excavator',
+    'conversation-curator',
+    'launch-companion',
   ];
 
   const filteredAgents = Object.values(MINDSET_AGENTS).filter(agent =>

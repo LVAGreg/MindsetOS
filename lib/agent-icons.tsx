@@ -74,32 +74,20 @@ export const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
  * Maps agent IDs to Lucide icon components
  */
 export const AGENT_ICONS: Record<string, LucideIcon> = {
-  // Core agents
+  // Core MindsetOS agents
   'general': GraduationCap,
+  'mindset-super-agent': Brain,
   'client-onboarding': HandshakeIcon,
-  'money-model-maker': DollarSign,
-  'mmm-5in30': Gem,
-  'fast-fix-finder': Zap,
-  'offer-promo-printer': Megaphone,
-  'promo-planner': Calendar,
-  'qualification-call-builder': Phone,
-  'linkedin-events-builder': Target,
-  'linkedin-events-builder-v2': Target,
-  'linkedin-events-builder-v3': Sparkles,
-  'linkedin-events-builder-v6': Palette,
-  'brand-voice-analyzer': PenLine,
-
-  // V2+ variants - Each has unique icon representing their evolution
-  'money-model-makerv2': TrendingUp,      // Growth/scaling focus
-  'money-model-makerv3': Crosshair,       // Precision targeting
-  'money-model-makerv4': Rocket,          // Launch/momentum
-  'money-model-makerv5': Sparkles,        // Enhanced/magical experience
-
-  // Special agents
-  'value-quantifier-v6': Calculator,
-  'memory-insights-v6': Brain,
-  'deep-research-expert': Search,
-  'content-catalyst': PenLine,
+  'mindset-score': Target,
+  'reset-guide': Rocket,
+  'architecture-coach': Lightbulb,
+  'inner-world-mapper': BookOpen,
+  'practice-builder': Calendar,
+  'decision-framework': Crosshair,
+  'accountability-partner': Users,
+  'story-excavator': Search,
+  'conversation-curator': MessageSquare,
+  'launch-companion': Sparkles,
 
   // Voice agents
   'voice-expert': Mic,

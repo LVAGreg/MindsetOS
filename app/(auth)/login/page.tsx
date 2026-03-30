@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { apiClient } from '@/lib/api-client';
 import { useAppStore } from '@/lib/store';
+import posthog from 'posthog-js';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,6 +38,10 @@ export default function LoginPage() {
       const userData = await apiClient.getCurrentUser();
       console.log('\u{1F464} Setting user in store:', userData.email);
       setUser(userData);
+      try {
+        posthog.identify(userData.id || userData.email, { email: userData.email });
+        posthog.capture('user_signed_in', { role: userData.role });
+      } catch {}
 
       // Load user's conversation history
       try {

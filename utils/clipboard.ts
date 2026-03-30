@@ -1,5 +1,5 @@
 /**
- * Clipboard utility functions for ECOS
+ * Clipboard utility functions for MindsetOS
  * Handles copying deliverables and content to clipboard
  */
 

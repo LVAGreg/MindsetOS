@@ -123,6 +123,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       items: [
         { href: '/admin/pipeline', label: 'Pipeline', icon: Target },
         { href: '/admin/claps', label: 'CLAPS Tracker', icon: TrendingUp },
+        { href: '/admin/cohorts', label: 'Cohorts', icon: Users },
       ],
     },
     {

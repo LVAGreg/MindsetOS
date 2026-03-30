@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, RotateCcw } from 'lucide-react';
+import posthog from 'posthog-js';
 
 const SCALE = [
   { value: 1, label: 'Almost never' },
@@ -113,7 +114,16 @@ export default function ScorecardViewPage() {
   const lowestDomain = [...domainScores].sort((a, b) => a.score - b.score)[0];
 
   const setAnswer = (domainKey: string, qi: number, val: number) => {
-    setAnswers(prev => ({ ...prev, [`${domainKey}-${qi}`]: val }));
+    setAnswers(prev => {
+      if (Object.keys(prev).length === 0) {
+        try {
+          if (typeof window !== 'undefined' && posthog) {
+            posthog.capture('scorecard_started', { source: 'scorecard' });
+          }
+        } catch (_) {}
+      }
+      return { ...prev, [`${domainKey}-${qi}`]: val };
+    });
   };
 
   const reset = () => { setAnswers({}); setSubmitted(false); };
@@ -175,6 +185,13 @@ export default function ScorecardViewPage() {
                 href={lowestDomain.cta.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  try {
+                    if (typeof window !== 'undefined' && posthog) {
+                      posthog.capture('scorecard_cta_clicked', { cta_type: lowestDomain.key, score: totalScore });
+                    }
+                  } catch (_) {}
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
               >
                 {lowestDomain.cta.label}
@@ -303,7 +320,14 @@ export default function ScorecardViewPage() {
             />
           </div>
           <button
-            onClick={() => setSubmitted(true)}
+            onClick={() => {
+              try {
+                if (typeof window !== 'undefined' && posthog) {
+                  posthog.capture('scorecard_completed', { score: totalScore, lowest_domain: lowestDomain.key, source: 'scorecard' });
+                }
+              } catch (_) {}
+              setSubmitted(true);
+            }}
             disabled={!isComplete}
             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >

@@ -161,7 +161,7 @@ export default function AssetsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: dbUserId,
-          agentId: asset.agent_id || 'money-model-maker',
+          agentId: asset.agent_id || 'mindset-score',
           title: `Continue: ${asset.content.substring(0, 50)}...`
         })
       });

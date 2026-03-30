@@ -76,7 +76,7 @@ const BONUSES = [
   { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
-type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10';
+type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'intensive_1997' | 'individual_annual';
 
 /* ------------------------------------------------------------------ */
 /*  Checkout Steps Indicator                                          */
@@ -111,7 +111,7 @@ function StepsIndicator() {
 function CheckoutPageInner() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan') as PricingPlan | null;
-  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10'];
+  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'intensive_1997', 'individual_annual'];
   const initialPlan: PricingPlan = planParam && validPlans.includes(planParam) ? planParam : 'weekly';
 
   const [plan, setPlan] = useState<PricingPlan>(initialPlan);
@@ -122,7 +122,7 @@ function CheckoutPageInner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397 };
+  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, intensive_1997: 1997, individual_annual: 1997 };
   const price = priceMap[plan];
 
   const handleSubmit = async (e: FormEvent) => {
@@ -335,6 +335,142 @@ function CheckoutPageInner() {
                       BEST VALUE
                     </span>
                   </label>
+
+                  {/* 90-Day Architecture — $997 */}
+                  <label
+                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                      plan === 'architecture_997'
+                        ? 'border-violet-500/60 bg-violet-500/[0.06]'
+                        : 'border-white/[0.06] bg-white/[0.02] hover:border-violet-500/20 hover:bg-violet-500/[0.03]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="plan"
+                      value="architecture_997"
+                      checked={plan === 'architecture_997'}
+                      onChange={() => setPlan('architecture_997')}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
+                      plan === 'architecture_997' ? 'border-violet-400' : 'border-white/20'
+                    }`}>
+                      {plan === 'architecture_997' && <div className="w-2.5 h-2.5 rounded-full bg-violet-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
+                        <span className="text-xl font-extrabold text-white tracking-tight">$997</span>
+                        <span className="text-sm text-white/40 font-medium">one-time</span>
+                      </div>
+                      <div className="text-sm font-semibold text-white/80 mb-1">90-Day Mindset Architecture</div>
+                      <div className="text-xs text-white/35 mb-2 leading-relaxed">
+                        The full 90-day group cohort. 10 participants max. Daily agent access + weekly Architecture Coach sessions.
+                      </div>
+                      <ul className="space-y-1">
+                        {['90 days of full agent access', 'Group cohort (10 people max)', 'Architecture Coach agent', 'Weekly group sessions', 'Memory across all agents'].map((f) => (
+                          <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
+                            <CheckCircle className="w-3 h-3 text-violet-400 flex-shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-violet-500 text-white text-[10px] font-bold rounded-full tracking-wide">
+                      MOST POPULAR
+                    </span>
+                  </label>
+
+                  {/* The Architecture Intensive — $1,997 */}
+                  <label
+                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                      plan === 'intensive_1997'
+                        ? 'border-indigo-500/60 bg-indigo-500/[0.06]'
+                        : 'border-white/[0.06] bg-white/[0.02] hover:border-indigo-500/20 hover:bg-indigo-500/[0.03]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="plan"
+                      value="intensive_1997"
+                      checked={plan === 'intensive_1997'}
+                      onChange={() => setPlan('intensive_1997')}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
+                      plan === 'intensive_1997' ? 'border-indigo-400' : 'border-white/20'
+                    }`}>
+                      {plan === 'intensive_1997' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
+                        <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
+                        <span className="text-sm text-white/40 font-medium">one-time</span>
+                      </div>
+                      <div className="text-sm font-semibold text-white/80 mb-1">The Architecture Intensive</div>
+                      <div className="text-xs text-white/35 mb-2 leading-relaxed">
+                        Everything in Architecture, plus 3 private 1:1 sessions with a certified Mindset Architecture coach.
+                      </div>
+                      <ul className="space-y-1">
+                        {['Everything in Architecture', '3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support access'].map((f) => (
+                          <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
+                            <CheckCircle className="w-3 h-3 text-indigo-400 flex-shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-full tracking-wide">
+                      1:1 ADD-ON
+                    </span>
+                  </label>
+
+                  {/* MindsetOS Annual — $1,997/year */}
+                  <label
+                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                      plan === 'individual_annual'
+                        ? 'border-emerald-500/60 bg-emerald-500/[0.06]'
+                        : 'border-white/[0.06] bg-white/[0.02] hover:border-emerald-500/20 hover:bg-emerald-500/[0.03]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="plan"
+                      value="individual_annual"
+                      checked={plan === 'individual_annual'}
+                      onChange={() => setPlan('individual_annual')}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
+                      plan === 'individual_annual' ? 'border-emerald-400' : 'border-white/20'
+                    }`}>
+                      {plan === 'individual_annual' && <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
+                        <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
+                        <span className="text-sm text-white/40 font-medium">/year</span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/20">
+                          <Zap className="w-3 h-3" />
+                          SAVE $440
+                        </span>
+                      </div>
+                      <div className="text-sm font-semibold text-white/80 mb-1">MindsetOS Annual</div>
+                      <div className="text-xs text-white/35 mb-2 leading-relaxed">
+                        Full platform access for a full year. Lock in your rate and commit to the long game.
+                      </div>
+                      <ul className="space-y-1">
+                        {['365 days of full access', 'All 10 agents', 'Unlimited conversations', 'Save $440 vs weekly'].map((f) => (
+                          <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
+                            <CheckCircle className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full tracking-wide">
+                      BEST VALUE
+                    </span>
+                  </label>
                 </div>
                 <p className="text-[11px] text-white/20 text-right mt-2">All prices in USD</p>
               </section>
@@ -348,17 +484,31 @@ function CheckoutPageInner() {
                   <div className="px-5 py-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-sm text-white/80">Mindset Architecture</span>
-                        <span className="text-xs text-white/30 ml-2">({plan === 'weekly' ? 'Weekly' : '12-Week Access'})</span>
+                        <span className="text-sm text-white/80">
+                          {plan === 'architecture_997' ? '90-Day Mindset Architecture'
+                            : plan === 'intensive_1997' ? 'The Architecture Intensive'
+                            : plan === 'individual_annual' ? 'MindsetOS Annual'
+                            : 'Mindset Architecture'}
+                        </span>
+                        <span className="text-xs text-white/30 ml-2">
+                          ({plan === 'weekly' ? 'Weekly'
+                            : plan === 'individual_annual' ? '1 Year'
+                            : plan === 'architecture_997' ? '90-Day Cohort'
+                            : plan === 'intensive_1997' ? '90-Day + 1:1'
+                            : '12-Week Access'})
+                        </span>
                       </div>
-                      <span className="text-sm font-semibold text-white">${price}</span>
+                      <span className="text-sm font-semibold text-white">${price.toLocaleString()}</span>
                     </div>
                     {plan === 'weekly' && (
                       <p className="text-xs text-white/30">Renews at $47/wk. Cancel anytime.</p>
                     )}
+                    {plan === 'individual_annual' && (
+                      <p className="text-xs text-white/30">Renews annually at $1,997/yr. Cancel anytime.</p>
+                    )}
                     <div className="border-t border-white/[0.06] pt-3 flex items-center justify-between">
                       <span className="text-sm font-bold text-white">Due Today</span>
-                      <span className="text-2xl font-extrabold text-[#fcc824] tracking-tight">${price}</span>
+                      <span className="text-2xl font-extrabold text-[#fcc824] tracking-tight">${price.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -399,7 +549,10 @@ function CheckoutPageInner() {
                       </>
                     ) : (
                       <>
-                        PROCEED TO PAY
+                        {plan === 'architecture_997' ? 'Enroll in Architecture'
+                          : plan === 'intensive_1997' ? 'Apply for Intensive'
+                          : plan === 'individual_annual' ? 'Start Annual Plan'
+                          : 'PROCEED TO PAY'}
                         <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                       </>
                     )}

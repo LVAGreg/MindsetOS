@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { RotateCcw } from 'lucide-react';
+import posthog from 'posthog-js';
 
 interface Question {
   id: number;
@@ -154,6 +155,19 @@ export default function AuditViewPage() {
 
   const reset = () => { setScores({}); setReflects({}); setSubmitted(false); };
 
+  const setScore = (id: number, value: number) => {
+    setScores(prev => {
+      if (Object.keys(prev).length === 0) {
+        try {
+          if (typeof window !== 'undefined' && posthog) {
+            posthog.capture('audit_started', { source: 'audit' });
+          }
+        } catch (_) {}
+      }
+      return { ...prev, [id]: value };
+    });
+  };
+
   if (submitted) {
     const result = getResult(totalScore);
     const lowestQ = QUESTIONS.reduce((min, q) => (scores[q.id] || 0) < (scores[min.id] || 0) ? q : min);
@@ -208,6 +222,13 @@ export default function AuditViewPage() {
               href={result.cta.href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                try {
+                  if (typeof window !== 'undefined' && posthog) {
+                    posthog.capture('audit_cta_clicked', { cta_type: result.label, score: totalScore });
+                  }
+                } catch (_) {}
+              }}
               className="inline-block px-5 py-2.5 bg-white text-gray-900 text-sm font-bold rounded-xl hover:opacity-90 transition-opacity"
             >
               {result.cta.label}
@@ -291,7 +312,7 @@ export default function AuditViewPage() {
                     {q.scores.map(s => (
                       <button
                         key={s.value}
-                        onClick={() => setScores(prev => ({ ...prev, [q.id]: s.value }))}
+                        onClick={() => setScore(q.id, s.value)}
                         className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all flex gap-3 items-start ${
                           score === s.value
                             ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30'
@@ -340,7 +361,14 @@ export default function AuditViewPage() {
             />
           </div>
           <button
-            onClick={() => setSubmitted(true)}
+            onClick={() => {
+              try {
+                if (typeof window !== 'undefined' && posthog) {
+                  posthog.capture('audit_completed', { score: totalScore, source: 'audit' });
+                }
+              } catch (_) {}
+              setSubmitted(true);
+            }}
             disabled={!isComplete}
             className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
