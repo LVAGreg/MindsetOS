@@ -198,12 +198,52 @@ export function CanvasPanel() {
     }
   };
 
-  const handleDownload = async (format: 'md' | 'txt' | 'pdf' | 'html') => {
+  const handleDownload = async (format: 'md' | 'txt' | 'pdf' | 'html' | 'docx') => {
     const safeName = (title || 'artifact')
       .replace(/[^a-z0-9\s-]/gi, '')
       .trim()
       .replace(/\s+/g, '_')
       .toLowerCase();
+
+    if (format === 'docx') {
+      try {
+        const { Document, Paragraph, TextRun, HeadingLevel, Packer } = await import('docx');
+        const paragraphs: InstanceType<typeof Paragraph>[] = [];
+        const lines = content.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('# ')) {
+            paragraphs.push(new Paragraph({ text: line.slice(2), heading: HeadingLevel.HEADING_1 }));
+          } else if (line.startsWith('## ')) {
+            paragraphs.push(new Paragraph({ text: line.slice(3), heading: HeadingLevel.HEADING_2 }));
+          } else if (line.startsWith('### ')) {
+            paragraphs.push(new Paragraph({ text: line.slice(4), heading: HeadingLevel.HEADING_3 }));
+          } else if (line.startsWith('- ') || line.startsWith('* ')) {
+            paragraphs.push(new Paragraph({
+              text: line.slice(2).replace(/\*\*(.*?)\*\*/g, '$1').replace(/`(.*?)`/g, '$1'),
+              bullet: { level: 0 },
+            }));
+          } else if (line.trim() === '') {
+            paragraphs.push(new Paragraph({ text: '' }));
+          } else {
+            const cleaned = line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`(.*?)`/g, '$1');
+            paragraphs.push(new Paragraph({ children: [new TextRun(cleaned)] }));
+          }
+        }
+        const doc = new Document({ sections: [{ properties: {}, children: paragraphs }] });
+        const buffer = await Packer.toBuffer(doc);
+        const blob = new Blob([new Uint8Array(buffer)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${safeName}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('[CanvasPanel] DOCX export failed:', err);
+      }
+      setShowDownloadMenu(false);
+      return;
+    }
 
     if (format === 'pdf') {
       // Render markdown to HTML, then use print-to-PDF
@@ -818,6 +858,12 @@ export function CanvasPanel() {
                     className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-md"
                   >
                     PDF (Print)
+                  </button>
+                  <button
+                    onClick={() => handleDownload('docx')}
+                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Word Doc (.docx)
                   </button>
                   <button
                     onClick={() => handleDownload('html')}

@@ -337,6 +337,25 @@ export default function DashboardSidebar({
           </>
         )}
 
+        {/* ── Progress tools (all paid users) ──────────────── */}
+        {isPremium && (
+          <>
+            <SectionLabel>My Progress</SectionLabel>
+            <div className="px-2 space-y-0.5">
+              <NavItem
+                icon={<TrendingUp className="w-4.5 h-4.5" />}
+                label="Weekly Wins"
+                onClick={() => router.push('/dashboard/claps')}
+              />
+              <NavItem
+                icon={<GraduationCap className="w-4.5 h-4.5" />}
+                label="Referrals"
+                onClick={() => router.push('/dashboard/referrals')}
+              />
+            </div>
+          </>
+        )}
+
         {/* ── Agency / practice tools ───────────────────────── */}
         {(isAgency || isAdmin) && (
           <>
