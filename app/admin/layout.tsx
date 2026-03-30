@@ -25,6 +25,8 @@ import {
   Coins,
   Terminal,
   Shield,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 
@@ -113,6 +115,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         { href: '/admin/broadcasts', label: 'Broadcasts', icon: Megaphone },
         { href: '/admin/emails', label: 'Email Templates', icon: Mail },
         { href: '/admin/feedback', label: 'Feedback Management', icon: MessageSquare },
+      ],
+    },
+    {
+      label: 'Sales',
+      icon: TrendingUp,
+      items: [
+        { href: '/admin/pipeline', label: 'Pipeline', icon: Target },
+        { href: '/admin/claps', label: 'CLAPS Tracker', icon: TrendingUp },
       ],
     },
     {
