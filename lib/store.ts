@@ -164,6 +164,166 @@ export const MINDSET_AGENTS = {
       "Create my 4-layer Inner World Map"
     ]
   },
+  GOAL_ARCHITECT: {
+    id: 'goal-architect',
+    name: 'Goal Architect',
+    description: 'Designs identity-driven goals with milestone maps and daily non-negotiables — goals that survive contact with real life.',
+    icon: '🎯',
+    color: 'bg-yellow-500',
+    tags: ['popular', 'workflow'],
+    popularity: 950,
+    releaseDate: '2026-03-01',
+    workflowStep: 11,
+    starterPrompts: [
+      "Design a goal I'll actually hit",
+      "Help me build a 90-day goal architecture",
+      "I keep setting the same goal and missing it"
+    ]
+  },
+  BELIEF_DEBUGGER: {
+    id: 'belief-debugger',
+    name: 'Belief Debugger',
+    description: 'Surfaces the limiting beliefs running your decisions — gets the stack trace, not just the symptom.',
+    icon: '🔍',
+    color: 'bg-violet-500',
+    tags: ['workflow', 'advanced'],
+    popularity: 880,
+    releaseDate: '2026-03-01',
+    workflowStep: 12,
+    starterPrompts: [
+      "Debug my money mindset",
+      "Why do I keep self-sabotaging?",
+      "Find the belief behind this stuck pattern"
+    ]
+  },
+  MORNING_RITUAL_BUILDER: {
+    id: 'morning-ritual-builder',
+    name: 'Morning Ritual Builder',
+    description: 'Designs a morning practice that fits your actual life — not a 5am fantasy that collapses in week two.',
+    icon: '🌅',
+    color: 'bg-amber-400',
+    tags: ['popular', 'quick-win'],
+    popularity: 1050,
+    releaseDate: '2026-03-01',
+    workflowStep: 13,
+    starterPrompts: [
+      "Build me a morning routine that actually sticks",
+      "Design a 15-minute morning practice",
+      "My mornings are chaos — help me design them"
+    ]
+  },
+  ENERGY_OPTIMIZER: {
+    id: 'energy-optimizer',
+    name: 'Energy Optimizer',
+    description: 'Maps your peak energy windows and protects them — stop spending your best hours on your worst tasks.',
+    icon: '⚡',
+    color: 'bg-lime-500',
+    tags: ['performance', 'popular'],
+    popularity: 920,
+    releaseDate: '2026-03-01',
+    workflowStep: 14,
+    starterPrompts: [
+      "Map my energy across the week",
+      "I'm exhausted by 2pm — help me fix this",
+      "Design my ideal energy schedule"
+    ]
+  },
+  FEAR_PROCESSOR: {
+    id: 'fear-processor',
+    name: 'Fear Processor',
+    description: 'Processes the fear-based thinking blocking your next move so you can act with clarity instead of avoidance.',
+    icon: '🔥',
+    color: 'bg-red-500',
+    tags: ['mindset', 'workflow'],
+    popularity: 860,
+    releaseDate: '2026-03-01',
+    workflowStep: 15,
+    starterPrompts: [
+      "I know what I need to do but I keep avoiding it",
+      "Help me process this fear",
+      "What's actually blocking me?"
+    ]
+  },
+  RELATIONSHIP_ARCHITECT: {
+    id: 'relationship-architect',
+    name: 'Relationship Architect',
+    description: 'Audits your relationship portfolio and designs it intentionally — who gets your energy and what you need in return.',
+    icon: '🤝',
+    color: 'bg-sky-500',
+    tags: ['mindset', 'advanced'],
+    popularity: 720,
+    releaseDate: '2026-03-01',
+    workflowStep: 16,
+    starterPrompts: [
+      "Audit my relationships",
+      "I'm surrounded by the wrong people",
+      "Help me design my relationship portfolio"
+    ]
+  },
+  FOCUS_TRAINER: {
+    id: 'focus-trainer',
+    name: 'Focus Trainer',
+    description: 'Rebuilds your deep work capacity with training protocols — because focus is a skill that deteriorates without practice.',
+    icon: '🎯',
+    color: 'bg-indigo-500',
+    tags: ['performance', 'popular'],
+    popularity: 980,
+    releaseDate: '2026-03-01',
+    workflowStep: 17,
+    starterPrompts: [
+      "Build my deep work capacity",
+      "I can't focus for more than 20 minutes",
+      "Design a focus training protocol for me"
+    ]
+  },
+  VALUES_CLARIFIER: {
+    id: 'values-clarifier',
+    name: 'Values Clarifier',
+    description: 'Surfaces your actual values — not the ones you inherited or wish you had — so your decisions finally feel right.',
+    icon: '⚖️',
+    color: 'bg-fuchsia-500',
+    tags: ['mindset', 'workflow'],
+    popularity: 790,
+    releaseDate: '2026-03-01',
+    workflowStep: 18,
+    starterPrompts: [
+      "Help me clarify my actual values",
+      "Why does hitting my goals feel hollow?",
+      "Surface my real values vs. inherited ones"
+    ]
+  },
+  TRANSFORMATION_TRACKER: {
+    id: 'transformation-tracker',
+    name: 'Transformation Tracker',
+    description: 'Captures your mindset shifts and wins weekly so you can see how far you\'ve actually come.',
+    icon: '📈',
+    color: 'bg-emerald-400',
+    tags: ['popular', 'workflow'],
+    popularity: 830,
+    releaseDate: '2026-03-01',
+    workflowStep: 19,
+    starterPrompts: [
+      "Weekly check-in",
+      "Help me see my growth this month",
+      "Document my transformation"
+    ]
+  },
+  CONTENT_ARCHITECT: {
+    id: 'content-architect',
+    name: 'Content Architect',
+    description: 'Turns your mindset work and lived experience into content that attracts the right clients — without sounding like AI.',
+    icon: '✍️',
+    color: 'bg-rose-500',
+    tags: ['sales', 'popular'],
+    popularity: 910,
+    releaseDate: '2026-03-01',
+    workflowStep: 20,
+    starterPrompts: [
+      "Turn this insight into a LinkedIn post",
+      "Help me build a content strategy",
+      "Write content from my client story"
+    ]
+  },
 } as const;
 
 export type AgentId = keyof typeof MINDSET_AGENTS;

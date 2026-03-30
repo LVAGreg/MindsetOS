@@ -29,6 +29,15 @@ import {
   Code,
   MessageSquare,
   FileText,
+  Flame,
+  Sun,
+  BarChart2,
+  Scale,
+  Handshake,
+  Focus,
+  Activity,
+  Pen,
+  Bug,
   LucideIcon
 } from 'lucide-react';
 
@@ -67,6 +76,15 @@ export const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
   Code,
   MessageSquare,
   FileText,
+  Flame,
+  Sun,
+  BarChart2,
+  Scale,
+  Handshake,
+  Focus,
+  Activity,
+  Pen,
+  Bug,
 };
 
 /**
@@ -95,6 +113,22 @@ export const AGENT_ICONS: Record<string, LucideIcon> = {
 
   // Agency tools
   'agent-creator': Wand2,
+
+  // New agents (migration 065)
+  'goal-architect': Target,
+  'belief-debugger': Brain,
+  'morning-ritual-builder': Sun,
+  'energy-optimizer': Zap,
+  'fear-processor': Flame,
+  'relationship-architect': Handshake,
+  'focus-trainer': Focus,
+  'values-clarifier': Scale,
+  'transformation-tracker': BarChart2,
+  'content-architect': Pen,
+
+  // Sales agents (063)
+  'pipeline-coach': TrendingUp,
+  'outreach-coach': MessageSquare,
 };
 
 /**
