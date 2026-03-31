@@ -6,459 +6,560 @@ import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
   Check,
-  Sparkles,
+  Brain,
   Zap,
   Target,
-  TrendingUp,
-  Users,
-  Award,
-  Lock
+  Layers,
+  Eye,
+  Activity,
+  ChevronRight,
+  Sparkles,
+  MessageSquare,
+  BookOpen,
+  Compass,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
 export default function LandingPage() {
   const router = useRouter();
-  const [isVisible, setIsVisible] = useState(false);
+  const [vis, setVis] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
   const { user, isAuthenticated } = useAppStore();
 
-  // Wait for store hydration
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
+  useEffect(() => { setHasHydrated(true); }, []);
 
-  // Redirect based on auth status
   useEffect(() => {
     if (!hasHydrated) return;
-
     const accessToken = localStorage.getItem('accessToken');
-
-    // If user is authenticated, redirect to dashboard
     if (user && isAuthenticated && accessToken) {
-      console.log('✅ User authenticated, redirecting to dashboard');
       router.push('/dashboard');
       return;
     }
-
-    // If not authenticated, redirect to login
-    console.log('🔒 No authenticated user, redirecting to login');
     router.push('/login');
   }, [hasHydrated, user, isAuthenticated, router]);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  useEffect(() => { setVis(true); }, []);
+
+  /* ── Data ─────────────────────────────────────────────── */
 
   const agents = [
     {
-      icon: '🧠',
-      name: 'Practice Coach',
-      tagline: 'Build Daily Rituals That Rewire Your Defaults',
-      description: 'Design a personalized mindset practice that fits your schedule. Replace reactive habits with intentional routines that compound over time.',
-      outcome: 'Custom daily practice blueprint',
-      time: '15 minutes'
+      Icon: Brain,
+      color: '#4f6ef7',
+      name: 'Mindset Score',
+      tagline: 'Find Your Weakest Pillar',
+      description: 'A precise 5-question diagnostic that pinpoints exactly where your mindset is working against you — in under 3 minutes.',
+      outcome: 'Personalized mindset profile',
+      time: '3 min',
     },
     {
-      icon: '🔍',
-      name: 'Inner World Navigator',
-      tagline: 'Map the Beliefs Running Your Decisions',
-      description: 'Surface the hidden assumptions and emotional patterns driving your behavior. Get clarity on what to keep, what to rewire, and what to release.',
-      outcome: 'Personal belief audit & reframe plan',
-      time: '20 minutes'
+      Icon: Zap,
+      color: '#0ea5e9',
+      name: '48-Hour Reset',
+      tagline: 'Interrupt the Pattern Now',
+      description: 'Six targeted exercises that break your reactive cycle and install a new behavioral baseline. Fastest results in the system.',
+      outcome: 'New behavioral baseline',
+      time: '48 hrs',
     },
     {
-      icon: '💬',
-      name: 'Conversation Architect',
-      tagline: 'Upgrade the Conversations That Matter Most',
-      description: 'Build frameworks for the hard conversations — with partners, clients, and yourself. Move from avoidance to alignment.',
-      outcome: 'Ready-to-use conversation playbooks',
-      time: '20 minutes'
+      Icon: Layers,
+      color: '#7c3aed',
+      name: 'Architecture Coach',
+      tagline: 'Build Your Mental OS',
+      description: 'The 90-day cohort that builds all three layers of mindset architecture. Awareness, interruption, and design — working together.',
+      outcome: 'Complete mental architecture',
+      time: '90 days',
     },
     {
-      icon: '⚡',
-      name: 'Decision Clarity Engine',
-      tagline: 'Cut Through Overthinking in Minutes',
-      description: 'Use structured decision frameworks to stop spinning and start moving. Designed for high-stakes choices under pressure.',
-      outcome: 'Clear next step with conviction',
-      time: '10 minutes'
+      Icon: Eye,
+      color: '#ec4899',
+      name: 'Inner World Mapper',
+      tagline: 'Surface What's Running You',
+      description: 'Map the beliefs, values, and emotional patterns driving your decisions. Clarity on what to keep, rewire, and release.',
+      outcome: 'Personal belief audit',
+      time: '20 min',
     },
     {
-      icon: '🎯',
-      name: 'Performance Reset',
-      tagline: 'Recover When You Hit the Wall',
-      description: 'Identify what drained you, recalibrate your energy, and rebuild momentum — without burning it all down.',
-      outcome: 'Personalized recovery protocol',
-      time: '15 minutes'
+      Icon: Target,
+      color: '#10b981',
+      name: 'Decision Framework',
+      tagline: 'Cut Through Overthinking',
+      description: 'The DESIGN process — Define, Examine, Separate, Identify, Generate, Name — for high-stakes decisions under pressure.',
+      outcome: 'Clear decision with conviction',
+      time: '10 min',
     },
     {
-      icon: '🗺️',
-      name: 'Leadership Lens',
-      tagline: 'See Yourself the Way Your Team Does',
-      description: 'Get honest feedback on your leadership patterns and blind spots. Build a plan to lead with more presence and less friction.',
-      outcome: 'Leadership growth roadmap',
-      time: '20 minutes'
-    }
+      Icon: Activity,
+      color: '#f59e0b',
+      name: 'Accountability Partner',
+      tagline: 'Daily Check-In That Compounds',
+      description: 'A 5-minute daily practice that tracks commitments, celebrates wins, and recalibrates when you drift — every day.',
+      outcome: 'Consistent forward momentum',
+      time: '5 min / day',
+    },
   ];
 
-  const benefits = [
+  const pillars = [
     {
-      icon: <Target className="w-6 h-6" />,
-      title: 'Practice',
-      description: 'Daily rituals that rewire your defaults and build unshakable clarity'
+      number: '01',
+      subtitle: 'The Audit',
+      title: 'Awareness',
+      description: 'Surface the beliefs and patterns running your decisions right now. Most entrepreneurs skip this step — and wonder why nothing changes.',
+      Icon: Eye,
+      color: '#4f6ef7',
     },
     {
-      icon: <Zap className="w-6 h-6" />,
-      title: 'Inner World',
-      description: 'Surface the beliefs and patterns silently running your decisions'
+      number: '02',
+      subtitle: 'The Pattern Break',
+      title: 'Interruption',
+      description: 'Install the ability to pause between stimulus and response. This gap is where every good decision lives.',
+      Icon: Zap,
+      color: '#7c5bf6',
     },
     {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: 'Conversations',
-      description: 'Upgrade the way you communicate — with others and with yourself'
+      number: '03',
+      subtitle: 'The Design',
+      title: 'Architecture',
+      description: 'Build a mental operating system that produces the results you want — by design, not by default.',
+      Icon: Layers,
+      color: '#a07ef9',
     },
-    {
-      icon: <Award className="w-6 h-6" />,
-      title: 'Battle-Tested',
-      description: 'Built on Greg\'s frameworks used by thousands of entrepreneurs worldwide'
-    }
   ];
 
   const stats = [
-    { number: '30-45', label: 'age range', sublabel: 'Built for entrepreneurs' },
-    { number: '3x', label: 'faster clarity', sublabel: 'Decision-making' },
-    { number: '6', label: 'AI agents', sublabel: 'Complete system' },
-    { number: '80%', label: 'less overthinking', sublabel: 'Within 30 days' }
+    { value: '10', label: 'AI agents', sub: 'Complete system' },
+    { value: '3×', label: 'faster decisions', sub: 'Measured at 30 days' },
+    { value: '90', label: 'day architecture', sub: 'Group cohort' },
+    { value: '48hr', label: 'reset protocol', sub: 'Fastest entry point' },
   ];
 
+  const steps = [
+    {
+      n: '1',
+      title: 'Take the Mindset Score',
+      desc: 'A 5-question diagnostic that pinpoints where your mindset is working against you. Activates the right agents for your patterns.',
+      color: '#4f6ef7',
+    },
+    {
+      n: '2',
+      title: 'Work with your agents',
+      desc: 'Each agent handles a specific layer of your OS — beliefs, decisions, practices, accountability. Start anywhere. The system connects.',
+      color: '#7c5bf6',
+    },
+    {
+      n: '3',
+      title: 'Build the architecture',
+      desc: 'Over 90 days the 3-layer system installs: Awareness → Interruption → Architecture. A mind that works for you, by design.',
+      color: '#a07ef9',
+    },
+  ];
+
+  /* ── Render ───────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Logo at top */}
-      <div className="w-full pt-6 pb-4">
-        <div className="flex justify-center">
-          <MindsetOSLogo size="lg" variant="light" />
-        </div>
-      </div>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#09090f' }}>
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '40px 40px'
+      {/* ── Fixed ambient atmosphere ──────────────────── */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute -top-40 -left-40 w-[800px] h-[800px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(79,110,247,0.055) 0%, transparent 65%)' }} />
+        <div className="absolute top-[35%] -right-32 w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(124,91,246,0.04) 0%, transparent 65%)' }} />
+        <div className="absolute bottom-[5%] left-[15%] w-[700px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(79,110,247,0.03) 0%, transparent 65%)' }} />
+        {/* Dot grid */}
+        <div className="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(79,110,247,0.25) 1px, transparent 0)',
+            backgroundSize: '32px 32px',
+            opacity: 0.025,
           }} />
+      </div>
+
+      {/* ── Nav ───────────────────────────────────────── */}
+      <nav className="relative z-10 w-full px-6 py-5 max-w-7xl mx-auto flex items-center justify-between"
+        style={{ animation: `${vis ? 'landingFadeUp 0.6s 0s ease-out both' : 'none'}` }}>
+        <MindsetOSLogo size="lg" variant="light" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04]"
+            style={{ color: '#9090a8' }}
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => router.push('/trial-v3b')}
+            className="px-5 py-2.5 text-sm font-bold text-black rounded-xl transition-all duration-300 hover:shadow-[0_0_24px_rgba(252,200,36,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+          >
+            Start Free
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Hero ──────────────────────────────────────── */}
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-28 text-center">
+
+        {/* Badge */}
+        <div className={`mb-8 lp-float-1 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
+            style={{
+              color: '#fcc824',
+              border: '1px solid rgba(252,200,36,0.28)',
+              background: 'rgba(252,200,36,0.07)',
+            }}>
+            <Sparkles className="w-3.5 h-3.5" />
+            Personal Operating System for Entrepreneurs
+          </span>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24">
-          {/* Logo/Branding Badge */}
-          <div className={`text-center mb-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ffc82c]/20 border border-[#ffc82c] rounded-full text-[#ffc82c] text-sm font-semibold mb-6">
-              <Sparkles className="w-4 h-4" />
-              <span>MindsetOS — Mindset Operating System</span>
-            </div>
-          </div>
+        {/* Headline */}
+        <div className={`mb-7 lp-float-2 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+          <h1 className="font-extrabold leading-none mb-5 heading-tighter"
+            style={{ fontSize: 'clamp(3rem,8vw,6rem)', color: '#ededf5' }}>
+            Stop reacting.<br />
+            <span className="gradient-text-brand">Start designing.</span>
+          </h1>
+          <p className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#9090a8' }}>
+            10 AI agents built on Greg's proven frameworks.<br />
+            Your mindset, rebuilt from the architecture up.
+          </p>
+        </div>
 
-          {/* Main Headline */}
-          <div className={`text-center mb-12 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              MindsetOS
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffc82c] to-[#f8c824]">
-                Stop reacting. Start designing.
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              The AI coaching platform built for the way entrepreneurs actually think — and where they get stuck.
+        {/* CTAs */}
+        <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 lp-float-3 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+          <button
+            onClick={() => router.push('/trial-v3b')}
+            className="group flex items-center gap-2.5 px-8 py-4 font-bold text-black text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_44px_rgba(252,200,36,0.38)] hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+          >
+            Start Free — No credit card
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          <button
+            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+            className="flex items-center gap-2 px-6 py-4 rounded-xl text-sm font-medium transition-all duration-300 hover:bg-white/[0.04]"
+            style={{
+              color: '#9090a8',
+              border: '1px solid rgba(255,255,255,0.07)',
+            }}
+          >
+            See how it works
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto lp-float-4 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+          {stats.map((s, i) => (
+            <div key={i} className="p-5 rounded-2xl text-center"
+              style={{
+                background: 'rgba(18,18,31,0.7)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(12px)',
+              }}>
+              <div className="text-3xl font-extrabold heading-tighter mb-1 gradient-text-brand">{s.value}</div>
+              <div className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#ededf5' }}>{s.label}</div>
+              <div className="text-xs" style={{ color: '#5a5a72' }}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 3 Pillars ─────────────────────────────────── */}
+      <section className="relative z-10 py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The Framework</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
+              3-Layer Architecture
+            </h2>
+            <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
+              Most mindset work skips to Layer 3.<br />That's why it doesn't stick.
             </p>
           </div>
 
-          {/* Social Proof Row */}
-          <div className={`flex flex-col items-center gap-3 mb-10 transition-all duration-1000 delay-350 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {[
-                  { initials: 'MR', bg: 'bg-violet-500' },
-                  { initials: 'JK', bg: 'bg-emerald-500' },
-                  { initials: 'AL', bg: 'bg-blue-500' },
-                  { initials: 'TP', bg: 'bg-rose-500' },
-                  { initials: 'SB', bg: 'bg-amber-500' },
-                ].map((avatar, i) => (
-                  <div
-                    key={i}
-                    className={`w-9 h-9 rounded-full ${avatar.bg} flex items-center justify-center text-white text-xs font-bold ring-2 ring-gray-900`}
-                  >
-                    {avatar.initials}
-                  </div>
-                ))}
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {pillars.map((p, i) => (
+              <div key={i} className="relative p-8 rounded-2xl transition-all duration-300 group hover:translate-y-[-2px]"
+                style={{
+                  background: 'rgba(18,18,31,0.8)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  backdropFilter: 'blur(14px)',
+                }}>
+                {/* Big ghost number */}
+                <div className="absolute top-6 right-6 text-7xl font-black leading-none pointer-events-none select-none"
+                  style={{ color: p.color, opacity: 0.07 }}>
+                  {p.number}
+                </div>
+
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
+                  style={{ background: `${p.color}18`, border: `1px solid ${p.color}2a` }}>
+                  <p.Icon className="w-5 h-5" style={{ color: p.color }} />
+                </div>
+
+                <div className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: p.color }}>
+                  Layer {i + 1} · {p.subtitle}
+                </div>
+                <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>{p.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{p.description}</p>
               </div>
-              <p className="text-sm text-gray-300">
-                <span className="font-semibold text-white">500+</span> entrepreneurs redesigning how they think
-              </p>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Agent Showcase ─────────────────────────────── */}
+      <section id="agents" className="relative z-10 py-28" style={{ background: '#09090f' }}>
+        <div className="max-w-7xl mx-auto px-6">
+
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The System</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
+              10 Agents. One Architecture.
+            </h2>
+            <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
+              Each agent handles a specific layer of your mindset work.<br />Together, they're a complete operating system.
+            </p>
           </div>
 
-          {/* CTA Buttons */}
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {agents.map((a, i) => (
+              <AgentCard key={i} {...a} />
+            ))}
+          </div>
+
+          <div className="mt-14 text-center">
             <button
               onClick={() => router.push('/trial-v3b')}
-              className="group px-8 py-4 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 flex items-center justify-center gap-2"
+              className="group inline-flex items-center gap-3 px-10 py-5 font-bold text-black text-xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
             >
-              Start Free — No credit card
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => document.getElementById('agents')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-300 border border-white/20"
-            >
-              See How It Works
-            </button>
-          </div>
-
-          {/* Stats */}
-          <div className={`grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                <div className="text-4xl font-bold text-[#ffc82c] mb-2">{stat.number}</div>
-                <div className="text-sm font-semibold text-white">{stat.label}</div>
-                <div className="text-xs text-gray-400 mt-1">{stat.sublabel}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Benefits Section */}
-      <div className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              The 3 Pillars
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              A systematic approach to transforming your mindset and performance
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:border-[#ffc82c]/50 transition-all duration-300">
-                <div className="w-12 h-12 bg-[#ffc82c]/20 rounded-lg flex items-center justify-center text-[#ffc82c] mb-4">
-                  {benefit.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">{benefit.title}</h3>
-                <p className="text-gray-400">{benefit.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Agents Section */}
-      <div id="agents" className="py-24 bg-gradient-to-b from-gray-800 to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Meet Your AI Agent Team
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Six specialized agents that work together to upgrade your mindset and performance
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {agents.map((agent, index) => (
-              <div
-                key={index}
-                className="group p-8 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-[#ffc82c]/50 transition-all duration-300 hover:shadow-2xl hover:shadow-[#ffc82c]/20"
-              >
-                <div className="text-5xl mb-4">{agent.icon}</div>
-                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#ffc82c] transition-colors">
-                  {agent.name}
-                </h3>
-                <p className="text-[#ffc82c] font-semibold mb-3">{agent.tagline}</p>
-                <p className="text-gray-300 mb-6 leading-relaxed">{agent.description}</p>
-
-                <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                  <div>
-                    <div className="text-xs text-gray-400 uppercase mb-1">Outcome</div>
-                    <div className="text-sm font-semibold text-white">{agent.outcome}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-400 uppercase mb-1">Time</div>
-                    <div className="text-sm font-semibold text-[#ffc82c]">{agent.time}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-16 text-center">
-            <button
-              onClick={() => router.push('/trial-v3b')}
-              className="group px-10 py-5 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-xl hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 inline-flex items-center gap-3"
-            >
-              Start Free — No credit card
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              Access All 10 Agents Free
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* How It Works Section */}
-      <div className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── How It Works ───────────────────────────────── */}
+      <section id="how-it-works" className="relative z-10 py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The Journey</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
               How It Works
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
               Three steps from reactive to designed.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                step: '1',
-                title: 'Take the Mindset Score',
-                desc: 'A 7-question assessment that pinpoints your thinking style and where you get stuck. Takes 3 minutes.',
-                icon: '🧠',
-              },
-              {
-                step: '2',
-                title: 'Get your personalized AI coach',
-                desc: 'Based on your score, MindsetOS activates the right AI coaches for your patterns — not generic advice.',
-                icon: '⚡',
-              },
-              {
-                step: '3',
-                title: 'Build the mental architecture for results',
-                desc: 'Daily practices, decision frameworks, and accountability that compound into a mind that works for you.',
-                icon: '🎯',
-              },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="relative p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-[#ffc82c]/40 transition-all duration-300"
-              >
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ffc82c] to-[#f8c824] flex items-center justify-center text-gray-900 font-extrabold text-lg shadow-lg shadow-[#ffc82c]/30">
-                    {item.step}
-                  </div>
-                  <span className="text-3xl">{item.icon}</span>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {steps.map((s, i) => (
+              <div key={i} className="relative p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-2px]"
+                style={{
+                  background: 'rgba(18,18,31,0.8)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  backdropFilter: 'blur(14px)',
+                }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-extrabold text-lg mb-6"
+                  style={{ background: `linear-gradient(135deg,${s.color} 0%,${s.color}cc 100%)` }}>
+                  {s.n}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#ededf5' }}>{s.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Social Proof / Features */}
-      <div className="py-24 bg-gradient-to-b from-gray-800 to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      {/* ── Proof / Features ───────────────────────────── */}
+      <section className="relative z-10 py-28" style={{ background: '#09090f' }}>
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-14 items-center">
+
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Built on Proven Frameworks
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>Why it works</p>
+              <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-6" style={{ color: '#ededf5' }}>
+                Built on Greg's<br />proven frameworks
               </h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                MindsetOS combines Greg's proven methodologies with AI-powered execution.
-                Every agent is trained on frameworks that have helped thousands of entrepreneurs
-                transform their mindset and performance.
+              <p className="mb-10 leading-relaxed text-lg" style={{ color: '#9090a8' }}>
+                MindsetOS is the AI-powered version of the coaching system Greg has used with high-performing entrepreneurs worldwide. Every agent is trained on real methodology — not generic advice.
               </p>
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 {[
-                  'Practice pillar: daily rituals that compound over time',
-                  'Inner World pillar: beliefs and patterns made visible',
-                  'Conversations pillar: frameworks for the talks that matter',
-                  'Built for entrepreneurs 30-45 running on fumes'
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#ffc82c]/20 flex items-center justify-center mt-1">
-                      <Check className="w-4 h-4 text-[#ffc82c]" />
+                  '3-Layer Architecture: Awareness → Interruption → Design',
+                  'The DESIGN Framework for high-stakes decisions',
+                  '48-Hour Reset protocol for pattern interruption',
+                  'Daily accountability system that compounds',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(79,110,247,0.18)', border: '1px solid rgba(79,110,247,0.35)' }}>
+                      <Check className="w-3 h-3" style={{ color: '#7b92ff' }} />
                     </div>
-                    <span className="text-gray-300">{feature}</span>
+                    <span className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="relative">
-              <div className="p-8 bg-gradient-to-br from-[#ffc82c]/20 to-[#ffc82c]/5 rounded-2xl border border-[#ffc82c]/30">
-                <div className="text-6xl mb-4">🎯</div>
-                <h3 className="text-2xl font-bold text-white mb-4">
+              {/* Ambient glow */}
+              <div className="absolute -inset-8 rounded-3xl pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(79,110,247,0.12) 0%, transparent 70%)' }} />
+              <div className="relative p-8 rounded-2xl"
+                style={{
+                  background: 'rgba(18,18,31,0.9)',
+                  border: '1px solid rgba(79,110,247,0.2)',
+                  backdropFilter: 'blur(16px)',
+                  boxShadow: '0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,110,247,0.07) inset',
+                }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                  style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.25)' }}>
+                  <Brain className="w-6 h-6" style={{ color: '#7b92ff' }} />
+                </div>
+                <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>
                   MindsetOS Methodology
                 </h3>
-                <p className="text-gray-300 mb-6">
-                  Created by Greg, this system is battle-tested with high-performing entrepreneurs worldwide.
-                  Now available as an AI-powered platform that guides you step-by-step.
+                <p className="mb-6 text-sm leading-relaxed" style={{ color: '#9090a8' }}>
+                  Created by Greg. Battle-tested with high-performing entrepreneurs. Now available as an AI platform that guides you through each layer, 24/7.
                 </p>
-                <a
-                  href="https://www.mindset.show"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[#ffc82c] hover:text-[#f8c824] font-semibold transition-colors"
+                <a href="https://www.mindset.show" target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+                  style={{ color: '#7b92ff' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#a07ef9')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#7b92ff')}
                 >
-                  Learn More About MindsetOS
+                  Learn more about MindsetOS
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Final CTA */}
-      <div className="py-24 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Ready to Transform Your
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffc82c] to-[#f8c824]">
-              Mindset and Performance?
-            </span>
+      {/* ── Final CTA ─────────────────────────────────── */}
+      <section className="relative z-10 py-32 overflow-hidden">
+        {/* Ambient glow behind text */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="w-[900px] h-[400px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, rgba(124,91,246,0.07) 0%, transparent 65%)' }} />
+        </div>
+
+        <div className="relative max-w-3xl mx-auto px-6 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: '#5a5a72' }}>Get started</p>
+          <h2 className="font-extrabold heading-tighter mb-6" style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', color: '#ededf5', lineHeight: 1.08 }}>
+            Your mind is running<br />
+            <span className="gradient-text-brand">on default settings.</span>
           </h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Join thousands of entrepreneurs using MindsetOS to think clearer, decide faster, and lead better
+          <p className="text-xl mb-12 max-w-xl mx-auto" style={{ color: '#9090a8' }}>
+            Every day you spend reacting is a day you're not designing. Start free. No credit card. Results in 48 hours.
           </p>
           <button
             onClick={() => router.push('/trial-v3b')}
-            className="group px-12 py-6 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-2xl hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 inline-flex items-center gap-3"
+            className="group inline-flex items-center gap-3 px-12 py-6 font-bold text-black text-2xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
           >
-            Start Free — No credit card
+            Start Free
             <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" />
           </button>
-          <p className="text-sm text-gray-400 mt-6">
-            No credit card required • Get started in 60 seconds
+          <p className="text-xs mt-5" style={{ color: '#5a5a72' }}>
+            No credit card required · Get started in 60 seconds
           </p>
         </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────── */}
+      <footer className="relative z-10 py-10" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm" style={{ color: '#5a5a72' }}>
+            © 2026 MindsetOS — Mindset Operating System
+          </p>
+          <div className="flex items-center gap-6">
+            {[
+              { label: 'mindset.show', href: 'https://www.mindset.show' },
+              { label: 'Connect with Greg', href: 'https://www.linkedin.com/in/gregmindset/' },
+              { label: 'Mindset Arena', href: 'https://www.mindset.show/c/mindset-arena' },
+              { label: 'Coaching Practice', href: '/agency' },
+            ].map((l, i) => (
+              <a key={i} href={l.href}
+                target={l.href.startsWith('http') ? '_blank' : undefined}
+                rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="text-sm transition-colors duration-200"
+                style={{ color: '#5a5a72' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#fcc824')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#5a5a72')}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        @keyframes landingFadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .lp-hidden { opacity: 0; transform: translateY(20px); }
+        .lp-vis    { transition: opacity 0.7s ease-out, transform 0.7s ease-out; opacity: 1; transform: none; }
+        .lp-float-1.lp-vis { transition-delay: 0.05s; }
+        .lp-float-2.lp-vis { transition-delay: 0.15s; }
+        .lp-float-3.lp-vis { transition-delay: 0.25s; }
+        .lp-float-4.lp-vis { transition-delay: 0.38s; }
+      `}</style>
+    </div>
+  );
+}
+
+/* ── Agent Card — isolated to avoid inline handler performance issues ── */
+function AgentCard({
+  Icon, color, name, tagline, description, outcome, time,
+}: {
+  Icon: React.ElementType; color: string; name: string; tagline: string;
+  description: string; outcome: string; time: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className="relative p-7 rounded-2xl transition-all duration-300"
+      style={{
+        background: 'rgba(18,18,31,0.75)',
+        border: `1px solid ${hovered ? color + '38' : 'rgba(255,255,255,0.07)'}`,
+        backdropFilter: 'blur(14px)',
+        transform: hovered ? 'translateY(-3px)' : 'none',
+        boxShadow: hovered ? `0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px ${color}14 inset` : 'none',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Icon */}
+      <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+        style={{ background: `${color}18`, border: `1px solid ${color}28` }}>
+        <Icon className="w-5 h-5" style={{ color }} />
       </div>
 
-      {/* Footer */}
-      <div className="py-12 bg-black border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-gray-400 text-sm">
-              © 2026 MindsetOS — Mindset Operating System. Built on MindsetOS methodology.
-            </div>
-            <div className="flex gap-6">
-              <a href="https://www.mindset.show" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#ffc82c] transition-colors text-sm">
-                MindsetOS
-              </a>
-              <a href="https://www.linkedin.com/in/gregmindset/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#ffc82c] transition-colors text-sm">
-                Connect with Greg
-              </a>
-              <a href="https://www.mindset.show/c/mindset-arena" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#ffc82c] transition-colors text-sm">
-                Mindset Arena
-              </a>
-              <a href="/agency" className="text-gray-400 hover:text-[#ffc82c] transition-colors text-sm">
-                Coaching Practice
-              </a>
-            </div>
-          </div>
+      <h3 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>{name}</h3>
+      <p className="text-xs font-semibold mb-3" style={{ color }}>{tagline}</p>
+      <p className="text-sm leading-relaxed mb-5" style={{ color: '#9090a8' }}>{description}</p>
+
+      <div className="flex items-center justify-between pt-4"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div>
+          <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Outcome</div>
+          <div className="text-xs font-semibold" style={{ color: '#ededf5' }}>{outcome}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Time</div>
+          <div className="text-xs font-semibold" style={{ color }}>{time}</div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Brain, Target, Zap } from 'lucide-react';
 import posthog from 'posthog-js';
 
 export default function ScorecardPage() {
@@ -63,20 +63,29 @@ export default function ScorecardPage() {
         .anim-pop { animation: pop 0.5s 0.1s ease-out both; }
       `}</style>
 
-      <div className="min-h-screen bg-[#09090f] flex flex-col">
+      <div className="min-h-screen flex flex-col" style={{ background: '#09090f' }}>
+
+        {/* Ambient atmosphere */}
+        <div className="pointer-events-none fixed inset-0 z-0">
+          <div className="absolute -top-20 left-1/4 w-[500px] h-[500px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(79,110,247,0.05) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(124,91,246,0.035) 0%, transparent 70%)' }} />
+        </div>
 
         {/* Top bar */}
-        <div className="flex items-center justify-between px-6 py-5">
-          <Link href="/" className="text-base font-bold text-[#ededf5]">
-            Mindset<span className="text-[#4f6ef7]">OS</span>
+        <div className="relative z-10 flex items-center justify-between px-6 py-5">
+          <Link href="/" className="text-base font-bold" style={{ color: '#ededf5' }}>
+            Mindset<span style={{ color: '#4f6ef7' }}>OS</span>
           </Link>
-          <span className="text-xs font-medium text-[#9090a8] bg-[#12121f] border border-[#1e1e30] px-3 py-1.5 rounded-full">
+          <span className="text-xs font-medium px-3 py-1.5 rounded-full"
+            style={{ color: '#9090a8', background: '#12121f', border: '1px solid #1e1e30' }}>
             Free · 20 Questions · Instant Score
           </span>
         </div>
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-10">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 py-10">
           <div className="w-full max-w-xl">
 
             {!submitted ? (
@@ -99,41 +108,38 @@ export default function ScorecardPage() {
 
                 {/* Benefit cards */}
                 <div className="anim-f4 space-y-3 mb-10">
-                  <div className="bg-[#12121f] border border-[#1e1e30] rounded-xl p-5 flex gap-4 items-start">
-                    <span className="text-xl leading-none mt-0.5">🧠</span>
-                    <div>
-                      <p className="text-[#ededf5] font-semibold text-sm mb-1">
-                        Score yourself across 4 domains
-                      </p>
-                      <p className="text-[#9090a8] text-sm leading-relaxed">
-                        Clarity, Resilience, Decision Quality, Identity Stability. Rated 1–25 each.
-                      </p>
+                  {[
+                    {
+                      Icon: Brain,
+                      color: '#4f6ef7',
+                      title: 'Score yourself across 4 domains',
+                      desc: 'Clarity, Resilience, Decision Quality, Identity Stability. Rated 1–25 each.',
+                    },
+                    {
+                      Icon: Target,
+                      color: '#7c5bf6',
+                      title: 'See exactly which domain is your bottleneck',
+                      desc: 'Not vague advice. A precise score that tells you where the money is leaking.',
+                    },
+                    {
+                      Icon: Zap,
+                      color: '#fcc824',
+                      title: 'Get a smart recommendation',
+                      desc: "Based on your lowest score, you'll know exactly what to work on first.",
+                    },
+                  ].map(({ Icon, color, title, desc }, i) => (
+                    <div key={i} className="rounded-xl p-5 flex gap-4 items-start"
+                      style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+                      <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
+                        style={{ background: `${color}15`, border: `1px solid ${color}25` }}>
+                        <Icon className="w-4 h-4" style={{ color }} />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm mb-1" style={{ color: '#ededf5' }}>{title}</p>
+                        <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{desc}</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="bg-[#12121f] border border-[#1e1e30] rounded-xl p-5 flex gap-4 items-start">
-                    <span className="text-xl leading-none mt-0.5">🎯</span>
-                    <div>
-                      <p className="text-[#ededf5] font-semibold text-sm mb-1">
-                        See exactly which domain is your bottleneck
-                      </p>
-                      <p className="text-[#9090a8] text-sm leading-relaxed">
-                        Not vague advice. A precise score that tells you where the money is leaking.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#12121f] border border-[#1e1e30] rounded-xl p-5 flex gap-4 items-start">
-                    <span className="text-xl leading-none mt-0.5">⚡</span>
-                    <div>
-                      <p className="text-[#ededf5] font-semibold text-sm mb-1">
-                        Get a smart recommendation
-                      </p>
-                      <p className="text-[#9090a8] text-sm leading-relaxed">
-                        Based on your lowest score, you'll know exactly what to work on first.
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Form card */}
