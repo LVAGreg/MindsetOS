@@ -515,7 +515,7 @@ export default function JoinPage() {
               </p>
 
               {/* Pricing options */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 max-w-4xl mx-auto mb-10">
                 {/* $47 Reset option */}
                 <a href="/buy/reset" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
                   <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">48-Hr Reset</div>
@@ -528,11 +528,17 @@ export default function JoinPage() {
                   <div className="text-3xl font-extrabold text-white tracking-tight">$47<span className="text-base font-medium text-gray-400">/wk</span></div>
                   <div className="text-xs text-gray-400 mt-1.5">Billed weekly</div>
                 </div>
-                {/* 90-Day Architecture */}
-                <a href="/checkout?plan=architecture_997" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap">
+                {/* Annual option */}
+                <a href="/checkout?plan=individual_annual" className="group relative bg-white/[0.06] border border-emerald-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-emerald-400 hover:bg-white/[0.1] block">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap">
                     BEST VALUE
                   </div>
+                  <div className="text-xs text-emerald-400 font-bold uppercase tracking-widest mb-2">Annual</div>
+                  <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
+                  <div className="text-xs text-gray-400 mt-1.5">Save $440 vs weekly</div>
+                </a>
+                {/* 90-Day Architecture */}
+                <a href="/checkout?plan=architecture_997" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
                   <div className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-2">90-Day Cohort</div>
                   <div className="text-3xl font-extrabold text-white tracking-tight">$997</div>
                   <div className="text-xs text-gray-500 mt-1.5">Group program</div>
