@@ -74,7 +74,7 @@ export default function LandingPage() {
       Icon: Eye,
       color: '#ec4899',
       name: 'Inner World Mapper',
-      tagline: 'Surface What's Running You',
+      tagline: "Surface What's Running You",
       description: 'Map the beliefs, values, and emotional patterns driving your decisions. Clarity on what to keep, rewire, and release.',
       outcome: 'Personal belief audit',
       time: '20 min',
