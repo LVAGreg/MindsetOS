@@ -11,7 +11,8 @@ import {
   Target,
   TrendingUp,
   Users,
-  Award
+  Award,
+  Lock
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -168,18 +169,42 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Transform how you think, decide, and lead.
-              AI-powered agents for entrepreneurs running on fumes who are ready to run on purpose.
+              The AI coaching platform built for the way entrepreneurs actually think — and where they get stuck.
             </p>
+          </div>
+
+          {/* Social Proof Row */}
+          <div className={`flex flex-col items-center gap-3 mb-10 transition-all duration-1000 delay-350 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {[
+                  { initials: 'MR', bg: 'bg-violet-500' },
+                  { initials: 'JK', bg: 'bg-emerald-500' },
+                  { initials: 'AL', bg: 'bg-blue-500' },
+                  { initials: 'TP', bg: 'bg-rose-500' },
+                  { initials: 'SB', bg: 'bg-amber-500' },
+                ].map((avatar, i) => (
+                  <div
+                    key={i}
+                    className={`w-9 h-9 rounded-full ${avatar.bg} flex items-center justify-center text-white text-xs font-bold ring-2 ring-gray-900`}
+                  >
+                    {avatar.initials}
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-gray-300">
+                <span className="font-semibold text-white">500+</span> entrepreneurs redesigning how they think
+              </p>
+            </div>
           </div>
 
           {/* CTA Buttons */}
           <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/trial-v3b')}
               className="group px-8 py-4 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              Get Started Free
+              Start Free — No credit card
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
@@ -270,10 +295,10 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/trial-v3b')}
               className="group px-10 py-5 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-xl hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 inline-flex items-center gap-3"
             >
-              Start Your Transformation
+              Start Free — No credit card
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -285,42 +310,48 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              The MindsetOS Path
+              How It Works
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Follow the sequential path from overwhelm to clarity
+              Three steps from reactive to designed.
             </p>
           </div>
 
-          <div className="relative max-w-4xl mx-auto">
-            {/* Vertical Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[#ffc82c] to-transparent hidden md:block" />
-
-            {/* Steps */}
-            <div className="space-y-12">
-              {[
-                { step: 1, title: 'Build Your Practice', desc: 'Practice Coach designs your daily rituals', icon: '🧠' },
-                { step: 2, title: 'Map Your Inner World', desc: 'Inner World Navigator surfaces hidden patterns', icon: '🔍' },
-                { step: 3, title: 'Upgrade Conversations', desc: 'Conversation Architect builds your playbooks', icon: '💬' },
-                { step: 4, title: 'Cut Through Overthinking', desc: 'Decision Clarity Engine moves you to action', icon: '⚡' },
-                { step: 5, title: 'Reset Performance', desc: 'Performance Reset rebuilds your momentum', icon: '🎯' },
-                { step: 6, title: 'Lead With Presence', desc: 'Leadership Lens sharpens how you show up', icon: '🗺️' }
-              ].map((item, index) => (
-                <div key={index} className={`relative flex items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                  <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                    <div className="p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                      <div className="text-sm font-bold text-[#ffc82c] mb-2">STEP {item.step}</div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
-                      <p className="text-gray-300">{item.desc}</p>
-                    </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                step: '1',
+                title: 'Take the Mindset Score',
+                desc: 'A 7-question assessment that pinpoints your thinking style and where you get stuck. Takes 3 minutes.',
+                icon: '🧠',
+              },
+              {
+                step: '2',
+                title: 'Get your personalized AI coach',
+                desc: 'Based on your score, MindsetOS activates the right AI coaches for your patterns — not generic advice.',
+                icon: '⚡',
+              },
+              {
+                step: '3',
+                title: 'Build the mental architecture for results',
+                desc: 'Daily practices, decision frameworks, and accountability that compound into a mind that works for you.',
+                icon: '🎯',
+              },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="relative p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-[#ffc82c]/40 transition-all duration-300"
+              >
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ffc82c] to-[#f8c824] flex items-center justify-center text-gray-900 font-extrabold text-lg shadow-lg shadow-[#ffc82c]/30">
+                    {item.step}
                   </div>
-                  <div className="hidden md:flex w-16 h-16 rounded-full bg-gradient-to-br from-[#ffc82c] to-[#f8c824] items-center justify-center text-3xl z-10 shadow-lg shadow-[#ffc82c]/50">
-                    {item.icon}
-                  </div>
-                  <div className="flex-1" />
+                  <span className="text-3xl">{item.icon}</span>
                 </div>
-              ))}
-            </div>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -394,10 +425,10 @@ export default function LandingPage() {
             Join thousands of entrepreneurs using MindsetOS to think clearer, decide faster, and lead better
           </p>
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/trial-v3b')}
             className="group px-12 py-6 bg-gradient-to-r from-[#ffc82c] to-[#f8c824] text-gray-900 rounded-xl font-bold text-2xl hover:shadow-2xl hover:shadow-[#ffc82c]/50 transition-all duration-300 inline-flex items-center gap-3"
           >
-            Start Free Now
+            Start Free — No credit card
             <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" />
           </button>
           <p className="text-sm text-gray-400 mt-6">

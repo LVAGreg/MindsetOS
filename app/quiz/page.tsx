@@ -141,7 +141,7 @@ function getDominantType(answers: string[]): ThinkingType {
 // ─────────────────────────────────────────────
 
 export default function QuizPage() {
-  const [step, setStep] = useState(0);           // 0–6 = questions, 7 = result
+  const [step, setStep] = useState(-1);          // -1 = intro, 0–6 = questions, 7 = result
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [resultType, setResultType] = useState<ThinkingType | null>(null);
@@ -210,7 +210,7 @@ export default function QuizPage() {
   }
 
   const result = resultType ? RESULTS[resultType] : null;
-  const progress = step >= 7 ? 7 : step;
+  const progress = step >= 7 ? 7 : Math.max(step, 0);
 
   return (
     <>
@@ -258,20 +258,20 @@ export default function QuizPage() {
           <Link href="/" className="text-base font-bold text-[#ededf5]">
             Mindset<span className="text-[#4f6ef7]">OS</span>
           </Link>
-          {step < 7 && (
-            <span className="text-sm text-[#9090a8]">
-              {step + 1} <span className="text-[#9090a8]/50">/ 7</span>
+          {step >= 0 && step < 7 && (
+            <span className="text-sm font-medium text-[#9090a8]">
+              Question <span className="text-[#ededf5]">{step + 1}</span> <span className="text-[#9090a8]/50">of 7</span>
             </span>
           )}
         </div>
 
         {/* Progress bar */}
-        {step < 7 && (
+        {step >= 0 && step < 7 && (
           <div className="px-6 mb-8">
             <div className="h-1 bg-[#12121f] rounded-full overflow-hidden">
               <div
                 className="h-full bg-[#4f6ef7] rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${((step) / 7) * 100}%` }}
+                style={{ width: `${(step / 7) * 100}%` }}
               />
             </div>
           </div>
@@ -280,8 +280,39 @@ export default function QuizPage() {
         {/* Main content */}
         <div className="flex-1 flex flex-col items-center justify-center px-5 pb-12">
 
+          {/* ── INTRO SCREEN ── */}
+          {step === -1 && (
+            <div className="w-full max-w-lg text-center anim-slide-forward">
+              <div className="mb-6">
+                <span
+                  className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+                  style={{ background: '#fcc82420', color: '#fcc824', border: '1px solid #fcc82440' }}
+                >
+                  7 questions · 3 minutes
+                </span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#ededf5] mb-4 leading-tight">
+                What&apos;s Your Thinking Style?
+              </h1>
+              <p className="text-[#9090a8] text-base leading-relaxed mb-10 max-w-sm mx-auto">
+                Every entrepreneur gets stuck in a pattern. This quiz identifies yours — and shows you exactly where it&apos;s costing you.
+              </p>
+              <button
+                onClick={() => { setDirection('forward'); setStep(0); }}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-base text-black transition-all hover:opacity-90 hover:scale-105 active:scale-95"
+                style={{ background: '#fcc824' }}
+              >
+                Start Quiz
+                <ArrowRight size={18} />
+              </button>
+              <p className="text-[#9090a8]/50 text-xs mt-5">
+                Free · No sign-up required
+              </p>
+            </div>
+          )}
+
           {/* ── QUESTION SCREEN ── */}
-          {step < 7 && (
+          {step >= 0 && step < 7 && (
             <div
               key={step}
               className={`w-full max-w-lg ${direction === 'forward' ? 'anim-slide-forward' : 'anim-slide-back'}`}
@@ -407,6 +438,17 @@ export default function QuizPage() {
                   <p className="anim-r6 text-center text-[#9090a8] text-xs mt-5">
                     {result.agentBridge}
                   </p>
+
+                  {/* Skip to trial CTA */}
+                  <div className="anim-r6 text-center mt-4">
+                    <Link
+                      href="/trial-v3b"
+                      className="inline-flex items-center gap-1.5 text-[#9090a8] hover:text-[#ededf5] text-xs transition-colors underline underline-offset-2"
+                    >
+                      Skip the email — try MindsetOS free now
+                      <ArrowRight size={12} />
+                    </Link>
+                  </div>
                 </>
               ) : (
                 /* ── SUCCESS STATE ── */
@@ -422,11 +464,11 @@ export default function QuizPage() {
                     Your full {result.label} breakdown is on its way. First email lands in the next few minutes.
                   </p>
                   <Link
-                    href="/register"
+                    href="/trial-v3b"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-white transition-opacity hover:opacity-90"
                     style={{ background: result.color }}
                   >
-                    Try MindsetOS free
+                    Start MindsetOS free
                     <ArrowRight size={16} />
                   </Link>
                   <p className="text-[#9090a8]/50 text-xs mt-4">

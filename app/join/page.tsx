@@ -16,6 +16,7 @@ import {
   Users,
   Shield,
   Clock,
+  Lock,
 } from 'lucide-react';
 
 const CHECKOUT_URL = '/checkout';
@@ -529,7 +530,7 @@ export default function JoinPage() {
                   <div className="text-xs text-gray-400 mt-1.5">Billed weekly</div>
                 </div>
                 {/* Annual option */}
-                <a href="/checkout?plan=individual_annual" className="group relative bg-white/[0.06] border border-emerald-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-emerald-400 hover:bg-white/[0.1] block">
+                <a href="/checkout?plan=individual_annual" className="col-span-2 sm:col-span-1 group relative bg-white/[0.06] border border-emerald-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-emerald-400 hover:bg-white/[0.1] block">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap">
                     BEST VALUE
                   </div>
@@ -549,6 +550,15 @@ export default function JoinPage() {
                   <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
                   <div className="text-xs text-gray-500 mt-1.5">Private add-on</div>
                 </a>
+              </div>
+
+              {/* Guarantee badge */}
+              <div className="flex items-center justify-center gap-3 mb-8 px-6 py-4 rounded-xl border border-emerald-500/30 bg-emerald-900/10 max-w-lg mx-auto">
+                <Lock className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <p className="text-sm text-gray-300 text-left">
+                  <span className="font-bold text-white">100% risk-free.</span>{' '}
+                  30-day money-back guarantee. If MindsetOS doesn&apos;t change how you think, we&apos;ll refund every cent.
+                </p>
               </div>
 
               <div className="space-y-3 text-left max-w-sm mx-auto mb-10">
