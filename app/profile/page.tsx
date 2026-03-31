@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Save, AlertCircle, CheckCircle, Eye, Key, ArrowLeft, Building2, MessageSquare, Target, Briefcase, TrendingUp, RotateCcw, Pencil, X } from 'lucide-react';
+import { User, Save, AlertCircle, CheckCircle, Eye, Key, ArrowLeft, Building2, MessageSquare, Target, Briefcase, TrendingUp, RotateCcw, Pencil, X, Webhook } from 'lucide-react';
 import { RoleBadge, UserRole } from '@/components/RoleBadge';
 import { apiClient } from '@/lib/api-client';
 
@@ -540,6 +540,17 @@ export default function ProfilePage() {
                 <div className="text-left">
                   <div className="font-medium text-gray-900 dark:text-white">Reset Password</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Change your account password</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push('/profile/webhooks')}
+                className="w-full flex items-center gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-xl transition-colors"
+              >
+                <Webhook className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="text-left">
+                  <div className="font-medium text-gray-900 dark:text-white">Webhooks</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Connect MindsetOS to Zapier, Make, or any tool</div>
                 </div>
               </button>
 
