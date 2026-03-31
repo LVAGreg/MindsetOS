@@ -322,6 +322,7 @@ function DashboardContent() {
   // Sidebar active section state for new DashboardSidebar
   const [sidebarSection, setSidebarSection] = useState<'home' | 'agents' | 'playbook' | 'conversations' | 'profile' | null>('home');
   const [hasMindsetScore, setHasMindsetScore] = useState(false);
+  const [aiGreeting, setAiGreeting] = useState<string | null>(null);
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const [selectedView, setSelectedView] = useState<'all' | 'starred' | 'project' | null>('all');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
@@ -455,6 +456,25 @@ function DashboardContent() {
     };
     checkMindsetScore();
   }, [user]);
+
+  // Fetch AI-generated personalized greeting
+  useEffect(() => {
+    const fetchGreeting = async () => {
+      if (!user || !hasHydrated) return;
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+      try {
+        const response = await fetch(`${API_URL}/api/user/greeting`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.greeting) setAiGreeting(data.greeting);
+        }
+      } catch { /* fail silently */ }
+    };
+    fetchGreeting();
+  }, [user, hasHydrated]);
 
   // Sync sidebarSection with showAgentBrowser
   useEffect(() => {
@@ -1302,175 +1322,156 @@ function DashboardContent() {
               conversationId={currentConversationId ?? undefined}
             />
           ) : (
-            /* ===== WELCOME HOME SCREEN ===== */
-            <div className="h-full overflow-y-auto custom-scrollbar">
+            /* ===== WELCOME HOME SCREEN — PATHWAY ===== */
+            <div className="h-full overflow-y-auto custom-scrollbar" style={{ background: '#09090f' }}>
               <div className="relative min-h-full">
-                {/* Ambient background orbs */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 dark:bg-amber-500/[0.04] rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute top-32 right-1/4 w-72 h-72 bg-cyan-500/4 dark:bg-cyan-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute bottom-20 left-1/3 w-64 h-64 bg-violet-500/4 dark:bg-violet-500/[0.02] rounded-full blur-[100px] pointer-events-none" />
+                {/* Ambient orbs */}
+                <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-[140px] pointer-events-none" style={{ background: 'rgba(252,200,36,0.03)' }} />
+                <div className="absolute top-40 right-1/3 w-72 h-72 rounded-full blur-[120px] pointer-events-none" style={{ background: 'rgba(79,110,247,0.03)' }} />
 
                 {/* Content */}
-                <div className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-16">
+                <div className="relative z-10 max-w-2xl mx-auto px-5 pt-10 pb-20">
 
-                  {/* ---- Greeting ---- */}
+                  {/* ---- AI Greeting ---- */}
                   {(() => {
                     const hour = new Date().getHours();
                     const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+                    const fallback = `Good ${timeOfDay}${user?.firstName ? `, ${user.firstName}` : ''}.`;
                     return (
                       <div className="mb-10 animate-float-up-1">
-                        <p className="text-xs font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400/70 mb-2">
-                          Your operating system
+                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-2.5" style={{ color: 'rgba(252,200,36,0.6)' }}>
+                          Your mindset OS
                         </p>
-                        <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white leading-tight mb-3">
-                          Good {timeOfDay}{user?.firstName ? `, ${user.firstName}` : ''}.
-                        </h1>
-                        <p className="text-base text-gray-500 dark:text-gray-500 leading-relaxed max-w-lg">
-                          What are you working on today?
-                        </p>
+                        {aiGreeting ? (
+                          <p className="text-2xl font-bold leading-snug" style={{ color: '#ededf5' }}>
+                            {aiGreeting}
+                          </p>
+                        ) : (
+                          <h1 className="text-3xl font-black tracking-tight leading-tight" style={{ color: '#ededf5' }}>
+                            {fallback}
+                          </h1>
+                        )}
                       </div>
                     );
                   })()}
 
-                  {/* ---- Quick Start Cards (top 3 agents) ---- */}
+                  {/* ---- Journey Pathway ---- */}
                   {(() => {
-                    const QUICK_START_IDS = ['mindset-score', 'accountability-partner', 'practice-builder'];
-                    // Build ordered list: prefer DB agents, fallback to MINDSET_AGENTS static data
-                    const quickAgents = QUICK_START_IDS.map(id => {
-                      const dbAgent = displayAgents.find(a => a.id === id);
-                      if (dbAgent) return dbAgent;
-                      // Fallback static data
-                      const staticMap: Record<string, { name: string; description: string; accent_color: string }> = {
-                        'mindset-score': { name: 'Mindset Score Agent', description: 'Your starting point — take the 5-question Mindset Score to reveal your weakest pillar.', accent_color: '#f59e0b' },
-                        'accountability-partner': { name: 'Accountability Partner', description: 'Your daily check-in companion — morning intentions, evening reflections, weekly reviews.', accent_color: '#16a34a' },
-                        'practice-builder': { name: 'Practice Builder', description: 'Creates your personalized 5-10 minute daily mindset routine based on your weakest pillar.', accent_color: '#10b981' },
-                      };
-                      return staticMap[id] ? { id, locked: false, ...staticMap[id] } : null;
-                    }).filter(Boolean);
+                    const PATHWAY_STAGES = [
+                      { id: 'mindset-score', label: 'Mindset Score', subtitle: 'Start here · Free', color: '#f59e0b', step: 1 },
+                      { id: 'reset-guide', label: '48-Hour Reset', subtitle: '$47 · Entry', color: '#8b5cf6', step: 2 },
+                      { id: 'architecture-coach', label: '90-Day Architecture', subtitle: '$997 · Core', color: '#4f6ef7', step: 3 },
+                      { id: 'launch-companion', label: 'Architecture Intensive', subtitle: '$1,997 · Premium', color: '#ec4899', step: 4 },
+                    ];
+
+                    const allConvs = Object.values(conversations) as any[];
+                    const stages = PATHWAY_STAGES.map(stage => {
+                      const sessionCount = allConvs.filter(c => c.agentId === stage.id).length;
+                      const dbAgent = displayAgents.find(a => a.id === stage.id);
+                      const locked = dbAgent ? dbAgent.locked : (stage.step > 1 && !hasMindsetScore);
+                      const lastConv = allConvs
+                        .filter(c => c.agentId === stage.id && c.updatedAt)
+                        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
+                      const lastActive = lastConv?.updatedAt
+                        ? new Date(lastConv.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        : null;
+                      return { ...stage, sessionCount, locked, lastActive };
+                    });
+
+                    const s0 = stages[0]; const s1 = stages[1]; const s2 = stages[2];
+                    let recommendedId: string;
+                    if (s0.sessionCount === 0) recommendedId = 'mindset-score';
+                    else if (s1.sessionCount === 0 && !s1.locked) recommendedId = 'reset-guide';
+                    else if (s2.sessionCount === 0 && !s2.locked) recommendedId = 'architecture-coach';
+                    else recommendedId = stages.filter(s => s.sessionCount > 0 && !s.locked).sort((a, b) => b.sessionCount - a.sessionCount)[0]?.id || 'mindset-score';
 
                     return (
                       <div className="mb-10 animate-float-up-2">
-                        <div className="flex items-center justify-between mb-4">
-                          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
-                            Start here
-                          </h2>
-                          <button
-                            onClick={() => setShowAgentBrowser(true)}
-                            className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
-                          >
-                            Browse all
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {quickAgents.map((agent: any) => (
-                            <button
-                              key={agent.id}
-                              onClick={() => !agent.locked && handleSelectAgent(agent.id)}
-                              disabled={agent.locked}
-                              className="group flex flex-col gap-3 p-4 rounded-xl border border-[#1e1e30] bg-[#12121f] hover:border-[#fcc824]/30 hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                              onMouseEnter={(e) => {
-                                if (!agent.locked) {
-                                  e.currentTarget.style.borderColor = `${agent.accent_color}45`;
-                                  e.currentTarget.style.boxShadow = `0 8px 24px ${agent.accent_color}14`;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = '';
-                                e.currentTarget.style.boxShadow = '';
-                              }}
-                            >
-                              <div
-                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
-                                style={{
-                                  background: `${agent.accent_color}18`,
-                                  border: `1.5px solid ${agent.accent_color}30`,
-                                }}
-                              >
-                                <AgentIcon agentId={agent.id} className="w-5 h-5" style={{ color: agent.accent_color }} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-bold text-gray-900 dark:text-white leading-snug mb-1 truncate">
-                                  {agent.name}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed line-clamp-1">
-                                  {agent.description}
-                                </p>
-                              </div>
-                              <div className="flex items-center justify-between mt-auto pt-1">
-                                <span
-                                  className="text-xs font-bold transition-colors"
-                                  style={{ color: agent.accent_color }}
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: '#4a4a60' }}>Your journey</h2>
+                        <div className="relative">
+                          <div className="absolute left-[27px] top-12 bottom-12 w-px pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(30,30,48,0), #1e1e30 15%, #1e1e30 85%, rgba(30,30,48,0))' }} />
+                          <div className="space-y-2">
+                            {stages.map(stage => {
+                              const isRecommended = stage.id === recommendedId;
+                              const isDone = stage.sessionCount > 0;
+                              const isLocked = stage.locked;
+                              return (
+                                <button
+                                  key={stage.id}
+                                  disabled={isLocked}
+                                  onClick={() => !isLocked && handleSelectAgent(stage.id)}
+                                  className="group relative w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-left transition-all duration-200"
+                                  style={{
+                                    background: isRecommended ? 'rgba(18,18,31,0.95)' : 'rgba(18,18,31,0.6)',
+                                    border: isRecommended ? `1px solid ${stage.color}45` : `1px solid ${isDone ? '#2a2a3f' : '#1e1e30'}`,
+                                    boxShadow: isRecommended ? `0 0 24px ${stage.color}0f` : 'none',
+                                    opacity: isLocked ? 0.45 : 1,
+                                    cursor: isLocked ? 'not-allowed' : 'pointer',
+                                  }}
+                                  onMouseEnter={e => { if (!isLocked) { (e.currentTarget as HTMLElement).style.borderColor = `${stage.color}55`; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.98)'; } }}
+                                  onMouseLeave={e => { if (!isLocked) { (e.currentTarget as HTMLElement).style.borderColor = isRecommended ? `${stage.color}45` : (isDone ? '#2a2a3f' : '#1e1e30'); (e.currentTarget as HTMLElement).style.background = isRecommended ? 'rgba(18,18,31,0.95)' : 'rgba(18,18,31,0.6)'; } }}
                                 >
-                                  Start &rarr;
-                                </span>
-                              </div>
-                            </button>
-                          ))}
+                                  <div className="relative z-10 flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
+                                    style={{ background: isDone ? `${stage.color}20` : isLocked ? 'rgba(30,30,48,0.8)' : `${stage.color}14`, border: `1.5px solid ${isDone ? stage.color + '50' : isLocked ? '#2a2a3f' : stage.color + '28'}` }}>
+                                    {isLocked ? (
+                                      <Lock className="w-4 h-4" style={{ color: '#4a4a60' }} />
+                                    ) : (
+                                      <AgentIcon agentId={stage.id} className="w-5 h-5" style={{ color: isDone ? stage.color : stage.color + 'cc' }} />
+                                    )}
+                                    {isDone && !isLocked && (
+                                      <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: stage.color, border: '2px solid #09090f' }}>
+                                        <Check className="w-2 h-2 text-black" strokeWidth={3} />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                      <span className="text-sm font-bold leading-none" style={{ color: isLocked ? '#4a4a60' : '#ededf5' }}>{stage.label}</span>
+                                      {isRecommended && !isLocked && (
+                                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full" style={{ background: `${stage.color}22`, color: stage.color, border: `1px solid ${stage.color}40` }}>Next</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs" style={{ color: '#4a4a60' }}>{stage.subtitle}</span>
+                                      {stage.sessionCount > 0 && <><span style={{ color: '#2a2a3f' }}>·</span><span className="text-xs" style={{ color: '#9090a8' }}>{stage.sessionCount} session{stage.sessionCount !== 1 ? 's' : ''}</span></>}
+                                      {stage.lastActive && <><span style={{ color: '#2a2a3f' }}>·</span><span className="text-xs" style={{ color: '#4a4a60' }}>Last: {stage.lastActive}</span></>}
+                                    </div>
+                                  </div>
+                                  {!isLocked && <ChevronRight className="w-4 h-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: stage.color }} />}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     );
                   })()}
 
-                  {/* ---- Recent conversations ---- */}
+                  {/* ---- Specialist Coaches ---- */}
                   {(() => {
-                    const recentConvs = Object.values(conversations)
-                      .filter((c: any) => c.messages && c.messages.length > 0)
-                      .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                      .slice(0, 4);
-                    if (recentConvs.length === 0) return null;
+                    const SPECIALIST_IDS = ['accountability-partner', 'practice-builder', 'decision-framework', 'inner-world-mapper', 'story-excavator', 'conversation-curator'];
+                    const specialists = SPECIALIST_IDS.map(id => displayAgents.find(a => a.id === id)).filter(Boolean) as any[];
+                    if (specialists.length === 0) return null;
                     return (
-                      <div className="animate-float-up-4">
-                        <div className="flex items-center justify-between mb-4">
-                          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
-                            Continue where you left off
-                          </h2>
-                          <button
-                            onClick={() => setShowConversationBrowser(true)}
-                            className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
-                          >
-                            View all
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="space-y-2">
-                          {recentConvs.map((conv: any) => {
-                            const agent = displayAgents.find(a => a.id === conv.agentId);
-                            const lastMsg = conv.messages?.[conv.messages.length - 1];
+                      <div className="mb-10 animate-float-up-3">
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: '#4a4a60' }}>Specialist coaches</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                          {specialists.map((agent: any) => {
+                            const sessionCount = (Object.values(conversations) as any[]).filter(c => c.agentId === agent.id).length;
                             return (
-                              <button
-                                key={conv.id}
-                                onClick={() => {
-                                  if (agent) setCurrentAgent(conv.agentId as AgentId);
-                                  setCurrentConversation(conv.id);
-                                }}
-                                className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left"
-                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.3)'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.95)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.7)'; }}
+                              <button key={agent.id} onClick={() => !agent.locked && handleSelectAgent(agent.id)} disabled={agent.locked}
+                                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200"
+                                style={{ background: 'rgba(18,18,31,0.6)', border: '1px solid #1e1e30', opacity: agent.locked ? 0.45 : 1, cursor: agent.locked ? 'not-allowed' : 'pointer' }}
+                                onMouseEnter={e => { if (!agent.locked) { (e.currentTarget as HTMLElement).style.borderColor = `${agent.accent_color}35`; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.98)'; } }}
+                                onMouseLeave={e => { if (!agent.locked) { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.6)'; } }}
                               >
-                                <div
-                                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                                  style={{
-                                    background: `${agent?.accent_color || '#fcc824'}14`,
-                                    border: `1.5px solid ${agent?.accent_color || '#fcc824'}22`,
-                                  }}
-                                >
-                                  {agent ? (
-                                    <AgentIcon agentId={agent.id} className="w-4 h-4" style={{ color: agent.accent_color }} />
-                                  ) : (
-                                    <MessageSquare className="w-4 h-4" style={{ color: '#9090a8' }} />
-                                  )}
+                                <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${agent.accent_color}14`, border: `1.5px solid ${agent.accent_color}28` }}>
+                                  {agent.locked ? <Lock className="w-3.5 h-3.5" style={{ color: '#4a4a60' }} /> : <AgentIcon agentId={agent.id} className="w-4 h-4" style={{ color: agent.accent_color }} />}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9090a8' }}>
-                                    {agent?.name || conv.agentId}
-                                  </p>
-                                  <p className="text-sm truncate font-medium leading-snug" style={{ color: '#ededf5' }}>
-                                    {conv.title || lastMsg?.content?.slice(0, 60) || 'Conversation'}
-                                  </p>
+                                  <p className="text-xs font-semibold leading-none mb-0.5 truncate" style={{ color: agent.locked ? '#4a4a60' : '#ededf5' }}>{agent.name}</p>
+                                  {sessionCount > 0 && <p className="text-[10px]" style={{ color: '#9090a8' }}>{sessionCount} session{sessionCount !== 1 ? 's' : ''}</p>}
                                 </div>
-                                <ChevronRight className="w-4 h-4 flex-shrink-0 transition-colors" style={{ color: '#4a4a60' }} />
                               </button>
                             );
                           })}
@@ -1479,20 +1480,63 @@ function DashboardContent() {
                     );
                   })()}
 
-                  {/* ---- Empty state (no agents yet) ---- */}
+                  {/* ---- Recent Conversations ---- */}
+                  {(() => {
+                    const recentConvs = Object.values(conversations)
+                      .filter((c: any) => c.messages && c.messages.length > 0)
+                      .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                      .slice(0, 4);
+                    if (recentConvs.length === 0) return null;
+                    return (
+                      <div className="animate-float-up-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h2 className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: '#4a4a60' }}>Continue where you left off</h2>
+                          <button onClick={() => setShowConversationBrowser(true)}
+                            className="text-xs font-semibold flex items-center gap-0.5 transition-colors"
+                            style={{ color: 'rgba(252,200,36,0.6)' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fcc824'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(252,200,36,0.6)'; }}>
+                            View all<ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <div className="space-y-1.5">
+                          {recentConvs.map((conv: any) => {
+                            const agent = displayAgents.find(a => a.id === conv.agentId);
+                            const lastMsg = conv.messages?.[conv.messages.length - 1];
+                            return (
+                              <button key={conv.id}
+                                onClick={() => { if (agent) setCurrentAgent(conv.agentId as AgentId); setCurrentConversation(conv.id); }}
+                                className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 text-left"
+                                style={{ background: 'rgba(18,18,31,0.6)', border: '1px solid #1e1e30' }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.3)'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.98)'; }}
+                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.6)'; }}
+                              >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                                  style={{ background: `${agent?.accent_color || '#fcc824'}14`, border: `1.5px solid ${agent?.accent_color || '#fcc824'}22` }}>
+                                  {agent ? <AgentIcon agentId={agent.id} className="w-3.5 h-3.5" style={{ color: agent.accent_color }} /> : <MessageSquare className="w-3.5 h-3.5" style={{ color: '#9090a8' }} />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-0.5 truncate" style={{ color: '#4a4a60' }}>{agent?.name || conv.agentId}</p>
+                                  <p className="text-sm truncate font-medium leading-snug" style={{ color: '#ededf5' }}>{conv.title || lastMsg?.content?.slice(0, 60) || 'Conversation'}</p>
+                                </div>
+                                <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" style={{ color: '#9090a8' }} />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* ---- Empty state ---- */}
                   {displayAgents.length === 0 && (
                     <div className="text-center py-16 animate-float-up-3">
-                      <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
-                        <Brain className="w-8 h-8 text-amber-500" />
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.15)' }}>
+                        <Brain className="w-7 h-7" style={{ color: '#fcc824' }} />
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Setting up your coaches</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6 max-w-sm mx-auto">
-                        Your AI mindset coaches are loading. This takes just a moment.
-                      </p>
-                      <button
-                        onClick={() => setShowAgentBrowser(true)}
-                        className="px-5 py-2.5 bg-[#fcc824] text-black text-sm font-bold rounded-xl hover:bg-[#f5c200] transition-colors shadow-sm"
-                      >
+                      <h3 className="text-base font-bold mb-2" style={{ color: '#ededf5' }}>Setting up your coaches</h3>
+                      <p className="text-sm mb-5 max-w-xs mx-auto" style={{ color: '#9090a8' }}>Your AI mindset coaches are loading.</p>
+                      <button onClick={() => setShowAgentBrowser(true)} className="px-5 py-2.5 text-sm font-bold rounded-xl transition-colors" style={{ background: '#fcc824', color: '#09090f' }}>
                         Browse Agents
                       </button>
                     </div>
