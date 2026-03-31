@@ -9,7 +9,7 @@ export const MINDSET_AGENTS = {
     name: 'Mindset Score Agent',
     description: 'Your starting point — take the 5-question Mindset Score to reveal your weakest pillar and get your personalized roadmap.',
     icon: '📊',
-    color: 'bg-amber-500',
+    color: 'bg-amber-500',   // amber — flagship gold
     tags: ['popular', 'workflow'],
     popularity: 1500,
     releaseDate: '2026-01-01',
@@ -25,7 +25,7 @@ export const MINDSET_AGENTS = {
     name: 'Reset Guide',
     description: 'Your 48-Hour Mindset Reset facilitator — 6 guided exercises over a weekend that interrupt your reactive patterns.',
     icon: '🔄',
-    color: 'bg-cyan-500',
+    color: 'bg-sky-500',     // sky blue
     tags: ['popular', 'quick-win'],
     popularity: 1200,
     releaseDate: '2026-01-01',
@@ -41,7 +41,7 @@ export const MINDSET_AGENTS = {
     name: 'Architecture Coach',
     description: 'Your 90-day companion for the Mindset Architecture cohort — guides daily practice, tracks progress, prepares you for weekly calls.',
     icon: '🏗️',
-    color: 'bg-purple-500',
+    color: 'bg-violet-600',  // deep violet — premium
     tags: ['workflow', 'advanced'],
     popularity: 900,
     releaseDate: '2026-01-01',
@@ -73,7 +73,7 @@ export const MINDSET_AGENTS = {
     name: 'Story Excavator',
     description: 'Uncovers the 5-7 core stories that are actually running your decisions — inherited narratives from family, culture, and early experiences.',
     icon: '📖',
-    color: 'bg-orange-500',
+    color: 'bg-orange-600',  // deep orange
     tags: ['workflow', 'advanced'],
     popularity: 850,
     releaseDate: '2026-01-01',
@@ -89,7 +89,7 @@ export const MINDSET_AGENTS = {
     name: 'Launch Companion',
     description: "Greg's personal strategy assistant — call prep, cohort dashboards, content calendars, and platform insights.",
     icon: '🚀',
-    color: 'bg-gray-500',
+    color: 'bg-slate-600',   // slate — admin/internal
     tags: ['advanced'],
     popularity: 300,
     releaseDate: '2026-01-01',
@@ -105,7 +105,7 @@ export const MINDSET_AGENTS = {
     name: 'Accountability Partner',
     description: 'Your daily check-in companion — morning intentions, evening reflections, weekly reviews, and streak tracking.',
     icon: '✅',
-    color: 'bg-green-500',
+    color: 'bg-green-600',   // rich green
     tags: ['popular', 'workflow'],
     popularity: 1300,
     releaseDate: '2026-01-01',
@@ -121,7 +121,7 @@ export const MINDSET_AGENTS = {
     name: 'Conversation Curator',
     description: 'Your podcast matchmaker — recommends specific Mindset.Show episodes based on your current challenge.',
     icon: '🎧',
-    color: 'bg-teal-500',
+    color: 'bg-teal-500',    // teal
     tags: ['content'],
     popularity: 700,
     releaseDate: '2026-01-01',
@@ -137,7 +137,7 @@ export const MINDSET_AGENTS = {
     name: 'Decision Framework Agent',
     description: 'Real-time decision support using the DESIGN process — when pressure hits, this agent slows you down so you choose well.',
     icon: '🔀',
-    color: 'bg-blue-500',
+    color: 'bg-blue-600',    // blue
     tags: ['workflow', 'popular'],
     popularity: 1000,
     releaseDate: '2026-01-01',
@@ -169,7 +169,7 @@ export const MINDSET_AGENTS = {
     name: 'Goal Architect',
     description: 'Designs identity-driven goals with milestone maps and daily non-negotiables — goals that survive contact with real life.',
     icon: '🎯',
-    color: 'bg-yellow-500',
+    color: 'bg-yellow-500',  // yellow
     tags: ['popular', 'workflow'],
     popularity: 950,
     releaseDate: '2026-03-01',
@@ -185,7 +185,7 @@ export const MINDSET_AGENTS = {
     name: 'Belief Debugger',
     description: 'Surfaces the limiting beliefs running your decisions — gets the stack trace, not just the symptom.',
     icon: '🔍',
-    color: 'bg-violet-500',
+    color: 'bg-purple-600',  // purple (different from violet-600 arch coach)
     tags: ['workflow', 'advanced'],
     popularity: 880,
     releaseDate: '2026-03-01',
@@ -201,7 +201,7 @@ export const MINDSET_AGENTS = {
     name: 'Morning Ritual Builder',
     description: 'Designs a morning practice that fits your actual life — not a 5am fantasy that collapses in week two.',
     icon: '🌅',
-    color: 'bg-amber-400',
+    color: 'bg-rose-500',    // rose/sunrise (was amber-400 — too close to amber-500)
     tags: ['popular', 'quick-win'],
     popularity: 1050,
     releaseDate: '2026-03-01',
@@ -217,7 +217,7 @@ export const MINDSET_AGENTS = {
     name: 'Energy Optimizer',
     description: 'Maps your peak energy windows and protects them — stop spending your best hours on your worst tasks.',
     icon: '⚡',
-    color: 'bg-lime-500',
+    color: 'bg-lime-500',    // lime
     tags: ['performance', 'popular'],
     popularity: 920,
     releaseDate: '2026-03-01',
@@ -233,7 +233,7 @@ export const MINDSET_AGENTS = {
     name: 'Fear Processor',
     description: 'Processes the fear-based thinking blocking your next move so you can act with clarity instead of avoidance.',
     icon: '🔥',
-    color: 'bg-red-500',
+    color: 'bg-red-600',     // red
     tags: ['mindset', 'workflow'],
     popularity: 860,
     releaseDate: '2026-03-01',
@@ -249,7 +249,7 @@ export const MINDSET_AGENTS = {
     name: 'Relationship Architect',
     description: 'Audits your relationship portfolio and designs it intentionally — who gets your energy and what you need in return.',
     icon: '🤝',
-    color: 'bg-sky-500',
+    color: 'bg-cyan-500',    // cyan
     tags: ['mindset', 'advanced'],
     popularity: 720,
     releaseDate: '2026-03-01',
@@ -265,7 +265,7 @@ export const MINDSET_AGENTS = {
     name: 'Focus Trainer',
     description: 'Rebuilds your deep work capacity with training protocols — because focus is a skill that deteriorates without practice.',
     icon: '🎯',
-    color: 'bg-indigo-500',
+    color: 'bg-indigo-500',  // indigo
     tags: ['performance', 'popular'],
     popularity: 980,
     releaseDate: '2026-03-01',
@@ -281,7 +281,7 @@ export const MINDSET_AGENTS = {
     name: 'Values Clarifier',
     description: 'Surfaces your actual values — not the ones you inherited or wish you had — so your decisions finally feel right.',
     icon: '⚖️',
-    color: 'bg-fuchsia-500',
+    color: 'bg-fuchsia-600', // fuchsia/magenta
     tags: ['mindset', 'workflow'],
     popularity: 790,
     releaseDate: '2026-03-01',
@@ -297,7 +297,7 @@ export const MINDSET_AGENTS = {
     name: 'Transformation Tracker',
     description: 'Captures your mindset shifts and wins weekly so you can see how far you\'ve actually come.',
     icon: '📈',
-    color: 'bg-emerald-400',
+    color: 'bg-green-500',   // green (was emerald-400 — too close to emerald-500)
     tags: ['popular', 'workflow'],
     popularity: 830,
     releaseDate: '2026-03-01',
@@ -313,7 +313,7 @@ export const MINDSET_AGENTS = {
     name: 'Content Architect',
     description: 'Turns your mindset work and lived experience into content that attracts the right clients — without sounding like AI.',
     icon: '✍️',
-    color: 'bg-rose-500',
+    color: 'bg-orange-500',  // orange (was rose-500 — too close to new morning-ritual rose)
     tags: ['sales', 'popular'],
     popularity: 910,
     releaseDate: '2026-03-01',
