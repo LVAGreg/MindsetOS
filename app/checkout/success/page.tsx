@@ -1,12 +1,22 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { CheckCircle, ArrowRight, Sparkles, Users, BookOpen, Video, ExternalLink } from 'lucide-react';
+import posthog from 'posthog-js';
 
 const CIRCLE_URL = 'https://www.mindset.show/'; // TODO: Update with actual invite link
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const plan = searchParams.get('plan') || 'unknown';
+    try { posthog.capture('checkout_completed', { plan }); } catch {}
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -150,5 +160,15 @@ export default function CheckoutSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+import { Suspense } from 'react';
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }

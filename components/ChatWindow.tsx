@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
+import posthog from 'posthog-js';
 import { Send, Loader2, Sparkles, ChevronUp, ChevronDown, Square, Paperclip, X, FileText, Mic, ThumbsUp, ThumbsDown, Copy, Check, Edit2, RefreshCw, Phone, PanelRightOpen, BarChart2, ArrowRight } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
@@ -1833,6 +1834,8 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
       messageContent = `📎 ${documentIds.length} attachment(s) uploaded`;
     }
 
+    const isFirstMessage = messages.length === 0;
+
     const userMsg: MessageNode = {
       id: `msg_${Date.now()}_user`,
       role: 'user' as const,
@@ -1847,6 +1850,10 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
       editedAt: null,
     };
     addMessage(convId, userMsg);
+
+    if (isFirstMessage) {
+      try { posthog.capture('agent_first_message', { agent_slug: agentId }); } catch {}
+    }
 
     setIsLoading(true);
     setStreamingResponse(true);
