@@ -53,29 +53,38 @@ const COHORT_TYPE_LABELS: Record<CohortType, string> = {
 };
 
 const COHORT_TYPE_COLORS: Record<CohortType, string> = {
-  architecture_997: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
-  intensive_1997: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  architecture_997: '',
+  intensive_1997: '',
 };
 
-const STATUS_CONFIG: Record<CohortStatus, { label: string; color: string; icon: React.ReactNode }> = {
+const COHORT_TYPE_STYLES: Record<CohortType, React.CSSProperties> = {
+  architecture_997: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8', borderRadius: 9999 },
+  intensive_1997: { background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.3)', color: '#fb923c', borderRadius: 9999 },
+};
+
+const STATUS_CONFIG: Record<CohortStatus, { label: string; color: string; style: React.CSSProperties; icon: React.ReactNode }> = {
   upcoming: {
     label: 'Upcoming',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+    color: '',
+    style: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8', borderRadius: 9999 },
     icon: <Clock className="w-3 h-3" />,
   },
   active: {
     label: 'Active',
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+    color: '',
+    style: { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80', borderRadius: 9999 },
     icon: <CheckCircle className="w-3 h-3" />,
   },
   completed: {
     label: 'Completed',
-    color: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+    color: '',
+    style: { background: 'rgba(144,144,168,0.12)', border: '1px solid rgba(144,144,168,0.25)', color: '#9090a8', borderRadius: 9999 },
     icon: <CheckCircle className="w-3 h-3" />,
   },
   cancelled: {
     label: 'Cancelled',
-    color: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+    color: '',
+    style: { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', borderRadius: 9999 },
     icon: <XCircle className="w-3 h-3" />,
   },
 };
@@ -210,8 +219,8 @@ export default function AdminCohortsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cohorts</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Cohorts</h1>
+          <p className="mt-1" style={{ color: '#9090a8' }}>
             Manage 90-Day Mindset Architecture cohort enrollments
           </p>
         </div>
@@ -219,14 +228,15 @@ export default function AdminCohortsPage() {
           <button
             onClick={fetchCohorts}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             New Cohort
@@ -237,11 +247,10 @@ export default function AdminCohortsPage() {
       {/* Status Banner */}
       {statusMsg && (
         <div
-          className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-            statusMsg.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-              : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
-          }`}
+          className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all"
+          style={statusMsg.type === 'success'
+            ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }
+            : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
         >
           <div className="flex items-center gap-2">
             {statusMsg.type === 'success' ? (
@@ -259,50 +268,50 @@ export default function AdminCohortsPage() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
-              <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
+              <Calendar className="w-5 h-5" style={{ color: '#7b8ff8' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Cohorts</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{totalCohorts}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Cohorts</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{totalCohorts}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)' }}>
+              <CheckCircle className="w-5 h-5" style={{ color: '#4ade80' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Active Cohorts</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{activeCohorts}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Active Cohorts</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{activeCohorts}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
+              <Users className="w-5 h-5" style={{ color: '#7b8ff8' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Enrolled</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{totalEnrolled}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Enrolled</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{totalEnrolled}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)' }}>
+              <TrendingUp className="w-5 h-5" style={{ color: '#4ade80' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Revenue</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 {totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
               </p>
             </div>
@@ -312,13 +321,14 @@ export default function AdminCohortsPage() {
 
       {/* Create Cohort Modal */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="rounded-xl p-6 max-w-lg w-full shadow-2xl" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">New Cohort</h2>
+              <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>New Cohort</h2>
               <button
                 onClick={() => { setShowCreateForm(false); setForm(DEFAULT_FORM); }}
-                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -327,21 +337,21 @@ export default function AdminCohortsPage() {
             <div className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Cohort Name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
+                  Cohort Name <span style={{ color: '#f87171' }}>*</span>
                 </label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g., Spring 2026 Architecture"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                 />
               </div>
 
               {/* Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Cohort Type
                 </label>
                 <select
@@ -354,7 +364,7 @@ export default function AdminCohortsPage() {
                       price_cents: t === 'intensive_1997' ? 199700 : 99700,
                     });
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                 >
                   <option value="architecture_997">$997 Architecture (90-Day Group Cohort)</option>
                   <option value="intensive_1997">$1,997 Intensive (1:1 Add-on)</option>
@@ -364,25 +374,25 @@ export default function AdminCohortsPage() {
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Start Date <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
+                    Start Date <span style={{ color: '#f87171' }}>*</span>
                   </label>
                   <input
                     type="date"
                     value={form.start_date}
                     onChange={e => setForm({ ...form, start_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    End Date <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
+                    End Date <span style={{ color: '#f87171' }}>*</span>
                   </label>
                   <input
                     type="date"
                     value={form.end_date}
                     onChange={e => setForm({ ...form, end_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   />
                 </div>
               </div>
@@ -390,7 +400,7 @@ export default function AdminCohortsPage() {
               {/* Max Participants & Price */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Max Participants
                   </label>
                   <input
@@ -398,11 +408,11 @@ export default function AdminCohortsPage() {
                     min="1"
                     value={form.max_participants}
                     onChange={e => setForm({ ...form, max_participants: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Price (cents)
                   </label>
                   <input
@@ -411,9 +421,9 @@ export default function AdminCohortsPage() {
                     step="100"
                     value={form.price_cents}
                     onChange={e => setForm({ ...form, price_cents: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   />
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     = {(form.price_cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                   </p>
                 </div>
@@ -423,14 +433,15 @@ export default function AdminCohortsPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => { setShowCreateForm(false); setForm(DEFAULT_FORM); }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
               >
                 Cancel
               </button>
               <button
                 onClick={createCohort}
                 disabled={creating}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {creating ? (
                   <>
@@ -450,31 +461,32 @@ export default function AdminCohortsPage() {
       )}
 
       {/* Cohorts List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="font-semibold text-gray-900 dark:text-white">All Cohorts</h2>
+      <div className="rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-4" style={{ borderBottom: '1px solid #1e1e30' }}>
+          <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Cohorts</h2>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading cohorts...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f6ef7]"></div>
+            <p className="text-sm" style={{ color: '#9090a8' }}>Loading cohorts...</p>
           </div>
         ) : cohorts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col items-center justify-center py-16" style={{ color: '#9090a8' }}>
             <Calendar className="w-12 h-12 mb-3 opacity-30" />
             <p className="font-medium">No cohorts yet</p>
             <p className="text-sm mt-1">Create your first cohort to get started.</p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="mt-4 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="mt-4 text-sm hover:underline"
+              style={{ color: '#7b8ff8' }}
             >
               Create a cohort
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {cohorts.map(cohort => {
+          <div>
+            {cohorts.map((cohort, idx) => {
               const statusCfg = STATUS_CONFIG[cohort.status] || STATUS_CONFIG.upcoming;
               const fillPct = cohort.max_participants > 0
                 ? Math.min(100, Math.round((cohort.current_participants / cohort.max_participants) * 100))
@@ -484,61 +496,56 @@ export default function AdminCohortsPage() {
               return (
                 <div
                   key={cohort.id}
-                  className="p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
+                  className="p-4 sm:p-5 transition-colors"
+                  style={idx < cohorts.length - 1 ? { borderBottom: '1px solid #1e1e30' } : undefined}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                     {/* Left: info */}
                     <div className="flex-1 min-w-0 space-y-2">
                       {/* Name + badges */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                        <h3 className="text-base font-semibold truncate" style={{ color: '#ededf5' }}>
                           {cohort.name}
                         </h3>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${COHORT_TYPE_COLORS[cohort.cohort_type]}`}>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium" style={COHORT_TYPE_STYLES[cohort.cohort_type]}>
                           {COHORT_TYPE_LABELS[cohort.cohort_type]}
                         </span>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${statusCfg.color}`}>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium" style={statusCfg.style}>
                           {statusCfg.icon}
                           {statusCfg.label}
                         </span>
                       </div>
 
                       {/* Dates */}
-                      <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-1.5 text-sm" style={{ color: '#7b8ff8' }}>
                         <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{formatDate(cohort.start_date)} – {formatDate(cohort.end_date)}</span>
                       </div>
 
                       {/* Participants + progress bar */}
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-2 text-sm" style={{ color: '#9090a8' }}>
                           <Users className="w-3.5 h-3.5 flex-shrink-0" />
                           <span>
                             {cohort.current_participants} / {cohort.max_participants} participants
                           </span>
-                          <span className="text-gray-400 dark:text-gray-500">({fillPct}%)</span>
+                          <span style={{ color: '#9090a8' }}>({fillPct}%)</span>
                         </div>
-                        <div className="w-full max-w-xs h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div className="w-full max-w-xs h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(30,30,48,0.8)' }}>
                           <div
-                            className={`h-full rounded-full transition-all ${
-                              fillPct >= 100
-                                ? 'bg-green-500'
-                                : fillPct >= 70
-                                ? 'bg-indigo-500'
-                                : 'bg-indigo-400'
-                            }`}
-                            style={{ width: `${fillPct}%` }}
+                            className="h-full rounded-full transition-all"
+                            style={{ width: `${fillPct}%`, background: '#4f6ef7' }}
                           />
                         </div>
                       </div>
 
                       {/* Revenue */}
-                      <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <TrendingUp className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-sm font-medium" style={{ color: '#ededf5' }}>
+                        <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#4ade80' }} />
                         <span>
                           {formatRevenue(cohort.price_cents, cohort.current_participants)} revenue
                         </span>
-                        <span className="text-gray-400 dark:text-gray-500 font-normal">
+                        <span className="font-normal" style={{ color: '#9090a8' }}>
                           ({(cohort.price_cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })} × {cohort.current_participants})
                         </span>
                       </div>
@@ -548,7 +555,8 @@ export default function AdminCohortsPage() {
                     <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-2 flex-shrink-0">
                       <Link
                         href={`/admin/cohorts/${cohort.id}/enrollments`}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }}
                       >
                         <Users className="w-3.5 h-3.5" />
                         View Enrollments
@@ -558,7 +566,8 @@ export default function AdminCohortsPage() {
                         <button
                           onClick={() => patchStatus(cohort, 'active')}
                           disabled={isPatching}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                          style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
                         >
                           {isPatching ? (
                             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -573,7 +582,8 @@ export default function AdminCohortsPage() {
                         <button
                           onClick={() => patchStatus(cohort, 'completed')}
                           disabled={isPatching}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                          style={{ background: 'rgba(144,144,168,0.12)', border: '1px solid rgba(144,144,168,0.2)', color: '#9090a8' }}
                         >
                           {isPatching ? (
                             <RefreshCw className="w-3.5 h-3.5 animate-spin" />

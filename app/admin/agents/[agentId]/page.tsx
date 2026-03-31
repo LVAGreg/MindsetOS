@@ -83,7 +83,6 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
 
   async function loadAgent() {
     try {
-      // Load agent data
       const token = localStorage.getItem('accessToken');
       const res = await fetch(`${API_URL}/api/admin/agents/${params.agentId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -112,16 +111,13 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
       setColor(agentData.color || agentData.accent_color || '#3B82F6');
       setSortOrder(agentData.sort_order || 0);
 
-      // Load conversation starters from metadata
       const starters = agentData.metadata?.conversationStarters || [];
       setConversationStarter1(starters[0] || '');
       setConversationStarter2(starters[1] || '');
       setConversationStarter3(starters[2] || '');
 
-      // Load allowed roles
       setAllowedRoles(agentData.allowed_roles || ['admin', 'power_user', 'user']);
 
-      // Load available AI models
       const modelsRes = await fetch(`${API_URL}/api/admin/ai-models`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -134,7 +130,6 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
         setAvailableModels(modelsRecord);
       }
 
-      // Load knowledge base files for this agent
       await loadKnowledgeFiles();
     } catch (err: any) {
       console.error('❌ Load agent error:', err);
@@ -146,22 +141,14 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
 
   async function loadKnowledgeFiles() {
     try {
-      console.log('📚 [KNOWLEDGE] Loading knowledge files for agent:', params.agentId);
       const token = localStorage.getItem('accessToken');
       const res = await fetch(`${API_URL}/api/knowledge-base?agent_id=${params.agentId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      console.log('📚 [KNOWLEDGE] Response status:', res.status);
 
       if (res.ok) {
         const data = await res.json();
-        console.log('📚 [KNOWLEDGE] Loaded documents:', data.documents?.length || 0);
         setKnowledgeFiles(data.documents || []);
-      } else {
-        console.error('📚 [KNOWLEDGE] Failed to load:', res.status);
       }
     } catch (err) {
       console.error('📚 [KNOWLEDGE] Error loading knowledge files:', err);
@@ -178,7 +165,6 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
     setSuccessMessage(null);
 
     try {
-      console.log('📤 [UPLOAD] Starting upload:', file.name);
       const formData = new FormData();
       formData.append('file', file);
       formData.append('title', file.name);
@@ -188,13 +174,9 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
       const token = localStorage.getItem('accessToken');
       const res = await fetch(`${API_URL}/api/knowledge-base/upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
-
-      console.log('📥 [UPLOAD] Response status:', res.status);
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ error: 'Upload failed' }));
@@ -202,22 +184,11 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
       }
 
       const data = await res.json();
-      console.log('✅ [UPLOAD] Success:', data);
-
       setSuccessMessage(`✅ Successfully uploaded "${file.name}" - ${data.chunks_processed} chunks processed, ${data.total_chars} characters`);
-
-      // Reload knowledge files
-      console.log('🔄 [UPLOAD] Reloading knowledge files...');
       await loadKnowledgeFiles();
-      console.log('✅ [UPLOAD] Knowledge files reloaded');
-
-      // Reset file input
       e.target.value = '';
-
-      // Clear success message after 10 seconds
       setTimeout(() => setSuccessMessage(null), 10000);
     } catch (err: any) {
-      console.error('❌ [UPLOAD] Error:', err);
       setError(err.message || 'Failed to upload file');
     } finally {
       setUploadingFile(false);
@@ -232,14 +203,10 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
       const token = localStorage.getItem('accessToken');
       const res = await fetch(`${API_URL}/api/knowledge-base/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      if (!res.ok) {
-        throw new Error('Delete failed');
-      }
+      if (!res.ok) throw new Error('Delete failed');
 
       setSuccessMessage('Knowledge document deleted');
       await loadKnowledgeFiles();
@@ -254,7 +221,6 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
     setSuccessMessage(null);
 
     try {
-      // Build conversation starters array, filtering out empty strings
       const conversationStarters = [
         conversationStarter1,
         conversationStarter2,
@@ -296,8 +262,6 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
       const data = await res.json();
       setAgent(data.agent);
       setSuccessMessage('✅ Agent updated successfully! Changes are now live.');
-
-      // Clear success message after 5 seconds
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: any) {
       console.error('❌ Save agent error:', err);
@@ -309,34 +273,39 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-gray-600 dark:text-gray-400">Loading agent...</div>
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
+        <div className="text-lg" style={{ color: '#9090a8' }}>Loading agent...</div>
       </div>
     );
   }
 
   if (error && !agent) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-red-600">Error: {error}</div>
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
+        <div className="text-lg text-red-400">Error: {error}</div>
       </div>
     );
   }
 
+  // Shared input class
+  const inputClass = "w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]";
+  const selectClass = "w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       <div className="max-w-4xl">
         {/* Header */}
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Agent</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>Edit Agent</h1>
+            <p className="mt-2 text-sm" style={{ color: '#9090a8' }}>
               Modify agent configuration and system prompt
             </p>
           </div>
           <Link
             href="/admin/agents"
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+            style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#ededf5' }}
           >
             ← Back to Agents
           </Link>
@@ -344,98 +313,98 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-800 font-medium">{successMessage}</p>
+          <div className="mb-6 rounded-xl p-4" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)' }}>
+            <p className="font-medium" style={{ color: '#4ade80' }}>{successMessage}</p>
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800 font-medium">Error: {error}</p>
+          <div className="mb-6 rounded-xl p-4" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <p className="font-medium" style={{ color: '#f87171' }}>Error: {error}</p>
           </div>
         )}
 
         {/* Agent Info Card */}
         {agent && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="mb-6 rounded-xl p-4" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium text-blue-900">Agent ID:</span>
-                <span className="ml-2 text-blue-800 font-mono">{agent.id}</span>
+                <span className="font-medium" style={{ color: '#ededf5' }}>Agent ID:</span>
+                <span className="ml-2 font-mono" style={{ color: '#7b8ff8' }}>{agent.id}</span>
               </div>
               <div>
-                <span className="font-medium text-blue-900">Category:</span>
-                <span className="ml-2 text-blue-800">{agent.category}</span>
+                <span className="font-medium" style={{ color: '#ededf5' }}>Category:</span>
+                <span className="ml-2" style={{ color: '#9090a8' }}>{agent.category}</span>
               </div>
               <div>
-                <span className="font-medium text-blue-900">Created:</span>
-                <span className="ml-2 text-blue-800">{new Date(agent.created_at).toLocaleString()}</span>
+                <span className="font-medium" style={{ color: '#ededf5' }}>Created:</span>
+                <span className="ml-2" style={{ color: '#9090a8' }}>{new Date(agent.created_at).toLocaleString()}</span>
               </div>
               <div>
-                <span className="font-medium text-blue-900">Last Updated:</span>
-                <span className="ml-2 text-blue-800">{new Date(agent.updated_at).toLocaleString()}</span>
+                <span className="font-medium" style={{ color: '#ededf5' }}>Last Updated:</span>
+                <span className="ml-2" style={{ color: '#9090a8' }}>{new Date(agent.updated_at).toLocaleString()}</span>
               </div>
             </div>
           </div>
         )}
 
         {/* Edit Form */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-6">
+        <div className="rounded-2xl p-6 space-y-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           {/* Basic Information */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>Basic Information</h2>
 
             <div className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Agent Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="e.g., Mindset Score Agent"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Description
                 </label>
                 <input
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="Brief description of what this agent does"
                 />
               </div>
 
               {/* Sort Order */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Display Order
                 </label>
                 <input
                   type="number"
                   value={sortOrder}
                   onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="0"
                   min="0"
                 />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Controls the order this agent appears in the Browse Agents list (lower numbers appear first)
                 </p>
               </div>
 
               {/* Agent Color */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Agent Color
                 </label>
                 <div className="flex items-center gap-3">
@@ -443,7 +412,8 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="h-10 w-20 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600"
+                    className="h-10 w-20 rounded-xl cursor-pointer"
+                    style={{ border: '1px solid #1e1e30', background: '#09090f' }}
                   />
                   <input
                     type="text"
@@ -454,16 +424,16 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                         setColor(hex);
                       }
                     }}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono uppercase"
+                    className="flex-1 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7] uppercase"
                     placeholder="#3B82F6"
                     maxLength={7}
                   />
                   <div
-                    className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 shadow-sm"
-                    style={{ backgroundColor: color }}
+                    className="w-10 h-10 rounded-xl shadow-sm"
+                    style={{ backgroundColor: color, border: '1px solid #1e1e30' }}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   This color will be used for the agent's icon, borders, and UI accents
                 </p>
               </div>
@@ -475,16 +445,17 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                  className="h-4 w-4 rounded"
+                  style={{ accentColor: '#4f6ef7' }}
                 />
-                <label htmlFor="isActive" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label htmlFor="isActive" className="ml-2 block text-sm font-medium" style={{ color: '#9090a8' }}>
                   Active (available for users to select)
                 </label>
               </div>
 
               {/* Allowed Roles */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   Access Control (Who can see this agent?)
                 </label>
                 <div className="flex flex-wrap gap-4">
@@ -505,95 +476,99 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                             setAllowedRoles(allowedRoles.filter(r => r !== role.value));
                           }
                         }}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                        className="h-4 w-4 rounded"
+                        style={{ accentColor: '#4f6ef7' }}
                       />
-                      <label htmlFor={`role-${role.value}`} className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      <label htmlFor={`role-${role.value}`} className="ml-2 text-sm" style={{ color: '#9090a8' }}>
                         {role.label}
                       </label>
                     </div>
                   ))}
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Select which user roles can access this agent. Uncheck all to make it admin-only.
                 </p>
               </div>
             </div>
           </div>
 
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #1e1e30' }} />
+
           {/* Conversation Starters */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Conversation Starters</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>Conversation Starters</h2>
+            <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
               Add up to 3 suggested conversation starters that users can click to begin chatting with this agent.
             </p>
 
             <div className="space-y-3">
-              {/* Starter 1 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Conversation Starter 1
                 </label>
                 <input
                   type="text"
                   value={conversationStarter1}
                   onChange={(e) => setConversationStarter1(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="e.g., Help me take my Mindset Score"
                 />
               </div>
 
-              {/* Starter 2 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Conversation Starter 2 (Optional)
                 </label>
                 <input
                   type="text"
                   value={conversationStarter2}
                   onChange={(e) => setConversationStarter2(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="e.g., What's the fastest way to validate my offer?"
                 />
               </div>
 
-              {/* Starter 3 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Conversation Starter 3 (Optional)
                 </label>
                 <input
                   type="text"
                   value={conversationStarter3}
                   onChange={(e) => setConversationStarter3(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                   placeholder="e.g., How do I price my services?"
                 />
               </div>
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs mt-2" style={{ color: '#9090a8' }}>
                 💡 Keep them short, specific, and action-oriented. These appear as clickable buttons when users start a new chat.
               </p>
             </div>
           </div>
 
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #1e1e30' }} />
+
           {/* AI Configuration */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">AI Configuration</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>AI Configuration</h2>
 
             <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
                 💡 Model overrides allow this agent to use different models for specific operations. Leave blank to use system defaults.
               </p>
 
               {/* Chat Model Override */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Chat Model Override (optional)
                 </label>
                 <select
                   value={chatModel}
                   onChange={(e) => setChatModel(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={selectClass}
                 >
                   <option value="">Use default (Claude Sonnet 4.5)</option>
                   {Object.entries(availableModels).map(([modelId, model]) => (
@@ -602,20 +577,20 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Model used for main chat conversations
                 </p>
               </div>
 
               {/* Memory Model Override */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Memory Extraction Model Override (optional)
                 </label>
                 <select
                   value={memoryModel}
                   onChange={(e) => setMemoryModel(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={selectClass}
                 >
                   <option value="">Use system default (Claude Haiku 4.5)</option>
                   {Object.entries(availableModels).map(([modelId, model]) => (
@@ -624,20 +599,20 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Model used for extracting user information from conversations
                 </p>
               </div>
 
               {/* Widget Model Override */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Widget Formatting Model Override (optional)
                 </label>
                 <select
                   value={widgetModel}
                   onChange={(e) => setWidgetModel(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={selectClass}
                 >
                   <option value="">Use system default (Claude Haiku 4.5)</option>
                   {Object.entries(availableModels).map(([modelId, model]) => (
@@ -646,14 +621,14 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Model used for detecting and formatting interactive widgets
                 </p>
               </div>
 
               {/* Max Tokens */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Max Tokens
                 </label>
                 <input
@@ -663,16 +638,16 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                   min="100"
                   max="32000"
                   step="100"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={inputClass}
                 />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Maximum length of AI responses (100-32000)
                 </p>
               </div>
 
               {/* Temperature */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Temperature: {temperature.toFixed(1)}
                 </label>
                 <input
@@ -682,31 +657,38 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                   min="0"
                   max="2"
                   step="0.1"
-                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style={{ background: '#1e1e30', accentColor: '#4f6ef7' }}
                 />
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <div className="flex justify-between text-xs mt-1" style={{ color: '#9090a8' }}>
                   <span>0.0 (Focused)</span>
                   <span>1.0 (Balanced)</span>
                   <span>2.0 (Creative)</span>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                   Controls randomness in responses. Lower = more focused, Higher = more creative
                 </p>
               </div>
             </div>
           </div>
 
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #1e1e30' }} />
+
           {/* Knowledge Base */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Knowledge Base</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>Knowledge Base</h2>
 
             <div className="space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
                 📚 Upload documents to give this agent specific knowledge. Supports PDF, DOCX, TXT, MD files.
               </p>
 
               {/* Upload Section */}
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+              <div
+                className="rounded-xl p-6 text-center transition-colors"
+                style={{ border: '2px dashed #1e1e30', background: 'rgba(0,0,0,0.2)' }}
+              >
                 <input
                   type="file"
                   id="knowledge-upload"
@@ -721,16 +703,16 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                 >
                   {uploadingFile ? (
                     <>
-                      <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Uploading and processing...</p>
+                      <Loader2 className="w-12 h-12 animate-spin" style={{ color: '#4f6ef7' }} />
+                      <p className="text-sm" style={{ color: '#9090a8' }}>Uploading and processing...</p>
                     </>
                   ) : (
                     <>
-                      <Upload className="w-12 h-12 text-gray-400 dark:text-gray-500" />
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Upload className="w-12 h-12" style={{ color: '#9090a8' }} />
+                      <p className="text-sm font-medium" style={{ color: '#ededf5' }}>
                         Click to upload or drag and drop
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs" style={{ color: '#9090a8' }}>
                         PDF, DOCX, TXT, MD up to 10MB
                       </p>
                     </>
@@ -741,32 +723,33 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
               {/* Uploaded Files List */}
               {knowledgeFiles.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <h3 className="text-sm font-medium" style={{ color: '#ededf5' }}>
                     Uploaded Documents ({knowledgeFiles.length})
                   </h3>
                   <div className="space-y-2">
                     {knowledgeFiles.map((file) => (
                       <div
                         key={file.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        className="flex items-center justify-between p-3 rounded-xl"
+                        style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid #1e1e30' }}
                       >
                         <div className="flex items-center gap-3">
-                          <File className="w-5 h-5 text-blue-500" />
+                          <File className="w-5 h-5" style={{ color: '#7b8ff8' }} />
                           <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            <p className="text-sm font-medium" style={{ color: '#ededf5' }}>
                               {file.title}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs" style={{ color: '#9090a8' }}>
                               {new Date(file.created_at).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => handleDeleteKnowledge(file.id)}
-                          className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                          className="p-1 rounded-md transition-colors"
                           title="Delete document"
                         >
-                          <X className="w-4 h-4 text-red-500" />
+                          <X className="w-4 h-4 text-red-400" />
                         </button>
                       </div>
                     ))}
@@ -776,16 +759,19 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
             </div>
           </div>
 
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #1e1e30' }} />
+
           {/* System Prompt */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">System Prompt</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>System Prompt</h2>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium" style={{ color: '#9090a8' }}>
                   Agent Instructions
                 </label>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs" style={{ color: '#9090a8' }}>
                   {systemPrompt.length} characters
                 </span>
               </div>
@@ -794,27 +780,31 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                 value={systemPrompt}
                 onChange={(e) => setSystemPrompt(e.target.value)}
                 rows={20}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
+                style={{ background: 'rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
                 placeholder="Enter the system prompt that defines this agent's behavior, personality, and expertise..."
               />
 
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs" style={{ color: '#9090a8' }}>
                 💡 This prompt defines the agent's personality, expertise, and how it responds to users.
                 Use Greg's warm, conversational, expert voice. No AI disclaimers or robotic language.
               </p>
             </div>
           </div>
 
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #1e1e30' }} />
+
           {/* Behavior Suffix */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Behavior Suffix (Optional)</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: '#ededf5' }}>Behavior Suffix (Optional)</h2>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium" style={{ color: '#9090a8' }}>
                   Additional Instructions Appended to System Prompt
                 </label>
-                <span className={`text-xs ${behaviorSuffix.length > 2000 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                <span className="text-xs" style={{ color: behaviorSuffix.length > 2000 ? '#f87171' : '#9090a8' }}>
                   {behaviorSuffix.length} / 2000 characters
                 </span>
               </div>
@@ -824,24 +814,25 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                 onChange={(e) => setBehaviorSuffix(e.target.value)}
                 rows={10}
                 maxLength={2000}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
+                style={{ background: 'rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
                 placeholder="Optional: Enter additional instructions that will be appended to the system prompt at runtime..."
               />
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                <p className="text-xs text-blue-800 dark:text-blue-300">
-                  <strong>💡 Use Case:</strong> This suffix is dynamically appended to the system prompt when the agent responds.
+              <div className="rounded-xl p-3" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}>
+                <p className="text-xs" style={{ color: '#9090a8' }}>
+                  <strong style={{ color: '#ededf5' }}>💡 Use Case:</strong> This suffix is dynamically appended to the system prompt when the agent responds.
                   Perfect for adding user-specific context like brand voice guidelines, writing style preferences, or personalization
                   instructions that should apply to all responses without modifying the core system prompt.
                 </p>
-                <p className="text-xs text-blue-700 dark:text-blue-400 mt-2">
-                  <strong>Example:</strong> "Always write in a warm, conversational tone matching the user's energy level.
+                <p className="text-xs mt-2" style={{ color: '#9090a8' }}>
+                  <strong style={{ color: '#ededf5' }}>Example:</strong> "Always write in a warm, conversational tone matching the user's energy level.
                   Use their preferred terminology: [specific terms]. Keep responses concise but actionable."
                 </p>
               </div>
 
               {behaviorSuffix.length > 2000 && (
-                <p className="text-xs text-red-600 dark:text-red-400">
+                <p className="text-xs" style={{ color: '#f87171' }}>
                   ⚠️ Behavior suffix exceeds maximum length of 2000 characters. Please shorten your input.
                 </p>
               )}
@@ -849,22 +840,19 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-4 pt-4" style={{ borderTop: '1px solid #1e1e30' }}>
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex-1 px-6 py-3 rounded-lg font-medium text-white ${
-                saving
-                  ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
+              className="flex-1 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50"
             >
               {saving ? 'Saving Changes...' : 'Save Changes'}
             </button>
 
             <Link
               href="/admin/agents"
-              className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
             >
               Cancel
             </Link>
@@ -872,9 +860,9 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
         </div>
 
         {/* Help Card */}
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-yellow-900 mb-2">⚠️ Important Notes</h3>
-          <ul className="text-xs text-yellow-800 space-y-1 list-disc list-inside">
+        <div className="mt-6 rounded-xl p-4" style={{ background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)' }}>
+          <h3 className="text-sm font-semibold mb-2" style={{ color: '#fbbf24' }}>⚠️ Important Notes</h3>
+          <ul className="text-xs space-y-1 list-disc list-inside" style={{ color: '#9090a8' }}>
             <li>Changes take effect immediately for all new conversations</li>
             <li>System prompt should use Greg's warm, conversational expert voice</li>
             <li>Avoid AI disclaimers like "As an AI assistant..."</li>

@@ -6,11 +6,11 @@ import { TrendingUp, Save, CheckCircle } from 'lucide-react';
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
 
 const CLAPS_FIELDS = [
-  { key: 'connections',   label: 'Connections',   letter: 'C', barColor: 'bg-blue-400',   letterColor: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
-  { key: 'leads',         label: 'Leads',         letter: 'L', barColor: 'bg-purple-400', letterColor: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
-  { key: 'appointments',  label: 'Appointments',  letter: 'A', barColor: 'bg-indigo-400', letterColor: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' },
-  { key: 'presentations', label: 'Presentations', letter: 'P', barColor: 'bg-orange-400', letterColor: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' },
-  { key: 'sales',         label: 'Sales',         letter: 'S', barColor: 'bg-green-500',  letterColor: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' },
+  { key: 'connections',   label: 'Connections',   letter: 'C', barColor: '#60a5fa', letterBg: 'rgba(96,165,250,0.15)',  letterColor: '#93c5fd' },
+  { key: 'leads',         label: 'Leads',         letter: 'L', barColor: '#a78bfa', letterBg: 'rgba(167,139,250,0.15)', letterColor: '#c4b5fd' },
+  { key: 'appointments',  label: 'Appointments',  letter: 'A', barColor: '#818cf8', letterBg: 'rgba(129,140,248,0.15)', letterColor: '#a5b4fc' },
+  { key: 'presentations', label: 'Presentations', letter: 'P', barColor: '#fbbf24', letterBg: 'rgba(251,191,36,0.15)',  letterColor: '#fde68a' },
+  { key: 'sales',         label: 'Sales',         letter: 'S', barColor: '#4ade80', letterBg: 'rgba(74,222,128,0.15)', letterColor: '#86efac' },
 ] as const;
 
 type ClapsKey = 'connections' | 'leads' | 'appointments' | 'presentations' | 'sales';
@@ -112,7 +112,7 @@ export default function ClapsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#4f6ef7' }} />
       </div>
     );
   }
@@ -120,26 +120,26 @@ export default function ClapsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <TrendingUp className="w-7 h-7 text-indigo-500" />
+        <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: '#ededf5' }}>
+          <TrendingUp className="w-7 h-7" style={{ color: '#818cf8' }} />
           CLAPS Tracker
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm mt-1" style={{ color: '#9090a8' }}>
           Connections · Leads · Appointments · Presentations · Sales
         </p>
       </div>
 
       {/* Current Week */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">This week</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Week of {formatWeek(current.week_start)}</p>
+            <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>This week</h2>
+            <p className="text-sm" style={{ color: '#9090a8' }}>Week of {formatWeek(current.week_start)}</p>
           </div>
           {convRate > 0 && (
             <div className="text-right">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{convRate}%</div>
-              <div className="text-xs text-gray-400">lead → sale</div>
+              <div className="text-2xl font-bold" style={{ color: '#4ade80' }}>{convRate}%</div>
+              <div className="text-xs" style={{ color: '#9090a8' }}>lead → sale</div>
             </div>
           )}
         </div>
@@ -148,14 +148,17 @@ export default function ClapsPage() {
           {CLAPS_FIELDS.map(f => (
             <div key={f.key}>
               <div className="flex items-center gap-2 mb-1">
-                <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold ${f.letterColor}`}>{f.letter}</span>
-                <label className="text-xs font-medium text-gray-600 dark:text-gray-400">{f.label}</label>
+                <span
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold"
+                  style={{ background: f.letterBg, color: f.letterColor }}
+                >{f.letter}</span>
+                <label className="text-xs font-medium" style={{ color: '#9090a8' }}>{f.label}</label>
               </div>
               <input
                 type="number" min={0}
                 value={current[f.key as ClapsKey]}
                 onChange={e => update(f.key as ClapsKey, parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 text-lg font-bold text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-lg font-bold text-center bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
               />
             </div>
           ))}
@@ -163,27 +166,28 @@ export default function ClapsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Revenue this week ($)</label>
+            <label className="block text-xs font-medium mb-1" style={{ color: '#9090a8' }}>Revenue this week ($)</label>
             <input
               type="number" min={0} step={0.01} value={current.revenue}
               onChange={e => update('revenue', parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notes</label>
+            <label className="block text-xs font-medium mb-1" style={{ color: '#9090a8' }}>Notes</label>
             <input
               type="text" value={current.notes}
               onChange={e => update('notes', e.target.value)}
               placeholder="What moved this week?"
-              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
             />
           </div>
         </div>
 
         <button
           onClick={handleSave} disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl disabled:opacity-50 transition-opacity hover:opacity-80"
+          style={{ background: '#4f6ef7', color: '#fff' }}
         >
           {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save this week'}
@@ -192,12 +196,12 @@ export default function ClapsPage() {
 
       {/* Trend Chart */}
       {history.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">8-Week Trend</h2>
+        <div className="p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <h2 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>8-Week Trend</h2>
           <div className="flex items-center gap-4 mb-5 flex-wrap">
             {CLAPS_FIELDS.map(f => (
-              <div key={f.key} className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                <div className={`w-3 h-3 rounded ${f.barColor}`} />
+              <div key={f.key} className="flex items-center gap-1.5 text-xs" style={{ color: '#9090a8' }}>
+                <div className="w-3 h-3 rounded" style={{ background: f.barColor }} />
                 {f.label}
               </div>
             ))}
@@ -212,17 +216,20 @@ export default function ClapsPage() {
                     return (
                       <div key={f.key} className="relative group flex-1">
                         <div
-                          className={`w-full rounded-t ${f.barColor}`}
-                          style={{ height: `${Math.max(pct, val > 0 ? 4 : 0)}%` }}
+                          className="w-full rounded-t"
+                          style={{ height: `${Math.max(pct, val > 0 ? 4 : 0)}%`, background: f.barColor }}
                         />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-900 text-white text-xs rounded px-1.5 py-0.5 whitespace-nowrap z-10">
+                        <div
+                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block text-xs rounded px-1.5 py-0.5 whitespace-nowrap z-10"
+                          style={{ background: '#1e1e30', color: '#ededf5', border: '1px solid #1e1e30' }}
+                        >
                           {f.label}: {val}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                <div className="text-xs text-gray-400 text-center">{formatWeek(row.week_start)}</div>
+                <div className="text-xs text-center" style={{ color: '#9090a8' }}>{formatWeek(row.week_start)}</div>
               </div>
             ))}
           </div>
@@ -231,38 +238,44 @@ export default function ClapsPage() {
 
       {/* History Table */}
       {history.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">History</h2>
+        <div className="overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-5" style={{ borderBottom: '1px solid #1e1e30' }}>
+            <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>History</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900/40 border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Week</th>
+                <tr style={{ background: 'rgba(9,9,15,0.6)', borderBottom: '1px solid #1e1e30' }}>
+                  <th className="text-left px-4 py-3 font-medium" style={{ color: '#9090a8' }}>Week</th>
                   {CLAPS_FIELDS.map(f => (
-                    <th key={f.key} className="text-center px-3 py-3 font-medium text-gray-500 dark:text-gray-400">{f.letter}</th>
+                    <th key={f.key} className="text-center px-3 py-3 font-medium" style={{ color: f.letterColor }}>{f.letter}</th>
                   ))}
-                  <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Revenue</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Notes</th>
+                  <th className="text-right px-4 py-3 font-medium" style={{ color: '#9090a8' }}>Revenue</th>
+                  <th className="text-left px-4 py-3 font-medium" style={{ color: '#9090a8' }}>Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
+              <tbody>
                 {history.map((row, i) => (
-                  <tr key={row.week_start} className={`hover:bg-gray-50 dark:hover:bg-gray-700/20 ${i === 0 ? 'font-medium' : ''}`}>
-                    <td className="px-4 py-3 text-gray-900 dark:text-white whitespace-nowrap">
+                  <tr
+                    key={row.week_start}
+                    className={i === 0 ? 'font-medium' : ''}
+                    style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap" style={{ color: '#ededf5' }}>
                       {formatWeek(row.week_start)}
-                      {i === 0 && <span className="ml-2 text-xs text-indigo-500 font-normal">current</span>}
+                      {i === 0 && <span className="ml-2 text-xs font-normal" style={{ color: '#818cf8' }}>current</span>}
                     </td>
                     {CLAPS_FIELDS.map(f => (
-                      <td key={f.key} className="px-3 py-3 text-center text-gray-700 dark:text-gray-300">
+                      <td key={f.key} className="px-3 py-3 text-center" style={{ color: '#ededf5' }}>
                         {Number(row[f.key as ClapsKey]) || 0}
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">
+                    <td className="px-4 py-3 text-right" style={{ color: '#ededf5' }}>
                       {row.revenue ? `$${Number(row.revenue).toLocaleString()}` : '—'}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                    <td className="px-4 py-3 max-w-xs truncate" style={{ color: '#9090a8' }}>
                       {row.notes || '—'}
                     </td>
                   </tr>
@@ -272,7 +285,10 @@ export default function ClapsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center h-32 text-gray-400 dark:text-gray-500">
+        <div
+          className="flex flex-col items-center justify-center h-32"
+          style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16, color: '#9090a8' }}
+        >
           <TrendingUp className="w-8 h-8 mb-2 opacity-40" />
           <p className="text-sm">Save your first week to start tracking</p>
         </div>

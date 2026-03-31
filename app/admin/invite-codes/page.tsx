@@ -146,27 +146,43 @@ export default function AdminInviteCodesPage() {
 
   const getStatusBadge = (code: InviteCode) => {
     if (!code.is_active) {
-      return <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Disabled</span>;
+      return (
+        <span className="px-2 py-0.5 text-xs font-medium rounded" style={{ background: 'rgba(144,144,168,0.15)', color: '#9090a8' }}>
+          Disabled
+        </span>
+      );
     }
     if (isExpired(code.expires_at)) {
-      return <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">Expired</span>;
+      return (
+        <span className="px-2 py-0.5 text-xs font-medium rounded" style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
+          Expired
+        </span>
+      );
     }
     if (isExhausted(code)) {
-      return <span className="px-2 py-0.5 text-xs font-medium rounded bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400">Maxed Out</span>;
+      return (
+        <span className="px-2 py-0.5 text-xs font-medium rounded" style={{ background: 'rgba(251,146,60,0.15)', color: '#fb923c' }}>
+          Maxed Out
+        </span>
+      );
     }
-    return <span className="px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">Active</span>;
+    return (
+      <span className="px-2 py-0.5 text-xs font-medium rounded" style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80' }}>
+        Active
+      </span>
+    );
   };
 
   const activeCount = inviteCodes.filter(c => c.is_active && !isExpired(c.expires_at) && !isExhausted(c)).length;
   const totalUses = inviteCodes.reduce((sum, c) => sum + c.uses_count, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invite Codes</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Invite Codes</h1>
+          <p className="mt-1" style={{ color: '#9090a8' }}>
             Manage registration access with invite codes
           </p>
         </div>
@@ -174,15 +190,15 @@ export default function AdminInviteCodesPage() {
           <button
             onClick={fetchInviteCodes}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl transition-colors text-sm font-medium"
+            style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="flex items-center gap-2 px-4 py-2 text-black rounded-lg transition-colors"
-            style={{ backgroundColor: '#fcc824' }}
+            className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Create Code
@@ -193,11 +209,12 @@ export default function AdminInviteCodesPage() {
       {/* Inline Status Banner */}
       {statusMsg && (
         <div
-          className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+          className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all"
+          style={
             statusMsg.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-              : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
-          }`}
+              ? { background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }
+              : { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }
+          }
         >
           <div className="flex items-center gap-2">
             {statusMsg.type === 'success' ? (
@@ -207,7 +224,7 @@ export default function AdminInviteCodesPage() {
             )}
             {statusMsg.text}
           </div>
-          <button onClick={() => setStatusMsg(null)} className="hover:opacity-70">
+          <button onClick={() => setStatusMsg(null)} className="hover:opacity-70" style={{ color: 'inherit' }}>
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -215,36 +232,36 @@ export default function AdminInviteCodesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Ticket className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
+              <Ticket className="w-5 h-5" style={{ color: '#7b8ff8' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Codes</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{inviteCodes.length}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Codes</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{inviteCodes.length}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.12)' }}>
+              <Check className="w-5 h-5" style={{ color: '#4ade80' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Active Codes</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{activeCount}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Active Codes</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{activeCount}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(168,85,247,0.12)' }}>
+              <Users className="w-5 h-5" style={{ color: '#c084fc' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Signups</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{totalUses}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Signups</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{totalUses}</p>
             </div>
           </div>
         </div>
@@ -252,13 +269,13 @@ export default function AdminInviteCodesPage() {
 
       {/* Create Form Modal */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Create Invite Code</h2>
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <div className="max-w-md w-full p-6" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <h2 className="text-xl font-bold mb-4" style={{ color: '#ededf5' }}>Create Invite Code</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Code (optional - auto-generated if empty)
                 </label>
                 <input
@@ -266,12 +283,12 @@ export default function AdminInviteCodesPage() {
                   value={newCode.code}
                   onChange={(e) => setNewCode({ ...newCode, code: e.target.value.toUpperCase() })}
                   placeholder="e.g., EXPERT2025"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Description
                 </label>
                 <input
@@ -279,13 +296,13 @@ export default function AdminInviteCodesPage() {
                   value={newCode.description}
                   onChange={(e) => setNewCode({ ...newCode, description: e.target.value })}
                   placeholder="e.g., Launch event attendees"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Max Uses
                   </label>
                   <input
@@ -293,18 +310,18 @@ export default function AdminInviteCodesPage() {
                     min="1"
                     value={newCode.max_uses}
                     onChange={(e) => setNewCode({ ...newCode, max_uses: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Assigned Role
                   </label>
                   <select
                     value={newCode.assigned_role}
                     onChange={(e) => setNewCode({ ...newCode, assigned_role: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   >
                     <option value="user">User</option>
                     <option value="power_user">Power User</option>
@@ -314,14 +331,14 @@ export default function AdminInviteCodesPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Expires At (optional)
                 </label>
                 <input
                   type="datetime-local"
                   value={newCode.expires_at}
                   onChange={(e) => setNewCode({ ...newCode, expires_at: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                 />
               </div>
             </div>
@@ -329,15 +346,17 @@ export default function AdminInviteCodesPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 Cancel
               </button>
               <button
                 onClick={createInviteCode}
                 disabled={saving === 'create'}
-                className="flex items-center gap-2 px-4 py-2 text-black rounded-lg transition-colors disabled:opacity-50"
-                style={{ backgroundColor: '#fcc824' }}
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {saving === 'create' ? (
                   <>
@@ -354,56 +373,71 @@ export default function AdminInviteCodesPage() {
       )}
 
       {/* Invite Codes List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="font-semibold text-gray-900 dark:text-white">All Invite Codes</h2>
+      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-4" style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+          <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Invite Codes</h2>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-6 h-6 text-yellow-500 animate-spin" />
+            <RefreshCw className="w-6 h-6 animate-spin" style={{ color: '#fcc824' }} />
           </div>
         ) : inviteCodes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12" style={{ color: '#9090a8' }}>
             <Ticket className="w-12 h-12 mb-3 opacity-30" />
             <p>No invite codes yet</p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="mt-3 text-sm hover:opacity-80"
+              className="mt-3 text-sm hover:opacity-80 transition-opacity"
               style={{ color: '#fcc824' }}
             >
               Create your first invite code
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div>
             {inviteCodes.map((inviteCode) => (
-              <div key={inviteCode.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50">
+              <div
+                key={inviteCode.id}
+                className="p-4 transition-colors"
+                style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.3)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
-                      <code className="text-lg font-mono font-bold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                      <code
+                        className="text-lg font-mono font-bold"
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8', fontFamily: 'monospace', padding: '3px 10px', borderRadius: 6 }}
+                      >
                         {inviteCode.code}
                       </code>
                       {getStatusBadge(inviteCode)}
-                      <span className="px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                      <span
+                        className="px-2 py-0.5 text-xs font-medium rounded"
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }}
+                      >
                         {inviteCode.assigned_role}
                       </span>
                     </div>
 
                     {inviteCode.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <p className="text-sm mb-2" style={{ color: '#9090a8' }}>
                         {inviteCode.description}
                       </p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+                    <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: '#9090a8' }}>
                       <span className="flex items-center gap-1">
                         <Users className="w-3 h-3" />
                         {inviteCode.uses_count} / {inviteCode.max_uses === null ? '∞' : inviteCode.max_uses} uses
                       </span>
                       {inviteCode.expires_at && (
-                        <span className={`flex items-center gap-1 ${isExpired(inviteCode.expires_at) ? 'text-red-500' : ''}`}>
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ color: isExpired(inviteCode.expires_at) ? '#f87171' : '#9090a8' }}
+                        >
                           <Calendar className="w-3 h-3" />
                           Expires: {new Date(inviteCode.expires_at).toLocaleDateString()}
                         </span>
@@ -420,11 +454,14 @@ export default function AdminInviteCodesPage() {
                     {/* Copy Code Button */}
                     <button
                       onClick={() => copyCodeOnly(inviteCode.code)}
-                      className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: '#9090a8' }}
                       title="Copy code"
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       {copiedCode === inviteCode.code ? (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check className="w-4 h-4" style={{ color: '#4ade80' }} />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -433,8 +470,11 @@ export default function AdminInviteCodesPage() {
                     {/* Copy Link Button */}
                     <button
                       onClick={() => copyToClipboard(inviteCode.code)}
-                      className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: '#9090a8' }}
                       title="Copy registration link"
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <LinkIcon className="w-4 h-4" />
                     </button>
@@ -443,9 +483,8 @@ export default function AdminInviteCodesPage() {
                     <button
                       onClick={() => toggleActive(inviteCode)}
                       disabled={saving === inviteCode.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${
-                        inviteCode.is_active ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
+                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+                      style={{ background: inviteCode.is_active ? '#22c55e' : '#1e1e30' }}
                     >
                       {saving === inviteCode.id ? (
                         <span className="absolute inset-0 flex items-center justify-center">
@@ -453,9 +492,11 @@ export default function AdminInviteCodesPage() {
                         </span>
                       ) : (
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                            inviteCode.is_active ? 'translate-x-6' : 'translate-x-1'
-                          }`}
+                          className="inline-block h-4 w-4 transform rounded-full shadow transition-transform"
+                          style={{
+                            background: '#ededf5',
+                            transform: inviteCode.is_active ? 'translateX(24px)' : 'translateX(4px)',
+                          }}
                         />
                       )}
                     </button>
@@ -464,8 +505,11 @@ export default function AdminInviteCodesPage() {
                     <button
                       onClick={() => deleteInviteCode(inviteCode)}
                       disabled={saving === inviteCode.id}
-                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: '#f87171' }}
                       title="Delete code"
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.12)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -478,11 +522,14 @@ export default function AdminInviteCodesPage() {
       </div>
 
       {/* Info Note */}
-      <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
-        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-amber-800 dark:text-amber-200">
-          <p className="font-medium mb-1">Invite Code Tips</p>
-          <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+      <div
+        className="flex items-start gap-3 p-4 rounded-xl"
+        style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.2)', borderRadius: 16 }}
+      >
+        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#fcc824' }} />
+        <div className="text-sm" style={{ color: '#ededf5' }}>
+          <p className="font-medium mb-1" style={{ color: '#fcc824' }}>Invite Code Tips</p>
+          <ul className="list-disc list-inside space-y-1" style={{ color: '#9090a8' }}>
             <li>Share the registration link (with code) for easy signup: {typeof window !== 'undefined' ? window.location.origin : ''}/register?code=CODE</li>
             <li>Set max uses to control how many people can use each code</li>
             <li>Assign roles to automatically give users specific permissions</li>

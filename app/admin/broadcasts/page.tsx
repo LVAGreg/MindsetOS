@@ -194,20 +194,20 @@ export default function AdminBroadcastsPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300';
-      case 'high': return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
-      case 'normal': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'low': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+      case 'urgent': return 'text-[#fca5a5]';
+      case 'high': return 'text-[#fb923c]';
+      case 'normal': return 'text-[#60a5fa]';
+      case 'low': return 'text-[#9090a8]';
       default: return '';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'sent': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
-      case 'scheduled': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'draft': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
-      case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300';
+      case 'sent': return '';
+      case 'scheduled': return '';
+      case 'draft': return '';
+      case 'cancelled': return '';
       default: return '';
     }
   };
@@ -216,7 +216,7 @@ export default function AdminBroadcastsPage() {
     switch (status) {
       case 'sent': return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'scheduled': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'draft': return <Edit className="w-4 h-4 text-gray-500" />;
+      case 'draft': return <Edit className="w-4 h-4" style={{ color: '#9090a8' }} />;
       case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
       default: return null;
     }
@@ -232,14 +232,14 @@ export default function AdminBroadcastsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Broadcasts</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Admin Broadcasts</h1>
+          <p className="mt-1" style={{ color: '#9090a8' }}>
             Send notifications to all users, specific roles, or individual users
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors self-start sm:self-auto"
+          className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           New Broadcast
@@ -249,11 +249,10 @@ export default function AdminBroadcastsPage() {
       {/* Inline Status Banner */}
       {statusMsg && (
         <div
-          className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-            statusMsg.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-              : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
-          }`}
+          className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all"
+          style={statusMsg.type === 'success'
+            ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }
+            : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}
         >
           <div className="flex items-center gap-2">
             {statusMsg.type === 'success' ? (
@@ -271,7 +270,7 @@ export default function AdminBroadcastsPage() {
 
       {/* Date Range Filter */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</span>
+        <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Show:</span>
         {[
           { label: 'Last 7 days', value: 7 },
           { label: 'Last 30 days', value: 30 },
@@ -281,11 +280,10 @@ export default function AdminBroadcastsPage() {
           <button
             key={opt.label}
             onClick={() => { setDaysFilter(opt.value); setCurrentPage(1); }}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              daysFilter === opt.value
-                ? 'bg-amber-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            style={daysFilter === opt.value
+              ? { background: '#4f6ef7', color: '#fff' }
+              : { background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
           >
             {opt.label}
           </button>
@@ -294,51 +292,51 @@ export default function AdminBroadcastsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Megaphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
+              <Megaphone className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Broadcasts</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{broadcasts.length}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Broadcasts</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{broadcasts.length}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Send className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
+              <Send className="w-5 h-5" style={{ color: '#4ade80' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Sent</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm" style={{ color: '#9090a8' }}>Sent</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 {broadcasts.filter(b => b.status === 'sent').length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(252,200,36,0.15)' }}>
+              <Clock className="w-5 h-5" style={{ color: '#fcc824' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Drafts</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm" style={{ color: '#9090a8' }}>Drafts</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 {broadcasts.filter(b => b.status === 'draft').length}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(192,132,252,0.15)' }}>
+              <Users className="w-5 h-5" style={{ color: '#c084fc' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Recipients</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Recipients</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 {broadcasts.reduce((sum, b) => sum + b.recipients_count, 0)}
               </p>
             </div>
@@ -347,23 +345,23 @@ export default function AdminBroadcastsPage() {
       </div>
 
       {/* Broadcasts Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900 dark:text-white">All Broadcasts</h2>
+      <div className="rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid #1e1e30' }}>
+          <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Broadcasts</h2>
           <button
             onClick={fetchBroadcasts}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} style={{ color: '#9090a8' }} />
           </button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-6 h-6 text-indigo-500 animate-spin" />
+            <RefreshCw className="w-6 h-6 animate-spin" style={{ color: '#4f6ef7' }} />
           </div>
         ) : broadcasts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12" style={{ color: '#9090a8' }}>
             <Megaphone className="w-12 h-12 mb-3 opacity-30" />
             <p>No broadcasts yet</p>
             <p className="text-sm mt-1">Create your first broadcast to notify users</p>
@@ -371,38 +369,38 @@ export default function AdminBroadcastsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-900/50">
+              <thead style={{ background: 'rgba(9,9,15,0.4)' }}>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Broadcast
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Priority
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Target
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Recipients
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Created
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase" style={{ color: '#9090a8' }}>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody>
                 {broadcasts.map((broadcast) => (
-                  <tr key={broadcast.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                  <tr key={broadcast.id} className="hover:bg-white/5" style={{ borderTop: '1px solid #1e1e30' }}>
                     <td className="px-4 py-4">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{broadcast.title}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                        <p className="font-medium" style={{ color: '#ededf5' }}>{broadcast.title}</p>
+                        <p className="text-sm truncate max-w-xs" style={{ color: '#9090a8' }}>
                           {broadcast.message}
                         </p>
                       </div>
@@ -410,20 +408,29 @@ export default function AdminBroadcastsPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(broadcast.status)}
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(broadcast.status)}`}>
+                        <span className="px-2 py-1 text-xs font-medium rounded"
+                          style={broadcast.status === 'sent'
+                            ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }
+                            : broadcast.status === 'draft'
+                            ? { background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.25)', color: '#fcc824' }
+                            : broadcast.status === 'scheduled'
+                            ? { background: 'rgba(79,110,247,0.1)', border: '1px solid rgba(79,110,247,0.25)', color: '#4f6ef7' }
+                            : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}
+                        >
                           {broadcast.status}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${getPriorityColor(broadcast.priority)}`}>
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${getPriorityColor(broadcast.priority)}`}
+                        style={{ background: 'rgba(144,144,168,0.1)', border: '1px solid rgba(144,144,168,0.2)' }}>
                         {broadcast.priority}
                       </span>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-1.5">
-                        <Users className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                        <Users className="w-4 h-4" style={{ color: '#9090a8' }} />
+                        <span className="text-sm capitalize" style={{ color: '#9090a8' }}>
                           {broadcast.target_type}
                           {broadcast.target_type === 'role' && broadcast.target_roles.length > 0 && (
                             <span className="ml-1 text-xs">({broadcast.target_roles.join(', ')})</span>
@@ -433,15 +440,15 @@ export default function AdminBroadcastsPage() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="text-sm">
-                        <span className="font-medium text-gray-900 dark:text-white">{broadcast.recipients_count}</span>
+                        <span className="font-medium" style={{ color: '#ededf5' }}>{broadcast.recipients_count}</span>
                         {broadcast.status === 'sent' && (
-                          <span className="text-gray-500 ml-1">
+                          <span className="ml-1" style={{ color: '#9090a8' }}>
                             ({broadcast.read_count} read)
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-4 text-sm" style={{ color: '#9090a8' }}>
                       {formatDate(broadcast.created_at)}
                     </td>
                     <td className="px-4 py-4 text-right">
@@ -450,7 +457,8 @@ export default function AdminBroadcastsPage() {
                           <button
                             onClick={() => sendBroadcast(broadcast.id)}
                             disabled={sendingId === broadcast.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors text-sm"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors text-sm text-white"
+                            style={{ background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
                           >
                             {sendingId === broadcast.id ? (
                               <RefreshCw className="w-3 h-3 animate-spin" />
@@ -461,10 +469,10 @@ export default function AdminBroadcastsPage() {
                           </button>
                         )}
                         <button
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-white/5 rounded-lg transition-colors"
                           title="View details"
                         >
-                          <Eye className="w-4 h-4 text-gray-500" />
+                          <Eye className="w-4 h-4" style={{ color: '#9090a8' }} />
                         </button>
                       </div>
                     </td>
@@ -477,25 +485,27 @@ export default function AdminBroadcastsPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 flex items-center justify-between" style={{ borderTop: '1px solid #1e1e30' }}>
+            <p className="text-sm" style={{ color: '#9090a8' }}>
               Showing {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, totalBroadcasts)} of {totalBroadcasts} broadcasts
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-700 dark:text-gray-300 px-2">
+              <span className="text-sm px-2" style={{ color: '#9090a8' }}>
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 Next
               </button>
@@ -506,11 +516,11 @@ export default function AdminBroadcastsPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">New Broadcast</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+              <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>New Broadcast</h2>
+              <p className="text-sm mt-1" style={{ color: '#9090a8' }}>
                 Create a notification to send to users
               </p>
             </div>
@@ -518,41 +528,41 @@ export default function AdminBroadcastsPage() {
             <div className="p-6 space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Title
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   placeholder="Broadcast title..."
                 />
               </div>
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Message
                 </label>
                 <textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   placeholder="Write your message..."
                 />
               </div>
 
               {/* Priority */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Priority
                 </label>
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 >
                   <option value="low">Low</option>
                   <option value="normal">Normal</option>
@@ -563,13 +573,13 @@ export default function AdminBroadcastsPage() {
 
               {/* Target */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Target Audience
                 </label>
                 <select
                   value={formData.target_type}
                   onChange={(e) => setFormData({ ...formData, target_type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 >
                   <option value="all">All Users</option>
                   <option value="role">By Role</option>
@@ -580,7 +590,7 @@ export default function AdminBroadcastsPage() {
               {/* Role Selection */}
               {formData.target_type === 'role' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Select Roles
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -594,11 +604,10 @@ export default function AdminBroadcastsPage() {
                             : [...formData.target_roles, role];
                           setFormData({ ...formData, target_roles: roles });
                         }}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                          formData.target_roles.includes(role)
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                        style={formData.target_roles.includes(role)
+                          ? { background: '#4f6ef7', color: '#fff' }
+                          : { background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
                       >
                         {role}
                       </button>
@@ -610,14 +619,14 @@ export default function AdminBroadcastsPage() {
               {/* User Selection */}
               {formData.target_type === 'users' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Select Users
                   </label>
-                  <div className="max-h-40 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <div className="max-h-40 overflow-y-auto rounded-xl" style={{ border: '1px solid #1e1e30' }}>
                     {users.map((user) => (
                       <label
                         key={user.id}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -628,9 +637,10 @@ export default function AdminBroadcastsPage() {
                               : formData.target_user_ids.filter(id => id !== user.id);
                             setFormData({ ...formData, target_user_ids: ids });
                           }}
-                          className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          className="rounded focus:ring-[#4f6ef7]"
+                          style={{ accentColor: '#4f6ef7' }}
                         />
-                        <span className="text-sm text-gray-900 dark:text-white">
+                        <span className="text-sm" style={{ color: '#ededf5' }}>
                           {user.firstName} {user.lastName} ({user.email})
                         </span>
                       </label>
@@ -640,20 +650,21 @@ export default function AdminBroadcastsPage() {
               )}
             </div>
 
-            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div className="p-6 flex justify-end gap-3" style={{ borderTop: '1px solid #1e1e30' }}>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
                   resetForm();
                 }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 rounded-lg transition-colors hover:bg-white/5"
+                style={{ color: '#9090a8' }}
               >
                 Cancel
               </button>
               <button
                 onClick={createBroadcast}
                 disabled={!formData.title || !formData.message}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <Plus className="w-4 h-4" />
                 Create Broadcast

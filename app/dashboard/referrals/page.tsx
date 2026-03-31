@@ -70,12 +70,12 @@ export default function ReferralsPage() {
               onClick={() => router.push('/dashboard')}
               className="p-2 hover:bg-white/5 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+              <ArrowLeft className="w-5 h-5" style={{ color: '#9090a8' }} />
             </button>
             <Gift className="w-6 h-6 text-[#fcc824]" />
             <div>
               <h1 className="text-xl font-bold text-[#ededf5]">Refer &amp; Earn</h1>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm" style={{ color: '#9090a8' }}>
                 Earn 10% per referral — paid monthly to your account.
               </p>
             </div>
@@ -89,15 +89,15 @@ export default function ReferralsPage() {
           <div className="flex items-start justify-between gap-4 mb-3">
             <div>
               <h2 className="text-base font-semibold text-[#ededf5]">Your Referral Link</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs mt-0.5" style={{ color: '#9090a8' }}>
                 You earn <span className="text-[#fcc824] font-semibold">10% of each referred user&apos;s first payment</span> — automatically credited monthly.
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="flex-1 px-3 py-2.5 bg-[#09090f] border border-[#1e1e30] rounded-lg text-sm text-gray-400 font-mono truncate">
+            <div className="flex-1 px-3 py-2.5 rounded-lg text-sm font-mono truncate" style={{ background: '#09090f', border: '1px solid #1e1e30', color: '#7b8ff8' }}>
               {loading ? (
-                <span className="text-gray-600">Loading your link...</span>
+                <span style={{ color: '#9090a8' }}>Loading your link...</span>
               ) : (
                 stats?.referralUrl || '—'
               )}
@@ -122,10 +122,10 @@ export default function ReferralsPage() {
               { label: 'Total Earned', value: `$${((stats?.totalEarnedCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, color: 'text-[#fcc824]' },
               { label: 'Paid Out', value: `$${((stats?.paidOutCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, color: 'text-emerald-400' },
             ].map(s => (
-              <div key={s.label} className="bg-[#12121f] rounded-xl border border-[#1e1e30] p-4">
+              <div key={s.label} className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
                 <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
-                <div className="text-xl font-bold text-[#ededf5]">{s.value}</div>
-                <div className="text-xs text-gray-400">{s.label}</div>
+                <div className="text-xl font-bold" style={{ color: '#ededf5' }}>{s.value}</div>
+                <div className="text-xs" style={{ color: '#9090a8' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -134,7 +134,7 @@ export default function ReferralsPage() {
         {/* How it works */}
         <div className="bg-[#fcc824]/[0.05] border border-[#fcc824]/20 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-[#fcc824] mb-3">How it works</h3>
-          <ol className="space-y-2 text-sm text-gray-400">
+          <ol className="space-y-2 text-sm" style={{ color: '#9090a8' }}>
             <li>1. Share your referral link with an entrepreneur you know</li>
             <li>2. They sign up and subscribe to any paid plan</li>
             <li>3. You earn 10% of their first payment (credited to your account)</li>
@@ -152,13 +152,13 @@ export default function ReferralsPage() {
               {history.map(c => (
                 <div key={c.id} className="flex items-center justify-between px-4 py-3">
                   <div>
-                    <div className="text-sm font-medium text-[#ededf5]">
+                    <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
                       {c.referee_email.replace(/(.{2}).+@/, '$1***@')}
                     </div>
-                    <div className="text-xs text-gray-400">{new Date(c.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs" style={{ color: '#9090a8' }}>{new Date(c.created_at).toLocaleDateString()}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-bold text-[#ededf5]">
+                    <div className="text-sm font-bold" style={{ color: '#4ade80', fontWeight: 700 }}>
                       +${(c.commission_amount_cents / 100).toFixed(2)}
                     </div>
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
@@ -182,10 +182,10 @@ export default function ReferralsPage() {
               <Gift className="w-6 h-6 text-[#fcc824]" />
             </div>
             <h3 className="text-base font-semibold text-[#ededf5] mb-1">Your first referral is one share away</h3>
-            <p className="text-sm text-gray-400 mb-1">
+            <p className="text-sm mb-1" style={{ color: '#9090a8' }}>
               Every entrepreneur you send earns you <span className="text-[#fcc824] font-semibold">10% of their first payment</span>.
             </p>
-            <p className="text-xs text-gray-600 mb-5">Earn 10% per referral — paid monthly</p>
+            <p className="text-xs mb-5" style={{ color: '#9090a8' }}>Earn 10% per referral — paid monthly</p>
             <button
               onClick={copyLink}
               disabled={!stats?.referralUrl}

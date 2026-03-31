@@ -86,7 +86,7 @@ export default function AgentEditorPage() {
       if (!res.ok) throw new Error('Failed to save agent');
 
       showFeedback('success', 'Agent saved successfully!');
-      await loadAgent(); // Reload to get updated full_prompt
+      await loadAgent();
     } catch (err: any) {
       showFeedback('error', `Error saving: ${err.message}`);
     } finally {
@@ -115,10 +115,10 @@ export default function AgentEditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-lg text-gray-600">Loading agent...</span>
+          <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#4f6ef7', borderTopColor: 'transparent' }} />
+          <span className="text-lg" style={{ color: '#9090a8' }}>Loading agent...</span>
         </div>
       </div>
     );
@@ -126,13 +126,13 @@ export default function AgentEditorPage() {
 
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow p-8 max-w-md text-center">
-          <div className="text-red-600 text-lg font-semibold mb-2">Failed to load agent</div>
-          <p className="text-gray-600 text-sm mb-4">{loadError}</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
+        <div className="rounded-2xl shadow-xl max-w-md p-8 text-center" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="text-lg font-semibold mb-2" style={{ color: '#f87171' }}>Failed to load agent</div>
+          <p className="text-sm mb-4" style={{ color: '#9090a8' }}>{loadError}</p>
           <button
             onClick={() => { setLoading(true); loadAgent(); }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
           >
             Retry
           </button>
@@ -143,8 +143,8 @@ export default function AgentEditorPage() {
 
   if (!agent) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg text-red-600">Agent not found</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
+        <div className="text-lg" style={{ color: '#f87171' }}>Agent not found</div>
       </div>
     );
   }
@@ -160,30 +160,31 @@ export default function AgentEditorPage() {
   const currentTab = tabs.find(t => t.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8" style={{ background: '#09090f' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">
           <Link
             href="/admin/agents"
-            className="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-sm mb-4 inline-block transition-colors"
+            style={{ color: '#7b8ff8' }}
           >
             ← Back to Agents
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{agent.agent_name}</h1>
-              <p className="mt-1 text-sm text-gray-600">{agent.agent_description}</p>
+              <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>{agent.agent_name}</h1>
+              <p className="mt-1 text-sm" style={{ color: '#9090a8' }}>{agent.agent_description}</p>
               <div className="mt-2 flex gap-2">
-                <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                <span style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8', borderRadius: 8, padding: '3px 10px', fontSize: 12 }}>
                   {agent.agent_version}
                 </span>
                 {agent.is_published ? (
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  <span style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80', borderRadius: 8, padding: '3px 10px', fontSize: 12 }}>
                     Published
                   </span>
                 ) : (
-                  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  <span style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.25)', color: '#fbbf24', borderRadius: 8, padding: '3px 10px', fontSize: 12 }}>
                     Draft
                   </span>
                 )}
@@ -192,14 +193,16 @@ export default function AgentEditorPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 {showPreview ? 'Hide' : 'Show'} Preview
               </button>
               {!agent.is_published && (
                 <button
                   onClick={publishAgent}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                  style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
                 >
                   Publish
                 </button>
@@ -207,7 +210,7 @@ export default function AgentEditorPage() {
               <button
                 onClick={saveAgent}
                 disabled={saving}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -218,18 +221,15 @@ export default function AgentEditorPage() {
         {/* Inline feedback banner */}
         {feedbackMessage && (
           <div
-            className={`mb-4 px-4 py-3 rounded-lg flex items-center justify-between text-sm ${
-              feedbackMessage.type === 'success'
-                ? 'bg-green-50 text-green-800 border border-green-200'
-                : 'bg-red-50 text-red-800 border border-red-200'
-            }`}
+            className="mb-4 px-4 py-3 rounded-xl flex items-center justify-between text-sm"
+            style={feedbackMessage.type === 'success'
+              ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }
+              : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
           >
             <span>{feedbackMessage.text}</span>
             <button
               onClick={() => setFeedbackMessage(null)}
-              className={`ml-4 font-medium hover:underline ${
-                feedbackMessage.type === 'success' ? 'text-green-600' : 'text-red-600'
-              }`}
+              className="ml-4 font-medium hover:underline"
             >
               Dismiss
             </button>
@@ -239,19 +239,18 @@ export default function AgentEditorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Editor */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow">
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
               {/* Tabs */}
-              <div className="border-b border-gray-200">
-                <nav className="flex -mb-px">
+              <div style={{ borderBottom: '1px solid #1e1e30' }}>
+                <nav className="flex -mb-px overflow-x-auto">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`px-6 py-3 text-sm font-medium border-b-2 ${
-                        activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
+                      className="px-5 py-3 text-sm font-medium whitespace-nowrap transition-colors"
+                      style={activeTab === tab.id
+                        ? { borderBottom: '2px solid #4f6ef7', color: '#7b8ff8' }
+                        : { borderBottom: '2px solid transparent', color: '#9090a8' }}
                     >
                       {tab.label}
                     </button>
@@ -262,7 +261,7 @@ export default function AgentEditorPage() {
               {/* Tab Content */}
               <div className="p-6">
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                     {currentTab?.label}
                   </label>
                   <textarea
@@ -272,12 +271,13 @@ export default function AgentEditorPage() {
                       [currentTab?.field as string]: e.target.value
                     })}
                     rows={20}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                    className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
+                    style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
                     placeholder={`Enter ${currentTab?.label.toLowerCase()}...`}
                   />
                 </div>
 
-                <div className="text-xs text-gray-500">
+                <div className="text-xs" style={{ color: '#9090a8' }}>
                   Character count: {(agent[currentTab?.field as keyof AgentData] as string || '').length}
                 </div>
               </div>
@@ -287,62 +287,63 @@ export default function AgentEditorPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Metadata */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Agent Details</h3>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Agent Details</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Name
                   </label>
                   <input
                     type="text"
                     value={agent.agent_name}
                     onChange={(e) => setAgent({ ...agent, agent_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Description
                   </label>
                   <textarea
                     value={agent.agent_description}
                     onChange={(e) => setAgent({ ...agent, agent_description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Agent ID
                   </label>
                   <input
                     type="text"
                     value={agent.agent_id}
                     disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                    className="w-full rounded-xl px-4 py-3 text-sm font-mono"
+                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid #1e1e30', color: '#9090a8' }}
                   />
                 </div>
               </div>
             </div>
 
             {/* Section Stats */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Section Stats</h3>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Section Stats</h3>
               <div className="space-y-2 text-sm">
                 {tabs.map((tab) => {
                   const content = agent[tab.field as keyof AgentData] as string || '';
                   const wordCount = content.split(/\s+/).filter(Boolean).length;
                   return (
                     <div key={tab.id} className="flex justify-between">
-                      <span className="text-gray-600">{tab.label}:</span>
-                      <span className="font-medium">{wordCount} words</span>
+                      <span style={{ color: '#9090a8' }}>{tab.label}:</span>
+                      <span className="font-medium" style={{ color: '#ededf5' }}>{wordCount} words</span>
                     </div>
                   );
                 })}
-                <div className="pt-2 border-t border-gray-200 flex justify-between font-semibold">
-                  <span>Total:</span>
-                  <span>
+                <div className="pt-2 flex justify-between font-semibold" style={{ borderTop: '1px solid #1e1e30' }}>
+                  <span style={{ color: '#9090a8' }}>Total:</span>
+                  <span style={{ color: '#ededf5' }}>
                     {tabs.reduce((sum, tab) => {
                       const content = agent[tab.field as keyof AgentData] as string || '';
                       return sum + content.split(/\s+/).filter(Boolean).length;
@@ -353,16 +354,20 @@ export default function AgentEditorPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Actions</h3>
               <div className="space-y-2">
                 <Link
                   href={`/admin/agents/${agentId}/${version}/history`}
-                  className="block w-full px-4 py-2 text-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  className="block w-full px-4 py-2.5 text-center rounded-xl text-sm font-semibold transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e30', color: '#9090a8' }}
                 >
                   View History
                 </Link>
-                <button className="block w-full px-4 py-2 text-center bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
+                <button
+                  className="block w-full px-4 py-2.5 text-center rounded-xl text-sm font-semibold transition-colors"
+                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
+                >
                   Delete Draft
                 </button>
               </div>
@@ -372,13 +377,14 @@ export default function AgentEditorPage() {
 
         {/* Preview Modal */}
         {showPreview && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="flex justify-between items-center p-6 border-b">
-                <h2 className="text-2xl font-bold text-gray-900">Assembled Prompt Preview</h2>
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <div className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <div className="flex justify-between items-center p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+                <h2 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Assembled Prompt Preview</h2>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  style={{ color: '#9090a8' }}
+                  className="hover:text-[#ededf5] transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -386,10 +392,13 @@ export default function AgentEditorPage() {
                 </button>
               </div>
               <div className="p-6 overflow-y-auto">
-                <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 bg-gray-50 p-4 rounded-lg">
+                <pre
+                  className="whitespace-pre-wrap text-sm p-4 rounded-xl"
+                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
+                >
                   {agent.full_prompt}
                 </pre>
-                <div className="mt-4 text-sm text-gray-500">
+                <div className="mt-4 text-sm" style={{ color: '#9090a8' }}>
                   Total prompt length: {agent.full_prompt.length} characters
                 </div>
               </div>

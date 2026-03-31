@@ -21,7 +21,7 @@ import { apiClient } from '@/lib/api-client';
 // Dynamically import React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill-new'), {
   ssr: false,
-  loading: () => <div className="h-full bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
+  loading: () => <div className="h-full rounded-lg animate-pulse" style={{ background: 'rgba(18,18,31,0.7)' }} />
 });
 
 import 'react-quill-new/dist/quill.snow.css';
@@ -183,12 +183,12 @@ export default function AdminEmailsPage() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'transactional': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'onboarding': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
-      case 'marketing': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
-      case 'milestone': return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
-      case 'engagement': return 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300';
-      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+      case 'transactional': return 'text-[#60a5fa]';
+      case 'onboarding': return 'text-[#4ade80]';
+      case 'marketing': return 'text-[#c084fc]';
+      case 'milestone': return 'text-[#fb923c]';
+      case 'engagement': return 'text-[#f472b6]';
+      default: return 'text-[#9090a8]';
     }
   };
 
@@ -199,11 +199,10 @@ export default function AdminEmailsPage() {
       {/* Status Message */}
       {statusMessage && (
         <div
-          className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm ${
-            statusMessage.type === 'error'
-              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
-              : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
-          }`}
+          className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm"
+          style={statusMessage.type === 'error'
+            ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }
+            : { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
         >
           <div className="flex items-center gap-2">
             {statusMessage.type === 'error' ? (
@@ -215,7 +214,7 @@ export default function AdminEmailsPage() {
           </div>
           <button
             onClick={() => setStatusMessage(null)}
-            className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded"
+            className="p-1 hover:bg-white/10 rounded"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -225,15 +224,16 @@ export default function AdminEmailsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Templates</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Email Templates</h1>
+          <p className="mt-1" style={{ color: '#9090a8' }}>
             Manage automated email notifications
           </p>
         </div>
         <button
           onClick={fetchTemplates}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+          style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -242,81 +242,82 @@ export default function AdminEmailsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
+              <Mail className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Templates</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{templates.length}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Total Templates</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{templates.length}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
+              <Check className="w-5 h-5" style={{ color: '#4ade80' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Enabled</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{enabledCount}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Enabled</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{enabledCount}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(144,144,168,0.15)' }}>
+              <X className="w-5 h-5" style={{ color: '#9090a8' }} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Disabled</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{templates.length - enabledCount}</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Disabled</p>
+              <p className="text-xl font-bold" style={{ color: '#ededf5' }}>{templates.length - enabledCount}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Templates List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="font-semibold text-gray-900 dark:text-white">All Email Templates</h2>
+      <div className="rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-4" style={{ borderBottom: '1px solid #1e1e30' }}>
+          <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Email Templates</h2>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-6 h-6 text-indigo-500 animate-spin" />
+            <RefreshCw className="w-6 h-6 animate-spin" style={{ color: '#4f6ef7' }} />
           </div>
         ) : templates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12" style={{ color: '#9090a8' }}>
             <Mail className="w-12 h-12 mb-3 opacity-30" />
             <p>No email templates found</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div>
             {templates.map((template) => (
-              <div key={template.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50">
+              <div key={template.id} className="p-4 m-3 rounded-xl" style={{ background: 'rgba(18,18,31,0.5)', border: '1px solid #1e1e30', borderRadius: 12 }}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
+                      <h3 className="font-medium" style={{ color: '#ededf5' }}>
                         {template.name}
                       </h3>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${getCategoryColor(template.category)}`}>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded ${getCategoryColor(template.category)}`}
+                        style={{ background: 'rgba(144,144,168,0.1)', border: '1px solid rgba(144,144,168,0.2)' }}>
                         {template.category}
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <p className="text-sm mb-2" style={{ color: '#9090a8' }}>
                       {template.description}
                     </p>
 
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-gray-400 dark:text-gray-500 uppercase font-medium">Subject:</span>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{template.subject}</span>
+                      <span className="text-xs uppercase font-medium" style={{ color: '#9090a8' }}>Subject:</span>
+                      <span className="text-sm" style={{ color: '#ededf5' }}>{template.subject}</span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+                    <div className="flex items-center gap-4 text-xs" style={{ color: '#9090a8' }}>
                       <span className="flex items-center gap-1">
                         <Send className="w-3 h-3" />
                         Trigger: {template.trigger_event || 'manual'}
@@ -333,20 +334,21 @@ export default function AdminEmailsPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => openEditModal(template)}
-                      className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: '#9090a8' }}
                       title="Edit template"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
 
-                    <span className={`text-xs font-medium ${template.enabled ? 'text-green-600' : 'text-gray-400'}`}>
+                    <span className="text-xs font-medium" style={{ color: template.enabled ? '#4ade80' : '#9090a8' }}>
                       {template.enabled ? 'ON' : 'OFF'}
                     </span>
                     <button
                       onClick={() => toggleEnabled(template)}
                       disabled={saving === template.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                        template.enabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 ${
+                        template.enabled ? 'bg-green-500' : 'bg-[#1e1e30]'
                       }`}
                     >
                       {saving === template.id ? (
@@ -370,11 +372,11 @@ export default function AdminEmailsPage() {
       </div>
 
       {/* Info Note */}
-      <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
-        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-amber-800 dark:text-amber-200">
+      <div className="flex items-start gap-3 p-4 rounded-xl" style={{ background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.25)' }}>
+        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#fcc824' }} />
+        <div className="text-sm" style={{ color: '#fcc824' }}>
           <p className="font-medium mb-1">Email Template Notes</p>
-          <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+          <ul className="list-disc list-inside space-y-1" style={{ color: '#fcc824', opacity: 0.85 }}>
             <li>Disabled templates will not be sent even when triggered</li>
             <li>Verification and Password Reset emails should remain enabled for security</li>
             <li>Use variables like {'{{userName}}'} in templates for personalization</li>
@@ -385,18 +387,18 @@ export default function AdminEmailsPage() {
 
       {/* Fullscreen Edit Modal */}
       {editingTemplate && (
-        <div className="fixed inset-0 z-50 bg-gray-100 dark:bg-gray-900 flex flex-col">
+        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#09090f' }}>
           {/* Modal Header */}
-          <div className="flex items-center justify-between px-4 md:px-6 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between px-4 md:px-6 py-3" style={{ background: 'rgba(18,18,31,0.7)', borderBottom: '1px solid #1e1e30' }}>
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
-              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white truncate">Edit: {editForm.name}</h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">({editingTemplate.id})</span>
+              <h2 className="text-base md:text-lg font-semibold truncate" style={{ color: '#ededf5' }}>Edit: {editForm.name}</h2>
+              <span className="text-sm hidden sm:inline" style={{ color: '#9090a8' }}>({editingTemplate.id})</span>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={saveTemplate}
                 disabled={saving === editingTemplate.id}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 font-medium"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {saving === editingTemplate.id ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -407,7 +409,8 @@ export default function AdminEmailsPage() {
               </button>
               <button
                 onClick={closeEditModal}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -415,33 +418,33 @@ export default function AdminEmailsPage() {
           </div>
 
           {/* Top Bar: Metadata */}
-          <div className="px-6 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div className="px-6 py-3" style={{ background: 'rgba(18,18,31,0.7)', borderBottom: '1px solid #1e1e30' }}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Name</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: '#9090a8' }}>Name</label>
                 <input
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: '#9090a8' }}>Description</label>
                 <input
                   type="text"
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Subject Line</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: '#9090a8' }}>Subject Line</label>
                 <input
                   type="text"
                   value={editForm.subject}
                   onChange={(e) => setEditForm({ ...editForm, subject: e.target.value })}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 />
               </div>
             </div>
@@ -450,28 +453,26 @@ export default function AdminEmailsPage() {
           {/* Main Content: Split View */}
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
             {/* Left Panel: Editor */}
-            <div className="w-full md:w-1/2 flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <div className="w-full md:w-1/2 flex flex-col" style={{ borderRight: '1px solid #1e1e30', background: 'rgba(18,18,31,0.7)' }}>
               {/* Editor Toggle & Variables */}
-              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-                <div className="flex items-center bg-gray-200 dark:bg-gray-700 rounded-lg p-0.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2" style={{ borderBottom: '1px solid #1e1e30', background: 'rgba(9,9,15,0.5)' }}>
+                <div className="flex items-center rounded-lg p-0.5" style={{ background: '#1e1e30' }}>
                   <button
                     onClick={() => setEditorMode('content')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                      editorMode === 'content'
-                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium transition-colors`}
+                    style={editorMode === 'content'
+                      ? { background: 'rgba(79,110,247,0.2)', color: '#ededf5' }
+                      : { color: '#9090a8' }}
                   >
                     <FileText className="w-4 h-4" />
                     Content
                   </button>
                   <button
                     onClick={() => setEditorMode('html')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                      editorMode === 'html'
-                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400'
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-sm font-medium transition-colors`}
+                    style={editorMode === 'html'
+                      ? { background: 'rgba(79,110,247,0.2)', color: '#ededf5' }
+                      : { color: '#9090a8' }}
                   >
                     <Code className="w-4 h-4" />
                     HTML
@@ -480,12 +481,13 @@ export default function AdminEmailsPage() {
 
                 {editingTemplate.available_variables && editingTemplate.available_variables.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Variables:</span>
+                    <span className="text-xs" style={{ color: '#9090a8' }}>Variables:</span>
                     {editingTemplate.available_variables.map((v) => (
                       <button
                         key={v}
                         type="button"
-                        className="px-2 py-0.5 text-xs font-mono bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+                        className="px-2 py-0.5 text-xs font-mono rounded transition-colors"
+                        style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.3)' }}
                         onClick={() => insertVariable(v)}
                       >
                         {`{{${v}}}`}
@@ -514,7 +516,8 @@ export default function AdminEmailsPage() {
                     id="html-editor"
                     value={editForm.html_template}
                     onChange={(e) => setEditForm({ ...editForm, html_template: e.target.value })}
-                    className="w-full h-full px-4 py-3 bg-gray-900 text-gray-100 font-mono text-sm leading-relaxed resize-none focus:outline-none"
+                    className="w-full h-full px-4 py-3 font-mono text-sm leading-relaxed resize-none focus:outline-none"
+                    style={{ background: '#09090f', color: '#ededf5' }}
                     placeholder="<html>...</html>"
                     spellCheck={false}
                   />
@@ -523,12 +526,12 @@ export default function AdminEmailsPage() {
             </div>
 
             {/* Right Panel: Live Preview */}
-            <div className="hidden md:flex md:w-1/2 flex-col bg-gray-50 dark:bg-gray-900">
-              <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                <Eye className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Live Preview</span>
+            <div className="hidden md:flex md:w-1/2 flex-col" style={{ background: '#09090f' }}>
+              <div className="flex items-center gap-2 px-4 py-2" style={{ borderBottom: '1px solid #1e1e30', background: 'rgba(18,18,31,0.7)' }}>
+                <Eye className="w-4 h-4" style={{ color: '#9090a8' }} />
+                <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Live Preview</span>
               </div>
-              <div className="flex-1 bg-white">
+              <div className="flex-1" style={{ background: '#fff' }}>
                 <iframe
                   srcDoc={editForm.html_template}
                   className="w-full h-full"
@@ -553,31 +556,31 @@ export default function AdminEmailsPage() {
         }
         .ql-toolbar {
           border: none !important;
-          border-bottom: 1px solid #e5e7eb !important;
-          background: #f9fafb;
+          border-bottom: 1px solid #1e1e30 !important;
+          background: rgba(9,9,15,0.5);
         }
-        .dark .ql-toolbar {
-          background: #1f2937;
-          border-color: #374151 !important;
+        .ql-toolbar .ql-stroke {
+          stroke: #9090a8;
         }
-        .dark .ql-toolbar .ql-stroke {
-          stroke: #9ca3af;
+        .ql-toolbar .ql-fill {
+          fill: #9090a8;
         }
-        .dark .ql-toolbar .ql-fill {
-          fill: #9ca3af;
+        .ql-toolbar .ql-picker {
+          color: #9090a8;
         }
-        .dark .ql-toolbar .ql-picker {
-          color: #9ca3af;
+        .ql-toolbar .ql-picker-options {
+          background: #12121f;
+          border-color: #1e1e30;
         }
         .ql-container.ql-snow {
           border: none !important;
         }
-        .dark .ql-editor {
-          color: #e5e7eb;
-          background: #1f2937;
+        .ql-editor {
+          color: #ededf5;
+          background: rgba(18,18,31,0.7);
         }
-        .dark .ql-editor.ql-blank::before {
-          color: #6b7280;
+        .ql-editor.ql-blank::before {
+          color: #9090a8;
         }
       `}</style>
     </div>

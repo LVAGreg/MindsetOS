@@ -195,10 +195,10 @@ export default function AdminCreditsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading credit overview...</p>
+          <RefreshCw className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#4f6ef7' }} />
+          <p style={{ color: '#9090a8' }}>Loading credit overview...</p>
         </div>
       </div>
     );
@@ -206,13 +206,13 @@ export default function AdminCreditsPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-20 p-4">
+      <div className="flex items-center justify-center py-20 p-4" style={{ background: '#09090f' }}>
         <div className="text-center max-w-md">
-          <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <p className="mb-4" style={{ color: '#ff6b6b' }}>{error}</p>
             <button
               onClick={() => router.push('/admin')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
             >
               Back to Admin
             </button>
@@ -227,24 +227,27 @@ export default function AdminCreditsPage() {
   const stats = overview.stats;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/admin')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Coins className="w-7 h-7 text-blue-600" />
+                <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: '#ededf5' }}>
+                  <Coins className="w-7 h-7" style={{ color: '#4f6ef7' }} />
                   Credit System Overview
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm mt-1" style={{ color: '#9090a8' }}>
                   Manage MindsetOS credit system and user balances
                 </p>
               </div>
@@ -252,14 +255,17 @@ export default function AdminCreditsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={fetchOverview}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-2 rounded-xl transition-colors flex items-center gap-2 text-sm font-medium"
+                style={{ color: '#9090a8', border: '1px solid #1e1e30' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </button>
               <button
                 onClick={() => setShowGrantModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Grant Credits
@@ -270,58 +276,58 @@ export default function AdminCreditsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Users */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</span>
+              <Users className="w-5 h-5" style={{ color: '#4f6ef7' }} />
+              <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Users</span>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold" style={{ color: '#ededf5' }}>
               {stats.user_count}
             </div>
           </div>
 
           {/* Total Balance */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
-              <Coins className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Balance</span>
+              <Coins className="w-5 h-5" style={{ color: '#22c55e' }} />
+              <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Balance</span>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold" style={{ color: '#fcc824', fontWeight: 700 }}>
               {parseInt(stats.total_balance).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm" style={{ color: '#9090a8' }}>
               ${parseFloat(stats.total_balance_usd).toFixed(2)} USD
             </div>
           </div>
 
           {/* Total Earned */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Earned</span>
+              <TrendingUp className="w-5 h-5" style={{ color: '#a855f7' }} />
+              <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Earned</span>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold" style={{ color: '#fcc824', fontWeight: 700 }}>
               {parseInt(stats.total_earned).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm" style={{ color: '#9090a8' }}>
               ${parseFloat(stats.total_earned_usd).toFixed(2)} USD
             </div>
           </div>
 
           {/* Total Spent */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
-              <TrendingDown className="w-5 h-5 text-red-600" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Spent</span>
+              <TrendingDown className="w-5 h-5" style={{ color: '#ef4444' }} />
+              <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Spent</span>
             </div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold" style={{ color: '#fcc824', fontWeight: 700 }}>
               {parseInt(stats.total_spent).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm" style={{ color: '#9090a8' }}>
               ${parseFloat(stats.total_spent_usd).toFixed(2)} USD
             </div>
           </div>
@@ -329,25 +335,25 @@ export default function AdminCreditsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Top Users by Balance */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+              <TrendingUp className="w-5 h-5" style={{ color: '#22c55e' }} />
               Top Users by Balance
             </h3>
             <div className="space-y-3">
               {overview.topUsers.map((user, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(30,30,48,0.5)', borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
+                    <div className="font-medium" style={{ color: '#ededf5' }}>
                       {user.first_name} {user.last_name}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                    <div className="text-sm" style={{ color: '#9090a8' }}>{user.email}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                    <div className="font-semibold" style={{ color: '#fcc824', fontWeight: 700 }}>
                       {user.balance.toLocaleString()} credits
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm" style={{ color: '#9090a8' }}>
                       ${parseFloat(user.balance_usd).toFixed(2)}
                     </div>
                   </div>
@@ -357,25 +363,25 @@ export default function AdminCreditsPage() {
           </div>
 
           {/* Top Spenders */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <TrendingDown className="w-5 h-5 text-red-600" />
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+              <TrendingDown className="w-5 h-5" style={{ color: '#ef4444' }} />
               Top Spenders
             </h3>
             <div className="space-y-3">
               {overview.topSpenders.map((user, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(30,30,48,0.5)', borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
+                    <div className="font-medium" style={{ color: '#ededf5' }}>
                       {user.first_name} {user.last_name}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                    <div className="text-sm" style={{ color: '#9090a8' }}>{user.email}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                    <div className="font-semibold" style={{ color: '#fcc824', fontWeight: 700 }}>
                       {user.total_spent.toLocaleString()} credits
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm" style={{ color: '#9090a8' }}>
                       ${parseFloat(user.total_spent_usd).toFixed(2)}
                     </div>
                   </div>
@@ -386,45 +392,46 @@ export default function AdminCreditsPage() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-blue-600" />
+        <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+            <DollarSign className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             Recent Transactions
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">User</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Type</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Amount</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Description</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-400">Date</th>
+                <tr style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                  <th className="text-left py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>User</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Type</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Amount</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Description</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Date</th>
                 </tr>
               </thead>
               <tbody>
                 {overview.recentTransactions.map((tx) => (
-                  <tr key={tx.id} className="border-b border-gray-100 dark:border-gray-700/50">
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">{tx.email}</td>
+                  <tr key={tx.id} style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                    <td className="py-3 px-4 text-sm" style={{ color: '#ededf5' }}>{tx.email}</td>
                     <td className="py-3 px-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        tx.transaction_type === 'admin_grant'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : tx.transaction_type === 'usage_deduction'
-                          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                          : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
-                      }`}>
+                      <span
+                        className="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                        style={
+                          tx.transaction_type === 'admin_grant'
+                            ? { background: 'rgba(34,197,94,0.15)', color: '#4ade80' }
+                            : tx.transaction_type === 'usage_deduction'
+                            ? { background: 'rgba(239,68,68,0.15)', color: '#f87171' }
+                            : { background: 'rgba(144,144,168,0.15)', color: '#9090a8' }
+                        }
+                      >
                         {tx.transaction_type.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className={`py-3 px-4 text-sm text-right font-medium ${
-                      tx.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                    }`}>
+                    <td className="py-3 px-4 text-sm text-right font-medium" style={{ color: tx.amount > 0 ? '#4ade80' : '#f87171', fontWeight: 700 }}>
                       {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()}
-                      <span className="text-xs ml-1">(${parseFloat(tx.amount_usd).toFixed(2)})</span>
+                      <span className="text-xs ml-1" style={{ color: '#9090a8' }}>(${parseFloat(tx.amount_usd).toFixed(2)})</span>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{tx.description}</td>
-                    <td className="py-3 px-4 text-sm text-gray-500 dark:text-gray-400 text-right">
+                    <td className="py-3 px-4 text-sm" style={{ color: '#9090a8' }}>{tx.description}</td>
+                    <td className="py-3 px-4 text-sm text-right" style={{ color: '#9090a8' }}>
                       {new Date(tx.created_at).toLocaleDateString()}
                     </td>
                   </tr>
@@ -437,61 +444,61 @@ export default function AdminCreditsPage() {
 
       {/* Grant Credits Modal */}
       {showGrantModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Grant Credits</h2>
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <div className="max-w-md w-full p-6" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <h2 className="text-xl font-bold mb-4" style={{ color: '#ededf5' }}>Grant Credits</h2>
             {grantError && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+              <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
                 {grantError}
               </div>
             )}
             {grantSuccess && (
-              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-300">
+              <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}>
                 {grantSuccess}
               </div>
             )}
             <form onSubmit={handleGrantCredits} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   User Email
                 </label>
                 <input
                   type="email"
                   value={grantEmail}
                   onChange={(e) => setGrantEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   placeholder="user@example.com"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Amount (credits)
                 </label>
                 <input
                   type="number"
                   value={grantAmount}
                   onChange={(e) => setGrantAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   placeholder="1000"
                   min="1"
                   required
                 />
                 {grantAmount && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     ≈ ${(parseInt(grantAmount) / 1000).toFixed(2)} USD
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                   Description (optional)
                 </label>
                 <input
                   type="text"
                   value={grantDescription}
                   onChange={(e) => setGrantDescription(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   placeholder="Admin credit grant"
                 />
               </div>
@@ -499,14 +506,17 @@ export default function AdminCreditsPage() {
                 <button
                   type="button"
                   onClick={() => setShowGrantModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                  style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
                   disabled={grantLoading}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50"
                   disabled={grantLoading}
                 >
                   {grantLoading ? 'Granting...' : 'Grant Credits'}

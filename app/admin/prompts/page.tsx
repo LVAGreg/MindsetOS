@@ -38,14 +38,12 @@ export default function SystemPromptsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Redirect if not admin
   useEffect(() => {
     if (user && user.role !== 'admin') {
       router.push('/dashboard');
     }
   }, [user, router]);
 
-  // Load prompts and models
   useEffect(() => {
     loadData();
   }, []);
@@ -55,12 +53,10 @@ export default function SystemPromptsPage() {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
 
-      // Fetch system prompts
       const promptsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/admin/system-prompts`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      // Fetch AI models
       const modelsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/admin/ai-models`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -69,7 +65,6 @@ export default function SystemPromptsPage() {
         const promptsData = await promptsRes.json();
         const modelsData = await modelsRes.json();
 
-        // Normalize prompts data - ensure temperature and maxTokens are numbers
         const normalizedPrompts = (promptsData.prompts || []).map((p: SystemPrompt) => ({
           ...p,
           temperature: typeof p.temperature === 'string' ? parseFloat(p.temperature) : p.temperature,
@@ -79,7 +74,6 @@ export default function SystemPromptsPage() {
         setPrompts(normalizedPrompts);
         setModels(modelsData.models || []);
 
-        // Select first prompt by default
         if (normalizedPrompts.length > 0) {
           const first = normalizedPrompts[0];
           setSelectedPrompt(first);
@@ -96,7 +90,6 @@ export default function SystemPromptsPage() {
   };
 
   const handleSelectPrompt = (prompt: SystemPrompt) => {
-    // Ensure temperature and maxTokens are numbers
     const normalizedPrompt = {
       ...prompt,
       temperature: typeof prompt.temperature === 'string' ? parseFloat(prompt.temperature) : prompt.temperature,
@@ -136,8 +129,6 @@ export default function SystemPromptsPage() {
 
       setSuccess('Prompt saved successfully!');
       await loadData();
-
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save prompt');
@@ -166,15 +157,11 @@ export default function SystemPromptsPage() {
 
   if (!user || user.role !== 'admin') {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Access Denied
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            This page is only accessible to administrators.
-          </p>
+          <AlertCircle className="w-16 h-16 mx-auto mb-4" style={{ color: '#f87171' }} />
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>Access Denied</h1>
+          <p style={{ color: '#9090a8' }}>This page is only accessible to administrators.</p>
         </div>
       </div>
     );
@@ -182,36 +169,37 @@ export default function SystemPromptsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading system prompts...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f6ef7] mx-auto mb-4" />
+          <p style={{ color: '#9090a8' }}>Loading system prompts...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">System Prompts</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Configure AI system prompts and models</p>
+              <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>System Prompts</h1>
+              <p className="text-sm mt-1" style={{ color: '#9090a8' }}>Configure AI system prompts and models</p>
             </div>
             <div className="flex items-center gap-3">
               <Link
                 href="/admin/settings"
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center gap-2 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
               >
                 <Cpu className="w-4 h-4" />
                 <span>AI Models</span>
               </Link>
               <Link
                 href="/admin"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors"
+                style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Admin</span>
@@ -224,30 +212,31 @@ export default function SystemPromptsPage() {
       <div className="space-y-6">
         {/* Status Messages */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <span className="font-medium text-red-900 dark:text-red-100">{error}</span>
+          <div className="p-4 rounded-xl flex items-center gap-3" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <AlertCircle className="w-5 h-5" style={{ color: '#f87171' }} />
+            <span className="font-medium" style={{ color: '#fca5a5' }}>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-            <span className="font-medium text-green-900 dark:text-green-100">{success}</span>
+          <div className="p-4 rounded-xl flex items-center gap-3" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }}>
+            <CheckCircle className="w-5 h-5" style={{ color: '#4ade80' }} />
+            <span className="font-medium" style={{ color: '#86efac' }}>{success}</span>
           </div>
         )}
 
         {/* Prompt Tabs */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-3">
           {prompts.map((prompt) => (
             <button
               key={prompt.id}
               onClick={() => handleSelectPrompt(prompt)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className="px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm"
+              style={
                 selectedPrompt?.id === prompt.id
-                  ? 'bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-[#ffc82c]/20 dark:to-[#f8c824]/20 border-2 border-[#ffc82c] text-gray-900 dark:text-white'
-                  : 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#ffc82c]/50'
-              }`}
+                  ? { background: 'rgba(79,110,247,0.15)', border: '2px solid #4f6ef7', color: '#ededf5' }
+                  : { background: 'rgba(18,18,31,0.7)', border: '2px solid #1e1e30', color: '#9090a8' }
+              }
             >
               {prompt.promptType === 'memory_agent' ? (
                 <Brain className="w-5 h-5" />
@@ -261,13 +250,13 @@ export default function SystemPromptsPage() {
 
         {/* Prompt Editor */}
         {editedPrompt && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8">
+          <div className="rounded-2xl p-8" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
             {/* Prompt Info */}
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>
                 {editedPrompt.promptName}
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: '#9090a8' }}>
                 {editedPrompt.promptDescription}
               </p>
             </div>
@@ -276,13 +265,13 @@ export default function SystemPromptsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* Model Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   AI Model
                 </label>
                 <select
                   value={editedPrompt.modelId}
                   onChange={(e) => setEditedPrompt({ ...editedPrompt, modelId: e.target.value })}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#ffc82c] focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 >
                   {models.map((model) => (
                     <option key={model.modelId} value={model.modelId}>
@@ -294,7 +283,7 @@ export default function SystemPromptsPage() {
 
               {/* Temperature */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   Temperature: {editedPrompt.temperature.toFixed(1)}
                 </label>
                 <input
@@ -304,9 +293,10 @@ export default function SystemPromptsPage() {
                   step="0.1"
                   value={editedPrompt.temperature}
                   onChange={(e) => setEditedPrompt({ ...editedPrompt, temperature: parseFloat(e.target.value) })}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                  style={{ background: '#1e1e30', accentColor: '#4f6ef7' }}
                 />
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <div className="flex justify-between text-xs mt-1" style={{ color: '#9090a8' }}>
                   <span>Precise</span>
                   <span>Creative</span>
                 </div>
@@ -314,14 +304,14 @@ export default function SystemPromptsPage() {
 
               {/* Max Tokens */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   Max Tokens
                 </label>
                 <input
                   type="number"
                   value={editedPrompt.maxTokens}
                   onChange={(e) => setEditedPrompt({ ...editedPrompt, maxTokens: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#ffc82c] focus:border-transparent"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   min="100"
                   max="10000"
                   step="100"
@@ -331,28 +321,29 @@ export default function SystemPromptsPage() {
 
             {/* System Prompt */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 System Prompt
               </label>
               <textarea
                 value={editedPrompt.systemPrompt}
                 onChange={(e) => setEditedPrompt({ ...editedPrompt, systemPrompt: e.target.value })}
                 rows={20}
-                className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-[#ffc82c] focus:border-transparent font-mono text-sm"
+                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                 placeholder="Enter system prompt..."
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs mt-2" style={{ color: '#9090a8' }}>
                 Use placeholders for dynamic content: {'{aiResponse}'} for widget formatter, {'{conversationText}'} for memory agent
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between pt-6" style={{ borderTop: '1px solid #1e1e30' }}>
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
                   disabled={!hasChanges()}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e30', color: '#9090a8' }}
                 >
                   <RotateCcw className="w-4 h-4" />
                   Reset Changes
@@ -361,18 +352,18 @@ export default function SystemPromptsPage() {
 
               <div className="flex gap-3 items-center">
                 {hasChanges() && (
-                  <span className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+                  <span className="text-sm font-medium" style={{ color: '#f8c824' }}>
                     Unsaved changes
                   </span>
                 )}
                 <button
                   onClick={handleSave}
                   disabled={saving || !hasChanges()}
-                  className="flex items-center gap-2 px-6 py-2 bg-[#ffc82c] text-black font-semibold rounded-lg hover:bg-[#f8c824] transition-colors disabled:opacity-50"
+                  className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-colors disabled:opacity-50 flex items-center gap-2"
                 >
                   {saving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                       <span>Saving...</span>
                     </>
                   ) : (
@@ -386,7 +377,7 @@ export default function SystemPromptsPage() {
             </div>
 
             {/* Last Updated */}
-            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-right">
+            <div className="mt-4 text-sm text-right" style={{ color: '#9090a8' }}>
               Last updated: {new Date(editedPrompt.updatedAt).toLocaleString()}
             </div>
           </div>

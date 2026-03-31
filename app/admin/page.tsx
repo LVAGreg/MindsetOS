@@ -40,7 +40,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for token before fetching
     const token = localStorage.getItem('accessToken');
     if (!token) {
       console.warn('No access token found, redirecting to login');
@@ -52,7 +51,6 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async (token: string) => {
     try {
-      // Add cache-busting timestamp to force fresh data
       const timestamp = new Date().getTime();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
       console.log('Fetching admin stats from:', `${apiUrl}/api/admin/stats`);
@@ -85,86 +83,100 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-gray-600 dark:text-gray-400">Loading admin dashboard...</div>
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
+        <div style={{ color: '#9090a8' }}>Loading admin dashboard...</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
+      <div className="mb-2">
+        <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>
+          Admin — Dashboard
+        </p>
+        <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>Overview</h1>
+      </div>
+
       {/* System Stats Cards */}
       {systemStats && (
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Total Users */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
+                  <Users className="w-6 h-6" style={{ color: '#4f6ef7' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{systemStats.totalUsers}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Total Users</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{systemStats.totalUsers}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Total Messages */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <MessageSquare className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
+                  <MessageSquare className="w-6 h-6" style={{ color: '#22c55e' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Messages</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{systemStats.totalMessages}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Total Messages</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{systemStats.totalMessages}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Total Conversations */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <BarChart3 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(168,85,247,0.15)' }}>
+                  <BarChart3 className="w-6 h-6" style={{ color: '#a855f7' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Conversations</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{systemStats.totalConversations}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Total Conversations</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{systemStats.totalConversations}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Active Today */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <Activity className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(249,115,22,0.15)' }}>
+                  <Activity className="w-6 h-6" style={{ color: '#f97316' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Active Today</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{systemStats.activeToday}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Active Today</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{systemStats.activeToday}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Avg Messages/User */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(20,184,166,0.15)' }}>
+                  <TrendingUp className="w-6 h-6" style={{ color: '#14b8a6' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Avg Messages/User</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{Number(systemStats.averageMessagesPerUser || 0).toFixed(1)}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Avg Messages/User</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{Number(systemStats.averageMessagesPerUser || 0).toFixed(1)}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            {/* Most Popular Agent */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
-                  <Clock className="w-6 h-6 text-pink-600 dark:text-pink-400" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(236,72,153,0.15)' }}>
+                  <Clock className="w-6 h-6" style={{ color: '#ec4899' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Most Popular Agent</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{systemStats.mostPopularAgent}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Most Popular Agent</p>
+                  <p className="text-lg font-bold" style={{ color: '#ededf5' }}>{systemStats.mostPopularAgent}</p>
                 </div>
               </div>
             </div>
@@ -172,128 +184,131 @@ export default function AdminDashboard() {
 
           {/* Usage & Cost Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-800">
+            {/* Total Tokens */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-200 dark:bg-yellow-900/50 rounded-lg">
-                  <Zap className="w-6 h-6 text-yellow-700 dark:text-yellow-300" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(234,179,8,0.15)' }}>
+                  <Zap className="w-6 h-6" style={{ color: '#eab308' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">Total Tokens Used</p>
-                  <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+                  <p className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Tokens Used</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                     {systemStats.totalTokens.toLocaleString()}
                   </p>
-                  <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     ~{((systemStats.totalTokens || 0) / 1000).toFixed(1)}K tokens
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+            {/* Total API Cost */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-200 dark:bg-green-900/50 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-green-700 dark:text-green-300" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
+                  <DollarSign className="w-6 h-6" style={{ color: '#22c55e' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-green-700 dark:text-green-300 font-medium">Total API Cost</p>
-                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  <p className="text-sm font-medium" style={{ color: '#9090a8' }}>Total API Cost</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                     ${(systemStats.totalCost || 0).toFixed(4)}
                   </p>
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     Live from OpenRouter usage
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+            {/* Avg Cost Per User */}
+            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-200 dark:bg-blue-900/50 rounded-lg">
-                  <Users className="w-6 h-6 text-blue-700 dark:text-blue-300" />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
+                  <Users className="w-6 h-6" style={{ color: '#4f6ef7' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Avg Cost Per User</p>
-                  <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  <p className="text-sm font-medium" style={{ color: '#9090a8' }}>Avg Cost Per User</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                     ${(systemStats.averageCostPerUser || 0).toFixed(4)}
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     Per active user
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          </div>
-        )}
+        </div>
+      )}
 
       {/* User List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">User Activity</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Detailed usage statistics per user</p>
+      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="overflow-hidden">
+        <div className="p-6 border-b border-[#1e1e30]">
+          <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>User Activity</h2>
+          <p className="text-sm mt-1" style={{ color: '#9090a8' }}>Detailed usage statistics per user</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <thead>
+              <tr style={{ background: 'rgba(18,18,31,0.5)' }}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Messages
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Conversations
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Tokens
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Cost
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Last Active
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Joined
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan={7} className="px-6 py-12 text-center" style={{ color: '#9090a8' }}>
                     No users found
                   </td>
                 </tr>
               ) : (
                 users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                  <tr key={user.id} style={{ borderBottom: '1px solid #1e1e30' }} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           {user.firstName} {user.lastName}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                        <div className="text-sm" style={{ color: '#9090a8' }}>{user.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">{user.messageCount}</span>
+                        <MessageSquare className="w-4 h-4" style={{ color: '#9090a8' }} />
+                        <span className="text-sm font-medium" style={{ color: '#ededf5' }}>{user.messageCount}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">{user.conversationCount}</span>
+                        <BarChart3 className="w-4 h-4" style={{ color: '#9090a8' }} />
+                        <span className="text-sm font-medium" style={{ color: '#ededf5' }}>{user.conversationCount}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4 text-yellow-500" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           {((user.totalTokens || 0) / 1000).toFixed(1)}K
                         </span>
                       </div>
@@ -301,15 +316,15 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-green-500" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           ${(user.estimatedCost || 0).toFixed(4)}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#9090a8' }}>
                       {user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#9090a8' }}>
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

@@ -181,31 +181,31 @@ export default function MyAgentsPage() {
   if (!user || (user.role !== 'agency' && user.role !== 'admin')) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <div className="sticky top-0 z-10" style={{ background: 'rgba(18,18,31,0.7)', borderBottom: '1px solid #1e1e30' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors hover:bg-white/5"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="w-5 h-5" style={{ color: '#9090a8' }} />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Wand2 className="w-5 h-5 text-purple-500" />
+                <h1 className="text-xl font-bold flex items-center gap-2" style={{ color: '#ededf5' }}>
+                  <Wand2 className="w-5 h-5 text-[#8b5cf6]" />
                   My Agents
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm" style={{ color: '#9090a8' }}>
                   {customAgents.length} custom agent{customAgents.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowCreatePicker(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg font-medium transition-colors shadow-sm bg-[#4f6ef7] hover:bg-[#3d5ce0]"
             >
               <Plus className="w-4 h-4" />
               Create Agent
@@ -218,28 +218,29 @@ export default function MyAgentsPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f6ef7]" />
           </div>
         ) : customAgents.length === 0 && !showCreate ? (
           <div className="text-center py-20">
-            <Wand2 className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <Wand2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#1e1e30' }} />
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#ededf5' }}>
               No custom agents yet
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
+            <p className="mb-8 max-w-md mx-auto" style={{ color: '#9090a8' }}>
               Build agents that follow your frameworks, speak in your style, and serve your clients.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => router.push('/dashboard?agent=agent-creator')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white rounded-xl font-semibold transition-colors"
               >
                 <Sparkles className="w-5 h-5" />
                 Create with AI Guide
               </button>
               <button
                 onClick={() => { setShowCreate(true); setCreateStep(0); setForm({ ...emptyForm }); }}
-                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-purple-400 dark:hover:border-purple-500 rounded-xl font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-colors"
+                style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 <Settings2 className="w-5 h-5" />
                 Create Manually
@@ -249,35 +250,38 @@ export default function MyAgentsPage() {
         ) : (
           <div className="space-y-4">
             {customAgents.map((agent) => (
-              <div key={agent.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+              <div key={agent.id} className="rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
                 <div className="p-4 sm:p-6">
                   <div className="flex items-start gap-4">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: agent.color || '#8b5cf6' }}
+                      style={{
+                        background: (agent.color || '#8b5cf6') + '15',
+                        border: '1px solid ' + (agent.color || '#8b5cf6') + '30',
+                      }}
                     >
-                      <Wand2 className="w-5 h-5 text-white" />
+                      <Wand2 className="w-5 h-5" style={{ color: agent.color || '#8b5cf6' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                        <h3 className="text-lg font-semibold truncate" style={{ color: '#ededf5' }}>
                           {agent.name}
                         </h3>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                           agent.isActive
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                            ? 'bg-green-500/10 text-green-400'
+                            : 'bg-white/5 text-[#9090a8]'
                         }`}>
                           {agent.isActive ? 'Active' : 'Inactive'}
                         </span>
-                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-[#4f6ef7]/10 text-[#7b8ff8]">
                           {agent.category}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                      <p className="text-sm line-clamp-2" style={{ color: '#9090a8' }}>
                         {agent.description || 'No description'}
                       </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-400 dark:text-gray-500">
+                      <div className="flex items-center gap-4 mt-2 text-xs" style={{ color: '#9090a8' }}>
                         <span className="flex items-center gap-1">
                           <MessageSquare className="w-3 h-3" />
                           {agent.conversationCount} conversations
@@ -286,35 +290,35 @@ export default function MyAgentsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button onClick={() => handleToggleActive(agent)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title={agent.isActive ? 'Deactivate' : 'Activate'}>
-                        {agent.isActive ? <ToggleRight className="w-5 h-5 text-green-500" /> : <ToggleLeft className="w-5 h-5 text-gray-400" />}
+                      <button onClick={() => handleToggleActive(agent)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title={agent.isActive ? 'Deactivate' : 'Activate'}>
+                        {agent.isActive ? <ToggleRight className="w-5 h-5 text-green-400" /> : <ToggleLeft className="w-5 h-5" style={{ color: '#9090a8' }} />}
                       </button>
-                      <button onClick={() => router.push(`/dashboard?agent=${agent.id}`)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Test agent">
-                        <MessageSquare className="w-5 h-5 text-blue-500" />
+                      <button onClick={() => router.push(`/dashboard?agent=${agent.id}`)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="Test agent">
+                        <MessageSquare className="w-5 h-5 text-[#7b8ff8]" />
                       </button>
-                      <button onClick={() => handleEdit(agent)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Edit">
-                        <Pencil className="w-5 h-5 text-gray-500" />
+                      <button onClick={() => handleEdit(agent)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="Edit">
+                        <Pencil className="w-5 h-5" style={{ color: '#9090a8' }} />
                       </button>
-                      <button onClick={() => setExpandedId(expandedId === agent.id ? null : agent.id)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="View prompt">
-                        {expandedId === agent.id ? <EyeOff className="w-5 h-5 text-gray-500" /> : <Eye className="w-5 h-5 text-gray-500" />}
+                      <button onClick={() => setExpandedId(expandedId === agent.id ? null : agent.id)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="View prompt">
+                        {expandedId === agent.id ? <EyeOff className="w-5 h-5" style={{ color: '#9090a8' }} /> : <Eye className="w-5 h-5" style={{ color: '#9090a8' }} />}
                       </button>
-                      <button onClick={() => setDeleteConfirmId(agent.id)} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Delete">
+                      <button onClick={() => setDeleteConfirmId(agent.id)} className="p-2 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete">
                         <Trash2 className="w-5 h-5 text-red-400" />
                       </button>
                     </div>
                   </div>
                   {expandedId === agent.id && (
-                    <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">System Prompt</h4>
-                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap max-h-64 overflow-y-auto font-mono">{agent.systemPrompt}</pre>
+                    <div className="mt-4 p-4 rounded-lg" style={{ background: '#09090f', border: '1px solid #1e1e30' }}>
+                      <h4 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#9090a8' }}>System Prompt</h4>
+                      <pre className="text-sm whitespace-pre-wrap max-h-64 overflow-y-auto font-mono" style={{ color: '#ededf5' }}>{agent.systemPrompt}</pre>
                     </div>
                   )}
                   {deleteConfirmId === agent.id && (
-                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                      <p className="text-sm text-red-700 dark:text-red-400 mb-3">Delete <strong>{agent.name}</strong>?</p>
+                    <div className="mt-4 p-4 rounded-lg" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                      <p className="text-sm text-red-400 mb-3">Delete <strong>{agent.name}</strong>?</p>
                       <div className="flex gap-2">
                         <button onClick={() => handleDelete(agent.id)} className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg">Delete</button>
-                        <button onClick={() => setDeleteConfirmId(null)} className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 rounded-lg">Cancel</button>
+                        <button onClick={() => setDeleteConfirmId(null)} className="px-3 py-1.5 text-sm rounded-lg" style={{ color: '#9090a8' }}>Cancel</button>
                       </div>
                     </div>
                   )}
@@ -327,42 +331,44 @@ export default function MyAgentsPage() {
 
       {/* Create Method Picker */}
       {showCreatePicker && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowCreatePicker(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Create a Custom Agent</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Choose how you want to build it</p>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowCreatePicker(false)}>
+          <div className="rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }} onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-5" style={{ borderBottom: '1px solid #1e1e30' }}>
+              <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Create a Custom Agent</h2>
+              <p className="text-sm mt-1" style={{ color: '#9090a8' }}>Choose how you want to build it</p>
             </div>
             <div className="p-6 space-y-3">
               <button
                 onClick={() => { setShowCreatePicker(false); router.push('/dashboard?agent=agent-creator'); }}
-                className="w-full flex items-center gap-4 p-4 border-2 border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600 bg-purple-50 dark:bg-purple-900/20 rounded-xl transition-all group"
+                className="w-full flex items-center gap-4 p-4 rounded-xl transition-all group"
+                style={{ background: 'linear-gradient(135deg, rgba(79,110,247,0.1), rgba(124,91,246,0.08))', border: '1px solid rgba(79,110,247,0.25)' }}
               >
-                <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-[#4f6ef7] flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-semibold text-gray-900 dark:text-white">AI-Guided Setup</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="font-semibold" style={{ color: '#ededf5' }}>AI-Guided Setup</div>
+                  <div className="text-sm" style={{ color: '#9090a8' }}>
                     Have a conversation — the Agent Creator walks you through it step by step
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
+                <ChevronRight className="w-5 h-5 text-[#7b8ff8] group-hover:text-[#4f6ef7] transition-colors" />
               </button>
               <button
                 onClick={() => { setShowCreatePicker(false); setShowCreate(true); setCreateStep(0); setForm({ ...emptyForm }); }}
-                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 rounded-xl transition-all group"
+                className="w-full flex items-center gap-4 p-4 rounded-xl transition-all group hover:bg-white/5"
+                style={{ border: '1px solid #1e1e30' }}
               >
-                <div className="w-12 h-12 rounded-xl bg-gray-500 flex items-center justify-center flex-shrink-0">
-                  <Settings2 className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#1e1e30' }}>
+                  <Settings2 className="w-6 h-6" style={{ color: '#9090a8' }} />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-semibold text-gray-900 dark:text-white">Manual Setup</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="font-semibold" style={{ color: '#ededf5' }}>Manual Setup</div>
+                  <div className="text-sm" style={{ color: '#9090a8' }}>
                     Fill out the form yourself — name, prompt, starters, and go
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                <ChevronRight className="w-5 h-5 transition-colors" style={{ color: '#9090a8' }} />
               </button>
             </div>
           </div>
@@ -371,14 +377,14 @@ export default function MyAgentsPage() {
 
       {/* Manual Create Modal — ChatGPT-style multi-step */}
       {showCreate && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             {/* Header with steps */}
-            <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #1e1e30' }}>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Create Agent</h2>
-                <button onClick={() => { setShowCreate(false); setForm({ ...emptyForm }); setCreateStep(0); }} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                  <X className="w-5 h-5 text-gray-500" />
+                <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Create Agent</h2>
+                <button onClick={() => { setShowCreate(false); setForm({ ...emptyForm }); setCreateStep(0); }} className="p-2 hover:bg-white/5 rounded-lg">
+                  <X className="w-5 h-5" style={{ color: '#9090a8' }} />
                 </button>
               </div>
               {/* Step indicator */}
@@ -389,11 +395,12 @@ export default function MyAgentsPage() {
                     onClick={() => setCreateStep(idx)}
                     className={`flex-1 text-center py-1.5 text-xs font-medium rounded-lg transition-colors ${
                       idx === createStep
-                        ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                        ? 'bg-[#4f6ef7]/15 text-[#7b8ff8]'
                         : idx < createStep
-                        ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                        ? 'bg-green-500/10 text-green-400'
+                        : 'text-[#9090a8]'
                     }`}
+                    style={idx !== createStep && idx >= createStep ? { background: '#1e1e30' } : undefined}
                   >
                     {idx < createStep ? '✓ ' : ''}{step}
                   </button>
@@ -406,53 +413,58 @@ export default function MyAgentsPage() {
               {createStep === 0 && (
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Agent Name *</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Agent Name *</label>
                     <input
                       type="text"
                       placeholder="e.g. Calendar Clarity Coach"
                       value={form.name}
                       onChange={e => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                       autoFocus
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Description</label>
                     <textarea
                       placeholder="What does this agent do? One or two sentences."
                       value={form.description}
                       onChange={e => setForm({ ...form, description: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Category</label>
                     <input
                       type="text"
                       placeholder="e.g. Operations, Sales, Marketing"
                       value={form.category}
                       onChange={e => setForm({ ...form, category: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Color</label>
                     <div className="flex gap-2 flex-wrap">
                       {COLOR_OPTIONS.map(c => (
                         <button key={c} onClick={() => setForm({ ...form, color: c })}
-                          className={`w-9 h-9 rounded-full border-2 transition-all ${form.color === c ? 'border-gray-800 dark:border-white scale-110 ring-2 ring-offset-2 ring-purple-400' : 'border-transparent hover:scale-105'}`}
-                          style={{ backgroundColor: c }}
+                          className={`w-9 h-9 rounded-full border-2 transition-all ${form.color === c ? 'scale-110 ring-2 ring-offset-2 ring-[#4f6ef7]/60' : 'border-transparent hover:scale-105'}`}
+                          style={{ backgroundColor: c, borderColor: form.color === c ? c : 'transparent' }}
                         />
                       ))}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Icon</label>
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Icon</label>
                     <div className="flex gap-2 flex-wrap">
                       {ICON_OPTIONS.map(i => (
                         <button key={i} onClick={() => setForm({ ...form, icon: i })}
-                          className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${form.icon === i ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400'}`}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                            form.icon === i
+                              ? 'bg-[#4f6ef7]/15 text-[#7b8ff8]'
+                              : 'text-[#9090a8] hover:bg-white/5'
+                          }`}
+                          style={{ border: `1px solid ${form.icon === i ? 'rgba(79,110,247,0.4)' : '#1e1e30'}` }}
                         >
                           {i}
                         </button>
@@ -465,22 +477,22 @@ export default function MyAgentsPage() {
               {createStep === 1 && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       System Prompt *
                     </label>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                      This is the instruction set that defines your agent's behavior, personality, and process. Write it as "You are..."
+                    <p className="text-xs mb-2" style={{ color: '#9090a8' }}>
+                      This is the instruction set that defines your agent&apos;s behavior, personality, and process. Write it as &quot;You are...&quot;
                     </p>
                     <textarea
                       placeholder={`You are the [Agent Name], a [role/personality] that helps [audience] with [task].\n\nYour tone is [warm/direct/professional]. You follow this process:\n\n1. First, ask...\n2. Then, guide them through...\n3. Finally, deliver...`}
                       value={form.systemPrompt}
                       onChange={e => setForm({ ...form, systemPrompt: e.target.value })}
                       rows={18}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-mono text-sm leading-relaxed"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 font-mono leading-relaxed"
                     />
                     <div className="flex justify-between mt-1">
-                      <span className="text-xs text-gray-400">{form.systemPrompt.length} characters</span>
-                      <span className="text-xs text-gray-400">~{Math.round(form.systemPrompt.length / 4)} tokens</span>
+                      <span className="text-xs" style={{ color: '#9090a8' }}>{form.systemPrompt.length} characters</span>
+                      <span className="text-xs" style={{ color: '#9090a8' }}>~{Math.round(form.systemPrompt.length / 4)} tokens</span>
                     </div>
                   </div>
                 </div>
@@ -489,10 +501,10 @@ export default function MyAgentsPage() {
               {createStep === 2 && (
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Conversation Starters
                     </label>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+                    <p className="text-xs mb-3" style={{ color: '#9090a8' }}>
                       Quick-start prompts users see when they open the agent
                     </p>
                     {form.conversationStarters.map((starter, idx) => (
@@ -506,11 +518,11 @@ export default function MyAgentsPage() {
                             setForm({ ...form, conversationStarters: updated });
                           }}
                           placeholder="e.g. Help me build my weekly plan"
-                          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
+                          className="flex-1 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                         />
                         {form.conversationStarters.length > 1 && (
                           <button onClick={() => setForm({ ...form, conversationStarters: form.conversationStarters.filter((_, i) => i !== idx) })}
-                            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
+                            className="p-2 hover:bg-red-500/10 rounded-lg">
                             <X className="w-4 h-4 text-red-400" />
                           </button>
                         )}
@@ -519,7 +531,7 @@ export default function MyAgentsPage() {
                     {form.conversationStarters.length < 5 && (
                       <button
                         onClick={() => setForm({ ...form, conversationStarters: [...form.conversationStarters, ''] })}
-                        className="text-sm text-purple-600 dark:text-purple-400 hover:underline mt-1"
+                        className="text-sm text-[#7b8ff8] hover:underline mt-1"
                       >
                         + Add another
                       </button>
@@ -527,22 +539,23 @@ export default function MyAgentsPage() {
                   </div>
 
                   {/* Preview */}
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Preview</h3>
-                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                  <div className="pt-5" style={{ borderTop: '1px solid #1e1e30' }}>
+                    <h3 className="text-sm font-semibold mb-3" style={{ color: '#9090a8' }}>Preview</h3>
+                    <div className="rounded-xl p-4" style={{ background: '#09090f', border: '1px solid #1e1e30' }}>
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: form.color }}>
-                          <Wand2 className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                          style={{ background: form.color + '15', border: '1px solid ' + form.color + '30' }}>
+                          <Wand2 className="w-5 h-5" style={{ color: form.color }} />
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900 dark:text-white">{form.name || 'Agent Name'}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">{form.category || 'custom'}</div>
+                          <div className="font-semibold" style={{ color: '#ededf5' }}>{form.name || 'Agent Name'}</div>
+                          <div className="text-xs" style={{ color: '#9090a8' }}>{form.category || 'custom'}</div>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{form.description || 'No description yet'}</p>
+                      <p className="text-sm mb-3" style={{ color: '#9090a8' }}>{form.description || 'No description yet'}</p>
                       <div className="flex flex-wrap gap-2">
                         {form.conversationStarters.filter(s => s.trim()).map((s, i) => (
-                          <span key={i} className="px-3 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-600 dark:text-gray-400">
+                          <span key={i} className="px-3 py-1 text-xs rounded-full" style={{ background: '#12121f', border: '1px solid #1e1e30', color: '#9090a8' }}>
                             {s}
                           </span>
                         ))}
@@ -551,7 +564,7 @@ export default function MyAgentsPage() {
                   </div>
 
                   {createError && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400">
+                    <div className="p-3 rounded-lg text-sm text-red-400" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
                       {createError}
                     </div>
                   )}
@@ -560,10 +573,11 @@ export default function MyAgentsPage() {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between">
+            <div className="px-6 py-4 flex justify-between" style={{ borderTop: '1px solid #1e1e30' }}>
               <button
                 onClick={() => createStep > 0 ? setCreateStep(createStep - 1) : (setShowCreate(false), setForm({ ...emptyForm }))}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm rounded-lg transition-colors hover:bg-white/5"
+                style={{ color: '#9090a8' }}
               >
                 {createStep > 0 ? 'Back' : 'Cancel'}
               </button>
@@ -571,7 +585,7 @@ export default function MyAgentsPage() {
                 <button
                   onClick={() => setCreateStep(createStep + 1)}
                   disabled={createStep === 0 && !form.name.trim()}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
+                  className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
@@ -580,7 +594,7 @@ export default function MyAgentsPage() {
                 <button
                   onClick={handleManualCreate}
                   disabled={creating || !form.name.trim() || !form.systemPrompt.trim()}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
+                  className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   {creating ? (
                     <>
@@ -602,66 +616,66 @@ export default function MyAgentsPage() {
 
       {/* Edit Modal */}
       {editingId && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Edit Agent</h2>
-              <button onClick={() => setEditingId(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="sticky top-0 px-6 py-4 flex items-center justify-between" style={{ background: 'rgba(18,18,31,0.97)', borderBottom: '1px solid #1e1e30' }}>
+              <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Edit Agent</h2>
+              <button onClick={() => setEditingId(null)} className="p-2 hover:bg-white/5 rounded-lg">
+                <X className="w-5 h-5" style={{ color: '#9090a8' }} />
               </button>
             </div>
             <div className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Name</label>
                 <input type="text" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Description</label>
                 <input type="text" value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Category</label>
                 <input type="text" value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none" />
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Color</label>
                 <div className="flex gap-2 flex-wrap">
                   {COLOR_OPTIONS.map(c => (
                     <button key={c} onClick={() => setEditForm({ ...editForm, color: c })}
-                      className={`w-9 h-9 rounded-full border-2 transition-all ${editForm.color === c ? 'border-gray-800 dark:border-white scale-110' : 'border-transparent'}`}
-                      style={{ backgroundColor: c }} />
+                      className={`w-9 h-9 rounded-full border-2 transition-all ${editForm.color === c ? 'scale-110 ring-2 ring-offset-2 ring-[#4f6ef7]/60' : 'border-transparent hover:scale-105'}`}
+                      style={{ backgroundColor: c, borderColor: editForm.color === c ? c : 'transparent' }} />
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">System Prompt</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>System Prompt</label>
                 <textarea value={editForm.systemPrompt} onChange={e => setEditForm({ ...editForm, systemPrompt: e.target.value })}
-                  rows={14} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-mono text-sm" />
+                  rows={14} className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 font-mono" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Conversation Starters</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Conversation Starters</label>
                 {editForm.conversationStarters.map((starter, idx) => (
                   <div key={idx} className="flex gap-2 mb-2">
                     <input type="text" value={starter} onChange={e => {
                       const updated = [...editForm.conversationStarters];
                       updated[idx] = e.target.value;
                       setEditForm({ ...editForm, conversationStarters: updated });
-                    }} className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" />
+                    }} className="flex-1 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40" />
                     <button onClick={() => setEditForm({ ...editForm, conversationStarters: editForm.conversationStarters.filter((_, i) => i !== idx) })}
-                      className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"><X className="w-4 h-4 text-red-400" /></button>
+                      className="p-2 hover:bg-red-500/10 rounded-lg"><X className="w-4 h-4 text-red-400" /></button>
                   </div>
                 ))}
                 <button onClick={() => setEditForm({ ...editForm, conversationStarters: [...editForm.conversationStarters, ''] })}
-                  className="text-sm text-purple-600 dark:text-purple-400 hover:underline">+ Add starter</button>
+                  className="text-sm text-[#7b8ff8] hover:underline">+ Add starter</button>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-end gap-3">
-              <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 rounded-lg">Cancel</button>
+            <div className="sticky bottom-0 px-6 py-4 flex justify-end gap-3" style={{ background: 'rgba(18,18,31,0.97)', borderTop: '1px solid #1e1e30' }}>
+              <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm rounded-lg hover:bg-white/5" style={{ color: '#9090a8' }}>Cancel</button>
               <button onClick={handleSave} disabled={saving || !editForm.name || !editForm.systemPrompt}
-                className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg">
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50">
                 <Save className="w-4 h-4" />{saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>

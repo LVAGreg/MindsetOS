@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, AlertTriangle, Eye, EyeOff, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
+import { Shield, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
 
 interface SecurityEvent {
   id: string;
@@ -22,6 +22,122 @@ interface SecurityStats {
   events: { total: number; unresolved: number; byType: Record<string, number> };
   patternsMonitored: number;
 }
+
+const cardStyle = {
+  background: 'rgba(18,18,31,0.7)',
+  border: '1px solid #1e1e30',
+  borderRadius: 16,
+};
+
+const severityStyle = (s: string): React.CSSProperties => {
+  switch (s) {
+    case 'high':
+      return {
+        background: 'rgba(239,68,68,0.1)',
+        border: '1px solid rgba(239,68,68,0.3)',
+        color: '#f87171',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    case 'medium':
+      return {
+        background: 'rgba(245,158,11,0.1)',
+        border: '1px solid rgba(245,158,11,0.3)',
+        color: '#fbbf24',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    case 'low':
+      return {
+        background: 'rgba(34,197,94,0.08)',
+        border: '1px solid rgba(34,197,94,0.2)',
+        color: '#4ade80',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    default:
+      return {
+        background: 'rgba(144,144,168,0.1)',
+        border: '1px solid rgba(144,144,168,0.2)',
+        color: '#9090a8',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+  }
+};
+
+const typeStyle = (t: string): React.CSSProperties => {
+  switch (t) {
+    case 'jailbreak_attempt':
+      return {
+        background: 'rgba(239,68,68,0.1)',
+        border: '1px solid rgba(239,68,68,0.3)',
+        color: '#f87171',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    case 'prompt_injection':
+      return {
+        background: 'rgba(249,115,22,0.1)',
+        border: '1px solid rgba(249,115,22,0.3)',
+        color: '#fb923c',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    case 'config_access':
+      return {
+        background: 'rgba(124,91,246,0.1)',
+        border: '1px solid rgba(124,91,246,0.3)',
+        color: '#a78bfa',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    case 'suspicious_pattern':
+      return {
+        background: 'rgba(245,158,11,0.1)',
+        border: '1px solid rgba(245,158,11,0.3)',
+        color: '#fbbf24',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+    default:
+      return {
+        background: 'rgba(144,144,168,0.1)',
+        border: '1px solid rgba(144,144,168,0.2)',
+        color: '#9090a8',
+        borderRadius: 8,
+        padding: '1px 8px',
+        fontSize: 11,
+        fontWeight: 600,
+      };
+  }
+};
+
+const typeLabel = (t: string) => {
+  switch (t) {
+    case 'jailbreak_attempt': return 'Jailbreak';
+    case 'prompt_injection': return 'Prompt Injection';
+    case 'config_access': return 'Config Access';
+    case 'suspicious_pattern': return 'Suspicious';
+    default: return t;
+  }
+};
 
 export default function SecurityPage() {
   const [events, setEvents] = useState<SecurityEvent[]>([]);
@@ -61,46 +177,23 @@ export default function SecurityPage() {
     return true;
   });
 
-  const severityColor = (s: string) => {
-    switch (s) {
-      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'low': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    }
-  };
-
-  const typeLabel = (t: string) => {
-    switch (t) {
-      case 'jailbreak_attempt': return 'Jailbreak';
-      case 'prompt_injection': return 'Prompt Injection';
-      case 'config_access': return 'Config Access';
-      case 'suspicious_pattern': return 'Suspicious';
-      default: return t;
-    }
-  };
-
-  const typeColor = (t: string) => {
-    switch (t) {
-      case 'jailbreak_attempt': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-      case 'prompt_injection': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
-      case 'config_access': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-      case 'suspicious_pattern': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    }
-  };
-
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div style={{ background: '#09090f', minHeight: '100vh', padding: 24 }}>
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-red-500" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Security Monitor</h1>
+          <Shield className="w-8 h-8" style={{ color: '#f87171' }} />
+          <h1 style={{ color: '#ededf5', fontSize: 24, fontWeight: 700 }}>Security Monitor</h1>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity disabled:opacity-50"
+          style={{
+            background: 'rgba(18,18,31,0.7)',
+            border: '1px solid #1e1e30',
+            color: '#ededf5',
+          }}
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -109,25 +202,29 @@ export default function SecurityPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total Flagged Messages</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats?.jailbreakAttempts ?? '—'}</p>
+        <div className="p-4" style={cardStyle}>
+          <p style={{ color: '#9090a8', fontSize: 13 }}>Total Flagged Messages</p>
+          <p style={{ color: '#ededf5', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
+            {stats?.jailbreakAttempts ?? '—'}
+          </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Jailbreak Attempts</p>
-          <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+        <div className="p-4" style={cardStyle}>
+          <p style={{ color: '#9090a8', fontSize: 13 }}>Jailbreak Attempts</p>
+          <p style={{ color: '#f87171', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             {filteredEvents.filter(e => e.event_type === 'jailbreak_attempt').length || '—'}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Config Access Attempts</p>
-          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+        <div className="p-4" style={cardStyle}>
+          <p style={{ color: '#9090a8', fontSize: 13 }}>Config Access Attempts</p>
+          <p style={{ color: '#a78bfa', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             {filteredEvents.filter(e => e.event_type === 'config_access').length || '—'}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Patterns Monitored</p>
-          <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats?.patternsMonitored ?? 16}</p>
+        <div className="p-4" style={cardStyle}>
+          <p style={{ color: '#9090a8', fontSize: 13 }}>Patterns Monitored</p>
+          <p style={{ color: '#4ade80', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
+            {stats?.patternsMonitored ?? 16}
+          </p>
         </div>
       </div>
 
@@ -136,7 +233,7 @@ export default function SecurityPage() {
         <select
           value={filterType}
           onChange={e => setFilterType(e.target.value)}
-          className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300"
+          className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm"
         >
           <option value="all">All Types</option>
           <option value="jailbreak_attempt">Jailbreak</option>
@@ -147,95 +244,115 @@ export default function SecurityPage() {
         <select
           value={filterSeverity}
           onChange={e => setFilterSeverity(e.target.value)}
-          className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300"
+          className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm"
         >
           <option value="all">All Severity</option>
           <option value="high">High</option>
           <option value="medium">Medium</option>
           <option value="low">Low</option>
         </select>
-        <span className="text-sm text-gray-500 dark:text-gray-400 self-center">
+        <span className="self-center" style={{ color: '#9090a8', fontSize: 13 }}>
           {filteredEvents.length} events
         </span>
       </div>
 
       {/* Events Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div style={{ ...cardStyle, overflow: 'hidden' }}>
         {loading ? (
-          <div className="p-12 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-12 text-center" style={{ color: '#9090a8' }}>
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
             Loading security events...
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="p-12 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-12 text-center" style={{ color: '#9090a8' }}>
             <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-lg font-medium">No security events found</p>
-            <p className="text-sm mt-1">All clear — no suspicious patterns detected.</p>
+            <p style={{ fontSize: 16, fontWeight: 500, color: '#ededf5' }}>No security events found</p>
+            <p style={{ fontSize: 13, marginTop: 4, color: '#9090a8' }}>All clear — no suspicious patterns detected.</p>
           </div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Time</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">User</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Severity</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Preview</th>
+            <thead>
+              <tr style={{ background: 'rgba(9,9,15,0.8)', borderBottom: '1px solid #1e1e30' }}>
+                {['Time', 'User', 'Type', 'Severity', 'Agent', 'Preview'].map(col => (
+                  <th
+                    key={col}
+                    className="px-4 py-3 text-left"
+                    style={{ color: '#9090a8', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                  >
+                    {col}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody>
               {filteredEvents.map((event) => (
-                <tr
-                  key={event.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
-                  onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
-                >
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                    {new Date(event.created_at).toLocaleDateString()}{' '}
-                    <span className="text-xs">{new Date(event.created_at).toLocaleTimeString()}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {event.user_email || 'Unknown'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeColor(event.event_type)}`}>
-                      {typeLabel(event.event_type)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${severityColor(event.severity)}`}>
-                      {event.severity}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {event.agent_name || '—'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                    <div className="flex items-center gap-1">
-                      {expandedId === event.id ? <ChevronDown className="w-4 h-4 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
-                      <span className="truncate">{event.content?.substring(0, 80)}</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {/* Expanded detail row */}
-              {filteredEvents.map((event) => expandedId === event.id && (
-                <tr key={`${event.id}-detail`} className="bg-gray-50 dark:bg-gray-900">
-                  <td colSpan={6} className="px-6 py-4">
-                    <div className="space-y-2">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase">Full Message Content</p>
-                      <pre className="text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 whitespace-pre-wrap break-words font-mono max-h-48 overflow-y-auto">
-                        {event.content}
-                      </pre>
-                      <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 pt-1">
-                        <span>User: {event.user_name || event.user_email}</span>
-                        <span>Agent: {event.agent_name}</span>
-                        <span>Conversation: {event.conversation_id?.substring(0, 8)}...</span>
+                <>
+                  <tr
+                    key={event.id}
+                    className="cursor-pointer transition-colors"
+                    style={{ borderBottom: '1px solid rgba(30,30,48,0.5)', color: '#ededf5' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap" style={{ color: '#9090a8', fontSize: 13 }}>
+                      {new Date(event.created_at).toLocaleDateString()}{' '}
+                      <span style={{ fontSize: 11 }}>{new Date(event.created_at).toLocaleTimeString()}</span>
+                    </td>
+                    <td className="px-4 py-3" style={{ color: '#ededf5', fontSize: 13 }}>
+                      {event.user_email || 'Unknown'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span style={typeStyle(event.event_type)}>
+                        {typeLabel(event.event_type)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span style={severityStyle(event.severity)}>
+                        {event.severity}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3" style={{ color: '#9090a8', fontSize: 13 }}>
+                      {event.agent_name || '—'}
+                    </td>
+                    <td className="px-4 py-3 max-w-xs" style={{ color: '#9090a8', fontSize: 13 }}>
+                      <div className="flex items-center gap-1 truncate">
+                        {expandedId === event.id
+                          ? <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: '#4f6ef7' }} />
+                          : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
+                        <span className="truncate">{event.content?.substring(0, 80)}</span>
                       </div>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
+                  {expandedId === event.id && (
+                    <tr key={`${event.id}-detail`} style={{ background: 'rgba(9,9,15,0.6)' }}>
+                      <td colSpan={6} className="px-6 py-4">
+                        <div className="space-y-2">
+                          <p style={{ color: '#9090a8', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Full Message Content
+                          </p>
+                          <pre
+                            className="font-mono text-sm whitespace-pre-wrap break-words max-h-48 overflow-y-auto p-3 rounded-lg"
+                            style={{
+                              background: 'rgba(18,18,31,0.7)',
+                              border: '1px solid #1e1e30',
+                              borderRadius: 12,
+                              color: '#ededf5',
+                              fontSize: 13,
+                            }}
+                          >
+                            {event.content}
+                          </pre>
+                          <div className="flex gap-4 pt-1" style={{ color: '#9090a8', fontSize: 12 }}>
+                            <span>User: {event.user_name || event.user_email}</span>
+                            <span>Agent: {event.agent_name}</span>
+                            <span>Conversation: {event.conversation_id?.substring(0, 8)}...</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))}
             </tbody>
           </table>

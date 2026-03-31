@@ -159,24 +159,32 @@ export default function TeamPage() {
   if (!isAgencyOrAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div style={{ background: 'rgba(18,18,31,0.7)', borderBottom: '1px solid #1e1e30' }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => router.push('/dashboard')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-gray-500" />
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <Users className="w-6 h-6 text-indigo-500" />
+              <Users className="w-6 h-6" style={{ color: '#7b8ff8' }} />
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">Team Management</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{managedUsers.length} member{managedUsers.length !== 1 ? 's' : ''} · {pendingInvites.length} pending</p>
+                <h1 className="text-xl font-bold" style={{ color: '#ededf5' }}>Team Management</h1>
+                <p className="text-sm" style={{ color: '#9090a8' }}>
+                  {managedUsers.length} member{managedUsers.length !== 1 ? 's' : ''} · {pendingInvites.length} pending
+                </p>
               </div>
             </div>
             <button
               onClick={() => setShowInvite(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
+              className="flex items-center gap-2 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
             >
               <Mail className="w-4 h-4" />
               Invite Member
@@ -188,39 +196,40 @@ export default function TeamPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Invite form */}
         {showInvite && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">Invite a Team Member</h2>
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <h2 className="text-base font-bold mb-4" style={{ color: '#ededf5' }}>Invite a Team Member</h2>
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 text-sm rounded-lg p-3 mb-4" style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
               </div>
             )}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address *</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Email Address *</label>
                 <input
                   type="email"
                   value={inviteEmail}
                   onChange={e => setInviteEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleInvite()}
                   placeholder="colleague@company.com"
-                  className="w-full max-w-md px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full max-w-md bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Agent Access (optional — blank = all agents)</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>Agent Access (optional — blank = all agents)</label>
                 <div className="flex flex-wrap gap-2">
                   {agents.slice(0, 14).map(agent => (
                     <button
                       key={agent.id}
                       onClick={() => toggleInviteAgent(agent.id)}
-                      className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                      className="px-2.5 py-1 text-xs rounded-full transition-colors"
+                      style={
                         inviteAgents.includes(agent.id)
-                          ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300'
-                          : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300'
-                      }`}
+                          ? { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }
+                          : { background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30', color: '#9090a8' }
+                      }
                     >
                       {agent.name}
                     </button>
@@ -228,10 +237,18 @@ export default function TeamPage() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={handleInvite} disabled={!inviteEmail.includes('@') || sending} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors">
+                <button
+                  onClick={handleInvite}
+                  disabled={!inviteEmail.includes('@') || sending}
+                  className="bg-[#4f6ef7] hover:bg-[#3d5ce0] disabled:opacity-50 text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
+                >
                   {sending ? 'Sending...' : 'Send Invite'}
                 </button>
-                <button onClick={() => { setShowInvite(false); setError(null); setInviteEmail(''); setInviteAgents([]); }} className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm rounded-lg transition-colors">
+                <button
+                  onClick={() => { setShowInvite(false); setError(null); setInviteEmail(''); setInviteAgents([]); }}
+                  className="px-4 py-2 text-sm rounded-xl transition-colors"
+                  style={{ color: '#9090a8' }}
+                >
                   Cancel
                 </button>
               </div>
@@ -241,32 +258,42 @@ export default function TeamPage() {
 
         {/* Pending Invites */}
         {pendingInvites.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-amber-500" />
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <h2 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+              <Clock className="w-5 h-5" style={{ color: '#f59e0b' }} />
               Pending Invites ({pendingInvites.length})
             </h2>
             <div className="space-y-2">
               {pendingInvites.map(invite => (
-                <div key={invite.id} className="flex items-center gap-4 p-3 rounded-lg bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30">
-                  <Mail className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                <div
+                  key={invite.id}
+                  className="flex items-center gap-4 p-3 rounded-lg"
+                  style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
+                >
+                  <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#f59e0b' }} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{invite.email}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-sm font-medium" style={{ color: '#ededf5' }}>{invite.email}</div>
+                    <div className="text-xs" style={{ color: '#9090a8' }}>
                       Expires {new Date(invite.expiresAt).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCopyCode(invite.inviteCode)}
-                      className="flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300 transition-colors"
+                      className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #1e1e30', color: '#9090a8' }}
                       title="Copy invite code"
                     >
-                      {copiedCode === invite.inviteCode ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                      {copiedCode === invite.inviteCode ? <Check className="w-3 h-3" style={{ color: '#4ade80' }} /> : <Copy className="w-3 h-3" />}
                       <span className="font-mono">{invite.inviteCode}</span>
                     </button>
-                    <button onClick={() => handleRevokeInvite(invite.id)} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors" title="Revoke invite">
-                      <X className="w-4 h-4 text-red-400" />
+                    <button
+                      onClick={() => handleRevokeInvite(invite.id)}
+                      className="p-1 rounded transition-colors"
+                      style={{ color: '#f87171' }}
+                      title="Revoke invite"
+                    >
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -276,57 +303,71 @@ export default function TeamPage() {
         )}
 
         {/* Team Members */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-green-500" />
+        <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+          <h2 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+            <UserCheck className="w-5 h-5" style={{ color: '#4ade80' }} />
             Team Members ({managedUsers.length})
           </h2>
 
           {loading ? (
-            <div className="text-center py-8 text-gray-400">Loading team...</div>
+            <div className="text-center py-8" style={{ color: '#9090a8' }}>Loading team...</div>
           ) : managedUsers.length === 0 ? (
             <div className="text-center py-8">
-              <Users className="w-12 h-12 mx-auto mb-3 text-gray-200 dark:text-gray-700" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">No team members yet</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Invite someone to get started</p>
+              <Users className="w-12 h-12 mx-auto mb-3" style={{ color: '#2a2a42' }} />
+              <p className="text-sm" style={{ color: '#9090a8' }}>No team members yet</p>
+              <p className="text-xs mt-1" style={{ color: '#5a5a72' }}>Invite someone to get started</p>
             </div>
           ) : (
             <div className="space-y-2">
               {managedUsers.map(mu => (
-                <div key={mu.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <div key={mu.id} style={{ border: '1px solid #1e1e30', borderRadius: 12, overflow: 'hidden' }}>
                   {/* User row */}
-                  <div className="flex items-center gap-4 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  <div className="flex items-center gap-4 p-3 transition-colors" style={{ cursor: 'default' }}>
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                      style={{ background: 'rgba(79,110,247,0.2)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8' }}
+                    >
                       {(mu.firstName?.[0] || mu.email[0]).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
                         {mu.firstName || mu.lastName ? `${mu.firstName || ''} ${mu.lastName || ''}`.trim() : mu.email}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{mu.email}</div>
+                      <div className="text-xs" style={{ color: '#9090a8' }}>{mu.email}</div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 text-xs" style={{ color: '#9090a8' }}>
                       <MessageSquare className="w-3.5 h-3.5" />
                       <span>{mu.conversationCount}</span>
                     </div>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      mu.role === 'agency' ? 'text-indigo-600 bg-indigo-50' :
-                      mu.role === 'power_user' ? 'text-purple-600 bg-purple-50' :
-                      mu.role === 'admin' ? 'text-red-600 bg-red-50' :
-                      'text-gray-600 bg-gray-50'
-                    }`}>{mu.role}</span>
-                    <button onClick={() => setExpandedUser(expandedUser === mu.userId ? null : mu.userId)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
-                      {expandedUser === mu.userId ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                    <span
+                      className="text-[10px] font-bold"
+                      style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11 }}
+                    >
+                      {mu.role}
+                    </span>
+                    <button
+                      onClick={() => setExpandedUser(expandedUser === mu.userId ? null : mu.userId)}
+                      className="p-1 rounded transition-colors"
+                      style={{ color: '#9090a8' }}
+                    >
+                      {expandedUser === mu.userId ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
-                    <button onClick={() => handleRemoveUser(mu.userId)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" title="Remove from team">
-                      <Trash2 className="w-4 h-4 text-red-400" />
+                    <button
+                      onClick={() => handleRemoveUser(mu.userId)}
+                      className="p-1 rounded transition-colors"
+                      style={{ color: '#f87171' }}
+                      title="Remove from team"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
 
                   {/* Expanded agent toggles */}
                   {expandedUser === mu.userId && (
-                    <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Agent Access {mu.allowedAgents.length === 0 ? '(all agents)' : `(${mu.allowedAgents.length} selected)`}</p>
+                    <div className="px-4 py-3" style={{ background: 'rgba(9,9,15,0.6)', borderTop: '1px solid #1e1e30' }}>
+                      <p className="text-xs font-medium mb-2" style={{ color: '#9090a8' }}>
+                        Agent Access {mu.allowedAgents.length === 0 ? '(all agents)' : `(${mu.allowedAgents.length} selected)`}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {agents.slice(0, 14).map(agent => {
                           const allowed = mu.allowedAgents.length === 0 || mu.allowedAgents.includes(agent.id);
@@ -334,11 +375,12 @@ export default function TeamPage() {
                             <button
                               key={agent.id}
                               onClick={() => handleToggleUserAgent(mu.userId, agent.id, mu.allowedAgents)}
-                              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                              className="px-2.5 py-1 text-xs rounded-full transition-colors"
+                              style={
                                 allowed
-                                  ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300'
-                                  : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500'
-                              }`}
+                                  ? { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }
+                                  : { background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30', color: '#5a5a72' }
+                              }
                             >
                               {agent.name}
                             </button>

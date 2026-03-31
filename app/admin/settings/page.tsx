@@ -148,7 +148,6 @@ export default function SystemSettingsPage() {
       const configName = configKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       setSuccess(`✅ ${configName} saved successfully!`);
 
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save config');
@@ -208,12 +207,10 @@ export default function SystemSettingsPage() {
 
       const data = await response.json();
 
-      // Reload models
       await loadData();
 
       setSuccess(`✅ Successfully refreshed ${data.count} models from OpenRouter!`);
 
-      // Clear success message after 5 seconds
       setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to refresh models');
@@ -250,8 +247,6 @@ export default function SystemSettingsPage() {
       if (result.success) {
         setSuccess(`✅ Updated ${result.successCount} agent prompts successfully!`);
         console.log('Agent prompt update results:', result.results);
-
-        // Clear success message after 5 seconds
         setTimeout(() => setSuccess(null), 5000);
       } else {
         setError('Failed to update agent prompts');
@@ -295,7 +290,6 @@ export default function SystemSettingsPage() {
         setSuccess('✅ Debug mode disabled - Verbose logging turned off.');
       }
 
-      // Clear success message after 5 seconds
       setTimeout(() => setSuccess(null), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to toggle debug mode');
@@ -304,13 +298,13 @@ export default function SystemSettingsPage() {
     }
   };
 
-  // Show loading while hydrating
+  // Loading while hydrating
   if (!hasHydrated) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f6ef7] mx-auto mb-4"></div>
+          <p style={{ color: '#9090a8' }}>Loading...</p>
         </div>
       </div>
     );
@@ -322,10 +316,10 @@ export default function SystemSettingsPage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>
             Access Denied
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p style={{ color: '#9090a8' }}>
             This page is only accessible to administrators and power users.
           </p>
         </div>
@@ -337,8 +331,8 @@ export default function SystemSettingsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading settings...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f6ef7] mx-auto mb-4"></div>
+          <p style={{ color: '#9090a8' }}>Loading settings...</p>
         </div>
       </div>
     );
@@ -350,10 +344,13 @@ export default function SystemSettingsPage() {
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>
+              Admin — Settings
+            </p>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#ededf5' }}>
               System Settings
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p style={{ color: '#9090a8' }}>
               Configure AI models used for memory extraction and widget formatting
             </p>
           </div>
@@ -361,7 +358,7 @@ export default function SystemSettingsPage() {
             <button
               onClick={handleRefreshModels}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Fetch latest models from OpenRouter"
             >
               {refreshing ? (
@@ -379,7 +376,8 @@ export default function SystemSettingsPage() {
             <button
               onClick={() => setShowPromptConfirm(true)}
               disabled={updatingPrompts}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: '#7c3aed' }}
               title="Update all agent prompts from instruction files"
             >
               {updatingPrompts ? (
@@ -399,31 +397,31 @@ export default function SystemSettingsPage() {
 
         {/* Alerts */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-xl flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-red-900 dark:text-red-100">Error</h3>
-              <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+              <h3 className="font-semibold text-red-400">Error</h3>
+              <p className="text-red-300 text-sm">{error}</p>
             </div>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <p className="text-green-900 dark:text-green-100 font-medium">{success}</p>
+          <div className="mb-6 p-4 rounded-xl" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}>
+            <p className="text-green-400 font-medium">{success}</p>
           </div>
         )}
 
         {/* Debug Mode Toggle */}
-        <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="mb-6 overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 border-b border-[#1e1e30]">
             <div className="flex items-center gap-3 mb-2">
-              <Bug className="w-6 h-6 text-red-600 dark:text-red-400" />
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              <Bug className="w-6 h-6 text-red-400" />
+              <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 Debug Mode
               </h2>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm mb-3" style={{ color: '#9090a8' }}>
               Enable verbose logging for vector searches and AI prompts (admin debugging only)
             </p>
           </div>
@@ -437,8 +435,9 @@ export default function SystemSettingsPage() {
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                     debugMode
                       ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      : 'hover:opacity-80'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  style={!debugMode ? { background: '#1e1e30' } : undefined}
                 >
                   <span
                     className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
@@ -446,20 +445,20 @@ export default function SystemSettingsPage() {
                     }`}
                   />
                 </button>
-                <span className="text-gray-900 dark:text-white font-medium">
+                <span className="font-medium" style={{ color: '#ededf5' }}>
                   {debugMode ? 'ON' : 'OFF'}
                 </span>
                 {togglingDebug && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-500"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#4f6ef7]"></div>
                 )}
               </div>
 
               {debugMode && (
                 <div className="text-right">
-                  <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+                  <p className="text-sm text-red-400 font-semibold">
                     🔍 Active - Check server console for logs
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                     Logs include: RAG searches, prompts, memory loads
                   </p>
                 </div>
@@ -467,14 +466,14 @@ export default function SystemSettingsPage() {
             </div>
 
             {debugMode && (
-              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                <p className="text-sm text-yellow-900 dark:text-yellow-100 font-medium">
+              <div className="mt-4 p-3 rounded-xl" style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.2)' }}>
+                <p className="text-sm text-yellow-400 font-medium">
                   ⚠️ Debug Output Active
                 </p>
-                <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                <p className="text-xs text-yellow-300/70 mt-1">
                   Verbose logging is enabled. The server console will show:
                 </p>
-                <ul className="text-xs text-yellow-700 dark:text-yellow-300 mt-2 space-y-1 list-disc list-inside">
+                <ul className="text-xs text-yellow-300/70 mt-2 space-y-1 list-disc list-inside">
                   <li>Vector database searches with similarity scores</li>
                   <li>Full AI prompts sent to OpenRouter</li>
                   <li>Memory loading operations</li>
@@ -490,22 +489,23 @@ export default function SystemSettingsPage() {
           {configs.filter(c => c.config_key.endsWith('_model')).map((config) => (
             <div
               key={config.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="overflow-hidden"
+              style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}
             >
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-b border-[#1e1e30]">
                 <div className="flex items-center gap-3 mb-2">
-                  <Cpu className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <Cpu className="w-6 h-6" style={{ color: '#a855f7' }} />
+                  <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>
                     {config.config_key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </h2>
                 </div>
                 {config.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  <p className="text-sm mb-3" style={{ color: '#9090a8' }}>
                     {config.description}
                   </p>
                 )}
                 {config.updated_by && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
+                  <p className="text-xs" style={{ color: '#9090a8' }}>
                     Last updated by {config.updated_by} on{' '}
                     {new Date(config.updated_at).toLocaleString()}
                   </p>
@@ -513,7 +513,7 @@ export default function SystemSettingsPage() {
               </div>
 
               <div className="p-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   Select AI Model
                 </label>
                 <select
@@ -524,7 +524,7 @@ export default function SystemSettingsPage() {
                       [config.config_key]: e.target.value,
                     }))
                   }
-                  className="w-full p-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                  className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 text-sm"
                 >
                   {modelsData_deduped.map((model) => (
                     <option key={model.openrouter_id || model.id} value={model.openrouter_id || model.id}>
@@ -533,12 +533,12 @@ export default function SystemSettingsPage() {
                   ))}
                 </select>
 
-                <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm text-blue-900 dark:text-blue-100">
+                <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.15)' }}>
+                  <p className="text-sm" style={{ color: '#ededf5' }}>
                     <strong>Current:</strong> {getModelDisplayName(editedConfigs[config.config_key])}
                   </p>
                   {availableModels[editedConfigs[config.config_key]]?.description && (
-                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                    <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                       {availableModels[editedConfigs[config.config_key]].description}
                     </p>
                   )}
@@ -548,11 +548,11 @@ export default function SystemSettingsPage() {
                   <button
                     onClick={() => handleSave(config.config_key)}
                     disabled={!hasChanges(config.config_key) || saving === config.config_key}
-                    className="flex items-center gap-2 px-6 py-2 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving === config.config_key ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                         <span>Saving...</span>
                       </>
                     ) : (
@@ -566,14 +566,15 @@ export default function SystemSettingsPage() {
                   <button
                     onClick={() => handleReset(config.config_key)}
                     disabled={!hasChanges(config.config_key)}
-                    className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: 'rgba(144,144,168,0.1)', color: '#ededf5', border: '1px solid #1e1e30' }}
                   >
                     <RotateCcw className="w-4 h-4" />
                     <span>Reset</span>
                   </button>
 
                   {hasChanges(config.config_key) && (
-                    <span className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+                    <span className="text-sm font-medium" style={{ color: '#eab308' }}>
                       Unsaved changes
                     </span>
                   )}
@@ -586,12 +587,15 @@ export default function SystemSettingsPage() {
         {/* General Settings — feature flags, trial config, etc. */}
         {configs.filter(c => !c.config_key.endsWith('_model')).length > 0 && (
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Settings className="w-5 h-5" />
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
+              <Settings className="w-5 h-5" style={{ color: '#9090a8' }} />
               General Settings
             </h2>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div
+              className="overflow-hidden"
+              style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}
+            >
+              <div className="divide-y divide-[#1e1e30]">
                 {configs.filter(c => !c.config_key.endsWith('_model')).map((config) => {
                   const val = editedConfigs[config.config_key] || '';
                   const isBool = val === 'true' || val === 'false';
@@ -609,19 +613,26 @@ export default function SystemSettingsPage() {
                         <div className="flex items-center gap-2">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                             category === 'Feature Flag'
-                              ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+                              ? 'text-orange-300'
                               : category === 'Trial'
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                              : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-                          }`}>
+                              ? 'text-blue-300'
+                              : ''
+                          }`}
+                          style={
+                            category === 'Feature Flag'
+                              ? { background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.2)' }
+                              : category === 'Trial'
+                              ? { background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.2)' }
+                              : { background: 'rgba(144,144,168,0.1)', border: '1px solid #1e1e30', color: '#9090a8' }
+                          }>
                             {category}
                           </span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                          <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                             {label}
                           </span>
                         </div>
                         {config.description && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{config.description}</p>
+                          <p className="text-xs mt-0.5" style={{ color: '#9090a8' }}>{config.description}</p>
                         )}
                       </div>
 
@@ -635,10 +646,9 @@ export default function SystemSettingsPage() {
                               }))
                             }
                             className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                              val === 'true'
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                              val === 'true' ? 'bg-green-600 hover:bg-green-700' : 'hover:opacity-80'
                             }`}
+                            style={val !== 'true' ? { background: '#1e1e30' } : undefined}
                           >
                             <span
                               className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
@@ -656,14 +666,14 @@ export default function SystemSettingsPage() {
                                 [config.config_key]: e.target.value,
                               }))
                             }
-                            className="w-48 p-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                            className="w-48 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 text-sm"
                           />
                         )}
 
                         <button
                           onClick={() => handleSave(config.config_key)}
                           disabled={!hasChanges(config.config_key) || saving === config.config_key}
-                          className="px-3 py-1.5 text-xs font-semibold bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {saving === config.config_key ? '...' : 'Save'}
                         </button>
@@ -671,7 +681,8 @@ export default function SystemSettingsPage() {
                         {hasChanges(config.config_key) && (
                           <button
                             onClick={() => handleReset(config.config_key)}
-                            className="px-3 py-1.5 text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            className="px-3 py-1.5 text-xs font-semibold rounded-xl transition-colors"
+                            style={{ background: 'rgba(144,144,168,0.1)', color: '#ededf5', border: '1px solid #1e1e30' }}
                           >
                             Reset
                           </button>
@@ -686,22 +697,22 @@ export default function SystemSettingsPage() {
         )}
 
         {/* Info Box */}
-        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+        <div className="mt-8 p-6 rounded-xl" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}>
+          <h3 className="font-semibold mb-2" style={{ color: '#ededf5' }}>
             💡 About AI Model Selection
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+          <ul className="text-sm space-y-1" style={{ color: '#9090a8' }}>
             <li>
-              <strong>Memory Extraction:</strong> Used for analyzing conversations and extracting important information about users (goals, challenges, outcomes, etc.)
+              <strong style={{ color: '#ededf5' }}>Memory Extraction:</strong> Used for analyzing conversations and extracting important information about users (goals, challenges, outcomes, etc.)
             </li>
             <li>
-              <strong>Widget Formatting:</strong> Used for detecting lists in AI responses and converting them to interactive widgets
+              <strong style={{ color: '#ededf5' }}>Widget Formatting:</strong> Used for detecting lists in AI responses and converting them to interactive widgets
             </li>
             <li>
-              <strong>Speed vs Quality:</strong> Haiku models are faster and cheaper, while larger models provide more accurate results
+              <strong style={{ color: '#ededf5' }}>Speed vs Quality:</strong> Haiku models are faster and cheaper, while larger models provide more accurate results
             </li>
             <li>
-              <strong>Changes take effect immediately</strong> for new memory extractions and widget formatting operations
+              <strong style={{ color: '#ededf5' }}>Changes take effect immediately</strong> for new memory extractions and widget formatting operations
             </li>
           </ul>
         </div>
@@ -709,24 +720,26 @@ export default function SystemSettingsPage() {
 
       {/* Confirmation Modal for Update Agent Prompts */}
       {showPromptConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 max-w-md mx-4">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="rounded-xl shadow-xl p-6 max-w-md mx-4" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}>
+            <h3 className="text-lg font-bold mb-2" style={{ color: '#ededf5' }}>
               Update All Agent Prompts?
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
               This will overwrite all agent system prompts from their instruction files. Any manual edits to prompts will be lost.
             </p>
             <div className="flex items-center gap-3 justify-end">
               <button
                 onClick={() => setShowPromptConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-xl transition-colors"
+                style={{ background: 'rgba(144,144,168,0.1)', color: '#ededf5', border: '1px solid #1e1e30' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateAgentPrompts}
-                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white rounded-xl transition-colors"
+                style={{ background: '#7c3aed' }}
               >
                 Yes, Update All Prompts
               </button>

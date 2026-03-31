@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import {
@@ -62,11 +62,11 @@ const TIER_LABELS: Record<MembershipTier, string> = {
 };
 
 const TIER_COLORS: Record<MembershipTier, string> = {
-  '5in30': 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  'fast_start': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-  'foundations': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-  'accelerate': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-  'private': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+  '5in30': '',
+  'fast_start': '',
+  'foundations': '',
+  'accelerate': '',
+  'private': '',
 };
 
 const STATUS_LABELS: Record<MembershipStatus, string> = {
@@ -78,11 +78,11 @@ const STATUS_LABELS: Record<MembershipStatus, string> = {
 };
 
 const STATUS_COLORS: Record<MembershipStatus, string> = {
-  'active': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-  'paused': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
-  'cancelled': 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  'grace_period': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 animate-pulse',
-  'expired': 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+  'active': '',
+  'paused': '',
+  'cancelled': '',
+  'grace_period': 'animate-pulse',
+  'expired': '',
 };
 
 type SortField = 'email' | 'role' | 'created_at' | 'last_login_at' | 'conversation_count' | 'total_input_tokens' | 'total_output_tokens' | 'estimated_cost';
@@ -481,14 +481,14 @@ export default function AdminUsersPage() {
     return `${diffDays} day${diffDays === 1 ? '' : 's'} left`;
   };
 
-  const getRoleBadgeColor = (role: string) => {
+  const getRoleBadgeStyle = (role: string): React.CSSProperties => {
     switch (role) {
       case 'admin':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300';
+        return { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 };
       case 'power_user':
-        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
+        return { background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#a78bfa', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 };
       default:
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+        return { background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 };
     }
   };
 
@@ -513,11 +513,11 @@ export default function AdminUsersPage() {
 
   if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'power_user')) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h1 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>Access Denied</h1>
+          <p style={{ color: '#9090a8' }}>
             This page is only accessible to administrators and power users.
           </p>
         </div>
@@ -527,32 +527,32 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading users...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f6ef7] mx-auto mb-4"></div>
+          <p style={{ color: '#9090a8' }}>Loading users...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       <div>
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-bold mb-2" style={{ color: '#ededf5' }}>
                 User Management
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p style={{ color: '#9090a8' }}>
                 Manage user accounts, roles, and permissions
               </p>
             </div>
             <button
               onClick={() => router.push('/admin')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors"
             >
               Back to Admin
             </button>
@@ -560,50 +560,50 @@ export default function AdminUsersPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 rounded-lg" style={{ background: '#4f6ef720' }}>
+                  <Users className="w-5 h-5" style={{ color: '#7b8ff8' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Total Users</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{stats.total}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <div className="p-2 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)' }}>
+                  <CheckCircle className="w-5 h-5" style={{ color: '#4ade80' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Active Users</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Active Users</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{stats.active}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                  <Crown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <div className="p-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.1)' }}>
+                  <Crown className="w-5 h-5" style={{ color: '#f87171' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Admins</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.admins}</p>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Admins</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>{stats.admins}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <div className="p-2 rounded-lg" style={{ background: '#4f6ef720' }}>
+                  <Calendar className="w-5 h-5" style={{ color: '#7b8ff8' }} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">New This Month</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-sm" style={{ color: '#9090a8' }}>New This Month</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                     {stats.newThisMonth}
                   </p>
                 </div>
@@ -613,29 +613,29 @@ export default function AdminUsersPage() {
 
           {/* Alerts */}
           {error && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="mb-4 p-4 rounded-lg flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#f87171' }} />
               <div>
-                <h3 className="font-semibold text-red-900 dark:text-red-100">Error</h3>
-                <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+                <h3 className="font-semibold" style={{ color: '#fca5a5' }}>Error</h3>
+                <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
               </div>
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <p className="text-green-900 dark:text-green-100 font-medium">{success}</p>
+            <div className="mb-4 p-4 rounded-lg" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)' }}>
+              <p className="font-medium" style={{ color: '#4ade80' }}>{success}</p>
             </div>
           )}
         </div>
 
         {/* Grace Period Warning */}
         {stats.graceWarning > 0 && (
-          <div className="mb-4 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg flex items-start gap-3">
-            <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+          <div className="mb-4 p-4 rounded-lg flex items-start gap-3" style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.25)' }}>
+            <Clock className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#fb923c' }} />
             <div>
-              <h3 className="font-semibold text-orange-900 dark:text-orange-100">Grace Period Alert</h3>
-              <p className="text-orange-700 dark:text-orange-300 text-sm">
+              <h3 className="font-semibold" style={{ color: '#fdba74' }}>Grace Period Alert</h3>
+              <p className="text-sm" style={{ color: '#fb923c' }}>
                 {stats.graceWarning} user{stats.graceWarning === 1 ? ' is' : 's are'} in grace period and may lose access soon.
               </p>
             </div>
@@ -644,7 +644,7 @@ export default function AdminUsersPage() {
 
         {/* Date Range Filter */}
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Show:</span>
+          <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Show:</span>
           {[
             { label: 'Last 7 days', value: 7 },
             { label: 'Last 30 days', value: 30 },
@@ -654,11 +654,10 @@ export default function AdminUsersPage() {
             <button
               key={opt.label}
               onClick={() => { setDaysFilter(opt.value); setCurrentPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                daysFilter === opt.value
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+              style={daysFilter === opt.value
+                ? { background: '#4f6ef7', color: '#fff' }
+                : { background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
             >
               {opt.label}
             </button>
@@ -666,32 +665,32 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-6">
+        <div className="rounded-lg p-4 mb-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 Search
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#9090a8' }} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name or email..."
-                  className="w-full pl-10 pr-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                  className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 Tier
               </label>
               <select
                 value={tierFilter}
                 onChange={(e) => setTierFilter(e.target.value)}
-                className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
               >
                 <option value="all">All Tiers</option>
                 <option value="5in30">5IN30 ({stats.tierBreakdown['5in30']})</option>
@@ -703,13 +702,13 @@ export default function AdminUsersPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 Membership
               </label>
               <select
                 value={membershipStatusFilter}
                 onChange={(e) => setMembershipStatusFilter(e.target.value)}
-                className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
               >
                 <option value="all">All Membership</option>
                 <option value="active">Active</option>
@@ -721,13 +720,13 @@ export default function AdminUsersPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 Role
               </label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
               >
                 <option value="all">All Roles</option>
                 <option value="user">User</option>
@@ -737,13 +736,13 @@ export default function AdminUsersPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                 Account Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
               >
                 <option value="all">All Statuses</option>
                 <option value="active">Active</option>
@@ -754,13 +753,14 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full min-w-[1200px]">
-              <thead className="bg-gray-50 dark:bg-gray-900/50">
+            <table className="w-full min-w-[1200px]" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+              <thead style={{ background: 'rgba(9,9,15,0.8)' }}>
                 <tr>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('email')}
                   >
                     <div className="flex items-center gap-2">
@@ -774,7 +774,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('role')}
                   >
                     <div className="flex items-center gap-2">
@@ -787,17 +788,18 @@ export default function AdminUsersPage() {
                         ))}
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}>
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}>
                     Tier
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}>
                     Membership
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('conversation_count')}
                   >
                     <div className="flex items-center gap-2">
@@ -811,7 +813,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('created_at')}
                   >
                     <div className="flex items-center gap-2">
@@ -825,7 +828,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('last_login_at')}
                   >
                     <div className="flex items-center gap-2">
@@ -839,7 +843,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('total_input_tokens')}
                   >
                     <div className="flex items-center gap-2">
@@ -853,7 +858,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('total_output_tokens')}
                   >
                     <div className="flex items-center gap-2">
@@ -867,7 +873,8 @@ export default function AdminUsersPage() {
                     </div>
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}
                     onClick={() => handleSort('estimated_cost')}
                   >
                     <div className="flex items-center gap-2">
@@ -880,17 +887,18 @@ export default function AdminUsersPage() {
                         ))}
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8', borderBottom: '1px solid #1e1e30' }}>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td
                       colSpan={10}
-                      className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                      className="px-6 py-12 text-center"
+                      style={{ color: '#9090a8' }}
                     >
                       No users found
                     </td>
@@ -899,14 +907,16 @@ export default function AdminUsersPage() {
                   filteredUsers.map((user) => (
                     <tr
                       key={user.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                      style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(18,18,31,0.8)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
                             {user.first_name} {user.last_name}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm" style={{ color: '#9090a8' }}>
                             {user.email}
                           </div>
                         </div>
@@ -916,9 +926,8 @@ export default function AdminUsersPage() {
                           value={user.role}
                           onChange={(e) => handleRoleChange(user.id, e.target.value)}
                           disabled={user.id === currentUser.id}
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(
-                            user.role
-                          )} disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                          style={getRoleBadgeStyle(user.role)}
+                          className="disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none bg-transparent"
                         >
                           <option value="user">User</option>
                           <option value="power_user">Power User</option>
@@ -929,11 +938,10 @@ export default function AdminUsersPage() {
                         <button
                           onClick={() => handleStatusToggle(user.id, user.is_active)}
                           disabled={user.id === currentUser.id}
-                          className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${
-                            user.is_active
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          } hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity`}
+                          className="flex items-center gap-1 hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                          style={user.is_active
+                            ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                            : { background: 'rgba(144,144,168,0.1)', border: '1px solid rgba(144,144,168,0.2)', color: '#9090a8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}
                         >
                           {user.is_active ? (
                             <>
@@ -953,9 +961,8 @@ export default function AdminUsersPage() {
                         <select
                           value={user.membership_tier || 'foundations'}
                           onChange={(e) => handleTierChange(user.id, e.target.value as MembershipTier)}
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            user.membership_tier ? TIER_COLORS[user.membership_tier] : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          } focus:outline-none focus:ring-2 focus:ring-yellow-500`}
+                          style={{ background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}
+                          className="focus:outline-none"
                         >
                           <option value="5in30">5IN30</option>
                           <option value="fast_start">Fast Start</option>
@@ -971,9 +978,18 @@ export default function AdminUsersPage() {
                             setMembershipModal(user);
                             setSelectedTier(user.membership_tier || 'foundations');
                           }}
-                          className={`px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${
-                            user.membership_status ? STATUS_COLORS[user.membership_status] : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          } hover:opacity-80 transition-opacity`}
+                          className={`flex items-center gap-1 hover:opacity-80 transition-opacity ${user.membership_status === 'grace_period' ? 'animate-pulse' : ''}`}
+                          style={
+                            user.membership_status === 'active'
+                              ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                              : user.membership_status === 'grace_period'
+                              ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                              : user.membership_status === 'paused'
+                              ? { background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                              : user.membership_status === 'cancelled'
+                              ? { background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.2)', color: '#fb923c', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                              : { background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                          }
                         >
                           {user.membership_status === 'grace_period' && (
                             <Clock className="w-3 h-3" />
@@ -987,7 +1003,7 @@ export default function AdminUsersPage() {
                         </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-3 text-sm" style={{ color: '#9090a8' }}>
                           <div className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
                             {user.conversation_count}
@@ -998,21 +1014,21 @@ export default function AdminUsersPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#9090a8' }}>
                         {new Date(user.created_at).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#9090a8' }}>
                         {user.last_login_at
                           ? new Date(user.last_login_at).toLocaleDateString()
                           : 'Never'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#ededf5' }}>
                         {Number(user.total_input_tokens || 0).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#ededf5' }}>
                         {Number(user.total_output_tokens || 0).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#4ade80' }}>
                         ${Number(user.estimated_cost || 0).toFixed(4)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -1020,7 +1036,8 @@ export default function AdminUsersPage() {
                           {/* Reset Password Button */}
                           <button
                             onClick={() => setPasswordResetModal(user)}
-                            className="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                            className="p-2 rounded-lg transition-colors hover:opacity-80"
+                            style={{ color: '#7b8ff8' }}
                             title="Reset password"
                           >
                             <Key className="w-4 h-4" />
@@ -1032,13 +1049,15 @@ export default function AdminUsersPage() {
                               <button
                                 onClick={() => handleResetMemory(user.id)}
                                 disabled={resettingMemory}
-                                className="px-2 py-1 text-xs font-medium bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:opacity-50"
+                                className="px-2 py-1 text-xs font-medium text-white rounded transition-colors disabled:opacity-50"
+                                style={{ background: '#fb923c' }}
                               >
                                 {resettingMemory ? '...' : 'Confirm'}
                               </button>
                               <button
                                 onClick={() => setResetMemoryConfirm(null)}
-                                className="px-2 py-1 text-xs font-medium bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                                className="px-2 py-1 text-xs font-medium rounded transition-colors"
+                                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
                               >
                                 Cancel
                               </button>
@@ -1046,7 +1065,8 @@ export default function AdminUsersPage() {
                           ) : (
                             <button
                               onClick={() => setResetMemoryConfirm(user.id)}
-                              className="p-2 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
+                              className="p-2 rounded-lg transition-colors hover:opacity-80"
+                              style={{ color: '#fb923c' }}
                               title="Reset memory (clear all business profile, brand voice, onboarding)"
                             >
                               <RotateCcw className="w-4 h-4" />
@@ -1058,13 +1078,15 @@ export default function AdminUsersPage() {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => handleDeleteUser(user.id)}
-                                className="px-2 py-1 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                className="px-2 py-1 text-xs font-medium text-white rounded transition-colors"
+                                style={{ background: '#ef4444' }}
                               >
                                 Confirm
                               </button>
                               <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="px-2 py-1 text-xs font-medium bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                                className="px-2 py-1 text-xs font-medium rounded transition-colors"
+                                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
                               >
                                 Cancel
                               </button>
@@ -1073,7 +1095,8 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => setDeleteConfirm(user.id)}
                               disabled={user.id === currentUser.id}
-                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="p-2 rounded-lg transition-colors hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+                              style={{ color: '#f87171' }}
                               title="Delete user"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1091,25 +1114,27 @@ export default function AdminUsersPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-4 flex items-center justify-between rounded-lg px-4 py-3" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+            <p className="text-sm" style={{ color: '#9090a8' }}>
               Showing {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, totalUsers)} of {totalUsers} users
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-3 py-1.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-700 dark:text-gray-300 px-2">
+              <span className="text-sm px-2" style={{ color: '#9090a8' }}>
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="px-3 py-1.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 Next
               </button>
@@ -1118,11 +1143,11 @@ export default function AdminUsersPage() {
         )}
 
         {/* Info Box */}
-        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+        <div className="mt-6 p-4 rounded-lg" style={{ background: '#4f6ef710', border: '1px solid #4f6ef730' }}>
+          <h3 className="font-semibold mb-2" style={{ color: '#7b8ff8' }}>
             User Management Notes
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+          <ul className="text-sm space-y-1" style={{ color: '#9090a8' }}>
             <li>• You cannot modify your own role or status</li>
             <li>• System prevents deletion of the last admin account</li>
             <li>• All changes are logged in the security events table</li>
@@ -1134,12 +1159,12 @@ export default function AdminUsersPage() {
 
       {/* Membership Management Modal */}
       {membershipModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}>
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #1e1e30', background: 'rgba(9,9,15,0.8)' }}>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>
                   Manage Membership
                 </h3>
                 <button
@@ -1147,7 +1172,8 @@ export default function AdminUsersPage() {
                     setMembershipModal(null);
                     setMembershipNotes('');
                   }}
-                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="p-1 rounded-full hover:opacity-70 transition-opacity"
+                  style={{ color: '#9090a8' }}
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
@@ -1157,34 +1183,30 @@ export default function AdminUsersPage() {
             {/* Modal Body */}
             <div className="px-6 py-4 space-y-4">
               {/* User Info */}
-              <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-4">
+              <div className="rounded-lg p-4" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-black font-bold">
+                  <div className="w-10 h-10 rounded-full bg-[#4f6ef7] flex items-center justify-center text-white font-bold">
                     {(membershipModal.first_name?.[0] || membershipModal.email[0]).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium" style={{ color: '#ededf5' }}>
                       {membershipModal.first_name} {membershipModal.last_name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: '#9090a8' }}>
                       {membershipModal.email}
                     </p>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                    membershipModal.membership_tier ? TIER_COLORS[membershipModal.membership_tier] : 'bg-gray-100 text-gray-700'
-                  }`}>
+                  <span style={{ background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>
                     {TIER_LABELS[membershipModal.membership_tier || 'foundations']}
                   </span>
-                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                    membershipModal.membership_status ? STATUS_COLORS[membershipModal.membership_status] : 'bg-gray-100 text-gray-700'
-                  }`}>
+                  <span style={{ background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>
                     {STATUS_LABELS[membershipModal.membership_status || 'active']}
                   </span>
                 </div>
                 {membershipModal.membership_status === 'grace_period' && membershipModal.grace_period_ends_at && (
-                  <div className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <div className="mt-2 text-sm flex items-center gap-1" style={{ color: '#f87171' }}>
                     <Clock className="w-4 h-4" />
                     Grace period ends: {new Date(membershipModal.grace_period_ends_at).toLocaleDateString()} ({formatGracePeriod(membershipModal.grace_period_ends_at)})
                   </div>
@@ -1194,13 +1216,13 @@ export default function AdminUsersPage() {
               {/* Tier Selection (for reactivation) */}
               {(membershipModal.membership_status === 'expired' || membershipModal.membership_status === 'cancelled' || membershipModal.membership_status === 'paused') && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                     Reactivate to Tier
                   </label>
                   <select
                     value={selectedTier}
                     onChange={(e) => setSelectedTier(e.target.value as MembershipTier)}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white"
+                    className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
                   >
                     <option value="5in30">5IN30</option>
                     <option value="fast_start">Fast Start ($87/week)</option>
@@ -1213,7 +1235,7 @@ export default function AdminUsersPage() {
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                   Admin Notes (optional)
                 </label>
                 <textarea
@@ -1221,7 +1243,7 @@ export default function AdminUsersPage() {
                   onChange={(e) => setMembershipNotes(e.target.value)}
                   placeholder="Add notes about this membership change..."
                   rows={2}
-                  className="w-full p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:text-white text-sm"
+                  className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full"
                 />
               </div>
 
@@ -1232,21 +1254,24 @@ export default function AdminUsersPage() {
                   <>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'pause')}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24' }}
                     >
                       <Pause className="w-4 h-4" />
                       Pause Membership (7-day grace)
                     </button>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'cancel')}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.2)', color: '#fb923c' }}
                     >
                       <XCircle className="w-4 h-4" />
                       Cancel Membership (7-day grace)
                     </button>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'expire')}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
                     >
                       <AlertCircle className="w-4 h-4" />
                       Expire Immediately (Revoke Access)
@@ -1259,14 +1284,16 @@ export default function AdminUsersPage() {
                   <>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'reactivate', selectedTier)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
                     >
                       <Play className="w-4 h-4" />
                       Reactivate Membership
                     </button>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'expire')}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
                     >
                       <AlertCircle className="w-4 h-4" />
                       Expire Now (Skip Grace Period)
@@ -1279,14 +1306,16 @@ export default function AdminUsersPage() {
                   <>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'reactivate', selectedTier)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
                     >
                       <Play className="w-4 h-4" />
                       Reactivate as {TIER_LABELS[selectedTier]}
                     </button>
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'expire')}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                      style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
                     >
                       <AlertCircle className="w-4 h-4" />
                       Expire Immediately
@@ -1298,7 +1327,8 @@ export default function AdminUsersPage() {
                 {membershipModal.membership_status === 'expired' && (
                   <button
                     onClick={() => handleMembershipAction(membershipModal.id, 'reactivate', selectedTier)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
+                    style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
                   >
                     <Play className="w-4 h-4" />
                     Reactivate as {TIER_LABELS[selectedTier]}
@@ -1307,8 +1337,8 @@ export default function AdminUsersPage() {
               </div>
 
               {/* Warning message */}
-              <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/30 rounded-lg p-3">
-                <p className="font-medium mb-1">Important:</p>
+              <div className="text-xs rounded-lg p-3" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30', color: '#9090a8' }}>
+                <p className="font-medium mb-1" style={{ color: '#ededf5' }}>Important:</p>
                 <ul className="space-y-0.5">
                   <li>• Paused/Cancelled members get 7 days to renew</li>
                   <li>• After grace period, access is permanently revoked</li>
@@ -1319,13 +1349,14 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <div className="px-6 py-4" style={{ borderTop: '1px solid #1e1e30', background: 'rgba(9,9,15,0.8)' }}>
               <button
                 onClick={() => {
                   setMembershipModal(null);
                   setMembershipNotes('');
                 }}
-                className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="w-full px-4 py-2 rounded-xl hover:opacity-80 transition-opacity"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 Close
               </button>
@@ -1336,22 +1367,23 @@ export default function AdminUsersPage() {
 
       {/* Password Reset Modal */}
       {passwordResetModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}>
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-900/20">
+            <div className="px-6 py-4" style={{ borderBottom: '1px solid #1e1e30', background: 'rgba(9,9,15,0.8)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                    <Key className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <div className="p-2 rounded-lg" style={{ background: '#4f6ef720' }}>
+                    <Key className="w-5 h-5" style={{ color: '#7b8ff8' }} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>
                     Reset Password
                   </h3>
                 </div>
                 <button
                   onClick={closePasswordModal}
-                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="p-1 rounded-full hover:opacity-70 transition-opacity"
+                  style={{ color: '#9090a8' }}
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
@@ -1361,16 +1393,16 @@ export default function AdminUsersPage() {
             {/* Modal Body */}
             <div className="px-6 py-4 space-y-4">
               {/* User Info */}
-              <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-4">
+              <div className="rounded-lg p-4" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-[#4f6ef7] flex items-center justify-center text-white font-bold">
                     {(passwordResetModal.first_name?.[0] || passwordResetModal.email[0]).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium" style={{ color: '#ededf5' }}>
                       {passwordResetModal.first_name} {passwordResetModal.last_name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: '#9090a8' }}>
                       {passwordResetModal.email}
                     </p>
                   </div>
@@ -1381,7 +1413,7 @@ export default function AdminUsersPage() {
                 <>
                   {/* Password Input */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: '#9090a8' }}>
                       New Password (optional)
                     </label>
                     <div className="relative">
@@ -1390,39 +1422,41 @@ export default function AdminUsersPage() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Leave empty to auto-generate"
-                        className="w-full p-2 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:text-white"
+                        className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 w-full pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:opacity-70 transition-opacity"
+                        style={{ color: '#9090a8' }}
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-xs" style={{ color: '#9090a8' }}>
                       If left empty, a secure random password will be generated.
                     </p>
                   </div>
 
                   {/* Email Option */}
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: '#4f6ef710', border: '1px solid #4f6ef730' }}>
                     <input
                       type="checkbox"
                       id="sendEmail"
                       checked={sendResetEmail}
                       onChange={(e) => setSendResetEmail(e.target.checked)}
-                      className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+                      className="w-4 h-4 rounded"
+                      style={{ accentColor: '#4f6ef7' }}
                     />
-                    <label htmlFor="sendEmail" className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-                      <Mail className="w-4 h-4 text-blue-500" />
+                    <label htmlFor="sendEmail" className="flex items-center gap-2 text-sm cursor-pointer" style={{ color: '#9090a8' }}>
+                      <Mail className="w-4 h-4" style={{ color: '#7b8ff8' }} />
                       Send password to user via email
                     </label>
                   </div>
 
                   {/* Warning */}
-                  <div className="text-xs text-gray-500 dark:text-gray-400 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3 border-l-4 border-yellow-400">
-                    <p className="font-medium mb-1">Important:</p>
+                  <div className="text-xs rounded-lg p-3" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)', borderLeft: '4px solid #fbbf24', color: '#9090a8' }}>
+                    <p className="font-medium mb-1" style={{ color: '#fbbf24' }}>Important:</p>
                     <ul className="space-y-0.5">
                       <li>• The user&apos;s current password will be replaced</li>
                       <li>• All active sessions will remain valid</li>
@@ -1434,7 +1468,7 @@ export default function AdminUsersPage() {
                   <button
                     onClick={() => handlePasswordReset(passwordResetModal.id)}
                     disabled={resettingPassword}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full flex items-center justify-center gap-2 py-2.5"
                   >
                     {resettingPassword ? (
                       <>
@@ -1453,13 +1487,13 @@ export default function AdminUsersPage() {
                 /* Success State */
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-3">
-                      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: 'rgba(34,197,94,0.1)' }}>
+                      <CheckCircle className="w-6 h-6" style={{ color: '#4ade80' }} />
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    <h4 className="text-lg font-semibold mb-1" style={{ color: '#ededf5' }}>
                       Password Reset Successful
                     </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: '#9090a8' }}>
                       {resetResult.email_sent
                         ? 'An email with the new password has been sent to the user.'
                         : 'The password has been reset. Share it with the user securely.'}
@@ -1467,21 +1501,22 @@ export default function AdminUsersPage() {
                   </div>
 
                   {!resetResult.email_sent && resetResult.password && (
-                    <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-4">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">New Password:</p>
+                    <div className="rounded-lg p-4" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30' }}>
+                      <p className="text-xs mb-2" style={{ color: '#9090a8' }}>New Password:</p>
                       <div className="flex items-center gap-2">
-                        <code className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded font-mono text-sm text-gray-900 dark:text-white">
+                        <code className="flex-1 px-3 py-2 rounded font-mono text-sm" style={{ background: '#09090f', border: '1px solid #1e1e30', color: '#ededf5' }}>
                           {resetResult.password}
                         </code>
                         <button
                           onClick={() => copyToClipboard(resetResult.password!)}
-                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="p-2 rounded-lg transition-colors hover:opacity-70"
+                          style={{ color: '#9090a8' }}
                           title="Copy to clipboard"
                         >
                           <Copy className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="mt-2 text-xs text-orange-600 dark:text-orange-400">
+                      <p className="mt-2 text-xs" style={{ color: '#fb923c' }}>
                         Make sure to share this password securely. It won&apos;t be shown again.
                       </p>
                     </div>
@@ -1491,10 +1526,11 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <div className="px-6 py-4" style={{ borderTop: '1px solid #1e1e30', background: 'rgba(9,9,15,0.8)' }}>
               <button
                 onClick={closePasswordModal}
-                className="w-full px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="w-full px-4 py-2 rounded-xl hover:opacity-80 transition-opacity"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 {resetResult ? 'Done' : 'Cancel'}
               </button>

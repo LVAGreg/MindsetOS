@@ -11,8 +11,6 @@ import {
   Calendar,
   Users,
   Bot,
-  ArrowUpRight,
-  ArrowDownRight
 } from 'lucide-react';
 
 interface ModelUsage {
@@ -58,6 +56,25 @@ interface UsageStats {
   }>;
 }
 
+const cardStyle = {
+  background: 'rgba(18,18,31,0.7)',
+  border: '1px solid #1e1e30',
+  borderRadius: 16,
+};
+
+const getModelAccent = (modelId: string): string => {
+  if (modelId.includes('claude')) return '#f97316';
+  if (modelId.includes('perplexity')) return '#4f6ef7';
+  if (modelId.includes('gpt') || modelId.includes('openai')) return '#22c55e';
+  if (modelId.includes('gemini') || modelId.includes('google')) return '#eab308';
+  return '#9090a8';
+};
+
+const getModelName = (modelId: string): string => {
+  const parts = modelId.split('/');
+  return parts[parts.length - 1];
+};
+
 export default function UsageDashboardPage() {
   const [stats, setStats] = useState<UsageStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,19 +103,17 @@ export default function UsageDashboardPage() {
 
   useEffect(() => {
     fetchStats();
-    // Refresh every 30 seconds
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const formatCost = (cost: number) => {
-    return new Intl.NumberFormat('en-US', {
+  const formatCost = (cost: number) =>
+    new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 4
+      maximumFractionDigits: 4,
     }).format(cost);
-  };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -106,34 +121,29 @@ export default function UsageDashboardPage() {
     return num.toString();
   };
 
-  const getModelColor = (modelId: string): string => {
-    if (modelId.includes('claude')) return 'bg-orange-500';
-    if (modelId.includes('perplexity')) return 'bg-blue-500';
-    if (modelId.includes('gpt') || modelId.includes('openai')) return 'bg-green-500';
-    if (modelId.includes('gemini') || modelId.includes('google')) return 'bg-yellow-500';
-    return 'bg-gray-500';
-  };
-
-  const getModelName = (modelId: string): string => {
-    const parts = modelId.split('/');
-    return parts[parts.length - 1];
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="flex items-center justify-center min-h-[400px]" style={{ background: '#09090f' }}>
+        <div className="animate-spin rounded-full h-12 w-12" style={{ borderBottom: '2px solid #4f6ef7' }}></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
-        <p className="text-red-600 dark:text-red-400">{error}</p>
+      <div
+        className="rounded-xl p-6 text-center"
+        style={{
+          background: 'rgba(239,68,68,0.1)',
+          border: '1px solid rgba(239,68,68,0.3)',
+          borderRadius: 12,
+        }}
+      >
+        <p style={{ color: '#f87171' }}>{error}</p>
         <button
           onClick={fetchStats}
-          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          className="mt-4 px-4 py-2 rounded-lg"
+          style={{ background: 'rgba(239,68,68,0.2)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}
         >
           Retry
         </button>
@@ -146,17 +156,18 @@ export default function UsageDashboardPage() {
   const maxModelCost = Math.max(...stats.by_model.map(m => m.total_cost));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f', minHeight: '100vh', padding: 24 }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">API Usage Dashboard</h1>
-          <p className="text-gray-500 dark:text-gray-400">Monitor costs, tokens, and model usage</p>
+          <h1 style={{ color: '#ededf5', fontSize: 24, fontWeight: 700 }}>API Usage Dashboard</h1>
+          <p style={{ color: '#9090a8', marginTop: 4 }}>Monitor costs, tokens, and model usage</p>
         </div>
         <button
           onClick={fetchStats}
           disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity disabled:opacity-50"
+          style={{ background: '#4f6ef7', color: '#ededf5' }}
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh
@@ -165,156 +176,143 @@ export default function UsageDashboardPage() {
 
       {/* Cost Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Today</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCost(stats.totals.today)}</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-              <Clock className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">This Week</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCost(stats.totals.week)}</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        {[
+          { label: 'Today', value: formatCost(stats.totals.today), icon: <Clock className="w-6 h-6" />, accent: '#22c55e' },
+          { label: 'This Week', value: formatCost(stats.totals.week), icon: <Calendar className="w-6 h-6" />, accent: '#4f6ef7' },
+          { label: 'This Month', value: formatCost(stats.totals.month), icon: <TrendingUp className="w-6 h-6" />, accent: '#7c5bf6' },
+          { label: 'All Time', value: formatCost(stats.totals.all_time), icon: <DollarSign className="w-6 h-6" />, accent: '#f59e0b' },
+        ].map(({ label, value, icon, accent }) => (
+          <div key={label} className="p-6" style={cardStyle}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p style={{ color: '#9090a8', fontSize: 13 }}>{label}</p>
+                <p style={{ color: '#ededf5', fontSize: 28, fontWeight: 700, marginTop: 4 }}>{value}</p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ background: `${accent}1a`, color: accent }}
+              >
+                {icon}
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">This Month</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCost(stats.totals.month)}</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">All Time</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCost(stats.totals.all_time)}</p>
-            </div>
-            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+        <div className="p-6" style={cardStyle}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7' }}
+            >
+              <Zap className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total API Calls</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{formatNumber(stats.totals.total_calls)}</p>
+              <p style={{ color: '#9090a8', fontSize: 13 }}>Total API Calls</p>
+              <p style={{ color: '#ededf5', fontSize: 28, fontWeight: 700 }}>{formatNumber(stats.totals.total_calls)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+        <div className="p-6" style={cardStyle}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(124,91,246,0.15)', color: '#7c5bf6' }}
+            >
+              <BarChart3 className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Tokens</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{formatNumber(stats.totals.total_tokens)}</p>
+              <p style={{ color: '#9090a8', fontSize: 13 }}>Total Tokens</p>
+              <p style={{ color: '#ededf5', fontSize: 28, fontWeight: 700 }}>{formatNumber(stats.totals.total_tokens)}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Cost by Model */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <Bot className="w-5 h-5" />
+      <div style={cardStyle}>
+        <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+          <h2 className="flex items-center gap-2" style={{ color: '#ededf5', fontSize: 17, fontWeight: 600 }}>
+            <Bot className="w-5 h-5" style={{ color: '#9090a8' }} />
             Cost by Model
           </h2>
         </div>
-        <div className="p-6 space-y-4">
-          {stats.by_model.map((model) => (
-            <div key={model.model_id} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${getModelColor(model.model_id)}`}></div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getModelName(model.model_id)}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatNumber(model.calls)} calls
-                  </span>
+        <div className="p-6 space-y-5">
+          {stats.by_model.map((model) => {
+            const accent = getModelAccent(model.model_id);
+            return (
+              <div key={model.model_id} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full" style={{ background: accent }}></div>
+                    <span style={{ color: '#ededf5', fontSize: 14, fontWeight: 500 }}>
+                      {getModelName(model.model_id)}
+                    </span>
+                    <span style={{ color: '#9090a8', fontSize: 12 }}>
+                      {formatNumber(model.calls)} calls
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span style={{ color: '#ededf5', fontSize: 14, fontWeight: 700 }}>
+                      {formatCost(model.total_cost)}
+                    </span>
+                    <span style={{ color: '#9090a8', fontSize: 12, marginLeft: 8 }}>
+                      ({formatNumber(model.input_tokens + model.output_tokens)} tokens)
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">
-                    {formatCost(model.total_cost)}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                    ({formatNumber(model.input_tokens + model.output_tokens)} tokens)
-                  </span>
+                {/* Progress bar */}
+                <div className="w-full h-2 rounded-full" style={{ background: 'rgba(30,30,48,0.8)' }}>
+                  <div
+                    className="h-2 rounded-full"
+                    style={{
+                      width: `${(model.total_cost / maxModelCost) * 100}%`,
+                      background: 'linear-gradient(90deg, #4f6ef7, #7c5bf6)',
+                    }}
+                  ></div>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className={`h-2 rounded-full ${getModelColor(model.model_id)}`}
-                  style={{ width: `${(model.total_cost / maxModelCost) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Users */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <Users className="w-5 h-5" />
+        <div style={cardStyle}>
+          <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+            <h2 className="flex items-center gap-2" style={{ color: '#ededf5', fontSize: 17, fontWeight: 600 }}>
+              <Users className="w-5 h-5" style={{ color: '#9090a8' }} />
               Top Users by Cost
             </h2>
           </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div>
             {stats.by_user.slice(0, 10).map((user, index) => (
-              <div key={user.user_id} className="p-4 flex items-center justify-between">
+              <div
+                key={user.user_id}
+                className="p-4 flex items-center justify-between"
+                style={{ borderBottom: '1px solid rgba(30,30,48,0.5)', color: '#ededf5' }}
+              >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-6">
-                    #{index + 1}
-                  </span>
+                  <span style={{ color: '#9090a8', fontSize: 13, width: 24 }}>#{index + 1}</span>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p style={{ color: '#ededf5', fontSize: 14, fontWeight: 500 }}>
                       {user.email || 'Unknown User'}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatNumber(user.calls)} calls
-                    </p>
+                    <p style={{ color: '#9090a8', fontSize: 12 }}>{formatNumber(user.calls)} calls</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                <span style={{ color: '#ededf5', fontSize: 14, fontWeight: 700 }}>
                   {formatCost(user.total_cost)}
                 </span>
               </div>
             ))}
             {stats.by_user.length === 0 && (
-              <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-6 text-center" style={{ color: '#9090a8' }}>
                 No user data available
               </div>
             )}
@@ -322,51 +320,59 @@ export default function UsageDashboardPage() {
         </div>
 
         {/* Recent Calls */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-5 h-5" />
+        <div style={cardStyle}>
+          <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+            <h2 className="flex items-center gap-2" style={{ color: '#ededf5', fontSize: 17, fontWeight: 600 }}>
+              <Clock className="w-5 h-5" style={{ color: '#9090a8' }} />
               Recent API Calls
             </h2>
           </div>
-          <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
-            {stats.recent.map((call, index) => (
-              <div key={index} className="p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${getModelColor(call.model_id)}`}></div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {getModelName(call.model_id)}
+          <div className="max-h-[400px] overflow-y-auto">
+            {stats.recent.map((call, index) => {
+              const accent = getModelAccent(call.model_id);
+              return (
+                <div
+                  key={index}
+                  className="p-4"
+                  style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ background: accent }}></div>
+                      <span style={{ color: '#ededf5', fontSize: 14, fontWeight: 500 }}>
+                        {getModelName(call.model_id)}
+                      </span>
+                    </div>
+                    <span style={{ color: '#ededf5', fontSize: 14, fontWeight: 700 }}>
+                      {formatCost(call.cost_usd)}
                     </span>
                   </div>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">
-                    {formatCost(call.cost_usd)}
-                  </span>
+                  <div className="flex items-center justify-between" style={{ fontSize: 12, color: '#9090a8' }}>
+                    <span>
+                      {formatNumber(call.input_tokens)} in / {formatNumber(call.output_tokens)} out
+                    </span>
+                    <span>{new Date(call.created_at).toLocaleTimeString()}</span>
+                  </div>
+                  {call.agent_id && (
+                    <span
+                      className="inline-block mt-1 px-2 py-0.5 rounded text-xs"
+                      style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.2)' }}
+                    >
+                      {call.agent_id}
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>
-                    {formatNumber(call.input_tokens)} in / {formatNumber(call.output_tokens)} out
-                  </span>
-                  <span>
-                    {new Date(call.created_at).toLocaleTimeString()}
-                  </span>
-                </div>
-                {call.agent_id && (
-                  <span className="inline-block mt-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-xs rounded text-gray-600 dark:text-gray-300">
-                    {call.agent_id}
-                  </span>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* Daily Usage Chart */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
+      <div style={cardStyle}>
+        <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+          <h2 className="flex items-center gap-2" style={{ color: '#ededf5', fontSize: 17, fontWeight: 600 }}>
+            <TrendingUp className="w-5 h-5" style={{ color: '#9090a8' }} />
             Daily Usage (Last 14 Days)
           </h2>
         </div>
@@ -378,15 +384,18 @@ export default function UsageDashboardPage() {
               return (
                 <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
                   <div className="w-full flex flex-col items-center justify-end h-40">
-                    <span className="text-xs font-medium text-gray-900 dark:text-white mb-1">
+                    <span style={{ color: '#ededf5', fontSize: 11, fontWeight: 500, marginBottom: 4 }}>
                       {formatCost(day.cost)}
                     </span>
                     <div
-                      className="w-full bg-indigo-500 rounded-t-lg transition-all duration-300 hover:bg-indigo-600"
-                      style={{ height: `${Math.max(height, 2)}%` }}
+                      className="w-full rounded-t-lg transition-all duration-300"
+                      style={{
+                        height: `${Math.max(height, 2)}%`,
+                        background: 'linear-gradient(180deg, #4f6ef7, #7c5bf6)',
+                      }}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span style={{ color: '#9090a8', fontSize: 11 }}>
                     {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 </div>

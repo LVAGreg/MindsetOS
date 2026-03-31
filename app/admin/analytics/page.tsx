@@ -121,16 +121,16 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-gray-600 dark:text-gray-400">Loading analytics...</div>
+      <div style={{ background: '#09090f' }} className="flex items-center justify-center py-20 min-h-screen">
+        <div style={{ color: '#9090a8' }}>Loading analytics...</div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-gray-600 dark:text-gray-400">No analytics data available</div>
+      <div style={{ background: '#09090f' }} className="flex items-center justify-center py-20 min-h-screen">
+        <div style={{ color: '#9090a8' }}>No analytics data available</div>
       </div>
     );
   }
@@ -138,21 +138,24 @@ export default function AnalyticsPage() {
   const { overview, byAgent, byModel, timeSeries } = data;
 
   return (
-    <div className="space-y-6">
+    <div style={{ background: '#09090f' }} className="space-y-6 min-h-screen p-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 href="/admin"
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Token Analytics</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <h1 style={{ color: '#ededf5', fontWeight: 700 }} className="text-3xl">Token Analytics</h1>
+                <p style={{ color: '#9090a8' }} className="text-sm mt-1">
                   OpenRouter API usage and cost tracking
                 </p>
               </div>
@@ -160,16 +163,17 @@ export default function AnalyticsPage() {
 
             <div className="flex items-center gap-3">
               {/* Time Range Selector */}
-              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}>
                 {[7, 14, 30, 90].map((d) => (
                   <button
                     key={d}
                     onClick={() => setDays(d)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                    style={
                       days === d
-                        ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                        ? { background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.3)' }
+                        : { color: '#9090a8', border: '1px solid transparent' }
+                    }
                   >
                     {d}d
                   </button>
@@ -180,7 +184,8 @@ export default function AnalyticsPage() {
               <button
                 onClick={fetchAnalytics}
                 disabled={refreshing}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                style={{ background: '#4f6ef7', color: '#ededf5' }}
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -195,14 +200,14 @@ export default function AnalyticsPage() {
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Requests */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
+                <MessageSquare className="w-6 h-6" style={{ color: '#4f6ef7' }} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Total Requests</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p style={{ color: '#9090a8' }} className="text-sm">Total Requests</p>
+                <p style={{ color: '#ededf5', fontSize: 32, fontWeight: 700 }} className="leading-tight">
                   {formatNumber(overview.total_requests)}
                 </p>
               </div>
@@ -210,17 +215,17 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Total Tokens */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <Zap className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(234,179,8,0.12)' }}>
+                <Zap className="w-6 h-6" style={{ color: '#eab308' }} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Total Tokens</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p style={{ color: '#9090a8' }} className="text-sm">Total Tokens</p>
+                <p style={{ color: '#ededf5', fontSize: 32, fontWeight: 700 }} className="leading-tight">
                   {formatNumber(overview.total_tokens)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p style={{ color: '#9090a8' }} className="text-xs mt-1">
                   {formatNumber(overview.total_input_tokens)} in / {formatNumber(overview.total_output_tokens)} out
                 </p>
               </div>
@@ -228,17 +233,17 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Total Cost */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(34,197,94,0.12)' }}>
+                <DollarSign className="w-6 h-6" style={{ color: '#22c55e' }} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Total Cost</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p style={{ color: '#9090a8' }} className="text-sm">Total Cost</p>
+                <p style={{ color: '#ededf5', fontSize: 32, fontWeight: 700 }} className="leading-tight">
                   {formatCost(overview.total_cost)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p style={{ color: '#9090a8' }} className="text-xs mt-1">
                   {formatCost(overview.total_cost / overview.unique_users)} per user
                 </p>
               </div>
@@ -246,17 +251,17 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Avg Latency */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(168,85,247,0.12)' }}>
+                <Clock className="w-6 h-6" style={{ color: '#a855f7' }} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Avg Latency</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p style={{ color: '#9090a8' }} className="text-sm">Avg Latency</p>
+                <p style={{ color: '#ededf5', fontSize: 32, fontWeight: 700 }} className="leading-tight">
                   {formatLatency(overview.avg_latency)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p style={{ color: '#9090a8' }} className="text-xs mt-1">
                   {overview.unique_users} users, {overview.active_agents} agents
                 </p>
               </div>
@@ -265,13 +270,13 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Time Series Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 mb-8">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="mb-8">
+          <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+            <h2 style={{ color: '#ededf5', fontWeight: 700 }} className="text-xl flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" style={{ color: '#4f6ef7' }} />
               Usage Trends
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p style={{ color: '#9090a8' }} className="text-sm mt-1">
               Daily token usage and cost over the last {days} days
             </p>
           </div>
@@ -287,7 +292,7 @@ export default function AnalyticsPage() {
                   return (
                     <div key={idx} className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400 font-medium">
+                        <span style={{ color: '#9090a8' }} className="font-medium">
                           {new Date(day.date).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -295,36 +300,36 @@ export default function AnalyticsPage() {
                         </span>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-2">
-                            <Zap className="w-4 h-4 text-yellow-500" />
-                            <span className="text-gray-900 dark:text-white font-medium">
+                            <Zap className="w-4 h-4" style={{ color: '#eab308' }} />
+                            <span style={{ color: '#ededf5' }} className="font-medium">
                               {formatNumber(Number(day.tokens))}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-green-500" />
-                            <span className="text-gray-900 dark:text-white font-medium">
+                            <DollarSign className="w-4 h-4" style={{ color: '#22c55e' }} />
+                            <span style={{ color: '#ededf5' }} className="font-medium">
                               {formatCost(Number(day.cost))}
                             </span>
                           </div>
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span style={{ color: '#9090a8' }}>
                             {day.requests} req
                           </span>
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <div className="flex-1">
-                          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}>
                             <div
-                              className="h-full bg-yellow-500 rounded-full transition-all duration-300"
-                              style={{ width: `${tokensPercent}%` }}
+                              className="h-full rounded-full transition-all duration-300"
+                              style={{ width: `${tokensPercent}%`, background: '#eab308' }}
                             />
                           </div>
                         </div>
                         <div className="flex-1">
-                          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}>
                             <div
-                              className="h-full bg-green-500 rounded-full transition-all duration-300"
-                              style={{ width: `${costPercent}%` }}
+                              className="h-full rounded-full transition-all duration-300"
+                              style={{ width: `${costPercent}%`, background: '#22c55e' }}
                             />
                           </div>
                         </div>
@@ -334,141 +339,143 @@ export default function AnalyticsPage() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-12" style={{ color: '#9090a8' }}>
                 No time series data available
               </div>
             )}
           </div>
         </div>
 
-      {/* By Agent Table */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            Usage by Agent
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Token usage and cost breakdown per agent
-          </p>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {byAgent.length > 0 ? (
-              byAgent.map((agent, idx) => {
-                const totalTokens = Number(agent.input_tokens) + Number(agent.output_tokens);
-                return (
-                  <div
-                    key={idx}
-                    className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {agent.agent_id}
-                      </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {agent.requests} requests
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Tokens</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatNumber(totalTokens)}
+        {/* By Agent Table */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+              <h2 style={{ color: '#ededf5', fontWeight: 700 }} className="text-xl flex items-center gap-2">
+                <Sparkles className="w-5 h-5" style={{ color: '#818cf8' }} />
+                Usage by Agent
+              </h2>
+              <p style={{ color: '#9090a8' }} className="text-sm mt-1">
+                Token usage and cost breakdown per agent
+              </p>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {byAgent.length > 0 ? (
+                  byAgent.map((agent, idx) => {
+                    const totalTokens = Number(agent.input_tokens) + Number(agent.output_tokens);
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-lg"
+                        style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span style={{ color: '#ededf5' }} className="font-medium">
+                            {agent.agent_id}
+                          </span>
+                          <span style={{ color: '#9090a8' }} className="text-sm">
+                            {agent.requests} requests
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Tokens</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatNumber(totalTokens)}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Cost</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatCost(Number(agent.cost))}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Latency</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatLatency(Number(agent.avg_latency))}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Cost</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatCost(Number(agent.cost))}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Latency</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatLatency(Number(agent.avg_latency))}
-                        </div>
-                      </div>
-                    </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-12" style={{ color: '#9090a8' }}>
+                    No agent data available
                   </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                No agent data available
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* By Model */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            Usage by Model
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Token usage and cost breakdown per AI model
-          </p>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {byModel.length > 0 ? (
-              byModel.slice(0, 10).map((model, idx) => {
-                const totalTokens = Number(model.input_tokens) + Number(model.output_tokens);
-                return (
-                  <div
-                    key={idx}
-                    className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <span className="font-medium text-gray-900 dark:text-white block">
-                          {model.model_id}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {model.operation}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {model.requests} req
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Tokens</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatNumber(totalTokens)}
+          {/* By Model */}
+          <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+              <h2 style={{ color: '#ededf5', fontWeight: 700 }} className="text-xl flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" style={{ color: '#a855f7' }} />
+                Usage by Model
+              </h2>
+              <p style={{ color: '#9090a8' }} className="text-sm mt-1">
+                Token usage and cost breakdown per AI model
+              </p>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {byModel.length > 0 ? (
+                  byModel.slice(0, 10).map((model, idx) => {
+                    const totalTokens = Number(model.input_tokens) + Number(model.output_tokens);
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-lg"
+                        style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <span style={{ color: '#ededf5' }} className="font-medium block">
+                              {model.model_id}
+                            </span>
+                            <span style={{ color: '#9090a8' }} className="text-xs">
+                              {model.operation}
+                            </span>
+                          </div>
+                          <span style={{ color: '#9090a8' }} className="text-sm">
+                            {model.requests} req
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Tokens</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatNumber(totalTokens)}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Cost</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatCost(Number(model.cost))}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: '#9090a8' }}>Latency</div>
+                            <div style={{ color: '#ededf5' }} className="font-medium">
+                              {formatLatency(Number(model.avg_latency))}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Cost</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatCost(Number(model.cost))}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-gray-500 dark:text-gray-400">Latency</div>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {formatLatency(Number(model.avg_latency))}
-                        </div>
-                      </div>
-                    </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-12" style={{ color: '#9090a8' }}>
+                    No model data available
                   </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                No model data available
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
-      </div>
       </div>
     </div>
   );

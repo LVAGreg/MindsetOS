@@ -139,34 +139,35 @@ export default function OutcomesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading outcomes...</p>
+          <div className="w-12 h-12 border-4 border-[#4f6ef7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p style={{ color: '#9090a8' }}>Loading outcomes...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div style={{ background: 'rgba(18,18,31,0.7)', borderBottom: '1px solid #1e1e30' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
                 title="Back to Dashboard"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3">
                 <Trophy className="w-8 h-8 text-[#ffc82c]" />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Outcomes & Deliverables</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Track your achievements and deliverables</p>
+                  <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Outcomes & Deliverables</h1>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Track your achievements and deliverables</p>
                 </div>
               </div>
             </div>
@@ -175,14 +176,16 @@ export default function OutcomesPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleExportJSON}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.3)', color: '#818cf8' }}
               >
                 <Download className="w-4 h-4" />
                 Export JSON
               </button>
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
               >
                 <Download className="w-4 h-4" />
                 Export CSV
@@ -192,17 +195,17 @@ export default function OutcomesPage() {
 
           {/* Stats Bar */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Outcomes</div>
-              <div className="text-2xl font-bold text-blue-600">{outcomes.length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>Total Outcomes</div>
+              <div className="text-2xl font-bold" style={{ color: '#818cf8' }}>{outcomes.length}</div>
             </div>
-            <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">User Provided</div>
-              <div className="text-2xl font-bold text-green-600">{outcomes.filter(o => o.source === 'user').length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.2)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>User Provided</div>
+              <div className="text-2xl font-bold" style={{ color: '#4ade80' }}>{outcomes.filter(o => o.source === 'user').length}</div>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">AI Extracted</div>
-              <div className="text-2xl font-bold text-purple-600">{outcomes.filter(o => o.source === 'ai').length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.2)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>AI Extracted</div>
+              <div className="text-2xl font-bold" style={{ color: '#c084fc' }}>{outcomes.filter(o => o.source === 'ai').length}</div>
             </div>
           </div>
 
@@ -210,11 +213,12 @@ export default function OutcomesPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             {/* Sort By */}
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <TrendingUp className="w-4 h-4" style={{ color: '#9090a8' }} />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                className="px-3 py-2 rounded-lg text-sm"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#ededf5' }}
               >
                 <option value="recent">Most Recent</option>
                 <option value="importance">Highest Importance</option>
@@ -224,11 +228,12 @@ export default function OutcomesPage() {
 
             {/* Agent Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <Filter className="w-4 h-4" style={{ color: '#9090a8' }} />
               <select
                 value={agentFilter}
                 onChange={(e) => setAgentFilter(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                className="px-3 py-2 rounded-lg text-sm"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#ededf5' }}
               >
                 <option value="all">All Agents</option>
                 {uniqueAgents.map(agentId => (
@@ -240,7 +245,7 @@ export default function OutcomesPage() {
             </div>
 
             {/* Showing count */}
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ml-auto">
+            <div className="flex items-center gap-2 text-sm ml-auto" style={{ color: '#9090a8' }}>
               Showing {filteredOutcomes.length} of {outcomes.length} outcomes
             </div>
           </div>
@@ -251,9 +256,9 @@ export default function OutcomesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {filteredOutcomes.length === 0 ? (
           <div className="text-center py-12">
-            <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Outcomes Yet</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <Trophy className="w-16 h-16 mx-auto mb-4 opacity-30" style={{ color: '#9090a8' }} />
+            <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>No Outcomes Yet</h3>
+            <p style={{ color: '#9090a8' }}>
               {outcomes.length === 0
                 ? 'Start conversations to capture outcomes and deliverables.'
                 : 'No outcomes match the selected filters.'}
@@ -267,22 +272,23 @@ export default function OutcomesPage() {
               return (
                 <div
                   key={outcome.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                  className="p-6 transition-shadow"
+                  style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
                       {outcome.source === 'user' ? (
                         <div title="User-provided">
-                          <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                          <UserIcon className="w-6 h-6" style={{ color: '#9090a8' }} />
                         </div>
                       ) : (
                         <div title="AI-extracted">
-                          <Sparkles className="w-6 h-6 text-purple-500" />
+                          <Sparkles className="w-6 h-6" style={{ color: '#c084fc' }} />
                         </div>
                       )}
                       {agent && (
-                        <AgentIcon agentId={agent.id} className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                        <AgentIcon agentId={agent.id} className="w-5 h-5" style={{ color: '#9090a8' }} />
                       )}
                     </div>
 
@@ -291,23 +297,24 @@ export default function OutcomesPage() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Sparkles
                           key={i}
-                          className={`w-3 h-3 ${
+                          className="w-3 h-3"
+                          style={
                             i < Math.round(outcome.importance_score * 5)
-                              ? 'text-[#ffc82c] fill-[#ffc82c]'
-                              : 'text-gray-300 dark:text-gray-600'
-                          }`}
+                              ? { color: '#ffc82c', fill: '#ffc82c' }
+                              : { color: '#1e1e30' }
+                          }
                         />
                       ))}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <p className="text-gray-900 dark:text-white mb-4 leading-relaxed">
+                  <p className="mb-4 leading-relaxed" style={{ color: '#ededf5' }}>
                     {outcome.content}
                   </p>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between text-xs pt-4" style={{ color: '#9090a8', borderTop: '1px solid #1e1e30' }}>
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {formatDate(outcome.created_at)}

@@ -88,7 +88,6 @@ export default function AgentsAdminPage() {
 
       if (!res.ok) throw new Error(`Failed to toggle agent status`);
 
-      // Reload agents
       await loadAgents();
     } catch (err: any) {
       setActionMsg({ type: 'error', text: err.message });
@@ -119,7 +118,6 @@ export default function AgentsAdminPage() {
         throw new Error(data.error || 'Failed to create agent');
       }
 
-      // Reset form and close modal
       setCreateForm({
         id: '',
         name: '',
@@ -134,7 +132,6 @@ export default function AgentsAdminPage() {
       });
       setShowCreateModal(false);
 
-      // Reload agents
       await loadAgents();
       setActionMsg({ type: 'success', text: 'Agent created successfully!' });
       setTimeout(() => setActionMsg(null), 4000);
@@ -146,28 +143,25 @@ export default function AgentsAdminPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-gray-600 dark:text-gray-400">Loading agents...</div>
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
+        <div className="text-lg" style={{ color: '#9090a8' }}>Loading agents...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-red-600">Error: {error}</div>
+      <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
+        <div className="text-lg text-red-400">Error: {error}</div>
       </div>
     );
   }
 
-  // Filter and sort agents
   const filteredAgents = agents
     .filter(agent => {
-      // Status filter
       if (filterStatus === 'active' && !agent.is_active) return false;
       if (filterStatus === 'inactive' && agent.is_active) return false;
 
-      // Search filter
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
         return (
@@ -181,7 +175,6 @@ export default function AgentsAdminPage() {
       return true;
     })
     .sort((a, b) => {
-      // Sort by sort_order first, then by name
       if (a.sort_order !== b.sort_order) {
         return a.sort_order - b.sort_order;
       }
@@ -189,38 +182,43 @@ export default function AgentsAdminPage() {
     });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Action Feedback */}
       {actionMsg && (
-        <div className={`p-4 rounded-lg flex items-center justify-between ${
-          actionMsg.type === 'error'
-            ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
-            : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300'
-        }`}>
-          <span className="text-sm font-medium">{actionMsg.text}</span>
-          <button onClick={() => setActionMsg(null)} className="ml-4 text-gray-400 hover:text-gray-600">&times;</button>
+        <div
+          className="p-4 rounded-xl flex items-center justify-between"
+          style={{
+            background: actionMsg.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
+            border: actionMsg.type === 'error' ? '1px solid rgba(239,68,68,0.25)' : '1px solid rgba(34,197,94,0.25)',
+          }}
+        >
+          <span className="text-sm font-medium" style={{ color: actionMsg.type === 'error' ? '#f87171' : '#4ade80' }}>
+            {actionMsg.text}
+          </span>
+          <button onClick={() => setActionMsg(null)} style={{ color: '#9090a8' }}>&times;</button>
         </div>
       )}
       <div>
         {/* Header */}
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">MindsetOS Agent Management</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>MindsetOS Agent Management</h1>
+            <p className="mt-2 text-sm" style={{ color: '#9090a8' }}>
               Manage database-stored agent prompts and configurations
             </p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-700 transition-colors"
+              className="flex items-center gap-2 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
             >
               <Plus className="w-4 h-4" />
               Create New Agent
             </button>
             <Link
               href="/dashboard"
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#ededf5' }}
             >
               Back to Dashboard
             </Link>
@@ -228,36 +226,33 @@ export default function AgentsAdminPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex gap-2">
               <button
                 onClick={() => setFilterStatus('all')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  filterStatus === 'all'
-                    ? 'bg-yellow-600 text-black'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                style={filterStatus === 'all'
+                  ? { background: '#4f6ef7', color: '#fff' }
+                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
               >
                 All ({agents.length})
               </button>
               <button
                 onClick={() => setFilterStatus('active')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  filterStatus === 'active'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                style={filterStatus === 'active'
+                  ? { background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#4ade80' }
+                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
               >
                 Active ({agents.filter(a => a.is_active).length})
               </button>
               <button
                 onClick={() => setFilterStatus('inactive')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  filterStatus === 'inactive'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                style={filterStatus === 'inactive'
+                  ? { background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#f87171' }
+                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
               >
                 Inactive ({agents.filter(a => !a.is_active).length})
               </button>
@@ -269,61 +264,70 @@ export default function AgentsAdminPage() {
                 placeholder="Search agents..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7] sm:w-64"
               />
             </div>
           </div>
         </div>
 
-        {/* Agents List */}
-        <div className="bg-white shadow rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        {/* Agents Table */}
+        <div className="rounded-xl overflow-x-auto" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+          <table className="min-w-full">
+            <thead>
+              <tr style={{ borderBottom: '1px solid #1e1e30' }}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Order
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Agent
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Color
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Model
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Config
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Last Updated
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: '#9090a8' }}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {filteredAgents.map((agent) => (
-                <tr key={agent.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                <tr
+                  key={agent.id}
+                  className="transition-colors"
+                  style={{ borderBottom: '1px solid #1e1e30' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(79,110,247,0.04)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '')}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#ededf5' }}>
                     {agent.sort_order}
                   </td>
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{agent.name}</div>
-                      <div className="text-sm text-gray-500">{agent.description}</div>
-                      <div className="text-xs text-gray-400 mt-1">{agent.id}</div>
+                      <div className="text-sm font-medium" style={{ color: '#ededf5' }}>{agent.name}</div>
+                      <div className="text-sm" style={{ color: '#9090a8' }}>{agent.description}</div>
+                      <div className="text-xs mt-1 font-mono" style={{ color: '#9090a8' }}>{agent.id}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-700">
+                    <span
+                      className="px-2 py-1 text-xs font-medium rounded-lg"
+                      style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }}
+                    >
                       {agent.category}
                     </span>
                   </td>
@@ -337,52 +341,56 @@ export default function AgentsAdminPage() {
                         }}
                         title={agent.color || agent.accent_color || '#3B82F6'}
                       />
-                      <span className="text-xs font-mono text-gray-500">
+                      <span className="text-xs font-mono" style={{ color: '#9090a8' }}>
                         {agent.color || agent.accent_color || '#3B82F6'}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-xs font-mono text-gray-600">
+                    <div className="text-xs font-mono" style={{ color: '#9090a8' }}>
                       <div>Chat: {agent.chat_model || agent.model_preference || 'Not set'}</div>
                       {agent.memory_model && agent.memory_model !== agent.chat_model && (
-                        <div className="text-gray-400">Mem: {agent.memory_model}</div>
+                        <div style={{ color: '#9090a8' }}>Mem: {agent.memory_model}</div>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-xs" style={{ color: '#9090a8' }}>
                     <div>tokens: {agent.max_tokens}</div>
                     <div>temp: {agent.temperature}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {agent.is_active ? (
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      <span
+                        className="px-2 py-1 text-xs font-semibold rounded-lg"
+                        style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80' }}
+                      >
                         Active
                       </span>
                     ) : (
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                      <span
+                        className="px-2 py-1 text-xs font-semibold rounded-lg"
+                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
+                      >
                         Inactive
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#9090a8' }}>
                     {new Date(agent.updated_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex gap-3 justify-end">
                       <Link
                         href={`/admin/agents/${agent.id}`}
-                        className="text-blue-600 hover:text-blue-900 font-medium"
+                        className="font-medium transition-colors"
+                        style={{ color: '#7b8ff8' }}
                       >
                         Edit
                       </Link>
                       <button
                         onClick={() => toggleActive(agent.id, agent.is_active)}
-                        className={`font-medium ${
-                          agent.is_active
-                            ? 'text-red-600 hover:text-red-900'
-                            : 'text-green-600 hover:text-green-900'
-                        }`}
+                        className="font-medium transition-colors"
+                        style={{ color: agent.is_active ? '#f87171' : '#4ade80' }}
                       >
                         {agent.is_active ? 'Deactivate' : 'Activate'}
                       </button>
@@ -395,13 +403,13 @@ export default function AgentsAdminPage() {
         </div>
 
         {filteredAgents.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-500">
+          <div className="text-center py-12 rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+            <p style={{ color: '#9090a8' }}>
               {searchTerm || filterStatus !== 'all'
                 ? 'No agents match your filters'
                 : 'No agents found'}
             </p>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm mt-2" style={{ color: '#9090a8' }}>
               {searchTerm || filterStatus !== 'all'
                 ? 'Try adjusting your search or filters'
                 : 'Agents will appear here when added to the database'}
@@ -410,26 +418,27 @@ export default function AgentsAdminPage() {
         )}
 
         {/* Info Card */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">About MindsetOS Agent System</h3>
-          <div className="text-sm text-blue-800 space-y-2">
-            <p>✅ <strong>Database-Driven</strong>: Edit agents without redeploying code</p>
-            <p>✅ <strong>Live Updates</strong>: Changes take effect immediately after saving</p>
-            <p>✅ <strong>Model Configuration</strong>: Choose AI model per agent</p>
-            <p>✅ <strong>Cross-Agent Memory</strong>: Agents share user context and memories</p>
-            <p>✅ <strong>Greg's Voice</strong>: All agents use warm, conversational expert tone</p>
+        <div className="mt-8 rounded-xl p-6" style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>About MindsetOS Agent System</h3>
+          <div className="text-sm space-y-2" style={{ color: '#9090a8' }}>
+            <p>✅ <strong style={{ color: '#ededf5' }}>Database-Driven</strong>: Edit agents without redeploying code</p>
+            <p>✅ <strong style={{ color: '#ededf5' }}>Live Updates</strong>: Changes take effect immediately after saving</p>
+            <p>✅ <strong style={{ color: '#ededf5' }}>Model Configuration</strong>: Choose AI model per agent</p>
+            <p>✅ <strong style={{ color: '#ededf5' }}>Cross-Agent Memory</strong>: Agents share user context and memories</p>
+            <p>✅ <strong style={{ color: '#ededf5' }}>Greg's Voice</strong>: All agents use warm, conversational expert tone</p>
           </div>
         </div>
 
         {/* Create Agent Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Agent</h2>
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <div className="rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+              <div className="flex items-center justify-between p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
+                <h2 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Create New Agent</h2>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  style={{ color: '#9090a8' }}
+                  className="hover:text-[#ededf5] transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -438,26 +447,26 @@ export default function AgentsAdminPage() {
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Agent ID * <span className="text-xs text-gray-500">(lowercase-with-dashes)</span>
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
+                      Agent ID * <span className="text-xs" style={{ color: '#9090a8' }}>(lowercase-with-dashes)</span>
                     </label>
                     <input
                       type="text"
                       value={createForm.id}
                       onChange={(e) => setCreateForm({ ...createForm, id: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                       placeholder="my-custom-agent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Agent Name *
                     </label>
                     <input
                       type="text"
                       value={createForm.name}
                       onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                       placeholder="My Custom Agent"
                     />
                   </div>
@@ -465,106 +474,108 @@ export default function AgentsAdminPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Category *
                     </label>
                     <input
                       type="text"
                       value={createForm.category}
                       onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                       placeholder="Custom Category"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Tier
                     </label>
                     <input
                       type="number"
                       value={createForm.tier}
                       onChange={(e) => setCreateForm({ ...createForm, tier: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     Description *
                   </label>
                   <input
                     type="text"
                     value={createForm.description}
                     onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     placeholder="Brief description of what this agent does"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                     System Prompt *
                   </label>
                   <textarea
                     value={createForm.system_prompt}
                     onChange={(e) => setCreateForm({ ...createForm, system_prompt: e.target.value })}
                     rows={10}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 font-mono text-sm"
+                    className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     placeholder="Enter the system prompt that defines this agent's behavior..."
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Max Tokens
                     </label>
                     <input
                       type="number"
                       value={createForm.max_tokens}
                       onChange={(e) => setCreateForm({ ...createForm, max_tokens: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Temperature
                     </label>
                     <input
                       type="text"
                       value={createForm.temperature}
                       onChange={(e) => setCreateForm({ ...createForm, temperature: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                       Active
                     </label>
-                    <div className="flex items-center h-[42px]">
+                    <div className="flex items-center h-[46px]">
                       <input
                         type="checkbox"
                         checked={createForm.is_active}
                         onChange={(e) => setCreateForm({ ...createForm, is_active: e.target.checked })}
-                        className="w-4 h-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                        className="w-4 h-4 rounded"
+                        style={{ accentColor: '#4f6ef7' }}
                       />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Enabled</span>
+                      <span className="ml-2 text-sm" style={{ color: '#9090a8' }}>Enabled</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-6" style={{ borderTop: '1px solid #1e1e30' }}>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#9090a8', border: '1px solid #1e1e30' }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createAgent}
-                  className="px-4 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-700"
+                  className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
                 >
                   Create Agent
                 </button>

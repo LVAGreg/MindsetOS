@@ -80,17 +80,15 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
       onClick={onSelect}
       disabled={agent.locked}
       title={agent.locked ? agent.lockedReason || 'Complete onboarding to unlock' : ''}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 text-left group relative ${
-        agent.locked
-          ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700'
-          : isActive
-          ? 'border-l-2 border-[#fcc824] shadow-sm bg-[#fcc824]/[0.05] dark:bg-[#fcc824]/[0.07]'
-          : 'bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/80'
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-150 text-left group relative ${
+        isActive && !agent.locked ? 'border-l-2 shadow-sm' : 'border'
       }`}
       style={
-        !agent.locked && isActive
-          ? { borderColor: '#fcc824', borderRightColor: 'transparent', borderTopColor: 'transparent', borderBottomColor: 'transparent' }
-          : {}
+        agent.locked
+          ? { background: 'rgba(18,18,31,0.3)', border: '1px solid rgba(30,30,48,0.5)', opacity: 0.5, cursor: 'not-allowed' }
+          : isActive
+          ? { background: `rgba(252,200,36,0.05)`, borderColor: '#fcc824', borderRightColor: 'transparent', borderTopColor: 'transparent', borderBottomColor: 'transparent' }
+          : { background: 'rgba(18,18,31,0.5)', border: '1px solid #1e1e30' }
       }
     >
       {/* Accent color dot indicator */}
@@ -123,7 +121,7 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
               style={{ backgroundColor: accentColor, opacity: isActive ? 1 : 0.5 }}
             />
           )}
-          <span className={`font-semibold text-sm truncate ${isActive ? 'text-[#fcc824]' : 'text-gray-900 dark:text-white'}`}>
+          <span className="font-semibold text-sm truncate" style={{ color: isActive ? '#fcc824' : '#ededf5' }}>
             {agent.name}
           </span>
           {isActive && !agent.locked && (
@@ -132,7 +130,7 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
             </span>
           )}
           {agent.locked && (
-            <Lock className="w-3 h-3 text-gray-400 flex-shrink-0" />
+            <Lock className="w-3 h-3 flex-shrink-0" style={{ color: '#9090a8' }} />
           )}
           {isCustom && (
             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: `${accentColor}15`, color: accentColor }}>
@@ -140,7 +138,7 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+        <p className="text-xs truncate mt-0.5" style={{ color: '#9090a8' }}>
           {agent.description}
         </p>
       </div>
@@ -150,15 +148,18 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
         <a
           href={`/admin/agents/${agent.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex-shrink-0"
+          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+          style={{ background: 'transparent' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.8)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           title="Manage agent & knowledge base"
         >
-          <Settings2 className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+          <Settings2 className="w-3.5 h-3.5" style={{ color: '#9090a8' }} />
         </a>
       )}
 
       {/* Arrow — visible on hover */}
-      <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+      <ChevronRight className="w-4 h-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" style={{ color: '#9090a8' }} />
     </button>
   );
 }
