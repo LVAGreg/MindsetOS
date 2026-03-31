@@ -14,7 +14,7 @@
  * - Active state: amber left-border indicator + very subtle amber tint
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Home,
@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { useAppStore } from '@/lib/store';
+import { apiClient } from '@/lib/api-client';
 
 /* ─── Types ─────────────────────────────────────────────── */
 interface DashboardSidebarProps {
@@ -168,6 +169,138 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ─── Stat pill ──────────────────────────────────────────── */
+function StatPill({ icon, value, label }: { icon: string; value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <span className="text-xs font-bold text-[#ededf5]">{icon} {value}</span>
+      <span className="text-[10px] text-[#9090a8]">{label}</span>
+    </div>
+  );
+}
+
+/* ─── Stats strip ────────────────────────────────────────── */
+interface UserStats {
+  streak: number;
+  sessionsThisWeek: number;
+  score: number | null;
+}
+
+function computeStatsFromConversations(
+  conversations: Array<{ createdAt: Date | string; updatedAt: Date | string }>
+): UserStats {
+  const now = new Date();
+
+  // Sessions this week — conversations updated in the last 7 days
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const sessionsThisWeek = conversations.filter((c) => {
+    const d = new Date(c.updatedAt);
+    return d >= sevenDaysAgo;
+  }).length;
+
+  // Streak — consecutive days ending today with at least 1 conversation
+  const daySet = new Set<string>();
+  for (const c of conversations) {
+    const d = new Date(c.updatedAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    daySet.add(key);
+  }
+
+  let streak = 0;
+  const cursor = new Date(now);
+  while (true) {
+    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+    if (daySet.has(key)) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return { streak, sessionsThisWeek, score: null };
+}
+
+function StatsStrip({ userId }: { userId?: string }) {
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchStats() {
+      try {
+        // Try the dedicated stats endpoint first
+        let resolved = false;
+        try {
+          // Access the underlying axios client via a typed cast
+          const innerClient = (apiClient as unknown as { client: { get: (url: string) => Promise<{ data: Record<string, unknown> }> } }).client;
+          const res = await innerClient.get('/api/users/me/stats');
+          if (res?.data && !cancelled) {
+            setStats({
+              streak: (res.data.streak as number) ?? 0,
+              sessionsThisWeek: (res.data.sessionsThisWeek as number) ?? 0,
+              score: (res.data.score as number | null) ?? null,
+            });
+            resolved = true;
+          }
+        } catch {
+          // endpoint doesn't exist yet — fall through to conversations
+        }
+
+        if (!resolved && !cancelled) {
+          const conversations = await apiClient.getUserConversations();
+          if (!cancelled) {
+            setStats(computeStatsFromConversations(conversations));
+          }
+        }
+      } catch {
+        // silently fail — stats are non-critical
+        if (!cancelled) setStats({ streak: 0, sessionsThisWeek: 0, score: null });
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchStats();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <div className="mx-3 mb-3 px-3 py-2.5 rounded-xl bg-[#12121f] border border-[#1e1e30]">
+        <div className="flex items-center justify-between">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className="h-3 w-12 rounded bg-white/[0.07] animate-pulse" />
+              <div className="h-2 w-8 rounded bg-white/[0.04] animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) return null;
+
+  return (
+    <div className="mx-3 mb-3 px-3 py-2.5 rounded-xl bg-[#12121f] border border-[#1e1e30]">
+      <div className="flex items-center justify-between">
+        <StatPill icon="🔥" value={stats.streak} label="day streak" />
+        <StatPill icon="💬" value={stats.sessionsThisWeek} label="this week" />
+        {stats.score !== null && <StatPill icon="📊" value={stats.score} label="score" />}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main component ─────────────────────────────────────── */
 export default function DashboardSidebar({
   activeSection,
@@ -251,6 +384,9 @@ export default function DashboardSidebar({
           <span className="text-sm font-semibold text-gray-200">New Chat</span>
         </button>
       </div>
+
+      {/* ── Stats strip ───────────────────────────────────── */}
+      <StatsStrip userId={effectiveUser?.id} />
 
       {/* ── Nav content — scrollable ───────────────────────── */}
       <div className="relative flex-1 overflow-y-auto min-h-0 custom-scrollbar pb-2">

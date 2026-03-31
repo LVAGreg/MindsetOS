@@ -18,7 +18,32 @@ import MindsetOSLogo from './MindsetOSLogo';
 import MessageEditModal from './MessageEditModal';
 import ConversationStats from './ConversationStats';
 import { buildMessageChain, MessageNode } from '../types/conversation';
+import { AgentIcon } from '@/lib/agent-icons';
 import dynamic from 'next/dynamic';
+
+// Agent accent hex map (for inline styles / opacity variants)
+const AGENT_HEX: Record<string, string> = {
+  'mindset-score': '#f59e0b',
+  'reset-guide': '#0ea5e9',
+  'architecture-coach': '#7c3aed',
+  'practice-builder': '#10b981',
+  'story-excavator': '#ea580c',
+  'launch-companion': '#475569',
+  'accountability-partner': '#16a34a',
+  'conversation-curator': '#14b8a6',
+  'decision-framework': '#2563eb',
+  'inner-world-mapper': '#ec4899',
+  'goal-architect': '#eab308',
+  'belief-debugger': '#9333ea',
+  'morning-ritual-builder': '#f43f5e',
+  'energy-optimizer': '#84cc16',
+  'fear-processor': '#dc2626',
+  'relationship-architect': '#06b6d4',
+  'focus-trainer': '#6366f1',
+  'values-clarifier': '#c026d3',
+  'transformation-tracker': '#22c55e',
+  'content-architect': '#f97316',
+};
 
 // Dynamically import VoiceChatLive for real-time Gemini voice
 const VoiceChatLive = dynamic(() => import('./VoiceChatLive'), { ssr: false });
@@ -992,31 +1017,40 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
       const agents: { id: string; name: string; slug: string }[] = data?.agents || [];
       if (agents.length === 0) return null;
       return (
-        <div className="mt-4 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/50 dark:bg-indigo-900/10 p-4">
-          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">
+        <div className="mt-4 space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#fcc824' }}>
             Suggested Next Step{agents.length > 1 ? 's' : ''}
           </p>
-          <div className="space-y-2">
-            {agents.map(agent => (
+          {agents.map(agent => {
+            const hex = AGENT_HEX[agent.slug] || '#6366f1';
+            return (
               <button
                 key={agent.id}
-                onClick={() => {
-                  window.location.href = `/dashboard?agent=${agent.slug}`;
+                onClick={() => { window.location.href = `/dashboard?agent=${agent.slug}`; }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left group transition-all"
+                style={{
+                  background: `${hex}0d`,
+                  border: `1px solid ${hex}30`,
                 }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-700/50 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-sm transition-all text-left group"
+                onMouseEnter={e => (e.currentTarget.style.borderColor = `${hex}60`)}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = `${hex}30`)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${hex}20` }}
+                  >
+                    <AgentIcon agentId={agent.slug} className="w-4 h-4" style={{ color: hex }} />
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{agent.name}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-[#ededf5]">{agent.name}</p>
+                    <p className="text-xs" style={{ color: hex }}>Continue your work →</p>
+                  </div>
                 </div>
-                <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-0.5 transition-transform">
-                  Open →
-                </span>
+                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: hex }} />
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
       );
     }
@@ -2678,6 +2712,9 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
   // Don't show default until API data is loaded to prevent "Let's GO!" flashing before real starters
   const starterPrompts = agentDataFromAPI?.conversationStarters || agentData?.starterPrompts || [];
 
+  // Agent accent hex for UI theming
+  const agentHex = AGENT_HEX[agentId] || '#6366f1';
+
   // Handler for using context suggestion
   const handleUseContext = (message: string) => {
     setInput(message);
@@ -2823,7 +2860,8 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                 </>
               ) : (
                 <>
-                  <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
+                  <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline flex items-center justify-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: agentHex }} />
                     {agentData?.name}
                   </h2>
                   <p className="text-base mb-5 leading-relaxed text-gray-500">{agentData?.description}</p>
@@ -2923,6 +2961,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                       ? 'msg-user text-white font-medium'
                       : ('msg-agent text-gray-100 ' + (isStreamingResponse && isLastAssistantMessage ? 'msg-agent-streaming' : ''))
                   }`}
+                  style={message.role === 'assistant' ? { borderLeft: `3px solid ${agentHex}30` } : undefined}
                 >
                   {message.role === 'assistant' ? (
                     <div className="space-y-4">
@@ -3160,6 +3199,21 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             <div className="mb-3 px-4 py-2.5 bg-white/04 border border-white/08 rounded-xl flex items-start gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-amber-400 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-gray-300 whitespace-pre-line">{statusMessage}</div>
+            </div>
+          )}
+
+          {/* Starter prompt chips — only shown when conversation is fresh */}
+          {messages.length === 0 && starterPrompts.length > 0 && !isVoiceAgent && agentId !== 'client-onboarding' && (
+            <div className="pb-3 flex flex-wrap gap-2">
+              {starterPrompts.map((prompt: string, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => setInput(prompt)}
+                  className="text-xs px-3 py-1.5 rounded-full border border-[#1e1e30] bg-[#12121f] text-[#9090a8] hover:text-[#ededf5] hover:border-[#fcc824]/40 transition-all"
+                >
+                  {prompt}
+                </button>
+              ))}
             </div>
           )}
 
