@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowRight, Search, Clock, Zap, Star, Brain, Target,
   Compass, RefreshCcw, Calendar, Radio, Rocket, BookOpen,
-  ChevronLeft,
+  ChevronLeft, TrendingUp, Activity, Layers, BarChart2,
+  Users,
 } from 'lucide-react';
 import AgentCard from '@/components/AgentCard';
 import AgentSearchBar from '@/components/AgentSearchBar';
+import { useAppStore } from '@/lib/store';
 
 interface Agent {
   id: string;
@@ -28,13 +30,25 @@ interface Agent {
   isTrialAgent?: boolean;
 }
 
-const CATEGORY_ORDER = [
+// USER-facing categories (everyone sees these)
+const USER_CATEGORY_ORDER = [
   'assessment',
   'coaching',
   'self-awareness',
   'strategy',
   'accountability',
+  'mindset',
+  'performance',
   'content',
+];
+
+// AGENCY/ADMIN-only categories (hidden from regular + trial users — filtered server-side)
+const AGENCY_CATEGORY_ORDER = [
+  'sales',
+];
+
+// Admin-only categories (only returned for admin users by the server)
+const ADMIN_CATEGORY_ORDER = [
   'admin',
 ];
 
@@ -44,18 +58,26 @@ const CATEGORY_META: Record<string, { label: string; description: string; Icon: 
   'self-awareness':{ label: 'Self-Awareness',  description: 'Surface the beliefs and stories running the show.',   Icon: Compass },
   strategy:        { label: 'Strategy',        description: 'Make better decisions under pressure.',                Icon: RefreshCcw },
   accountability:  { label: 'Accountability',  description: 'Stay consistent when motivation fades.',              Icon: Calendar },
+  mindset:         { label: 'Mindset',         description: 'Rewire the beliefs and patterns shaping your results.', Icon: Layers },
+  performance:     { label: 'Performance',     description: 'Optimise your energy, focus, and output.',            Icon: Activity },
   content:         { label: 'Content',         description: 'Find the right conversations for your journey.',      Icon: Radio },
+  sales:           { label: 'Agency Tools',    description: 'Pipeline and client tools for agency coaches.',       Icon: TrendingUp },
   admin:           { label: 'Admin',           description: 'Behind-the-scenes tools for platform management.',    Icon: Rocket },
 };
 
 export default function AgentsPage() {
   const router = useRouter();
+  const { user, viewAsUser } = useAppStore();
+  const effectiveUser = viewAsUser || user;
   const [searchQuery, setSearchQuery]     = useState('');
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [hasHydrated, setHasHydrated]     = useState(false);
   const [allAgents, setAllAgents]         = useState<Agent[]>([]);
   const [isLoading, setIsLoading]         = useState(true);
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
+
+  const userRole = effectiveUser?.role || 'user';
+  const isAgencyOrAdmin = userRole === 'agency' || userRole === 'admin' || userRole === 'power_user';
 
   useEffect(() => {
     async function fetchAgents() {
@@ -113,7 +135,10 @@ export default function AgentsPage() {
 
   const orderedCategories = useMemo(() => {
     const present = new Set(Object.keys(agentsByCategory));
-    const ordered = CATEGORY_ORDER.filter((c) => present.has(c));
+    // User categories first, then agency, then admin — in defined order
+    const allOrdered = [...USER_CATEGORY_ORDER, ...AGENCY_CATEGORY_ORDER, ...ADMIN_CATEGORY_ORDER];
+    const ordered = allOrdered.filter((c) => present.has(c));
+    // Any category not in our lists goes at the end
     Object.keys(agentsByCategory).forEach((c) => { if (!ordered.includes(c)) ordered.push(c); });
     return ordered;
   }, [agentsByCategory]);
@@ -339,13 +364,34 @@ export default function AgentsPage() {
         ) : (
           /* ── Category sections ── */
           <div className="space-y-12">
-            {orderedCategories.map((catKey) => {
+            {orderedCategories.map((catKey, idx) => {
               const agents = agentsByCategory[catKey] || [];
               const meta = CATEGORY_META[catKey];
               const CatIcon = meta?.Icon || BookOpen;
 
+              const isAgencyCat = AGENCY_CATEGORY_ORDER.includes(catKey) || ADMIN_CATEGORY_ORDER.includes(catKey);
+              const prevKey = idx > 0 ? orderedCategories[idx - 1] : null;
+              const prevIsUser = prevKey !== null && !AGENCY_CATEGORY_ORDER.includes(prevKey) && !ADMIN_CATEGORY_ORDER.includes(prevKey);
+              const showSectionDivider = isAgencyCat && (idx === 0 || prevIsUser) && isAgencyOrAdmin;
+
               return (
-                <section key={catKey}>
+                <div key={catKey}>
+                {showSectionDivider && (
+                  <div className="flex items-center gap-4 mb-10 mt-2">
+                    <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold"
+                      style={{
+                        color: '#7b92ff',
+                        background: 'rgba(79,110,247,0.08)',
+                        border: '1px solid rgba(79,110,247,0.18)',
+                      }}>
+                      <Users className="w-3 h-3" />
+                      Agency & Admin Tools
+                    </div>
+                    <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  </div>
+                )}
+                <section>
                   {/* Section header */}
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -390,6 +436,7 @@ export default function AgentsPage() {
                     ))}
                   </div>
                 </section>
+                </div>
               );
             })}
           </div>
