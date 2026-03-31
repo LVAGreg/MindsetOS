@@ -116,20 +116,20 @@ function NavItem({
       disabled={locked}
       className={`
         w-full flex items-center gap-3 px-3 py-3 rounded-xl
-        transition-all duration-200 text-left group relative
+        transition-all duration-150 text-left group relative
         min-h-[44px]
         ${isActive
-          ? 'bg-[#fcc824]/[0.06] text-[#fcc824] border border-[#fcc824]/[0.12]'
+          ? 'bg-[#fcc824]/[0.07] text-[#fcc824] border border-[#fcc824]/[0.14] border-l-[3px] border-l-[#fcc824]'
           : locked
-            ? 'opacity-40 cursor-not-allowed text-gray-500'
-            : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04] border border-transparent'
+            ? 'opacity-40 cursor-not-allowed text-gray-500 border border-transparent'
+            : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.05] border border-transparent'
         }
         ${className}
       `}
     >
-      {/* Active left-border indicator */}
+      {/* Active left-border indicator (additional inset glow) */}
       {isActive && (
-        <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-[#fcc824]" />
+        <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#fcc824] shadow-[0_0_6px_#fcc82466]" />
       )}
 
       <span className={`flex-shrink-0 transition-colors duration-200 ${isActive ? 'text-[#fcc824]' : 'text-gray-500 group-hover:text-gray-300'}`}>
@@ -610,23 +610,33 @@ export default function DashboardSidebar({
         {/* User profile button */}
         <button
           onClick={() => setShowUserMenu(!showUserMenu)}
-          className="w-full flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.05] transition-colors group min-h-[44px]"
+          className="w-full flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-150 group min-h-[44px]"
         >
-          {/* Avatar */}
-          <div
-            className={`
-              w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
-              text-sm font-bold shadow-sm
-              ${viewAsUser
-                ? 'bg-gradient-to-br from-blue-400 to-indigo-600 text-white'
-                : isPremium
-                  ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
-                  : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
-              }
-            `}
-          >
-            {(effectiveUser?.name?.[0] || effectiveUser?.email?.[0] || 'U').toUpperCase()}
-          </div>
+          {/* Avatar — initials from firstName + lastName, gold ring on hover */}
+          {(() => {
+            const name = effectiveUser?.name || '';
+            const parts = name.trim().split(/\s+/);
+            const initials = parts.length >= 2
+              ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+              : (name[0] || effectiveUser?.email?.[0] || 'U').toUpperCase();
+            return (
+              <div
+                className={`
+                  w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
+                  text-sm font-bold shadow-sm
+                  ring-2 ring-[#fcc824]/0 group-hover:ring-[#fcc824]/60 transition-all duration-150
+                  ${viewAsUser
+                    ? 'bg-gradient-to-br from-blue-400 to-indigo-600 text-white'
+                    : isPremium
+                      ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
+                      : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
+                  }
+                `}
+              >
+                {initials}
+              </div>
+            );
+          })()}
 
           {/* Name + role */}
           <div className="flex-1 text-left min-w-0">
@@ -723,21 +733,31 @@ export default function DashboardSidebar({
       <div className="px-2 py-3 border-t border-white/[0.05]">
         <button
           onClick={toggleSidebar}
-          className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-colors w-full flex items-center justify-center min-h-[44px]"
+          className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-all duration-150 w-full flex items-center justify-center min-h-[44px] group"
           title={user?.name || user?.email || 'Open sidebar'}
           aria-label="Open sidebar"
         >
-          <div
-            className={`
-              w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm
-              ${isPremium
-                ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
-                : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
-              }
-            `}
-          >
-            {(user?.name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
-          </div>
+          {(() => {
+            const name = user?.name || '';
+            const parts = name.trim().split(/\s+/);
+            const initials = parts.length >= 2
+              ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+              : (name[0] || user?.email?.[0] || 'U').toUpperCase();
+            return (
+              <div
+                className={`
+                  w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm
+                  ring-2 ring-[#fcc824]/0 group-hover:ring-[#fcc824]/60 transition-all duration-150
+                  ${isPremium
+                    ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
+                    : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
+                  }
+                `}
+              >
+                {initials}
+              </div>
+            );
+          })()}
         </button>
       </div>
     </div>

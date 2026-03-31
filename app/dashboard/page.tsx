@@ -79,19 +79,27 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
       onClick={onSelect}
       disabled={agent.locked}
       title={agent.locked ? agent.lockedReason || 'Complete onboarding to unlock' : ''}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left group ${
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150 text-left group relative ${
         agent.locked
           ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700'
           : isActive
-          ? 'border-2 shadow-sm'
-          : 'bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600'
+          ? 'border-l-2 border-[#fcc824] shadow-sm bg-[#fcc824]/[0.05] dark:bg-[#fcc824]/[0.07]'
+          : 'bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/80'
       }`}
       style={
         !agent.locked && isActive
-          ? { borderColor: accentColor, background: `linear-gradient(135deg, ${accentColor}08, transparent)` }
+          ? { borderColor: '#fcc824', borderRightColor: 'transparent', borderTopColor: 'transparent', borderBottomColor: 'transparent' }
           : {}
       }
     >
+      {/* Accent color dot indicator */}
+      {!agent.locked && (
+        <span
+          className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          style={{ backgroundColor: accentColor, display: isActive ? 'none' : undefined }}
+        />
+      )}
+
       {/* Icon */}
       <div
         className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -107,11 +115,18 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
       {/* Name + Description */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+          {/* Accent dot — always visible next to agent name */}
+          {!agent.locked && (
+            <span
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{ backgroundColor: accentColor, opacity: isActive ? 1 : 0.5 }}
+            />
+          )}
+          <span className={`font-semibold text-sm truncate ${isActive ? 'text-[#fcc824]' : 'text-gray-900 dark:text-white'}`}>
             {agent.name}
           </span>
           {isActive && !agent.locked && (
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-[#ffc82c] text-black text-[10px] font-bold rounded-full flex-shrink-0">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-[#fcc824] text-black text-[10px] font-bold rounded-full flex-shrink-0">
               <Check className="w-2.5 h-2.5" /> ACTIVE
             </span>
           )}
@@ -141,8 +156,8 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
         </a>
       )}
 
-      {/* Arrow */}
-      <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 flex-shrink-0 transition-colors" />
+      {/* Arrow — visible on hover */}
+      <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
     </button>
   );
 }
@@ -1133,8 +1148,8 @@ function DashboardContent() {
                       {/* Core Agents — compact list grouped by category */}
                       {agentBrowserTab === 'core' && (
                         <div className="space-y-5">
-                          {categoryOrder.map(category => (
-                            <div key={category}>
+                          {categoryOrder.map((category, categoryIndex) => (
+                            <div key={category} className={categoryIndex > 0 ? 'border-t border-[#1e1e30] pt-4 mt-2' : ''}>
                               <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-1">
                                 {CATEGORY_LABELS[category] || category}
                               </h2>
