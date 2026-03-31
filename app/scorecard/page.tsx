@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import posthog from 'posthog-js';
 
 export default function ScorecardPage() {
@@ -17,7 +18,7 @@ export default function ScorecardPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || submitting) return;
     setSubmitting(true);
     setFormError('');
 
@@ -54,6 +55,12 @@ export default function ScorecardPage() {
         .anim-f3 { animation: fadeUp 0.5s 0.2s ease-out both; }
         .anim-f4 { animation: fadeUp 0.5s 0.3s ease-out both; }
         .anim-f5 { animation: fadeUp 0.5s 0.4s ease-out both; }
+        @keyframes pop {
+          0%   { transform: scale(0.5); opacity: 0; }
+          70%  { transform: scale(1.1); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .anim-pop { animation: pop 0.5s 0.1s ease-out both; }
       `}</style>
 
       <div className="min-h-screen bg-[#09090f] flex flex-col">
@@ -69,7 +76,7 @@ export default function ScorecardPage() {
         </div>
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12">
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-10">
           <div className="w-full max-w-xl">
 
             {!submitted ? (
@@ -141,16 +148,22 @@ export default function ScorecardPage() {
                       placeholder="First name"
                       value={firstName}
                       onChange={e => setFirstName(e.target.value)}
-                      className="w-full bg-[#12121f] border border-[#1e1e30] rounded-xl px-4 py-3 text-[#ededf5] placeholder:text-[#9090a8]/60 focus:outline-none focus:border-[#4f6ef7]/60 text-sm"
+                      className="w-full bg-[#09090f] border border-[#1e1e30] rounded-xl px-4 py-3 text-[#ededf5] placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824] text-sm transition-colors"
                     />
-                    <input
-                      type="email"
-                      placeholder="Work email"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      required
-                      className="w-full bg-[#12121f] border border-[#1e1e30] rounded-xl px-4 py-3 text-[#ededf5] placeholder:text-[#9090a8]/60 focus:outline-none focus:border-[#4f6ef7]/60 text-sm"
-                    />
+
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="Your email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        className="w-full bg-[#09090f] border border-[#1e1e30] rounded-xl px-4 py-3 text-[#ededf5] placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824] text-sm transition-colors"
+                      />
+                      <p className="text-[#9090a8]/60 text-xs mt-1.5 pl-1">
+                        We'll send your score here
+                      </p>
+                    </div>
 
                     {formError && (
                       <p className="text-red-400 text-xs">{formError}</p>
@@ -159,9 +172,16 @@ export default function ScorecardPage() {
                     <button
                       type="submit"
                       disabled={submitting || !email.trim()}
-                      className="w-full bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold py-3.5 px-6 rounded-xl text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="w-full bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold py-3.5 px-6 rounded-xl text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      {submitting ? 'Sending...' : 'Send My Scorecard →'}
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Send My Scorecard →'
+                      )}
                     </button>
                   </form>
 
@@ -173,29 +193,49 @@ export default function ScorecardPage() {
             ) : (
               /* Thank-you state */
               <div className="anim-f1 text-center">
-                {/* Gold checkmark */}
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                  style={{ background: 'rgba(252,200,36,0.12)', border: '1px solid rgba(252,200,36,0.3)' }}>
-                  <span className="text-2xl font-bold" style={{ color: '#fcc824' }}>✓</span>
+                {/* Animated gold checkmark */}
+                <div className="anim-pop w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                  style={{ background: 'rgba(252,200,36,0.15)', border: '2px solid rgba(252,200,36,0.5)', boxShadow: '0 0 32px rgba(252,200,36,0.15)' }}>
+                  <span className="text-3xl font-bold" style={{ color: '#fcc824' }}>✓</span>
                 </div>
 
-                <h2 className="text-2xl font-bold text-[#ededf5] mb-3">
-                  It's on its way.
-                </h2>
-
-                <p className="text-[#9090a8] text-base leading-relaxed mb-8 max-w-sm mx-auto">
-                  Your Thinking Scorecard is on its way. Check your inbox — it should be there in under a minute.
+                <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#fcc824' }}>
+                  You're in
                 </p>
 
+                <h2 className="text-2xl md:text-3xl font-bold text-[#ededf5] mb-3">
+                  Your Scorecard is on its way.
+                </h2>
+
+                <p className="text-[#9090a8] text-base leading-relaxed mb-3 max-w-sm mx-auto">
+                  Check your inbox — it should be there in under a minute. Pay close attention to your lowest domain. That's your leverage point.
+                </p>
+
+                <p className="text-[#9090a8]/60 text-sm mb-8 max-w-sm mx-auto">
+                  While you wait — go deeper with MindsetOS.
+                </p>
+
+                {/* Primary CTA */}
                 <Link
-                  href="/quiz"
-                  className="inline-block bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold py-3 px-7 rounded-xl text-sm transition-colors"
+                  href="/trial-v3b"
+                  className="inline-flex items-center gap-2 font-semibold py-3.5 px-8 rounded-xl text-sm transition-all hover:scale-[1.02]"
+                  style={{ background: '#fcc824', color: '#09090f' }}
                 >
-                  → Take the Thinking Style Quiz
+                  Start Free Trial →
                 </Link>
 
+                {/* Secondary CTA */}
                 <p className="mt-4">
-                  <Link href="/" className="text-[#9090a8]/60 text-sm hover:text-[#9090a8] transition-colors">
+                  <Link
+                    href="/quiz"
+                    className="text-[#4f6ef7] text-sm hover:text-[#6b84f9] transition-colors"
+                  >
+                    → Take the Thinking Style Quiz first
+                  </Link>
+                </p>
+
+                <p className="mt-3">
+                  <Link href="/" className="text-[#9090a8]/50 text-sm hover:text-[#9090a8] transition-colors">
                     or explore MindsetOS →
                   </Link>
                 </p>
