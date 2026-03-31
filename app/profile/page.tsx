@@ -402,12 +402,12 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <Eye className="h-5 w-5" style={{ color: '#4f6ef7' }} />
               <div>
-                <h3 className="font-semibold" style={{ color: '#ededf5' }}>Coach is Helping You</h3>
+                <h3 className="font-semibold" style={{ color: '#ededf5' }}>Your Mindset Coach</h3>
                 <p className="text-sm" style={{ color: '#9090a8' }}>
                   {takeoverStatus.takeover.power_user_first_name && takeoverStatus.takeover.power_user_last_name
                     ? `${takeoverStatus.takeover.power_user_first_name} ${takeoverStatus.takeover.power_user_last_name}`
                     : takeoverStatus.takeover.power_user_email}
-                  {' '}is currently viewing your session
+                  {' '}is currently supporting your session
                 </p>
               </div>
             </div>
@@ -674,11 +674,11 @@ export default function ProfilePage() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <Target className="h-6 w-6" style={{ color: '#10b981' }} />
-                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Client Focus</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Your Audience</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Target Clients</label>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Who You Serve</label>
                     <textarea
                       value={coreMemoriesData.targetClients}
                       onChange={(e) => handleCoreMemoryChange('targetClients', e.target.value)}
@@ -688,7 +688,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Client Problems</label>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Problems You Solve</label>
                     {coreMemoriesData.clientProblems.length > 0 ? (
                       <ul className="space-y-1 mb-2">
                         {coreMemoriesData.clientProblems.map((problem, idx) => (
@@ -708,7 +708,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Client Results</label>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Results You Create</label>
                     <textarea
                       value={coreMemoriesData.clientResults}
                       onChange={(e) => handleCoreMemoryChange('clientResults', e.target.value)}
@@ -727,11 +727,11 @@ export default function ProfilePage() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <Briefcase className="h-6 w-6" style={{ color: '#ec4899' }} />
-                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Methodology</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Your Approach</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Core Method</label>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Your Method</label>
                     <textarea
                       value={coreMemoriesData.coreMethod}
                       onChange={(e) => handleCoreMemoryChange('coreMethod', e.target.value)}
@@ -769,11 +769,11 @@ export default function ProfilePage() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <Briefcase className="h-6 w-6" style={{ color: '#8b5cf6' }} />
-                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Services</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Your Business</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>Service Description</label>
+                    <label className="block text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>What You Offer</label>
                     <textarea
                       value={coreMemoriesData.serviceDescription}
                       onChange={(e) => handleCoreMemoryChange('serviceDescription', e.target.value)}
