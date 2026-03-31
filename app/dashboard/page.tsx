@@ -869,7 +869,7 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0d1117]">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="text-center animate-float-up-1">
           <div className="w-14 h-14 border-[3px] border-[#fcc824]/20 border-t-[#fcc824] rounded-full animate-spin mx-auto mb-5" />
           <p className="text-sm font-medium text-gray-500 dark:text-gray-500 tracking-wide">Loading MindsetOS</p>
@@ -879,7 +879,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="h-screen flex bg-gray-50 dark:bg-[#0d1117] relative dark:dashboard-bg">
+    <div className="h-screen flex relative dark:dashboard-bg" style={{ background: '#09090f' }}>
       {/* Trial Expired Popup */}
       <TrialExpiredPopup
         membershipTier={user?.membershipTier}
@@ -1086,7 +1086,7 @@ function DashboardContent() {
         <div className="flex-1 overflow-hidden flex">
           <div className="flex-1 min-w-0">
           {showAgentBrowser ? (
-            <div className="h-full overflow-y-auto custom-scrollbar bg-gray-50 dark:bg-[#0d1117] px-3 sm:px-6 py-4 sm:py-5">
+            <div className="h-full overflow-y-auto custom-scrollbar px-3 sm:px-6 py-4 sm:py-5" style={{ background: '#09090f' }}>
               <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
@@ -1443,7 +1443,10 @@ function DashboardContent() {
                                   if (agent) setCurrentAgent(conv.agentId as AgentId);
                                   setCurrentConversation(conv.id);
                                 }}
-                                className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#111827] hover:border-gray-300 dark:hover:border-white/[0.12] hover:shadow-md dark:hover:shadow-black/30 transition-all duration-200 text-left"
+                                className="group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left"
+                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.3)'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.95)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.7)'; }}
                               >
                                 <div
                                   className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -1455,18 +1458,18 @@ function DashboardContent() {
                                   {agent ? (
                                     <AgentIcon agentId={agent.id} className="w-4 h-4" style={{ color: agent.accent_color }} />
                                   ) : (
-                                    <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-600" />
+                                    <MessageSquare className="w-4 h-4" style={{ color: '#9090a8' }} />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-600 mb-0.5">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: '#9090a8' }}>
                                     {agent?.name || conv.agentId}
                                   </p>
-                                  <p className="text-sm text-gray-800 dark:text-gray-300 truncate font-medium leading-snug">
+                                  <p className="text-sm truncate font-medium leading-snug" style={{ color: '#ededf5' }}>
                                     {conv.title || lastMsg?.content?.slice(0, 60) || 'Conversation'}
                                   </p>
                                 </div>
-                                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-500 flex-shrink-0 transition-colors" />
+                                <ChevronRight className="w-4 h-4 flex-shrink-0 transition-colors" style={{ color: '#4a4a60' }} />
                               </button>
                             );
                           })}

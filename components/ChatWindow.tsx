@@ -2728,6 +2728,30 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
   return (
     <div className="flex flex-col h-full chat-area-bg">
+      {/* Agent context bar — shown once conversation is active */}
+      {messages.length > 0 && (agentDataFromAPI?.name || agentData?.name) && (
+        <div
+          className="flex items-center gap-2.5 px-4 py-2 border-b flex-shrink-0"
+          style={{
+            background: 'rgba(9,9,15,0.92)',
+            borderColor: '#1e1e30',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <div
+            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{
+              background: agentHex,
+              boxShadow: `0 0 6px ${agentHex}`,
+            }}
+          />
+          <span className="text-xs font-semibold" style={{ color: '#ededf5' }}>
+            {agentDataFromAPI?.name || agentData?.name}
+          </span>
+          <span className="text-xs" style={{ color: '#4a4a60' }}>· Active</span>
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 space-y-4 sm:space-y-6 chat-content-layer">
         {/* Conversation Stats - Hidden from user view (admin only in /admin/analytics) */}
@@ -2811,7 +2835,19 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   <MindsetOSLogo size="lg" />
                 </div>
               ) : (
-                <div className="text-6xl mb-7 opacity-90">{agentData?.icon}</div>
+                <div
+                  className="mb-7 mx-auto flex items-center justify-center"
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 20,
+                    background: `${agentHex}18`,
+                    border: `1.5px solid ${agentHex}35`,
+                    boxShadow: `0 0 32px ${agentHex}12`,
+                  }}
+                >
+                  <AgentIcon agentId={agentId} className="w-8 h-8" style={{ color: agentHex }} />
+                </div>
               )}
 
               {/* Custom greeting for default agents */}
@@ -2908,10 +2944,11 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                       onClick={() => handleSendMessage(prompt)}
                       disabled={isLoading}
                       className="starter-prompt-card w-full px-5 py-3.5 rounded-xl text-left group disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ borderLeft: `2px solid ${agentHex}50` }}
                     >
                       <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-amber-500/40 group-hover:text-amber-400 flex-shrink-0 transition-colors duration-200" />
-                        <span className="text-sm font-medium text-gray-400 group-hover:text-gray-200 transition-colors duration-200">
+                        <Sparkles className="w-4 h-4 flex-shrink-0 transition-colors duration-200" style={{ color: `${agentHex}60` }} />
+                        <span className="text-sm font-medium transition-colors duration-200" style={{ color: '#9090a8' }}>
                           {prompt}
                         </span>
                       </div>
@@ -3103,10 +3140,10 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                               className="quick-add-btn w-full px-4 py-3 rounded-xl text-left group disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <div className="flex items-start gap-3">
-                                <span className="text-amber-400/70 font-bold text-sm flex-shrink-0 mt-0.5 tabular-nums">
+                                <span className="font-bold text-sm flex-shrink-0 mt-0.5 tabular-nums" style={{ color: 'rgba(252,200,36,0.6)' }}>
                                   {idx + 1}
                                 </span>
-                                <span className="text-sm font-medium text-gray-300 leading-relaxed">
+                                <span className="text-sm font-medium leading-relaxed" style={{ color: '#ededf5' }}>
                                   {option}
                                 </span>
                               </div>
