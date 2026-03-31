@@ -76,7 +76,7 @@ const BONUSES = [
   { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
-type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'intensive_1997' | 'individual_annual';
+type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'individual_annual';
 
 /* ------------------------------------------------------------------ */
 /*  Checkout Steps Indicator                                          */
@@ -111,10 +111,11 @@ function StepsIndicator() {
 function CheckoutPageInner() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan') as PricingPlan | null;
-  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'intensive_1997', 'individual_annual'];
+  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'individual_annual'];
   const initialPlan: PricingPlan = planParam && validPlans.includes(planParam) ? planParam : 'weekly';
 
   const [plan, setPlan] = useState<PricingPlan>(initialPlan);
+  const [addons, setAddons] = useState<Set<string>>(new Set());
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -122,8 +123,24 @@ function CheckoutPageInner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, intensive_1997: 1997, individual_annual: 1997 };
+  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, individual_annual: 1997 };
   const price = priceMap[plan];
+  const addonPrice = (plan === 'architecture_997' && addons.has('1on1_intensive')) ? 1000 : 0;
+  const totalDue = price + addonPrice;
+
+  function toggleAddon(key: string) {
+    setAddons(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
+
+  function handlePlanChange(p: PricingPlan) {
+    setPlan(p);
+    // Clear addons that are incompatible with new plan
+    if (p !== 'architecture_997') setAddons(new Set());
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -142,6 +159,7 @@ function CheckoutPageInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan,
+          addons: Array.from(addons),
           firstName,
           lastName,
           email,
@@ -281,7 +299,7 @@ function CheckoutPageInner() {
                       name="plan"
                       value="weekly"
                       checked={plan === 'weekly'}
-                      onChange={() => setPlan('weekly')}
+                      onChange={() => handlePlanChange('weekly')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
@@ -311,7 +329,7 @@ function CheckoutPageInner() {
                       name="plan"
                       value="upfront"
                       checked={plan === 'upfront'}
-                      onChange={() => setPlan('upfront')}
+                      onChange={() => handlePlanChange('upfront')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
@@ -349,7 +367,7 @@ function CheckoutPageInner() {
                       name="plan"
                       value="architecture_997"
                       checked={plan === 'architecture_997'}
-                      onChange={() => setPlan('architecture_997')}
+                      onChange={() => handlePlanChange('architecture_997')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
@@ -380,49 +398,55 @@ function CheckoutPageInner() {
                     </span>
                   </label>
 
-                  {/* The Architecture Intensive — $1,997 */}
-                  <label
-                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                      plan === 'intensive_1997'
-                        ? 'border-indigo-500/60 bg-indigo-500/[0.06]'
-                        : 'border-white/[0.06] bg-white/[0.02] hover:border-indigo-500/20 hover:bg-indigo-500/[0.03]'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="plan"
-                      value="intensive_1997"
-                      checked={plan === 'intensive_1997'}
-                      onChange={() => setPlan('intensive_1997')}
-                      className="sr-only"
-                    />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
-                      plan === 'intensive_1997' ? 'border-indigo-400' : 'border-white/20'
-                    }`}>
-                      {plan === 'intensive_1997' && <div className="w-2.5 h-2.5 rounded-full bg-indigo-400" />}
+                  {/* ── ADD-ON: 1:1 Intensive (only shown when Architecture is selected) ── */}
+                  {plan === 'architecture_997' && (
+                    <div className="mt-1 ml-2">
+                      <p className="text-[11px] text-white/30 uppercase tracking-widest font-semibold mb-2">Optional Add-On</p>
+                      <label
+                        className={`group flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                          addons.has('1on1_intensive')
+                            ? 'border-indigo-500/60 bg-indigo-500/[0.06]'
+                            : 'border-dashed border-white/[0.10] bg-white/[0.01] hover:border-indigo-500/30 hover:bg-indigo-500/[0.03]'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={addons.has('1on1_intensive')}
+                          onChange={() => toggleAddon('1on1_intensive')}
+                          className="sr-only"
+                        />
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-200 ${
+                          addons.has('1on1_intensive')
+                            ? 'border-indigo-400 bg-indigo-500'
+                            : 'border-white/20 bg-transparent'
+                        }`}>
+                          {addons.has('1on1_intensive') && (
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-2 flex-wrap mb-1">
+                            <span className="text-base font-bold text-white tracking-tight">+ $1,000</span>
+                            <span className="text-xs text-white/40 font-medium">one-time</span>
+                          </div>
+                          <div className="text-sm font-semibold text-white/80 mb-1">1:1 Architecture Intensive</div>
+                          <div className="text-xs text-white/35 mb-2 leading-relaxed">
+                            Add 3 private coaching sessions with a certified Mindset Architecture coach. Personalized blueprint + priority support.
+                          </div>
+                          <ul className="space-y-1">
+                            {['3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support access'].map((f) => (
+                              <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
+                                <CheckCircle className="w-3 h-3 text-indigo-400 flex-shrink-0" />
+                                {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </label>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
-                        <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
-                        <span className="text-sm text-white/40 font-medium">one-time</span>
-                      </div>
-                      <div className="text-sm font-semibold text-white/80 mb-1">The Architecture Intensive</div>
-                      <div className="text-xs text-white/35 mb-2 leading-relaxed">
-                        Everything in Architecture, plus 3 private 1:1 sessions with a certified Mindset Architecture coach.
-                      </div>
-                      <ul className="space-y-1">
-                        {['Everything in Architecture', '3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support access'].map((f) => (
-                          <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
-                            <CheckCircle className="w-3 h-3 text-indigo-400 flex-shrink-0" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-full tracking-wide">
-                      1:1 ADD-ON
-                    </span>
-                  </label>
+                  )}
 
                   {/* MindsetOS Annual — $1,997/year */}
                   <label
@@ -437,7 +461,7 @@ function CheckoutPageInner() {
                       name="plan"
                       value="individual_annual"
                       checked={plan === 'individual_annual'}
-                      onChange={() => setPlan('individual_annual')}
+                      onChange={() => handlePlanChange('individual_annual')}
                       className="sr-only"
                     />
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
@@ -486,7 +510,6 @@ function CheckoutPageInner() {
                       <div>
                         <span className="text-sm text-white/80">
                           {plan === 'architecture_997' ? '90-Day Mindset Architecture'
-                            : plan === 'intensive_1997' ? 'The Architecture Intensive'
                             : plan === 'individual_annual' ? 'MindsetOS Annual'
                             : 'Mindset Architecture'}
                         </span>
@@ -494,12 +517,20 @@ function CheckoutPageInner() {
                           ({plan === 'weekly' ? 'Weekly'
                             : plan === 'individual_annual' ? '1 Year'
                             : plan === 'architecture_997' ? '90-Day Cohort'
-                            : plan === 'intensive_1997' ? '90-Day + 1:1'
                             : '12-Week Access'})
                         </span>
                       </div>
                       <span className="text-sm font-semibold text-white">${price.toLocaleString()}</span>
                     </div>
+                    {addons.has('1on1_intensive') && plan === 'architecture_997' && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+                          <span className="text-sm text-white/70">1:1 Architecture Intensive</span>
+                        </div>
+                        <span className="text-sm font-semibold text-white">+$1,000</span>
+                      </div>
+                    )}
                     {plan === 'weekly' && (
                       <p className="text-xs text-white/30">Renews at $47/wk. Cancel anytime.</p>
                     )}
@@ -508,7 +539,7 @@ function CheckoutPageInner() {
                     )}
                     <div className="border-t border-white/[0.06] pt-3 flex items-center justify-between">
                       <span className="text-sm font-bold text-white">Due Today</span>
-                      <span className="text-2xl font-extrabold text-[#fcc824] tracking-tight">${price.toLocaleString()}</span>
+                      <span className="text-2xl font-extrabold text-[#fcc824] tracking-tight">${totalDue.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -549,8 +580,8 @@ function CheckoutPageInner() {
                       </>
                     ) : (
                       <>
-                        {plan === 'architecture_997' ? 'Enroll in Architecture'
-                          : plan === 'intensive_1997' ? 'Apply for Intensive'
+                        {plan === 'architecture_997' && addons.has('1on1_intensive') ? 'Enroll in Architecture + Intensive'
+                          : plan === 'architecture_997' ? 'Enroll in Architecture'
                           : plan === 'individual_annual' ? 'Start Annual Plan'
                           : 'PROCEED TO PAY'}
                         <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
