@@ -3,7 +3,7 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN --mount=type=cache,id=npm-cache,target=/root/.npm npm ci --cache /root/.npm
+RUN npm ci
 
 FROM base AS builder
 WORKDIR /app
