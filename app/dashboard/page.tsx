@@ -63,6 +63,7 @@ import FirstTimeModal from '@/components/FirstTimeModal';
 import { CanvasPanel } from '@/components/CanvasPanel';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import { CoworkModal } from '@/components/CoworkModal';
+import QuickAgentSwitch from '@/components/QuickAgentSwitch';
 
 // Compact agent row for Browse Agents view
 function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, userRole }: {
@@ -326,6 +327,8 @@ function DashboardContent() {
   const [conversationBrowserProjectId, setConversationBrowserProjectId] = useState<string | null>(null);
   const [displayAgents, setDisplayAgents] = useState<any[]>([]);
   const [agentBrowserTab, setAgentBrowserTab] = useState<'core' | 'custom'>('core');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [quickSwitchOpen, setQuickSwitchOpen] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackForm, setFeedbackForm] = useState({
     name: user?.firstName || user?.name || '',
@@ -389,6 +392,18 @@ function DashboardContent() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // ⌘K / Ctrl+K → Quick Agent Switch
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setQuickSwitchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
 
   // Fetch unread feedback reply count
@@ -1096,6 +1111,27 @@ function DashboardContent() {
                   const hasCustom = customAgents.length > 0;
                   const isAgency = effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin';
 
+                  // Category filter tab definitions
+                  const FILTER_TABS = [
+                    { key: 'all', label: 'All' },
+                    { key: 'mindset', label: 'Mindset' },
+                    { key: 'performance', label: 'Performance' },
+                    { key: 'sales', label: 'Sales' },
+                  ];
+
+                  // Count agents per filter tab
+                  const tabCounts: Record<string, number> = {
+                    all: coreAgents.length,
+                    mindset: coreAgents.filter(a => (a.category || '').toLowerCase() === 'mindset').length,
+                    performance: coreAgents.filter(a => (a.category || '').toLowerCase() === 'performance').length,
+                    sales: coreAgents.filter(a => (a.category || '').toLowerCase() === 'sales').length,
+                  };
+
+                  // Apply category filter to core agents
+                  const filteredCoreAgents = categoryFilter === 'all'
+                    ? coreAgents
+                    : coreAgents.filter(a => (a.category || '').toLowerCase() === categoryFilter);
+
                   // Group core agents by category, sort by sort_order
                   const CATEGORY_ORDER = ['Getting Started', 'mindset', 'performance', 'sales', 'Strategy & Foundations', 'Marketing & Content', 'Events & LinkedIn', 'Sales & Voice', 'Research & Support', 'Practice Tools'];
                   const CATEGORY_LABELS: Record<string, string> = {
@@ -1104,7 +1140,7 @@ function DashboardContent() {
                     'sales': 'Pipeline & Outreach',
                   };
                   const coreByCategory: Record<string, typeof coreAgents> = {};
-                  coreAgents.forEach(a => {
+                  filteredCoreAgents.forEach((a: any) => {
                     const cat = a.category || 'General';
                     if (!coreByCategory[cat]) coreByCategory[cat] = [];
                     coreByCategory[cat].push(a);
@@ -1117,6 +1153,32 @@ function DashboardContent() {
 
                   return (
                     <>
+                      {/* Category filter pills */}
+                      <div className="flex gap-1.5 mb-4 flex-wrap">
+                        {FILTER_TABS.map(tab => (
+                          <button
+                            key={tab.key}
+                            onClick={() => setCategoryFilter(tab.key)}
+                            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150 ${
+                              categoryFilter === tab.key
+                                ? 'bg-[#fcc824]/10 text-[#fcc824] border border-[#fcc824]/30'
+                                : 'text-[#9090a8] hover:text-[#ededf5] border border-transparent hover:border-white/10'
+                            }`}
+                          >
+                            {tab.label}
+                            {tabCounts[tab.key] > 0 && (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                categoryFilter === tab.key
+                                  ? 'bg-[#fcc824]/20 text-[#fcc824]'
+                                  : 'bg-white/[0.06] text-[#9090a8]'
+                              }`}>
+                                {tabCounts[tab.key]}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
                       {(isAgency || hasCustom) && (
                         <div className="flex gap-1 mb-5 border-b border-gray-200 dark:border-gray-700">
                           <button
@@ -1251,97 +1313,66 @@ function DashboardContent() {
                 <div className="relative z-10 max-w-3xl mx-auto px-6 pt-12 pb-16">
 
                   {/* ---- Greeting ---- */}
-                  <div className="mb-10 animate-float-up-1">
-                    <p className="text-xs font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400/70 mb-2">
-                      Your operating system
-                    </p>
-                    <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white leading-tight mb-3">
-                      Good to see you{user?.firstName ? `, ${user.firstName}` : ''}.
-                    </h1>
-                    <p className="text-base text-gray-500 dark:text-gray-500 leading-relaxed max-w-lg">
-                      Your mind runs your business. Let&rsquo;s make sure it&rsquo;s running at full capacity today.
-                    </p>
-                  </div>
+                  {(() => {
+                    const hour = new Date().getHours();
+                    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+                    return (
+                      <div className="mb-10 animate-float-up-1">
+                        <p className="text-xs font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400/70 mb-2">
+                          Your operating system
+                        </p>
+                        <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white leading-tight mb-3">
+                          Good {timeOfDay}{user?.firstName ? `, ${user.firstName}` : ''}.
+                        </h1>
+                        <p className="text-base text-gray-500 dark:text-gray-500 leading-relaxed max-w-lg">
+                          What are you working on today?
+                        </p>
+                      </div>
+                    );
+                  })()}
 
-                  {/* ---- Mindset Score CTA ---- */}
-                  <div className="mb-10 animate-float-up-2">
-                    <button
-                      onClick={() => {
-                        const scoreAgent = displayAgents.find(a => a.id === 'mindset-score');
-                        if (scoreAgent && !scoreAgent.locked) {
-                          handleSelectAgent('mindset-score');
-                        } else {
-                          setShowAgentBrowser(true);
-                        }
-                      }}
-                      className="group w-full relative overflow-hidden rounded-2xl border border-amber-300/50 dark:border-amber-500/20 p-6 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-500/10"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(252,200,36,0.07) 0%, rgba(252,200,36,0.02) 60%, transparent 100%)',
-                      }}
-                    >
-                      <div
-                        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                        style={{ background: 'linear-gradient(135deg, rgba(252,200,36,0.05) 0%, transparent 60%)' }}
-                      />
-                      <div className="relative z-10 flex items-center gap-5">
-                        <div
-                          className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
-                          style={{
-                            background: 'linear-gradient(135deg, rgba(252,200,36,0.15), rgba(252,200,36,0.06))',
-                            border: '1.5px solid rgba(252,200,36,0.3)',
-                            boxShadow: '0 4px 16px rgba(252,200,36,0.12)',
-                          }}
-                        >
-                          <Brain className="w-8 h-8 text-amber-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500/60 dark:text-amber-400/50 mb-1">
-                            Free Assessment
-                          </p>
-                          <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white mb-1">
-                            Take Your Mindset Score
+                  {/* ---- Quick Start Cards (top 3 agents) ---- */}
+                  {(() => {
+                    const QUICK_START_IDS = ['mindset-score', 'accountability-partner', 'practice-builder'];
+                    // Build ordered list: prefer DB agents, fallback to MINDSET_AGENTS static data
+                    const quickAgents = QUICK_START_IDS.map(id => {
+                      const dbAgent = displayAgents.find(a => a.id === id);
+                      if (dbAgent) return dbAgent;
+                      // Fallback static data
+                      const staticMap: Record<string, { name: string; description: string; accent_color: string }> = {
+                        'mindset-score': { name: 'Mindset Score Agent', description: 'Your starting point — take the 5-question Mindset Score to reveal your weakest pillar.', accent_color: '#f59e0b' },
+                        'accountability-partner': { name: 'Accountability Partner', description: 'Your daily check-in companion — morning intentions, evening reflections, weekly reviews.', accent_color: '#16a34a' },
+                        'practice-builder': { name: 'Practice Builder', description: 'Creates your personalized 5-10 minute daily mindset routine based on your weakest pillar.', accent_color: '#10b981' },
+                      };
+                      return staticMap[id] ? { id, locked: false, ...staticMap[id] } : null;
+                    }).filter(Boolean);
+
+                    return (
+                      <div className="mb-10 animate-float-up-2">
+                        <div className="flex items-center justify-between mb-4">
+                          <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
+                            Start here
                           </h2>
-                          <p className="text-sm text-gray-500 dark:text-gray-500 leading-relaxed">
-                            5 questions. See which pillar needs work &mdash; and exactly where to start.
-                          </p>
+                          <button
+                            onClick={() => setShowAgentBrowser(true)}
+                            className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
+                          >
+                            Browse all
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
                         </div>
-                        <div className="flex-shrink-0 hidden sm:block">
-                          <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#fcc824] text-black text-sm font-bold rounded-xl transition-all group-hover:bg-[#f5c200] group-hover:shadow-md group-hover:shadow-amber-500/15">
-                            Start
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* ---- Your Coaches grid ---- */}
-                  {displayAgents.filter(a => !a.locked && a.id !== 'mindset-score').length > 0 && (
-                    <div className="mb-10 animate-float-up-3">
-                      <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-600">
-                          Your Coaches
-                        </h2>
-                        <button
-                          onClick={() => setShowAgentBrowser(true)}
-                          className="text-xs font-semibold text-amber-500 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-300 transition-colors flex items-center gap-0.5"
-                        >
-                          Browse all
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {displayAgents
-                          .filter(a => !a.locked && !a.isCustom && a.id !== 'mindset-score')
-                          .slice(0, 6)
-                          .map((agent) => (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {quickAgents.map((agent: any) => (
                             <button
                               key={agent.id}
-                              onClick={() => handleSelectAgent(agent.id)}
-                              className="group relative flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#111827] hover:shadow-lg dark:hover:shadow-black/40 hover:-translate-y-0.5 transition-all duration-200 text-center"
+                              onClick={() => !agent.locked && handleSelectAgent(agent.id)}
+                              disabled={agent.locked}
+                              className="group flex flex-col gap-3 p-4 rounded-xl border border-[#1e1e30] bg-[#12121f] hover:border-[#fcc824]/30 hover:shadow-lg hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = `${agent.accent_color}45`;
-                                e.currentTarget.style.boxShadow = `0 8px 24px ${agent.accent_color}14`;
+                                if (!agent.locked) {
+                                  e.currentTarget.style.borderColor = `${agent.accent_color}45`;
+                                  e.currentTarget.style.boxShadow = `0 8px 24px ${agent.accent_color}14`;
+                                }
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.borderColor = '';
@@ -1349,22 +1380,36 @@ function DashboardContent() {
                               }}
                             >
                               <div
-                                className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110 flex-shrink-0"
+                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
                                 style={{
-                                  background: `linear-gradient(135deg, ${agent.accent_color}18, ${agent.accent_color}08)`,
+                                  background: `${agent.accent_color}18`,
                                   border: `1.5px solid ${agent.accent_color}30`,
                                 }}
                               >
                                 <AgentIcon agentId={agent.id} className="w-5 h-5" style={{ color: agent.accent_color }} />
                               </div>
-                              <p className="text-xs font-bold tracking-tight text-gray-900 dark:text-white leading-snug line-clamp-2">
-                                {agent.name}
-                              </p>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white leading-snug mb-1 truncate">
+                                  {agent.name}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed line-clamp-1">
+                                  {agent.description}
+                                </p>
+                              </div>
+                              <div className="flex items-center justify-between mt-auto pt-1">
+                                <span
+                                  className="text-xs font-bold transition-colors"
+                                  style={{ color: agent.accent_color }}
+                                >
+                                  Start &rarr;
+                                </span>
+                              </div>
                             </button>
                           ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* ---- Recent conversations ---- */}
                   {(() => {
@@ -1462,6 +1507,19 @@ function DashboardContent() {
 
       {/* Memory Analytics Drawer - slides in from right - Admin/Power User only */}
       {effectiveUser && (effectiveUser.role === 'admin' || effectiveUser.role === 'power_user') && <MemoryDashboard />}
+
+      {/* ⌘K Quick Agent Switch */}
+      <QuickAgentSwitch
+        isOpen={quickSwitchOpen}
+        onClose={() => setQuickSwitchOpen(false)}
+        onSelect={(key) => {
+          handleSelectAgent(
+            MINDSET_AGENTS[key as AgentId]?.id || key.toLowerCase().replace(/_/g, '-')
+          );
+          setQuickSwitchOpen(false);
+        }}
+        displayAgents={displayAgents}
+      />
 
       {/* Conversation Browser Modal */}
       <ConversationBrowser
