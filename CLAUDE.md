@@ -196,6 +196,15 @@ Use Railway MCP `get-logs` with `logType: "deploy"` — filter with `filter: "er
 
 ---
 
+## 🎯 Evaluation
+
+After any significant UI build or feature implementation, score it against `EVALUATION_CRITERIA.md`.
+Target ≥7 on all criteria, ≥8 on starred (Originality, Quality of Design, Conversation Feel, User Intent).
+If anything scores below 7, fix it before marking done.
+Spawn `feature-dev:code-reviewer` as the separate evaluator — don't self-certify.
+
+---
+
 ## ⚠️ Critical Rules
 
 1. **Never cross-contaminate** — Don't reference ECOS/Rana's product in MindsetOS UI or prompts
