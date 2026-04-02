@@ -100,7 +100,10 @@ export function AdminUserSwitcher() {
             });
           }
         })
-        .catch(() => {});
+        .catch((err: unknown) => {
+          // Polling failure — non-blocking but log so transient errors are visible
+          console.error('[AdminUserSwitcher] Failed to poll impersonation session status:', err);
+        });
     }, 5000);
     return () => clearInterval(interval);
   }, [impersonationSession?.status]);

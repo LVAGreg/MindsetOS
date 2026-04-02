@@ -62,13 +62,13 @@ export default function FirstTimeModal({ show, onDismiss, onStartMindsetScore }:
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — z-[80]: below modal (z-[90]), above WelcomeGuide (z-[70]) and normal content */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-md z-[80] transition-opacity duration-300"
         onClick={onDismiss}
       />
 
-      {/* Modal */}
+      {/* Modal — z-[90]: above backdrop (z-[80]) and WelcomeGuide (z-[70]); below TrialExpiredPopup (z-[9999]) */}
       <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none">
         <div
           className="pointer-events-auto w-full max-w-md bg-white dark:bg-[#0d1117] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/[0.08] overflow-hidden"

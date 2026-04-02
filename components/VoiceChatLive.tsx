@@ -40,6 +40,9 @@ export default function VoiceChatLive({
   // Audio visualization
   const [audioLevel, setAudioLevel] = useState(0);
   const [frequencyBins, setFrequencyBins] = useState<number[]>(new Array(12).fill(0));
+  // Agent speaking waveform — updated by interval, never via Math.random() in render
+  const [agentFrequencyBins, setAgentFrequencyBins] = useState<number[]>(new Array(12).fill(0));
+  const agentWaveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Transcript (shown after call ends)
   const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
@@ -177,6 +180,29 @@ export default function VoiceChatLive({
     };
     monitor();
   }, []);
+
+  // Drive agent waveform animation with stable interval instead of Math.random() in JSX
+  useEffect(() => {
+    if (isAgentSpeaking) {
+      agentWaveIntervalRef.current = setInterval(() => {
+        setAgentFrequencyBins(
+          Array.from({ length: 12 }, () => Math.random() * 0.5 + 0.3)
+        );
+      }, 100);
+    } else {
+      if (agentWaveIntervalRef.current) {
+        clearInterval(agentWaveIntervalRef.current);
+        agentWaveIntervalRef.current = null;
+      }
+      setAgentFrequencyBins(new Array(12).fill(0));
+    }
+    return () => {
+      if (agentWaveIntervalRef.current) {
+        clearInterval(agentWaveIntervalRef.current);
+        agentWaveIntervalRef.current = null;
+      }
+    };
+  }, [isAgentSpeaking]);
 
   // Connect to Gemini Live
   const connect = async () => {
@@ -453,10 +479,10 @@ export default function VoiceChatLive({
               </div>
             </div>
 
-            {/* Waveform */}
+            {/* Waveform — agent bins driven by interval state, not Math.random() in render */}
             <div className="flex items-end justify-center gap-1 h-16 mb-6">
-              {frequencyBins.map((bin, i) => {
-                const height = Math.max(8, (isAgentSpeaking ? Math.random() * 0.5 + 0.3 : bin) * 60 + 8);
+              {(isAgentSpeaking ? agentFrequencyBins : frequencyBins).map((bin, i) => {
+                const height = Math.max(8, bin * 60 + 8);
                 return (
                   <div
                     key={i}

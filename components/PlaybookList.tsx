@@ -95,7 +95,10 @@ export function PlaybookList() {
       viewAsUserId: viewAsUser?.id || undefined,
     }).then(data => {
       extractTags(Array.isArray(data) ? data : []);
-    }).catch(() => {});
+    }).catch((err: unknown) => {
+      // Background tag refresh — non-blocking but log so failures are visible
+      console.error('[PlaybookList] Failed to refresh tag list:', err);
+    });
   }, [playbookRefreshKey, activeClientProfileId, viewAsUser?.id]);
 
   useEffect(() => {

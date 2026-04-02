@@ -173,6 +173,8 @@ export default function VoiceChat({
 
   // Start continuous audio monitoring
   const startAudioMonitoring = useCallback(() => {
+    // Frame counter used for deterministic debug logging (~every 60 frames) instead of Math.random()
+    let frameCount = 0;
     const monitor = () => {
       if (!analyserRef.current) {
         console.log('⚠️ No analyser ref');
@@ -190,8 +192,9 @@ export default function VoiceChat({
       const rms = Math.sqrt(sum / dataArray.length);
       const normalizedLevel = Math.min(rms / 128, 1);
 
-      // Debug logging every 60 frames (~1 second)
-      if (Math.random() < 0.016) {
+      // Debug logging every 60 frames (~1 second at 60fps) — use counter, not Math.random()
+      frameCount = (frameCount + 1) % 60;
+      if (frameCount === 0) {
         const maxBin = dataArray.reduce((max, val) => Math.max(max, val), 0);
         console.log('🎤 Audio level:', normalizedLevel.toFixed(3), 'Max bin:', maxBin);
       }
@@ -882,11 +885,12 @@ export default function VoiceChat({
             </div>
 
             {/* Audio waveform bars - using real frequency data */}
+            {/* Agent bars use agentAudioLevel (already updated via interval) — no Math.random() in render */}
             <div className="flex items-end justify-center gap-1 h-16 mb-6">
               {frequencyBins.map((bin, i) => {
-                // Use real frequency data for user, simulated for agent
+                // Use real frequency data for user, stable agentAudioLevel state for agent
                 const binValue = isAgentSpeaking
-                  ? Math.random() * agentAudioLevel * 0.8 + agentAudioLevel * 0.2
+                  ? agentAudioLevel * 0.8 + agentAudioLevel * 0.2
                   : isUserSpeaking
                     ? bin
                     : 0.05;

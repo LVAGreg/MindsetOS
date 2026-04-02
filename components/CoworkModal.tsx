@@ -161,12 +161,18 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
   };
 
   const copyText = () => {
-    navigator.clipboard.writeText(generated).catch(() => {});
-    setDownloaded(true);
-    setTimeout(() => setDownloaded(false), 2000);
+    navigator.clipboard.writeText(generated).then(() => {
+      setDownloaded(true);
+      setTimeout(() => setDownloaded(false), 2000);
+    }).catch((err: unknown) => {
+      console.error('[CoworkModal] Failed to copy to clipboard:', err);
+      // Fallback: still show the button briefly so user can manually copy
+      setDownloaded(false);
+    });
   };
 
   return (
+    {/* z-[9999]: highest-priority modal — sits above TrialExpiredPopup (z-[9999]) and all other overlays */}
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div
         className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden"

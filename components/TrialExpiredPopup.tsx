@@ -57,13 +57,13 @@ export default function TrialExpiredPopup({
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — z-[9998]: sits below popup (z-[9999]), above all normal page content */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] transition-opacity duration-300"
         onClick={handleDismiss}
       />
 
-      {/* Popup */}
+      {/* Popup — z-[9999]: top-priority upgrade gate, above CoworkModal and all other overlays */}
       <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4">
         <div
           className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 overflow-hidden animate-in fade-in zoom-in-95 duration-300"

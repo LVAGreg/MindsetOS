@@ -161,7 +161,10 @@ export function CanvasPanel() {
     if (showBrowser) {
       fetchArtifacts({ limit: 100, client_profile_id: activeClientProfileId || undefined, viewAsUserId: viewAsUser?.id || undefined })
         .then(data => extractBrowseTags(Array.isArray(data) ? data : []))
-        .catch(() => {});
+        .catch((err: unknown) => {
+          // Background tag refresh — non-blocking but log so failures are visible
+          console.error('[CanvasPanel] Failed to refresh browse tag list:', err);
+        });
     }
   }, [showBrowser]);
 

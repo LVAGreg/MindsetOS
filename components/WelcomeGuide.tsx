@@ -66,13 +66,13 @@ export default function WelcomeGuide({ show, onDismiss, onStartMindsetScore }: W
 
   return (
     <>
-      {/* Backdrop overlay */}
+      {/* Backdrop overlay — z-[60]: below tooltips (z-[70]), above sidebar (z-40) and page content */}
       <div
         className="fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300"
         onClick={handleSkip}
       />
 
-      {/* Step 0: Agent selector tooltip — positioned right of sidebar, below header */}
+      {/* Step 0: Agent selector tooltip — z-[70]: above backdrop (z-[60]); below FirstTimeModal (z-[80]) */}
       {step.id === 'agents' && (
         <div
           className="fixed z-[70] animate-in fade-in slide-in-from-top-2 duration-300"
@@ -122,7 +122,7 @@ export default function WelcomeGuide({ show, onDismiss, onStartMindsetScore }: W
         </div>
       )}
 
-      {/* Step 1: Sidebar tooltip — positioned right of sidebar */}
+      {/* Step 1: Sidebar tooltip — z-[70]: above backdrop (z-[60]); below FirstTimeModal (z-[80]) */}
       {step.id === 'sidebar' && (
         <div
           className="fixed z-[70] animate-in fade-in slide-in-from-left-2 duration-300"
@@ -172,7 +172,7 @@ export default function WelcomeGuide({ show, onDismiss, onStartMindsetScore }: W
         </div>
       )}
 
-      {/* Step 2: Center — ready to go + Mindset Score CTA */}
+      {/* Step 2: Center — ready to go + Mindset Score CTA — z-[70]: above backdrop (z-[60]); below FirstTimeModal (z-[80]) */}
       {step.id === 'start' && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto animate-in fade-in zoom-in-95 duration-300">
