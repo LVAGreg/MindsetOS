@@ -219,6 +219,16 @@ function DashboardContent() {
     setHasHydrated(true);
   }, []);
 
+  // On initial /dashboard load (no conversation in URL), clear persisted agent
+  // so the welcome/brain screen shows instead of jumping straight into a chat
+  useEffect(() => {
+    if (window.location.pathname === '/dashboard') {
+      setCurrentAgent(null as any);
+      setCurrentConversation(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Track onboarding status to refetch agents when it changes
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
   // Counter incremented to trigger agent refetch without null→value setTimeout cycling
@@ -929,7 +939,11 @@ function DashboardContent() {
         activeSection={sidebarSection}
         onSectionChange={(section) => {
           setSidebarSection(section);
-          if (section === 'agents') setShowAgentBrowser(true);
+          if (section === 'home') {
+            setCurrentAgent(null as any);
+            setCurrentConversation(null);
+            setShowAgentBrowser(false);
+          } else if (section === 'agents') setShowAgentBrowser(true);
           else if (section === 'conversations') setShowConversationBrowser(true);
           else if (section === 'playbook') {
             // Playbook is surfaced in the sidebar children slot below
