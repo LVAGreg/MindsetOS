@@ -76,7 +76,7 @@ const BONUSES = [
   { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
-type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'individual_annual';
+type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'individual_annual' | 'intensive_1997';
 
 /* ------------------------------------------------------------------ */
 /*  Checkout Steps Indicator                                          */
@@ -111,7 +111,7 @@ function StepsIndicator() {
 function CheckoutPageInner() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan') as PricingPlan | null;
-  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'individual_annual'];
+  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'individual_annual', 'intensive_1997'];
   const initialPlan: PricingPlan = planParam && validPlans.includes(planParam) ? planParam : 'weekly';
 
   const [plan, setPlan] = useState<PricingPlan>(initialPlan);
@@ -123,7 +123,7 @@ function CheckoutPageInner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, individual_annual: 1997 };
+  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, individual_annual: 1997, intensive_1997: 1997 };
   const price = priceMap[plan];
   const addonPrice = (plan === 'architecture_997' && addons.has('1on1_intensive')) ? 1000 : 0;
   const totalDue = price + addonPrice;
@@ -495,6 +495,50 @@ function CheckoutPageInner() {
                       BEST VALUE
                     </span>
                   </label>
+
+                  {/* Architecture Intensive (1:1) — $1,997 one-time */}
+                  <label
+                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                      plan === 'intensive_1997'
+                        ? 'border-rose-500/60 bg-rose-500/[0.06]'
+                        : 'border-white/[0.06] bg-white/[0.02] hover:border-rose-500/20 hover:bg-rose-500/[0.03]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="plan"
+                      value="intensive_1997"
+                      checked={plan === 'intensive_1997'}
+                      onChange={() => handlePlanChange('intensive_1997')}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
+                      plan === 'intensive_1997' ? 'border-rose-400' : 'border-white/20'
+                    }`}>
+                      {plan === 'intensive_1997' && <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap mb-1">
+                        <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
+                        <span className="text-sm text-white/40 font-medium">one-time</span>
+                      </div>
+                      <div className="text-sm font-semibold text-white/80 mb-1">Architecture Intensive (1:1)</div>
+                      <div className="text-xs text-white/35 mb-2 leading-relaxed">
+                        Greg&apos;s flagship 1:1 program. Full 90-Day Architecture access plus 3 private coaching sessions, a personalized mindset blueprint, and priority support.
+                      </div>
+                      <ul className="space-y-1">
+                        {['Full 90-Day Architecture program', '3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support & direct access'].map((f) => (
+                          <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
+                            <CheckCircle className="w-3 h-3 text-rose-400 flex-shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-rose-600 text-white text-[10px] font-bold rounded-full tracking-wide">
+                      PREMIUM
+                    </span>
+                  </label>
                 </div>
                 <p className="text-[11px] text-white/20 text-right mt-2">All prices in USD</p>
               </section>
@@ -511,12 +555,14 @@ function CheckoutPageInner() {
                         <span className="text-sm text-white/80">
                           {plan === 'architecture_997' ? '90-Day Mindset Architecture'
                             : plan === 'individual_annual' ? 'MindsetOS Annual'
+                            : plan === 'intensive_1997' ? 'Architecture Intensive (1:1)'
                             : 'Mindset Architecture'}
                         </span>
                         <span className="text-xs text-white/30 ml-2">
                           ({plan === 'weekly' ? 'Weekly'
                             : plan === 'individual_annual' ? '1 Year'
                             : plan === 'architecture_997' ? '90-Day Cohort'
+                            : plan === 'intensive_1997' ? 'One-Time'
                             : '12-Week Access'})
                         </span>
                       </div>
@@ -583,6 +629,7 @@ function CheckoutPageInner() {
                         {plan === 'architecture_997' && addons.has('1on1_intensive') ? 'Enroll in Architecture + Intensive'
                           : plan === 'architecture_997' ? 'Enroll in Architecture'
                           : plan === 'individual_annual' ? 'Start Annual Plan'
+                          : plan === 'intensive_1997' ? 'Enroll in Architecture Intensive'
                           : 'PROCEED TO PAY'}
                         <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                       </>
