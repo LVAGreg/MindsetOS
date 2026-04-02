@@ -1027,10 +1027,12 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               <button
                 key={agent.id}
                 onClick={() => {
-                  const agentKey = (Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug)?.[0]) as AgentId | undefined;
-                  if (agentKey) {
-                    useAppStore.getState().setCurrentAgent(agentKey);
+                  const entry = Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug);
+                  if (entry) {
+                    useAppStore.getState().setCurrentAgent(entry[0] as AgentId);
                     useAppStore.getState().setCurrentConversation(null);
+                  } else {
+                    console.error(`[Handoff] No MINDSET_AGENTS entry for slug "${agent.slug}" — cannot navigate`);
                   }
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left group transition-all"
