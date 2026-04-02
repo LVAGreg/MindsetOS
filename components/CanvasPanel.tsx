@@ -249,16 +249,10 @@ export function CanvasPanel() {
     }
 
     if (format === 'pdf') {
-      // Render markdown to HTML, then use print-to-PDF
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`<!DOCTYPE html><html><head><title>${title || 'Play'}</title>
-          <style>body{font-family:system-ui,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.6;color:#333}
-          h1,h2,h3{margin-top:1.5em}pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}
-          code{background:#f4f4f4;padding:2px 6px;border-radius:3px}blockquote{border-left:3px solid #ccc;margin-left:0;padding-left:16px;color:#666}
-          table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f4f4f4}
-          @media print{body{margin:0;padding:20px}}</style></head><body>`);
-        // Simple markdown-to-HTML conversion for print
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const html2pdfModule = await import('html2pdf.js') as any;
+        const html2pdfFn = html2pdfModule.default ?? html2pdfModule;
         const html = content
           .replace(/^### (.*$)/gm, '<h3>$1</h3>')
           .replace(/^## (.*$)/gm, '<h2>$1</h2>')
@@ -266,12 +260,21 @@ export function CanvasPanel() {
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
           .replace(/\*(.*?)\*/g, '<em>$1</em>')
           .replace(/^- (.*$)/gm, '<li>$1</li>')
-          .replace(/(<li>[\s\S]*<\/li>)/, '<ul>$1</ul>')
           .replace(/\n\n/g, '</p><p>')
           .replace(/\n/g, '<br>');
-        printWindow.document.write(`<p>${html}</p></body></html>`);
-        printWindow.document.close();
-        setTimeout(() => { printWindow.print(); }, 500);
+        const el = document.createElement('div');
+        el.style.cssText = 'font-family:system-ui,sans-serif;max-width:720px;padding:32px;line-height:1.7;color:#1a1a2e';
+        el.innerHTML = `<p>${html}</p>`;
+        document.body.appendChild(el);
+        await html2pdfFn().from(el).set({
+          filename: `${safeName}.pdf`,
+          margin: 12,
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          html2canvas: { scale: 2, useCORS: true },
+        }).save();
+        document.body.removeChild(el);
+      } catch (err) {
+        console.error('[CanvasPanel] PDF export failed:', err);
       }
       setShowDownloadMenu(false);
       return;
