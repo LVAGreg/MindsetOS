@@ -64,6 +64,8 @@ import { CanvasPanel } from '@/components/CanvasPanel';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import { CoworkModal } from '@/components/CoworkModal';
 import QuickAgentSwitch from '@/components/QuickAgentSwitch';
+import dynamic from 'next/dynamic';
+const BrainInterface = dynamic(() => import('@/components/BrainInterface'), { ssr: false });
 
 // Compact agent row for Browse Agents view
 function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, userRole }: {
@@ -1351,6 +1353,17 @@ function DashboardContent() {
                       </div>
                     );
                   })()}
+
+                  {/* ---- Interactive Brain ---- */}
+                  <div className="mb-10 animate-float-up-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-3" style={{ color: '#4a4a60' }}>
+                      Your agent network
+                    </p>
+                    <BrainInterface
+                      onAgentSelect={(slug) => handleSelectAgent(slug as any)}
+                      activeSlug={currentAgent?.id}
+                    />
+                  </div>
 
                   {/* ---- Journey Pathway ---- */}
                   {(() => {
