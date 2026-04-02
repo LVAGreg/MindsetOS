@@ -12,17 +12,18 @@ interface LobeDef {
   color: string;
   position: [number, number, number];
   scale: [number, number, number];
+  primarySlug: string;
 }
 
 const LOBES: LobeDef[] = [
-  { name: "assessment",     color: "#F59E0B", position: [0,     0.5,   0.2],  scale: [0.35, 0.30, 0.35] },
-  { name: "coaching",       color: "#8B5CF6", position: [0.45,  0.2,   0.1],  scale: [0.38, 0.32, 0.30] },
-  { name: "self-awareness", color: "#EC4899", position: [-0.45, 0.0,  -0.1],  scale: [0.36, 0.30, 0.32] },
-  { name: "strategy",       color: "#3B82F6", position: [0.1,   0.1,   0.45], scale: [0.30, 0.28, 0.25] },
-  { name: "accountability", color: "#059669", position: [0.5,  -0.1,  -0.3],  scale: [0.30, 0.28, 0.28] },
-  { name: "mindset",        color: "#A855F7", position: [-0.35, 0.1,   0.2],  scale: [0.40, 0.35, 0.38] },
-  { name: "performance",    color: "#FBBF24", position: [0,    -0.5,  -0.2],  scale: [0.38, 0.28, 0.35] },
-  { name: "content",        color: "#14B8A6", position: [0,    -0.3,   0.35], scale: [0.28, 0.22, 0.25] },
+  { name: "assessment",     color: "#F59E0B", position: [0,     0.5,   0.2],  scale: [0.35, 0.30, 0.35], primarySlug: "mindset-score"        },
+  { name: "coaching",       color: "#8B5CF6", position: [0.45,  0.2,   0.1],  scale: [0.38, 0.32, 0.30], primarySlug: "architecture-coach"   },
+  { name: "self-awareness", color: "#EC4899", position: [-0.45, 0.0,  -0.1],  scale: [0.36, 0.30, 0.32], primarySlug: "inner-world-mapper"   },
+  { name: "strategy",       color: "#3B82F6", position: [0.1,   0.1,   0.45], scale: [0.30, 0.28, 0.25], primarySlug: "decision-framework"   },
+  { name: "accountability", color: "#059669", position: [0.5,  -0.1,  -0.3],  scale: [0.30, 0.28, 0.28], primarySlug: "accountability-partner"},
+  { name: "mindset",        color: "#A855F7", position: [-0.35, 0.1,   0.2],  scale: [0.40, 0.35, 0.38], primarySlug: "belief-debugger"      },
+  { name: "performance",    color: "#FBBF24", position: [0,    -0.5,  -0.2],  scale: [0.38, 0.28, 0.35], primarySlug: "energy-optimizer"     },
+  { name: "content",        color: "#14B8A6", position: [0,    -0.3,   0.35], scale: [0.28, 0.22, 0.25], primarySlug: "conversation-curator" },
 ];
 
 // ─── Label State (projected screen positions) ─────────────────────────────────
@@ -340,16 +341,24 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       const hits = rc.intersectObjects(lobeMeshes, false);
       if (hits.length > 0) {
         const idx = hits[0].object.userData.lobeIdx as number;
-        const lobeName = LOBES[idx].name;
-        // Pick the first agent in this lobe
-        const agent = AGENT_NODES.find((a) => a.category === lobeName);
-        if (agent) onAgentSelect(agent.slug);
+        onAgentSelect(LOBES[idx].primarySlug);
       }
+    }
+
+    function onPointerMove(e: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+      onMouseMove({ clientX: e.clientX, clientY: e.clientY } as MouseEvent);
+    }
+    function onPointerUp(e: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+      onClick({ clientX: e.clientX, clientY: e.clientY } as MouseEvent);
     }
 
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("mouseleave", onMouseLeave);
     canvas.addEventListener("click", onClick);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
 
     return () => {
       cancelAnimationFrame(refs.animFrameId);
@@ -357,8 +366,13 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       canvas.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("mouseleave", onMouseLeave);
       canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
       renderer.dispose();
-      baseGeometry.dispose();
+      // Do NOT dispose baseGeometry here — each mesh clones it via scale,
+      // but THREE reuses the buffer. Dispose per-mesh geometry instead.
+      refs.lobeMeshes.forEach((m) => m.geometry.dispose());
+      refs.wireframes.forEach((m) => m.geometry.dispose());
     };
   }, [categoryAgents, onAgentSelect, projectToScreen, rebuildLabels]);
 

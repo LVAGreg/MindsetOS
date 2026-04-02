@@ -236,8 +236,17 @@ export default function BrainVariantA({
       }
     };
 
+    const onPointerMove = (e: PointerEvent) => {
+      onMouseMove({ clientX: e.clientX, clientY: e.clientY } as MouseEvent);
+    };
+    const onPointerUp = () => {
+      if (currentHoveredSlug) onAgentSelect(currentHoveredSlug);
+    };
+
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("click", onClick);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
 
     // ── Resize Observer ───────────────────────────────────────────────────────
     const resizeObserver = new ResizeObserver(() => setSize());
@@ -362,6 +371,8 @@ export default function BrainVariantA({
       cancelAnimationFrame(rafId);
       canvas.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
       resizeObserver.disconnect();
       renderer.dispose();
 

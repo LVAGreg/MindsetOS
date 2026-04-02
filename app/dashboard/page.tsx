@@ -1361,7 +1361,7 @@ function DashboardContent() {
                     </p>
                     <BrainInterface
                       onAgentSelect={(slug) => handleSelectAgent(slug as any)}
-                      activeSlug={currentAgent?.id}
+                      activeSlug={currentAgentData?.id}
                     />
                   </div>
 

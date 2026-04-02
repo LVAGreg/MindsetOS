@@ -60,7 +60,7 @@ Is the implementation as simple as it needs to be, no more?
 Does it actually work, including edge cases?
 - 1–4: Breaks on obvious inputs, missing null checks at system boundaries
 - 5–7: Happy path works, some edge cases untested
-- 8–10: Error paths handled, no silent failures, no data mutation surprises. Async state transitions that depend on timing (nested `setTimeout` re-trigger tricks, double-setState cycling) score a maximum of 7 without explicit justification. Agent slugs passed to routing functions must use one canonical format consistently across all call sites (e.g., always `'mindset-score'`, never mix with display names or ad-hoc variants).
+- 8–10: Error paths handled, no silent failures, no data mutation surprises. Async state transitions that depend on timing (nested `setTimeout` re-trigger tricks, double-setState cycling) score a maximum of 7 without explicit justification. Agent slugs passed to routing functions must use one canonical format consistently across all call sites (e.g., always `'mindset-score'`, never mix with display names or ad-hoc variants). Props wired at the integration site must be verified against the actual type of the source variable — passing `obj?.id` when `obj` is already a string (not an object) is a wiring bug that silently disables the prop's feature. Shared WebGL resources (geometries, materials) disposed in cleanup while still referenced by live meshes score a maximum of 6.
 
 ---
 
@@ -74,9 +74,9 @@ Does the flow match what a user actually wants to accomplish, not just what was 
 
 ### Mobile Readiness — /10
 Does it work on a phone? (MindsetOS users are often on mobile)
-- 1–4: Layout breaks below 768px, tap targets too small
+- 1–4: Layout breaks below 768px, tap targets too small; or canvas/WebGL components have zero touch event handlers (entire feature non-interactive on mobile) — score ≤4
 - 5–7: Usable but not polished
-- 8–10: Responsive at all breakpoints, tap targets ≥44px, no horizontal scroll
+- 8–10: Responsive at all breakpoints, tap targets ≥44px, no horizontal scroll; canvas/Three.js components handle `touchstart`/`touchend` or `pointerdown`/`pointerup` equivalently to mouse events
 
 ---
 
@@ -152,3 +152,12 @@ When a PR replaces a colour token (e.g., generic purple/indigo → MindsetOS amb
 
 ### Silent feature-gate API check
 A `.catch(() => {})` on an API call whose result determines whether a UI warning or feature is shown (e.g., checking tier/access to conditionally render an upgrade prompt for `architecture-coach` or `launch-companion`) counts as a silent failure. If the check call fails, the feature gate silently defaults to "no problem", hiding important user-facing information. The catch must either show an error state or fail-open (show the warning). Scores Functionality ≤6 and Correctness ≤6.
+
+### `Math.random()` inside a `useEffect` with unstable dependencies
+`Math.random()` inside a `useEffect` whose dependency array contains an unstable value (e.g., an inline arrow function re-created on every parent render) causes the entire Three.js scene to rebuild on every parent render. The effect's deps must be stable (memoized via `useCallback`, or refs) and any random initialization must live outside the component or be seeded once into a `useRef`. Flag for Correctness.
+
+### Prop wiring type mismatch at integration site
+When a parent passes a prop from a store value, verify the type of the store value against what the prop expects. A common pattern: `activeSlug={currentAgent?.id}` when `currentAgent` is `string | null` (not an object) means `.id` is always `undefined`, silently killing the receiving component's active-state logic. Always check the store type definition before accessing nested properties. Flag for Correctness at the integration file, not just the component.
+
+### Shared WebGL geometry disposed while meshes live
+When multiple Three.js `Mesh` objects share a `BufferGeometry` instance, calling `geometry.dispose()` in cleanup invalidates it while all meshes still reference it. Each mesh should own its geometry instance, or dispose per-mesh geometries individually in cleanup. Flag for Correctness.

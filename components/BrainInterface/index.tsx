@@ -1,6 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import BrainToggle, { BrainVariant } from './BrainToggle';
 
@@ -39,14 +39,14 @@ export default function BrainInterface({
   const [variant, setVariant] = useState<BrainVariant>('A');
   const router = useRouter();
 
-  function handleSelect(slug: string) {
+  const handleSelect = useCallback((slug: string) => {
     if (onAgentSelect) {
       onAgentSelect(slug);
     } else {
       sessionStorage.setItem('brainSelectedAgent', slug);
       router.push('/dashboard');
     }
-  }
+  }, [onAgentSelect, router]);
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
