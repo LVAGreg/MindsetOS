@@ -279,12 +279,7 @@ function DashboardContent() {
     checkOnboarding();
   }, [user, hasHydrated, createConversation, setCurrentAgent, setCurrentConversation]);
 
-  // Set MindsetAI as default agent if no agent selected (only after onboarding check)
-  useEffect(() => {
-    if (!currentAgent && hasHydrated) {
-      setCurrentAgent('MINDSET_SCORE');
-    }
-  }, [currentAgent, hasHydrated, setCurrentAgent]);
+  // No auto-select — users land on the welcome/brain screen and pick an agent themselves
 
   // Apply theme on mount
   useEffect(() => {
