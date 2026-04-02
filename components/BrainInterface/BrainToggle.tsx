@@ -1,4 +1,5 @@
 'use client';
+import type { ReactNode } from 'react';
 import { Brain, Network } from 'lucide-react';
 
 export type BrainVariant = 'A' | 'B';
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export default function BrainToggle({ active, onChange }: Props) {
-  const buttons: { variant: BrainVariant; icon: React.ReactNode; label: string }[] = [
+  const buttons: { variant: BrainVariant; icon: ReactNode; label: string }[] = [
     { variant: 'A', icon: <Network size={12} />, label: 'Synaptic Web' },
     { variant: 'B', icon: <Brain size={12} />,   label: 'Brain Atlas'  },
   ];

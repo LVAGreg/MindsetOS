@@ -393,11 +393,18 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       canvas.removeEventListener("click", onClick);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerUp);
+      refs.scene.clear(); // detach all objects before disposing resources
       renderer.dispose();
       // Each mesh owns a distinct geometry instance (created via makeSphere()),
       // so dispose is safe to call once per mesh without double-free.
-      refs.lobeMeshes.forEach((m) => m.geometry.dispose());
-      refs.wireframes.forEach((m) => m.geometry.dispose());
+      refs.lobeMeshes.forEach((m) => {
+        m.geometry.dispose();
+        (m.material as THREE.MeshPhongMaterial).dispose();
+      });
+      refs.wireframes.forEach((m) => {
+        m.geometry.dispose();
+        (m.material as THREE.MeshBasicMaterial).dispose();
+      });
     };
   }, [categoryAgents, onAgentSelect, projectToScreen, rebuildLabels]);
 
