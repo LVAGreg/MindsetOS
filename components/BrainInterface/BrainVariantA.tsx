@@ -255,8 +255,9 @@ export default function BrainVariantA({
     resizeObserver.observe(container);
 
     // ── Animation Loop ────────────────────────────────────────────────────────
-    // Reusable scratch vector — avoids a new THREE.Vector3 allocation every frame
+    // Reusable scratch vectors — avoids per-frame THREE.Vector3 allocations
     const _scaleTarget = new THREE.Vector3();
+    const _worldPos = new THREE.Vector3();
     let rafId: number;
     let previousHoveredMesh: NodeMesh | null = null;
 
@@ -342,14 +343,14 @@ export default function BrainVariantA({
 
       // ── Label Positioning ───────────────────────────────────────────────────
       if (hoveredMesh) {
-        // Project world position to screen
-        const worldPos = new THREE.Vector3();
-        hoveredMesh.getWorldPosition(worldPos);
-        worldPos.project(camera);
+        // Project world position to screen (reuse scratch vector)
+        _worldPos.set(0, 0, 0);
+        hoveredMesh.getWorldPosition(_worldPos);
+        _worldPos.project(camera);
 
         const rect = canvas.getBoundingClientRect();
-        const sx = ((worldPos.x + 1) / 2) * rect.width;
-        const sy = ((-worldPos.y + 1) / 2) * rect.height;
+        const sx = ((_worldPos.x + 1) / 2) * rect.width;
+        const sy = ((-_worldPos.y + 1) / 2) * rect.height;
 
         setLabel({
           visible: true,
@@ -377,6 +378,7 @@ export default function BrainVariantA({
       canvas.removeEventListener("pointerup", onPointerUp);
       resizeObserver.disconnect();
       renderer.dispose();
+      scene.clear(); // remove all objects before disposing materials/geometries
 
       // Dispose geometries + materials
       for (const mesh of nodeMeshes) {

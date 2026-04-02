@@ -21,8 +21,8 @@ const LOBES: LobeDef[] = [
   { name: "self-awareness", color: "#EC4899", position: [-0.45, 0.0,  -0.1],  scale: [0.36, 0.30, 0.32], primarySlug: "inner-world-mapper"   },
   { name: "strategy",       color: "#3B82F6", position: [0.1,   0.1,   0.45], scale: [0.30, 0.28, 0.25], primarySlug: "decision-framework"   },
   { name: "accountability", color: "#059669", position: [0.5,  -0.1,  -0.3],  scale: [0.30, 0.28, 0.28], primarySlug: "accountability-partner"},
-  { name: "mindset",        color: "#A855F7", position: [-0.35, 0.1,   0.2],  scale: [0.40, 0.35, 0.38], primarySlug: "belief-debugger"      },
-  { name: "performance",    color: "#FBBF24", position: [0,    -0.5,  -0.2],  scale: [0.38, 0.28, 0.35], primarySlug: "energy-optimizer"     },
+  { name: "mindset",        color: "#A855F7", position: [-0.35, 0.1,   0.2],  scale: [0.40, 0.35, 0.38], primarySlug: "story-excavator"      },
+  { name: "performance",    color: "#FBBF24", position: [0,    -0.5,  -0.2],  scale: [0.38, 0.28, 0.35], primarySlug: "practice-builder"     },
   { name: "content",        color: "#14B8A6", position: [0,    -0.3,   0.35], scale: [0.28, 0.22, 0.25], primarySlug: "conversation-curator" },
 ];
 

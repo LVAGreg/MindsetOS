@@ -167,3 +167,6 @@ When a component offers two interaction surfaces for the same action (e.g., clic
 
 ### Concurrent WebGL state mutation from React effect and rAF loop
 When a `useEffect` and a `requestAnimationFrame` loop both write to the same Three.js material properties (`emissiveIntensity`, `opacity`, etc.), the last writer per-frame wins silently. Active-state highlights applied by the effect are overwritten by the animation loop's hover-restore path. Assign ownership of WebGL material state to one writer — store active state as a field on the scene refs object (`sceneRef.current.activeLobeIdx`) so the animation loop applies all material writes in one place. Flag for Correctness.
+
+### Ghost agent slugs in interactive scene data
+When a Three.js scene assigns `userData.slug` values to interactive objects, every slug must resolve to a real navigable agent at runtime. Slugs that exist in scene data but not in the backend agent list produce silent no-ops on click — the user gets no feedback and no navigation. The canonical slug list for MindsetOS is the 10 agents defined in CLAUDE.md. Validate slugs against this list at definition time. Scores Functionality ≤6 and User Intent ≤6.
