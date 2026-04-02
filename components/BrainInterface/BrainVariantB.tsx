@@ -57,6 +57,7 @@ interface SceneRefs {
   raycaster: THREE.Raycaster;
   mouse: THREE.Vector2;
   hoveredLobeIdx: number;
+  activeLobeIdx: number;
   animFrameId: number;
   targetRotY: number;
   targetTiltX: number;
@@ -225,6 +226,7 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       raycaster,
       mouse,
       hoveredLobeIdx: -1,
+      activeLobeIdx: -1,
       animFrameId: 0,
       targetRotY: 0,
       targetTiltX: 0,
@@ -299,6 +301,24 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
         wireframes[i].scale.copy(mesh.scale).multiplyScalar(1.001);
       });
 
+      // Active-lobe pass — drives emissive/opacity for the selected lobe.
+      // Runs after hover logic so hover always wins for the hovered lobe.
+      const activeIdx = refs.activeLobeIdx;
+      LOBES.forEach((_, i) => {
+        if (i === refs.hoveredLobeIdx) return; // hover logic already handled this lobe
+        const mat = lobeMeshes[i].material as THREE.MeshPhongMaterial;
+        const wMat = wireframes[i].material as THREE.MeshBasicMaterial;
+        if (i === activeIdx) {
+          mat.emissiveIntensity = 0.45;
+          mat.opacity = 0.55;
+          wMat.opacity = 0.22;
+        } else {
+          mat.emissiveIntensity = activeIdx === -1 ? 0.15 : 0.10;
+          mat.opacity = activeIdx === -1 ? 0.35 : 0.28;
+          wMat.opacity = 0.12;
+        }
+      });
+
       // Rebuild labels every 3 frames (~20fps) — reduces React reconciliation load
       if (frameCount % 3 === 0) {
         const cw = container.clientWidth;
@@ -356,7 +376,6 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       onMouseMove({ clientX: e.clientX, clientY: e.clientY } as MouseEvent);
     }
     function onPointerUp(e: PointerEvent) {
-      const rect = canvas.getBoundingClientRect();
       onClick({ clientX: e.clientX, clientY: e.clientY } as MouseEvent);
     }
 
@@ -382,27 +401,16 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
     };
   }, [categoryAgents, onAgentSelect, projectToScreen, rebuildLabels]);
 
-  // Highlight active lobe when activeSlug changes
+  // Highlight active lobe when activeSlug changes.
+  // We only update the ref here; the animate() loop reads activeLobeIdx each frame
+  // so there is no race with the hover logic that also writes material properties.
   useEffect(() => {
-    const refs = sceneRef.current;
-    if (!refs) return;
+    if (!sceneRef.current) return;
     const activeAgent = AGENT_NODES.find((a) => a.slug === activeSlug);
-    if (!activeAgent) return;
-    const lobeIdx = LOBES.findIndex((l) => l.name === activeAgent.category);
-    if (lobeIdx < 0) return;
-
-    LOBES.forEach((_, i) => {
-      const mat = refs.lobeMeshes[i].material as THREE.MeshPhongMaterial;
-      if (i === lobeIdx) {
-        mat.emissiveIntensity = 0.45;
-        mat.opacity = 0.55;
-        refs.pointLights[i].intensity = 0.4;
-      } else {
-        mat.emissiveIntensity = 0.10;
-        mat.opacity = 0.28;
-        refs.pointLights[i].intensity = 0.12;
-      }
-    });
+    const lobeIdx = activeAgent
+      ? LOBES.findIndex((l) => l.name === activeAgent.category)
+      : -1;
+    sceneRef.current.activeLobeIdx = lobeIdx;
   }, [activeSlug]);
 
   // ── Label rendering helpers ──────────────────────────────────────────────────
@@ -541,10 +549,7 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
           <div
             key={lobe.name}
             className="flex items-center gap-1 cursor-pointer"
-            onClick={() => {
-              const agent = AGENT_NODES.find((a) => a.category === lobe.name);
-              if (agent) onAgentSelect(agent.slug);
-            }}
+            onClick={() => onAgentSelect(lobe.primarySlug)}
           >
             <span
               className="rounded-full"

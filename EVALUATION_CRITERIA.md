@@ -161,3 +161,9 @@ When a parent passes a prop from a store value, verify the type of the store val
 
 ### Shared WebGL geometry disposed while meshes live
 When multiple Three.js `Mesh` objects share a `BufferGeometry` instance, calling `geometry.dispose()` in cleanup invalidates it while all meshes still reference it. Each mesh should own its geometry instance, or dispose per-mesh geometries individually in cleanup. Flag for Correctness.
+
+### Divergent navigation paths for the same UI element
+When a component offers two interaction surfaces for the same action (e.g., clicking a canvas lobe shape vs. clicking the same lobe in a legend), both must resolve to the same destination via the same canonical lookup. Using different strategies (e.g., `primarySlug` on canvas path vs. `AGENT_NODES.find()` on legend path) produces silent routing divergence — the user reaches a different agent with no visual indication. All call sites must use one canonical lookup. Scores Correctness ≤6 and Functionality ≤7.
+
+### Concurrent WebGL state mutation from React effect and rAF loop
+When a `useEffect` and a `requestAnimationFrame` loop both write to the same Three.js material properties (`emissiveIntensity`, `opacity`, etc.), the last writer per-frame wins silently. Active-state highlights applied by the effect are overwritten by the animation loop's hover-restore path. Assign ownership of WebGL material state to one writer — store active state as a field on the scene refs object (`sceneRef.current.activeLobeIdx`) so the animation loop applies all material writes in one place. Flag for Correctness.

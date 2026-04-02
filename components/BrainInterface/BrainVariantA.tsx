@@ -255,6 +255,8 @@ export default function BrainVariantA({
     resizeObserver.observe(container);
 
     // ── Animation Loop ────────────────────────────────────────────────────────
+    // Reusable scratch vector — avoids a new THREE.Vector3 allocation every frame
+    const _scaleTarget = new THREE.Vector3();
     let rafId: number;
     let previousHoveredMesh: NodeMesh | null = null;
 
@@ -328,10 +330,8 @@ export default function BrainVariantA({
         const target = isActive
           ? mesh.userData.baseScale * 1.2
           : mesh.userData.targetScale;
-        mesh.scale.lerp(
-          new THREE.Vector3(target, target, target),
-          LERP_SPEED
-        );
+        _scaleTarget.set(target, target, target);
+        mesh.scale.lerp(_scaleTarget, LERP_SPEED);
 
         if (isActive) {
           const mat = mesh.material as THREE.MeshStandardMaterial;
