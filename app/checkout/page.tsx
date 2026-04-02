@@ -473,15 +473,13 @@ function CheckoutPageInner() {
                       <div className="flex items-baseline gap-2 flex-wrap mb-1">
                         <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
                         <span className="text-sm text-white/40 font-medium">/year</span>
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 tracking-wide">ANNUAL SUBSCRIPTION</span>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/20">
                           <Zap className="w-3 h-3" />
                           SAVE $440
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-semibold text-white/80">MindsetOS Annual</span>
-                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 tracking-wide">ANNUAL SUBSCRIPTION</span>
-                      </div>
+                      <div className="text-sm font-semibold text-white/80 mb-2">MindsetOS Annual</div>
                       <div className="text-xs text-white/35 mb-2 leading-relaxed">
                         Full platform access for a full year. Lock in your rate and commit to the long game.
                       </div>
