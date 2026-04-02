@@ -76,7 +76,7 @@ const BONUSES = [
   { name: 'Accountability Partner \u2014 Daily Check-in System', value: '$400' },
 ];
 
-type PricingPlan = 'weekly' | 'upfront' | 'practice5' | 'practice10' | 'architecture_997' | 'individual_annual' | 'intensive_1997';
+type PricingPlan = 'weekly' | 'upfront' | 'architecture_997' | 'individual_annual' | 'intensive_1997';
 
 /* ------------------------------------------------------------------ */
 /*  Checkout Steps Indicator                                          */
@@ -111,7 +111,7 @@ function StepsIndicator() {
 function CheckoutPageInner() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get('plan') as PricingPlan | null;
-  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'practice5', 'practice10', 'architecture_997', 'individual_annual', 'intensive_1997'];
+  const validPlans: PricingPlan[] = ['weekly', 'upfront', 'architecture_997', 'individual_annual', 'intensive_1997'];
   const initialPlan: PricingPlan = planParam && validPlans.includes(planParam) ? planParam : 'weekly';
 
   const [plan, setPlan] = useState<PricingPlan>(initialPlan);
@@ -123,7 +123,7 @@ function CheckoutPageInner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
-  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, practice5: 297, practice10: 397, architecture_997: 997, individual_annual: 1997, intensive_1997: 1997 };
+  const priceMap: Record<PricingPlan, number> = { weekly: 47, upfront: 397, architecture_997: 997, individual_annual: 1997, intensive_1997: 1997 };
   const price = priceMap[plan];
   const addonPrice = (plan === 'architecture_997' && addons.has('1on1_intensive')) ? 1000 : 0;
   const totalDue = price + addonPrice;
