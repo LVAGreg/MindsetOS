@@ -179,3 +179,6 @@ The `validPlans` array and `priceMap` in the checkout page must only contain key
 
 ### Cross-product metadata leak into Stripe
 MindsetOS is a white-label product. Any Stripe API call (customer creation, session metadata, webhook logging) that embeds ECOS-specific identifiers (e.g., `source: 'ecos_checkout'`) violates the CLAUDE.md cross-contamination rule. These strings appear in Stripe dashboards, customer exports, and support tickets visible to users. Audit all `metadata` objects in `checkout.cjs` after every backend change.
+
+### Payload-type mismatch after field removal
+When a backend response object drops a field (e.g., removing `id` from a handoff agent payload), every downstream consumer must be audited: (1) inline TypeScript type annotations, (2) `key` props on mapped list elements, (3) any logic that reads the removed field. Leaving a TypeScript type that still declares the removed field as `string` suppresses the type error and allows `undefined` to propagate silently at runtime — causing `key={undefined}` on React list items and defeating reconciliation. Fix order: update the type → grep all usages of the removed field name in the consumer → replace with the canonical field still present. Scores Correctness ≤6 if removed-field references remain in the consumer after the contract change.

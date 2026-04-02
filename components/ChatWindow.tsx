@@ -1014,7 +1014,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
     // Agent handoff suggestion card
     if (type === 'agent_handoff') {
-      const agents: { id: string; name: string; slug: string }[] = data?.agents || [];
+      const agents: { slug: string; name: string }[] = data?.agents || [];
       if (agents.length === 0) return null;
       return (
         <div className="mt-4 space-y-2">
@@ -1023,17 +1023,15 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
           </p>
           {agents.map(agent => {
             const hex = AGENT_HEX[agent.slug] || '#6366f1';
+            // Resolve AgentId at render time — skip card entirely if slug not in MINDSET_AGENTS
+            const agentEntry = Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug);
+            if (!agentEntry) return null;
             return (
               <button
-                key={agent.id}
+                key={agent.slug}
                 onClick={() => {
-                  const entry = Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug);
-                  if (entry) {
-                    useAppStore.getState().setCurrentAgent(entry[0] as AgentId);
-                    useAppStore.getState().setCurrentConversation(null);
-                  } else {
-                    console.error(`[Handoff] No MINDSET_AGENTS entry for slug "${agent.slug}" — cannot navigate`);
-                  }
+                  useAppStore.getState().setCurrentAgent(agentEntry[0] as AgentId);
+                  useAppStore.getState().setCurrentConversation(null);
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left group transition-all"
                 style={{
