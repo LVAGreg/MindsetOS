@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Loader2, CheckCircle, Clock, Zap, Lock, ArrowRight, Eye, EyeOff, Sparkles, Brain } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { apiClient } from '@/lib/api-client';
-import posthog from 'posthog-js';
+import { identifyUser, trackTrialStarted, trackEvent } from '@/lib/analytics';
 
 /* ── password helpers ────────────────────────────────────── */
 function getPasswordStrength(pw: string): { score: number; label: string; color: string } {
@@ -47,7 +47,7 @@ export default function TrialRegisterPage() {
   const pwStrength = useMemo(() => getPasswordStrength(formData.password), [formData.password]);
 
   useEffect(() => {
-    try { posthog.capture('trial_page_viewed', { source: 'trial' }); } catch {}
+    trackEvent('trial_page_viewed', { source: 'trial' });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,10 +78,8 @@ export default function TrialRegisterPage() {
         daysRemaining: result.trial?.daysRemaining || 7,
         trialAgent: result.trial?.trialAgent || 'Mindset Score Agent',
       });
-      try {
-        posthog.identify(result.user?.id || formData.email, { email: formData.email, role: 'trial' });
-        posthog.capture('lead_magnet_submitted', { source: 'trial' });
-      } catch {}
+      identifyUser(result.user?.id || formData.email, { email: formData.email, role: 'trial' });
+      trackTrialStarted('trial');
       setRegistrationComplete(true);
     } catch (err: any) {
       setError(

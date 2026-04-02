@@ -5,17 +5,28 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { CheckCircle, ArrowRight, Sparkles, Users, BookOpen, Video, ExternalLink } from 'lucide-react';
-import posthog from 'posthog-js';
+import { trackCheckoutCompleted } from '@/lib/analytics';
+
+// Plan → price map (mirrors checkout/page.tsx priceMap)
+const PLAN_AMOUNTS: Record<string, number> = {
+  weekly: 47,
+  upfront: 397,
+  architecture_997: 997,
+  individual_annual: 1997,
+  intensive_1997: 1997,
+};
 
 const CIRCLE_URL = 'https://www.mindset.show/'; // TODO: Update with actual invite link
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
 
+  const plan = searchParams.get('plan') || 'unknown';
+  const amount = PLAN_AMOUNTS[plan] ?? 0;
+
   useEffect(() => {
-    const plan = searchParams.get('plan') || 'unknown';
-    try { posthog.capture('checkout_completed', { plan }); } catch {}
-  }, [searchParams]);
+    trackCheckoutCompleted(plan, amount);
+  }, [plan, amount]);
 
   return (
     <div className="min-h-screen bg-[#09090f]">
