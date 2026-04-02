@@ -119,7 +119,7 @@ export default function BrainVariantA({
         metalness: 0.4,
       });
 
-      const mesh = new THREE.Mesh(geo, mat) as NodeMesh;
+      const mesh = new THREE.Mesh(geo, mat) as unknown as NodeMesh;
       const [x, y, z] = node.position;
       mesh.position.set(x * SCENE_SCALE, y * SCENE_SCALE, z * SCENE_SCALE);
 
