@@ -163,7 +163,8 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
     // ── Lobes ───────────────────────────────────────────────────────────────
     const lobeMeshes: THREE.Mesh[] = [];
     const wireframes: THREE.Mesh[] = [];
-    const baseGeometry = new THREE.SphereGeometry(1, 32, 24);
+    // Bug 1 fix: factory function so each mesh gets its own GPU buffer instance
+    const makeSphere = () => new THREE.SphereGeometry(1, 32, 24);
 
     LOBES.forEach((lobe) => {
       const [px, py, pz] = lobe.position;
@@ -181,7 +182,7 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
         specular: new THREE.Color(lobe.color).multiplyScalar(0.3),
       });
 
-      const mesh = new THREE.Mesh(baseGeometry, mat);
+      const mesh = new THREE.Mesh(makeSphere(), mat);
       mesh.position.set(px, py, pz);
       mesh.scale.set(sx, sy, sz);
       mesh.userData = { lobeIdx: lobeMeshes.length, lobeName: lobe.name };
@@ -195,7 +196,7 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
         transparent: true,
         opacity: 0.12,
       });
-      const wireMesh = new THREE.Mesh(baseGeometry, wireMat);
+      const wireMesh = new THREE.Mesh(makeSphere(), wireMat);
       wireMesh.position.set(px, py, pz);
       wireMesh.scale.set(sx * 1.001, sy * 1.001, sz * 1.001); // hair above solid
       wireMesh.userData = { lobeIdx: wireframes.length };
@@ -235,9 +236,12 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
 
     // ── Animation loop ───────────────────────────────────────────────────────
     const catAgents = categoryAgents();
+    // Bug 3 fix: frame counter to throttle rebuildLabels to ~20fps instead of 60fps
+    let frameCount = 0;
 
     function animate() {
       refs.animFrameId = requestAnimationFrame(animate);
+      frameCount++;
 
       // Auto-rotation
       refs.targetRotY += 0.002;
@@ -295,10 +299,12 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
         wireframes[i].scale.copy(mesh.scale).multiplyScalar(1.001);
       });
 
-      // Rebuild labels each frame (they follow the rotating scene)
-      const cw = container.clientWidth;
-      const ch = container.clientHeight;
-      rebuildLabels(camera, cw, ch);
+      // Rebuild labels every 3 frames (~20fps) — reduces React reconciliation load
+      if (frameCount % 3 === 0) {
+        const cw = container.clientWidth;
+        const ch = container.clientHeight;
+        rebuildLabels(camera, cw, ch);
+      }
 
       renderer.render(scene, camera);
     }
@@ -369,8 +375,8 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerUp);
       renderer.dispose();
-      // Do NOT dispose baseGeometry here — each mesh clones it via scale,
-      // but THREE reuses the buffer. Dispose per-mesh geometry instead.
+      // Each mesh owns a distinct geometry instance (created via makeSphere()),
+      // so dispose is safe to call once per mesh without double-free.
       refs.lobeMeshes.forEach((m) => m.geometry.dispose());
       refs.wireframes.forEach((m) => m.geometry.dispose());
     };
@@ -409,7 +415,7 @@ export default function BrainVariantB({ onAgentSelect, activeSlug }: BrainVarian
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full cursor-pointer"
-        style={{ display: "block" }}
+        style={{ display: "block", touchAction: "none" }}
       />
 
       {/* Agent short-name labels overlay */}

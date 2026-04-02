@@ -152,6 +152,7 @@ export default function BrainVariantA({
 
     // Build a set to avoid duplicate pairs
     const drawnPairs = new Set<string>();
+    const lineGeos: THREE.BufferGeometry[] = [];
 
     for (const node of AGENT_NODES) {
       const fromMesh = meshBySlug[node.slug];
@@ -167,6 +168,7 @@ export default function BrainVariantA({
 
         const points = [fromMesh.position.clone(), toMesh.position.clone()];
         const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+        lineGeos.push(lineGeo);
         const line = new THREE.Line(lineGeo, lineMat);
         brainGroup.add(line);
       }
@@ -381,6 +383,7 @@ export default function BrainVariantA({
         mesh.geometry.dispose();
         (mesh.material as THREE.MeshStandardMaterial).dispose();
       }
+      lineGeos.forEach((g) => g.dispose());
       particleGeo.dispose();
       particleMat.dispose();
       lineMat.dispose();
