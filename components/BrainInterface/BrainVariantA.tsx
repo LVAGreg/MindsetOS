@@ -377,8 +377,8 @@ export default function BrainVariantA({
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", onPointerUp);
       resizeObserver.disconnect();
+      scene.clear(); // detach all objects before releasing the WebGL context
       renderer.dispose();
-      scene.clear(); // remove all objects before disposing materials/geometries
 
       // Dispose geometries + materials
       for (const mesh of nodeMeshes) {

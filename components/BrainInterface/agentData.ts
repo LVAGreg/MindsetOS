@@ -58,7 +58,7 @@ export const AGENT_NODES: AgentNode[] = [
     description:
       "Designs your daily mindset routines — the reps that make the architecture stick over time.",
     color: "#10B981",
-    category: "coaching",
+    category: "performance",
     position: [0.5, -0.2, -0.3],
     connections: ["reset-guide", "architecture-coach", "accountability-partner"],
     weight: 2,
@@ -84,7 +84,7 @@ export const AGENT_NODES: AgentNode[] = [
     description:
       "Digs into the core narratives you've been running — finds the ones holding you back.",
     color: "#F97316",
-    category: "self-awareness",
+    category: "mindset",
     position: [-0.55, -0.1, 0.1],
     connections: ["inner-world-mapper"],
     weight: 2,
