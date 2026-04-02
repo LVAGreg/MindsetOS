@@ -64,6 +64,8 @@ export function CanvasPanel() {
   const [copied,       setCopied]       = useState(false);
   const [saving,       setSaving]       = useState(false);
   const [saved,        setSaved]        = useState(false);
+  const [saveError,    setSaveError]    = useState<string | null>(null);
+  const [browseError,  setBrowseError]  = useState<string | null>(null);
   const [starring,     setStarring]     = useState(false);
   const [cleaning,     setCleaning]     = useState(false);
   const [cleanResult,  setCleanResult]  = useState<string | null>(null);
@@ -186,8 +188,12 @@ export function CanvasPanel() {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
       setBrowseList(list);
-    } catch { setBrowseList([]); }
-    finally { setBrowseLoading(false); }
+      setBrowseError(null);
+    } catch (err) {
+      console.error('[CanvasPanel] Failed to load browse list:', err);
+      setBrowseList([]);
+      setBrowseError('Failed to load saved plays. Please try again.');
+    } finally { setBrowseLoading(false); }
   };
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -249,6 +255,8 @@ export function CanvasPanel() {
     }
 
     if (format === 'pdf') {
+      const el = document.createElement('div');
+      el.style.cssText = 'font-family:system-ui,sans-serif;max-width:720px;padding:32px;line-height:1.7;color:#1a1a2e';
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const html2pdfModule = await import('html2pdf.js') as any;
@@ -262,8 +270,6 @@ export function CanvasPanel() {
           .replace(/^- (.*$)/gm, '<li>$1</li>')
           .replace(/\n\n/g, '</p><p>')
           .replace(/\n/g, '<br>');
-        const el = document.createElement('div');
-        el.style.cssText = 'font-family:system-ui,sans-serif;max-width:720px;padding:32px;line-height:1.7;color:#1a1a2e';
         el.innerHTML = `<p>${html}</p>`;
         document.body.appendChild(el);
         await html2pdfFn().from(el).set({
@@ -272,9 +278,10 @@ export function CanvasPanel() {
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           html2canvas: { scale: 2, useCORS: true },
         }).save();
-        document.body.removeChild(el);
       } catch (err) {
         console.error('[CanvasPanel] PDF export failed:', err);
+      } finally {
+        if (document.body.contains(el)) document.body.removeChild(el);
       }
       setShowDownloadMenu(false);
       return;
@@ -337,6 +344,8 @@ export function CanvasPanel() {
       triggerPlaybookRefresh();
     } catch (err) {
       console.error('[CanvasPanel] Failed to save artifact:', err);
+      setSaveError('Save failed. Please try again.');
+      setTimeout(() => setSaveError(null), 4000);
     } finally {
       setSaving(false);
     }
@@ -492,6 +501,11 @@ export function CanvasPanel() {
               Saved
             </span>
           )}
+          {saveError && !showBrowser && (
+            <span className="flex items-center gap-1 text-xs shrink-0" style={{ color: '#ef4444' }}>
+              {saveError}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
@@ -570,6 +584,10 @@ export function CanvasPanel() {
 
           {browseLoading ? (
             <div className="px-4 py-8 text-center text-sm text-gray-400">Loading plays...</div>
+          ) : browseError ? (
+            <div className="px-4 py-8 text-center text-sm" style={{ color: '#ef4444' }}>
+              {browseError}
+            </div>
           ) : browseList.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-gray-400">
               {(browseDebouncedSearch || browseActiveTag) ? 'No plays match your filters.' : 'No plays saved yet.'}
@@ -696,7 +714,7 @@ export function CanvasPanel() {
                   border border-gray-200 dark:border-gray-600
                   rounded-md
                   text-gray-700 dark:text-gray-300
-                  focus:outline-none focus:ring-1 focus:ring-indigo-500
+                  focus:outline-none focus:ring-1 focus:ring-[#4f6ef7]
                   cursor-pointer
                 "
               >
@@ -937,18 +955,18 @@ export function CanvasPanel() {
 
                   prose-li:text-gray-700 dark:prose-li:text-gray-300
 
-                  prose-a:text-indigo-600 dark:prose-a:text-indigo-400
+                  prose-a:text-[#4f6ef7] dark:prose-a:text-[#4f6ef7]
                   prose-a:no-underline hover:prose-a:underline
 
-                  prose-code:text-indigo-600 dark:prose-code:text-indigo-400
-                  prose-code:bg-indigo-50 dark:prose-code:bg-indigo-900/30
+                  prose-code:text-[#4f6ef7] dark:prose-code:text-[#4f6ef7]
+                  prose-code:bg-[#4f6ef7]/10 dark:prose-code:bg-[#4f6ef7]/10
                   prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                   prose-code:before:content-none prose-code:after:content-none
 
                   prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950
                   prose-pre:rounded-lg prose-pre:overflow-x-auto
 
-                  prose-blockquote:border-l-indigo-400 dark:prose-blockquote:border-l-indigo-600
+                  prose-blockquote:border-l-[#4f6ef7] dark:prose-blockquote:border-l-[#4f6ef7]
                   prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-400
 
                   prose-hr:border-gray-200 dark:prose-hr:border-gray-700
