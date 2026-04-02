@@ -897,7 +897,7 @@ function DashboardContent() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="text-center animate-float-up-1">
           <div className="w-14 h-14 border-[3px] border-[#fcc824]/20 border-t-[#fcc824] rounded-full animate-spin mx-auto mb-5" />
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-500 tracking-wide">Loading MindsetOS</p>
+          <p className="text-sm font-medium tracking-wide" style={{ color: '#9090a8' }}>Loading MindsetOS</p>
         </div>
       </div>
     );
@@ -1017,7 +1017,7 @@ function DashboardContent() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Header - Compact with Agent Selector and Search */}
-        <header className="bg-white/80 dark:bg-[#0d1117]/90 header-glass border-b border-gray-200 dark:border-white/[0.06] px-3 sm:px-4 py-1.5 flex items-center gap-2 sm:gap-3">
+        <header className="header-glass border-b px-3 sm:px-4 py-1.5 flex items-center gap-2 sm:gap-3" style={{ background: 'rgba(9,9,15,0.92)', borderColor: '#1e1e30', backdropFilter: 'blur(12px)' }}>
           {/* Mobile hamburger — only visible on mobile when sidebar is closed */}
           {!isSidebarOpen && (
             <button
@@ -1026,7 +1026,7 @@ function DashboardContent() {
               title="Open sidebar"
               aria-label="Open sidebar"
             >
-              <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <Menu className="w-5 h-5" style={{ color: '#9090a8' }} />
             </button>
           )}
 
@@ -1754,10 +1754,10 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="w-12 h-12 rounded-full animate-spin mx-auto mb-4" style={{ border: '2px solid #1e1e30', borderTopColor: '#4f6ef7' }} />
+          <p style={{ color: '#9090a8' }}>Loading...</p>
         </div>
       </div>
     }>

@@ -2748,7 +2748,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
           <span className="text-xs font-semibold" style={{ color: '#ededf5' }}>
             {agentDataFromAPI?.name || agentData?.name}
           </span>
-          <span className="text-xs" style={{ color: '#4a4a60' }}>· Active</span>
+          <span className="text-xs" style={{ color: '#9090a8' }}>· Active</span>
         </div>
       )}
 
@@ -2856,7 +2856,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
                     What's running your mind right now?
                   </h2>
-                  <p className="text-base mb-5 leading-relaxed text-gray-500">
+                  <p className="text-base mb-5 leading-relaxed" style={{ color: '#9090a8' }}>
                     MindsetOS helps you stop reacting and start designing how you think. Not sure where to begin? The Mindset Score takes 3 minutes and tells you exactly where to focus.
                   </p>
                   {/* Mindset Score CTA card */}
@@ -2879,10 +2879,10 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                       <BarChart2 className="w-5 h-5" style={{ color: '#f59e0b' }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">Mindset Score — Free</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">5 questions &middot; 3 minutes &middot; know where you stand</p>
+                      <p className="text-sm font-bold" style={{ color: '#ededf5' }}>Mindset Score — Free</p>
+                      <p className="text-xs" style={{ color: '#9090a8' }}>5 questions &middot; 3 minutes &middot; know where you stand</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#f59e0b] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-all flex-shrink-0" style={{ color: '#9090a8' }} />
                   </button>
                 </>
               ) : agentId === 'client-onboarding' ? (
@@ -2890,7 +2890,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   <h2 className="text-3xl font-bold mb-3 tracking-tight chat-welcome-headline">
                     Welcome to MindsetOS
                   </h2>
-                  <p className="text-base mb-8 leading-relaxed text-gray-500">
+                  <p className="text-base mb-8 leading-relaxed" style={{ color: '#9090a8' }}>
                     Let's personalize your experience. I'll ask a few quick questions to personalize your experience.
                   </p>
                 </>
@@ -2900,7 +2900,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                     <span className="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: agentHex }} />
                     {agentData?.name}
                   </h2>
-                  <p className="text-base mb-5 leading-relaxed text-gray-500">{agentData?.description}</p>
+                  <p className="text-base mb-5 leading-relaxed" style={{ color: '#9090a8' }}>{agentData?.description}</p>
                 </>
               )}
             </div>
@@ -2934,7 +2934,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               ) : (
                 /* Regular starter prompts for other agents */
                 <>
-                  <p className="text-xs uppercase tracking-widest font-semibold text-gray-600 flex items-center justify-center gap-2 mb-5">
+                  <p className="text-xs uppercase tracking-widest font-semibold flex items-center justify-center gap-2 mb-5" style={{ color: '#9090a8' }}>
                     <Sparkles className="w-3 h-3 text-amber-500/60" />
                     Begin here
                   </p>
@@ -2959,7 +2959,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             </div>
 
             {agentId !== 'client-onboarding' && !isVoiceAgent && (
-              <p className="text-xs mt-7 text-gray-600 tracking-wide">
+              <p className="text-xs mt-7 tracking-wide" style={{ color: '#9090a8' }}>
                 or type your own message below
               </p>
             )}
@@ -2996,7 +2996,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   className={`max-w-[90vw] sm:max-w-3xl rounded-2xl px-5 sm:px-6 py-4 group ${
                     message.role === 'user'
                       ? 'msg-user text-white font-medium'
-                      : ('msg-agent text-gray-100 ' + (isStreamingResponse && isLastAssistantMessage ? 'msg-agent-streaming' : ''))
+                      : ('msg-agent text-[#ededf5] ' + (isStreamingResponse && isLastAssistantMessage ? 'msg-agent-streaming' : ''))
                   }`}
                   style={message.role === 'assistant' ? { borderLeft: `3px solid ${agentHex}30` } : undefined}
                 >
