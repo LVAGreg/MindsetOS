@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import posthog from 'posthog-js';
 import { Send, Loader2, Sparkles, ChevronUp, ChevronDown, Square, Paperclip, X, FileText, Mic, ThumbsUp, ThumbsDown, Copy, Check, Edit2, RefreshCw, Phone, PanelRightOpen, BarChart2, ArrowRight } from 'lucide-react';
-import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
+import { useAppStore, MINDSET_AGENTS, type AgentId } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -1026,7 +1026,13 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             return (
               <button
                 key={agent.id}
-                onClick={() => { window.location.href = `/dashboard?agent=${agent.slug}`; }}
+                onClick={() => {
+                  const agentKey = (Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug)?.[0]) as AgentId | undefined;
+                  if (agentKey) {
+                    useAppStore.getState().setCurrentAgent(agentKey);
+                    useAppStore.getState().setCurrentConversation(null);
+                  }
+                }}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left group transition-all"
                 style={{
                   background: `${hex}0d`,
