@@ -22,13 +22,13 @@ Does the screen feel like a coherent product or assembled components?
 Typography, spacing, color, micro-details.
 - 1–4: Inconsistent font sizes, arbitrary padding, raw Tailwind defaults
 - 5–7: Mostly consistent but corners cut
-- 8–10: Spacing is deliberate, type scale is consistent, colors match `#09090f / #12121f / #1e1e30 / #9090a8 / #ededf5` design tokens, hover states exist on interactive elements
+- 8–10: Spacing is deliberate, type scale is consistent, colors match `#09090f / #12121f / #1e1e30 / #9090a8 / #ededf5` design tokens, hover states exist on interactive elements. When a PR replaces a colour token (e.g., migrating to `#fcc824` amber or `#4f6ef7` blue), ALL instances in changed files must be updated — including focus-ring classes, icon colour classes, and border-colour classes. A partial migration caps Craft at 7.
 
 ### Functionality — /10
 Does every visual element serve a purpose?
 - 1–4: Decorative components with no interaction, dead CTAs, broken states
 - 5–7: Core flow works, edge cases rough
-- 8–10: Empty states handled, loading states exist, error states degrade gracefully, all buttons do what the label says
+- 8–10: Empty states handled, loading states exist, user receives visible error feedback on every async failure (save, fetch, upload). Silent `catch` blocks that swallow errors without any UI indication score a maximum of 6. Feature-gate API calls on mount (e.g. checking whether a user's tier allows access to `architecture-coach` or `launch-companion` to decide whether to show an upgrade banner) must fail-open — a bare `.catch(() => {})` that silently suppresses the banner also scores a maximum of 6.
 
 ---
 
@@ -60,7 +60,7 @@ Is the implementation as simple as it needs to be, no more?
 Does it actually work, including edge cases?
 - 1–4: Breaks on obvious inputs, missing null checks at system boundaries
 - 5–7: Happy path works, some edge cases untested
-- 8–10: Error paths handled, no silent failures, no data mutation surprises
+- 8–10: Error paths handled, no silent failures, no data mutation surprises. Async state transitions that depend on timing (nested `setTimeout` re-trigger tricks, double-setState cycling) score a maximum of 7 without explicit justification. Agent slugs passed to routing functions must use one canonical format consistently across all call sites (e.g., always `'mindset-score'`, never mix with display names or ad-hoc variants).
 
 ---
 
@@ -124,3 +124,31 @@ Ship? YES / NO / REVISE
 | Accent blue | `#4f6ef7` | Primary actions |
 | Accent amber | `#fcc824` | Free/score/CTAs |
 | Accent purple | `#7c5bf6` | Premium/intensity |
+
+---
+
+## Project-Specific Anti-Patterns (updated 2026-04-02)
+
+### Silent async failure
+Any `catch` block in a user-initiated save/submit action that does not set an error state or show a toast scores Functionality ≤6 and Correctness ≤6. The user must always know whether their data was saved.
+
+### `setTimeout`-based state re-trigger
+Using nested `setTimeout` calls to force an effect re-run (e.g., null → value cycling to trigger a `useEffect`) creates race conditions on slow connections or unmount. Flag for Correctness. Acceptable alternatives: a dedicated `refetchTrigger` counter, or a named async function called directly.
+
+### Agent slug format inconsistency
+Routing functions (e.g., `handleSelectAgent`, chat navigation) must be called with one canonical slug format throughout the codebase. Mixing slug formats — e.g., using `'mindset-score'` in one place and a display-name variant or uppercase key in another — is a correctness risk. The canonical format is the database slug (`'mindset-score'`, `'reset-guide'`, `'architecture-coach'`, `'inner-world-mapper'`, `'practice-builder'`, `'decision-framework'`, `'accountability-partner'`, `'story-excavator'`, `'conversation-curator'`, `'launch-companion'`). Use this format at every call site.
+
+### Duplicated inline form blocks
+When the same form structure appears twice in one component, extract it to a named sub-component before shipping. Diverging Tailwind class strings are a long-term craft debt.
+
+### Fixed z-index stacking
+When introducing a new `fixed`-position overlay, document its z-index and verify it against all other fixed elements in the layout (floating panels, modals, chat windows, notification bell). A z-index comment or constant prevents future regressions.
+
+### `Math.random()` in render
+Using `Math.random()` inside JSX or a component render path produces a different value on every re-render, causing visual instability (flickering, layout jumps) and defeating React reconciliation. Stable pseudo-random placeholder sequences must be defined as constants outside the component. Flag for Correctness and Craft.
+
+### Incomplete colour-token migration
+When a PR replaces a colour token (e.g., generic purple/indigo → MindsetOS amber `#fcc824` or blue `#4f6ef7`), every usage in changed files must be updated: CTA backgrounds, focus rings (`focus:ring-*`), icon colour classes, and border-colour classes. Leaving focus rings or icon accents in the old colour means the visual pass is half-done. Reviewers should grep all changed files for the old token names before accepting. Scores Craft ≤7 if the pass is partial.
+
+### Silent feature-gate API check
+A `.catch(() => {})` on an API call whose result determines whether a UI warning or feature is shown (e.g., checking tier/access to conditionally render an upgrade prompt for `architecture-coach` or `launch-companion`) counts as a silent failure. If the check call fails, the feature gate silently defaults to "no problem", hiding important user-facing information. The catch must either show an error state or fail-open (show the warning). Scores Functionality ≤6 and Correctness ≤6.

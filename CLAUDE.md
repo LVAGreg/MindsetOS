@@ -203,6 +203,18 @@ Target ≥7 on all criteria, ≥8 on starred (Originality, Quality of Design, Co
 If anything scores below 7, fix it before marking done.
 Spawn `feature-dev:code-reviewer` as the separate evaluator — don't self-certify.
 
+feature-dev:code-reviewer is a built-in Claude Code agent type — no setup needed.
+Invoke it via the Agent tool with subagent_type: "feature-dev:code-reviewer".
+
+Pass it the modified files and this instruction:
+"Score this implementation using the rubric at /data/workspace/ECOS/apps/mindset-os/EVALUATION_CRITERIA.md.
+Approach it assuming bugs exist — do not praise.
+Report the score per criterion, list everything below 7, flag any starred criteria below 8,
+and return a ship decision: YES / NO / REVISE.
+After scoring, update EVALUATION_CRITERIA.md — add any new criteria that emerged from this review,
+raise the bar on any criterion where the current description proved too lenient, and note any
+project-specific patterns to watch for in future builds."
+
 ---
 
 ## ⚠️ Critical Rules
