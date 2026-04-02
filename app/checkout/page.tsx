@@ -478,7 +478,10 @@ function CheckoutPageInner() {
                           SAVE $440
                         </span>
                       </div>
-                      <div className="text-sm font-semibold text-white/80 mb-1">MindsetOS Annual</div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-semibold text-white/80">MindsetOS Annual</span>
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 tracking-wide">ANNUAL SUBSCRIPTION</span>
+                      </div>
                       <div className="text-xs text-white/35 mb-2 leading-relaxed">
                         Full platform access for a full year. Lock in your rate and commit to the long game.
                       </div>
@@ -522,7 +525,10 @@ function CheckoutPageInner() {
                         <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
                         <span className="text-sm text-white/40 font-medium">one-time</span>
                       </div>
-                      <div className="text-sm font-semibold text-white/80 mb-1">Architecture Intensive (1:1)</div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-semibold text-white/80">Architecture Intensive (1:1)</span>
+                        <span className="px-2 py-0.5 bg-rose-500/10 text-rose-400 text-[10px] font-bold rounded border border-rose-500/20 tracking-wide">ONE-TIME PAYMENT</span>
+                      </div>
                       <div className="text-xs text-white/35 mb-2 leading-relaxed">
                         Greg&apos;s flagship 1:1 program. Full 90-Day Architecture access plus 3 private coaching sessions, a personalized mindset blueprint, and priority support.
                       </div>

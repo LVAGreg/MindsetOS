@@ -170,3 +170,12 @@ When a `useEffect` and a `requestAnimationFrame` loop both write to the same Thr
 
 ### Ghost agent slugs in interactive scene data
 When a Three.js scene assigns `userData.slug` values to interactive objects, every slug must resolve to a real navigable agent at runtime. Slugs that exist in scene data but not in the backend agent list produce silent no-ops on click — the user gets no feedback and no navigation. The canonical slug list for MindsetOS is the 10 agents defined in CLAUDE.md. Validate slugs against this list at definition time. Scores Functionality ≤6 and User Intent ≤6.
+
+### Same-price plan collision in checkout
+When two or more checkout plans share the same displayed price (e.g., two products at $1,997), the billing model difference (one-time vs. recurring subscription) must be communicated at the plan-card heading level, not only in small muted sub-text. A user in a buying moment will misread the secondary label. Acceptable fix: a prominent billing-type badge ("ONE-TIME PAYMENT" / "ANNUAL SUBSCRIPTION") adjacent to the price amount, or a visual separator between recurring and one-time plan groups. Scores User Intent ≤6 if the distinction relies solely on muted `/year` vs `one-time` sub-labels at text-white/40 weight.
+
+### Frontend validPlans out of sync with backend PLANS
+The `validPlans` array and `priceMap` in the checkout page must only contain keys that exist in the backend `PLANS` object. Orphaned plan keys that pass frontend validation but are rejected by the backend surface a raw "Unknown plan: [key]" error string directly in the user-facing error div. Cross-check `validPlans` against the backend catalogue on every checkout change. Scores Functionality ≤6 and Correctness ≤6 if orphaned keys exist.
+
+### Cross-product metadata leak into Stripe
+MindsetOS is a white-label product. Any Stripe API call (customer creation, session metadata, webhook logging) that embeds ECOS-specific identifiers (e.g., `source: 'ecos_checkout'`) violates the CLAUDE.md cross-contamination rule. These strings appear in Stripe dashboards, customer exports, and support tickets visible to users. Audit all `metadata` objects in `checkout.cjs` after every backend change.
