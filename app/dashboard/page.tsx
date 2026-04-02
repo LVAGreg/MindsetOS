@@ -219,6 +219,8 @@ function DashboardContent() {
 
   // Track onboarding status to refetch agents when it changes
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
+  // Counter incremented to trigger agent refetch without null→value setTimeout cycling
+  const [agentRefetchTrigger, setAgentRefetchTrigger] = useState(0);
 
   // Check onboarding status and force new users to Client Onboarding
   useEffect(() => {
@@ -247,13 +249,8 @@ function DashboardContent() {
           // If onboarding just completed (changed from false to true), force agent refetch
           if (status.completed && previouslyCompleted === false) {
             console.log('🎉 [ONBOARDING] Just completed! Forcing agent refetch to unlock all agents');
-            // Force immediate refetch by toggling a state that triggers the agent fetch effect
-            setTimeout(() => {
-              setOnboardingCompleted(null); // Temporarily null
-              setTimeout(() => {
-                setOnboardingCompleted(true); // Back to true, triggering refetch
-              }, 100);
-            }, 500);
+            // Increment trigger counter so the fetchAgents effect re-runs immediately
+            setAgentRefetchTrigger(prev => prev + 1);
           }
 
           // If onboarding not completed, start with Mindset Score
@@ -552,7 +549,7 @@ function DashboardContent() {
     };
 
     fetchAgents();
-  }, [showAgentBrowser, onboardingCompleted, activeClientProfileId, viewAsUser?.id]); // Refetch when agent browser opens/closes, onboarding changes, client switches, or viewAs user changes
+  }, [showAgentBrowser, onboardingCompleted, agentRefetchTrigger, activeClientProfileId, viewAsUser?.id]); // Refetch when agent browser opens/closes, onboarding changes, client switches, or viewAs user changes
 
   // Handle ?agent= URL parameter for direct agent links
   useEffect(() => {

@@ -351,6 +351,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
   const [deleting, setDeleting] = useState(false);
   const [lastContacted, setLastContacted] = useState<string | null>(contact.last_contacted_at);
   const [dirty, setDirty] = useState(false);
+  const [drawerError, setDrawerError] = useState<string | null>(null);
 
   const handleStageChange = (newStage: Stage) => {
     setStage(newStage);
@@ -364,6 +365,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
   const handleSave = async () => {
     setSaving(true);
+    setDrawerError(null);
     try {
       const res = await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
         method: 'PATCH',
@@ -373,8 +375,9 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
       if (!res.ok) throw new Error('Failed to update');
       setDirty(false);
       onUpdated();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setDrawerError(err?.message || 'Failed to save. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -382,6 +385,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
   const handleMarkContacted = async () => {
     setMarkingContacted(true);
+    setDrawerError(null);
     const now = new Date().toISOString();
     try {
       const res = await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
@@ -392,8 +396,9 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
       if (!res.ok) throw new Error('Failed to update');
       setLastContacted(now);
       onUpdated();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setDrawerError(err?.message || 'Failed to mark contacted. Please try again.');
     } finally {
       setMarkingContacted(false);
     }
@@ -402,6 +407,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
   const handleDelete = async () => {
     if (!confirm(`Delete ${displayName(contact)}? This cannot be undone.`)) return;
     setDeleting(true);
+    setDrawerError(null);
     try {
       const res = await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
         method: 'DELETE',
@@ -410,8 +416,9 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
       if (!res.ok) throw new Error('Failed to delete');
       onDeleted();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setDrawerError(err?.message || 'Failed to delete. Please try again.');
     } finally {
       setDeleting(false);
     }
@@ -441,6 +448,12 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+          {drawerError && (
+            <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400 flex items-center justify-between">
+              <span>{drawerError}</span>
+              <button onClick={() => setDrawerError(null)} className="ml-2 text-red-400 hover:text-red-600">✕</button>
+            </div>
+          )}
           {/* Meta chips */}
           <div className="flex flex-wrap gap-2">
             {contact.company && (
@@ -648,6 +661,7 @@ export default function PipelinePage() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
 
   const isAllowed = user?.role === 'agency' || user?.role === 'power_user' || user?.role === 'admin';
 
@@ -679,14 +693,17 @@ export default function PipelinePage() {
   }, [isAllowed, fetchContacts]);
 
   const handleDeleteCard = async (contact: Contact) => {
+    setPageError(null);
     try {
-      await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
+      const res = await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
         method: 'DELETE',
         headers: authHeaders(),
       });
+      if (!res.ok) throw new Error('Failed to delete contact');
       fetchContacts();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setPageError(err?.message || 'Failed to delete contact. Please try again.');
     }
   };
 
@@ -725,6 +742,16 @@ export default function PipelinePage() {
           </div>
         </div>
       </div>
+
+      {/* Page-level error */}
+      {pageError && (
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
+          <div className="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400 flex items-center justify-between">
+            <span>{pageError}</span>
+            <button onClick={() => setPageError(null)} className="ml-2 text-red-400 hover:text-red-600">✕</button>
+          </div>
+        </div>
+      )}
 
       {/* Board */}
       <div className="flex-1 overflow-x-auto">

@@ -111,21 +111,25 @@ export default function TeamPage() {
   };
 
   const handleRevokeInvite = async (inviteId: string) => {
+    setError(null);
     try {
       await apiClient.delete(`/api/agency/invite/${inviteId}`);
       setPendingInvites(prev => prev.filter(i => i.id !== inviteId));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to revoke invite:', err);
+      setError(err?.message || 'Failed to revoke invite. Please try again.');
     }
   };
 
   const handleRemoveUser = async (userId: string) => {
     if (!confirm('Remove this user from your team? They will keep their account but lose managed access.')) return;
+    setError(null);
     try {
       await apiClient.delete(`/api/agency/team/${userId}`);
       setManagedUsers(prev => prev.filter(u => u.userId !== userId));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to remove user:', err);
+      setError(err?.message || 'Failed to remove user. Please try again.');
     }
   };
 
@@ -139,10 +143,11 @@ export default function TeamPage() {
 
     try {
       await apiClient.patch(`/api/agency/team/${userId}`, { allowedAgents: newAgents });
-    } catch (err) {
-      // Revert
+    } catch (err: any) {
+      // Revert optimistic update
       setManagedUsers(prev => prev.map(u => u.userId === userId ? { ...u, allowedAgents: currentAgents } : u));
       console.error('Failed to update user agents:', err);
+      setError(err?.message || 'Failed to update agent access. Please try again.');
     }
   };
 
@@ -194,6 +199,14 @@ export default function TeamPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Global error banner (for revoke/remove failures outside the invite form) */}
+        {error && !showInvite && (
+          <div className="flex items-center gap-2 text-sm rounded-xl p-3" style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="flex-1">{error}</span>
+            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">✕</button>
+          </div>
+        )}
         {/* Invite form */}
         {showInvite && (
           <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">

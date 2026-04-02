@@ -71,6 +71,9 @@ export default function MyAgentsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [toggleError, setToggleError] = useState<string | null>(null);
 
   // Manual create flow
   const [showCreate, setShowCreate] = useState(false);
@@ -118,6 +121,7 @@ export default function MyAgentsPage() {
   const handleSave = async () => {
     if (!editingId || !editForm.name || !editForm.systemPrompt) return;
     setSaving(true);
+    setSaveError(null);
     try {
       await updateCustomAgent(editingId, {
         name: editForm.name,
@@ -129,27 +133,32 @@ export default function MyAgentsPage() {
         conversationStarters: editForm.conversationStarters.filter(s => s.trim()),
       } as any);
       setEditingId(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save agent:', err);
+      setSaveError(err?.message || 'Failed to save agent. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (agentId: string) => {
+    setDeleteError(null);
     try {
       await deleteCustomAgent(agentId);
       setDeleteConfirmId(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete agent:', err);
+      setDeleteError(err?.message || 'Failed to delete agent. Please try again.');
     }
   };
 
   const handleToggleActive = async (agent: CustomAgent) => {
+    setToggleError(null);
     try {
       await updateCustomAgent(agent.id, { isActive: !agent.isActive } as any);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to toggle agent:', err);
+      setToggleError(err?.message || 'Failed to update agent. Please try again.');
     }
   };
 
@@ -216,6 +225,12 @@ export default function MyAgentsPage() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {(saveError || deleteError || toggleError) && (
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm text-red-400 flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <span>{saveError || deleteError || toggleError}</span>
+            <button onClick={() => { setSaveError(null); setDeleteError(null); setToggleError(null); }} className="ml-auto text-red-400 hover:text-red-300">✕</button>
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4f6ef7]" />

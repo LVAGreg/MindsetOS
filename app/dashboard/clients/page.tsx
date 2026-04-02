@@ -42,6 +42,7 @@ export default function ClientsPage() {
   const [loadingAgents, setLoadingAgents] = useState(false);
   const [savingAgents, setSavingAgents] = useState(false);
   const [search, setSearch] = useState('');
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const isAgencyOrAdmin = user?.role === 'agency' || user?.role === 'admin';
 
@@ -59,7 +60,12 @@ export default function ClientsPage() {
       setLoadingAgents(true);
       apiClient.get(`/api/client-profiles/${selectedClient.id}/agents`)
         .then((data: any) => setAgentSettings(data.agents || []))
-        .catch(err => console.error('Failed to fetch agent settings:', err))
+        .catch((err: any) => {
+          console.error('Failed to fetch agent settings:', err);
+          // Fail-open: keep agentSettings empty so the UI renders with defaults
+          setAgentSettings([]);
+          setActionError('Failed to load agent settings. Some settings may not be displayed correctly.');
+        })
         .finally(() => setLoadingAgents(false));
     }
   }, [selectedClient?.id]);
@@ -76,6 +82,7 @@ export default function ClientsPage() {
   const handleSaveEdit = async () => {
     if (!selectedClient || !editName.trim()) return;
     setSaving(true);
+    setActionError(null);
     try {
       await updateClientProfile(selectedClient.id, {
         clientName: editName.trim(),
@@ -87,8 +94,9 @@ export default function ClientsPage() {
       // Update selected client with new values
       setSelectedClient(prev => prev ? { ...prev, clientName: editName.trim(), industry: editIndustry.trim() || null, description: editDescription.trim() || null, color: editColor } : null);
       setEditMode(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update client:', err);
+      setActionError(err?.message || 'Failed to update client. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -96,17 +104,20 @@ export default function ClientsPage() {
 
   const handleArchive = async (client: ClientProfile) => {
     if (!confirm(`Archive "${client.clientName}"? Their data will be preserved but the profile will be hidden.`)) return;
+    setActionError(null);
     try {
       await deleteClientProfile(client.id);
       if (selectedClient?.id === client.id) setSelectedClient(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to archive client:', err);
+      setActionError(err?.message || 'Failed to archive client. Please try again.');
     }
   };
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
+    setActionError(null);
     try {
       const colorIdx = clientProfiles.length % PROFILE_COLORS.length;
       const { createClientProfile } = useAppStore.getState();
@@ -120,8 +131,9 @@ export default function ClientsPage() {
       setShowCreate(false);
       await fetchClientProfiles();
       handleSelectClient(profile);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create client:', err);
+      setActionError(err?.message || 'Failed to create client. Please try again.');
     } finally {
       setCreating(false);
     }
@@ -193,6 +205,12 @@ export default function ClientsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {actionError && (
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm text-red-400 flex items-center justify-between" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <span>{actionError}</span>
+            <button onClick={() => setActionError(null)} className="ml-2 text-red-400 hover:text-red-300">✕</button>
+          </div>
+        )}
         <div className="flex gap-6">
           {/* Left panel - client list */}
           <div className="w-80 flex-shrink-0">
