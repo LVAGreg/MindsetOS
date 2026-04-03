@@ -52,6 +52,7 @@ export default function TrialRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
@@ -329,8 +330,9 @@ export default function TrialRegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
-                    tabIndex={-1}
+                    tabIndex={0}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -380,8 +382,9 @@ export default function TrialRegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
+                    aria-label={showConfirm ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
-                    tabIndex={-1}
+                    tabIndex={0}
                   >
                     {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>

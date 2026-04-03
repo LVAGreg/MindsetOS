@@ -13,6 +13,8 @@ export default function LoginPage() {
   const router = useRouter();
   const setUser = useAppStore((state) => state.setUser);
   const loadConversations = useAppStore((state) => state.loadConversations);
+  const setCurrentConversation = useAppStore((state) => state.setCurrentConversation);
+  const currentUser = useAppStore((state) => state.user);
   const currentConversationId = useAppStore((state) => state.currentConversationId);
   const currentAgent = useAppStore((state) => state.currentAgent);
 
@@ -36,7 +38,10 @@ export default function LoginPage() {
 
       // Fetch user details
       const userData = await apiClient.getCurrentUser();
-      console.log('\u{1F464} Setting user in store:', userData.email);
+      // Clear stale conversation state when a different user logs in
+      if (currentUser && currentUser.email !== userData.email) {
+        setCurrentConversation(null);
+      }
       setUser(userData);
       try {
         posthog.identify(userData.id || userData.email, { email: userData.email });
@@ -75,7 +80,6 @@ export default function LoginPage() {
 
       // Navigate to dashboard
       if (currentConversationId && currentAgent) {
-        console.log(`\u{1F504} Returning to conversation: ${currentConversationId} with agent: ${currentAgent}`);
         router.push(`/dashboard?agent=${currentAgent}`);
       } else {
         router.push('/dashboard');
@@ -401,13 +405,20 @@ export default function LoginPage() {
           <div className="fixed inset-0 z-50 overflow-y-auto" onClick={() => setShowTermsModal(false)}>
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true"></div>
-              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]" style={{ background: 'rgba(18,18,31,0.95)' }}
-                   onClick={(e) => e.stopPropagation()}>
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="terms-modal-title"
+                className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]"
+                style={{ background: 'rgba(18,18,31,0.95)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="px-6 py-4 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-bold text-white">Terms & Conditions</h3>
+                    <h3 id="terms-modal-title" className="text-2xl font-bold text-white">Terms & Conditions</h3>
                     <button
                       onClick={() => setShowTermsModal(false)}
+                      aria-label="Close"
                       className="text-[#5a5a72] hover:text-[#9090a8] transition-colors"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,6 +449,7 @@ export default function LoginPage() {
                   </Link>
                   <button
                     onClick={() => setShowTermsModal(false)}
+                    aria-label="Close"
                     className="px-5 py-2 text-black font-semibold rounded-xl transition-all duration-200 hover:opacity-90"
                     style={{ background: 'linear-gradient(135deg, #fcc824 0%, #f0b800 100%)' }}
                   >
@@ -454,13 +466,20 @@ export default function LoginPage() {
           <div className="fixed inset-0 z-50 overflow-y-auto" onClick={() => setShowPrivacyModal(false)}>
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true"></div>
-              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]" style={{ background: 'rgba(18,18,31,0.95)' }}
-                   onClick={(e) => e.stopPropagation()}>
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="privacy-modal-title"
+                className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]"
+                style={{ background: 'rgba(18,18,31,0.95)' }}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="px-6 py-4 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-2xl font-bold text-white">Privacy Policy</h3>
+                    <h3 id="privacy-modal-title" className="text-2xl font-bold text-white">Privacy Policy</h3>
                     <button
                       onClick={() => setShowPrivacyModal(false)}
+                      aria-label="Close"
                       className="text-[#5a5a72] hover:text-[#9090a8] transition-colors"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,6 +513,7 @@ export default function LoginPage() {
                   </Link>
                   <button
                     onClick={() => setShowPrivacyModal(false)}
+                    aria-label="Close"
                     className="px-5 py-2 text-black font-semibold rounded-xl transition-all duration-200 hover:opacity-90"
                     style={{ background: 'linear-gradient(135deg, #fcc824 0%, #f0b800 100%)' }}
                   >
