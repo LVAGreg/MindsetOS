@@ -126,6 +126,7 @@ export default function NotificationsPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard"
+                aria-label="Back to dashboard"
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
               >
@@ -135,13 +136,13 @@ export default function NotificationsPage() {
                 <Bell className="w-6 h-6" style={{ color: '#fcc824' }} />
                 <h1 className="text-xl font-bold" style={{ color: '#ededf5' }}>Notifications</h1>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 text-xs font-medium rounded-full" style={{ color: '#fbbf24', background: 'rgba(251,191,36,0.12)' }}>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded-full" style={{ color: '#fcc824', background: 'rgba(252,200,36,0.12)' }}>
                     {unreadCount} unread
                   </span>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Filter */}
               <div className="flex items-center rounded-lg p-1" style={{ background: 'rgba(30,30,48,0.8)' }}>
                 <button
@@ -283,14 +284,14 @@ export default function NotificationsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {!selectedNotification.is_read && (
-                      <button onClick={() => markAsRead(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#9090a8' }} title="Mark as read">
+                      <button onClick={() => markAsRead(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#9090a8' }} aria-label="Mark as read" title="Mark as read">
                         <Check className="w-4 h-4" />
                       </button>
                     )}
-                    <button onClick={() => deleteNotification(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }} title="Delete">
+                    <button onClick={() => deleteNotification(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }} aria-label="Delete notification" title="Delete">
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => setSelectedNotification(null)} className="p-1.5 rounded-lg text-xs" style={{ color: '#9090a8' }} title="Close">
+                    <button onClick={() => setSelectedNotification(null)} className="p-1.5 rounded-lg text-xs" style={{ color: '#9090a8' }} aria-label="Close notification" title="Close">
                       ✕
                     </button>
                   </div>
@@ -353,6 +354,7 @@ export default function NotificationsPage() {
                         onClick={() => markAsRead(selectedNotification.id)}
                         className="p-2 rounded-lg transition-colors"
                         style={{ color: '#9090a8' }}
+                        aria-label="Mark as read"
                         title="Mark as read"
                       >
                         <Check className="w-5 h-5" />
@@ -362,6 +364,7 @@ export default function NotificationsPage() {
                       onClick={() => deleteNotification(selectedNotification.id)}
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: '#ef4444' }}
+                      aria-label="Delete notification"
                       title="Delete"
                     >
                       <Trash2 className="w-5 h-5" />
