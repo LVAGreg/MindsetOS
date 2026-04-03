@@ -24,13 +24,15 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isClearingId, setIsClearingId] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState('');
   const [newFirstName, setNewFirstName] = useState('');
   const [newLastName, setNewLastName] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchConsultants();
-    // Set selected ID to current user on mount
     if (user?.id) {
       setSelectedId(user.id);
     }
@@ -43,15 +45,14 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
         const data = await res.json();
         setConsultants(data);
       }
-    } catch (error) {
-      console.error('Failed to fetch consultants:', error);
+    } catch (err) {
+      setError('Failed to fetch consultants');
     }
   };
 
   const handleSelect = async (consultant: Consultant) => {
     setSelectedId(consultant.id);
 
-    // Switch the active user in the app store
     setUser({
       id: consultant.id,
       email: consultant.email,
@@ -62,10 +63,7 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
       emailVerified: true
     });
 
-    // Close the panel
     setIsExpanded(false);
-
-    // Force reload the page to refresh all data for new consultant
     window.location.reload();
 
     if (onSelectConsultant) {
@@ -75,6 +73,8 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
 
   const handleCreateConsultant = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/admin/consultants`, {
@@ -93,14 +93,21 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
         setNewLastName('');
         setIsCreating(false);
         await fetchConsultants();
+      } else {
+        setError('Failed to create consultant');
       }
-    } catch (error) {
-      console.error('Failed to create consultant:', error);
+    } catch (err) {
+      setError('Failed to create consultant');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleClearMemories = async (consultantId: string) => {
     if (!confirm('Clear all memories for this consultant? This cannot be undone.')) return;
+
+    setIsClearingId(consultantId);
+    setError(null);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/admin/consultants/${consultantId}/memories`, {
@@ -110,9 +117,13 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
       if (res.ok) {
         await fetchConsultants();
         alert('Memories cleared successfully');
+      } else {
+        setError('Failed to clear memories');
       }
-    } catch (error) {
-      console.error('Failed to clear memories:', error);
+    } catch (err) {
+      setError('Failed to clear memories');
+    } finally {
+      setIsClearingId(null);
     }
   };
 
@@ -124,10 +135,24 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
       {!isExpanded && (
         <button
           onClick={() => setIsExpanded(true)}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all"
+          style={{
+            background: 'linear-gradient(to right, #7c5bf6, #4f6ef7)',
+            color: '#ededf5',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
         >
           <Users className="w-5 h-5" />
-          <span className="font-medium">
+          <span style={{ fontWeight: 500 }}>
             {selectedConsultant ? selectedConsultant.email : 'Select Consultant'}
           </span>
         </button>
@@ -135,118 +160,286 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
 
       {/* Expanded Panel */}
       {isExpanded && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 w-96 max-h-[600px] overflow-hidden flex flex-col">
+        <div
+          style={{
+            background: '#09090f',
+            borderRadius: '10px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            border: '1px solid #1e1e30',
+            width: '384px',
+            maxHeight: '600px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <div
+            style={{
+              padding: '16px',
+              borderBottom: '1px solid #1e1e30',
+              background: 'linear-gradient(to right, #7c5bf6, #4f6ef7)',
+              color: '#ededf5',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Users className="w-5 h-5" />
-                <h3 className="font-semibold">Admin: Consultant Selector</h3>
+                <h3 style={{ fontWeight: 600, margin: 0 }}>Admin: Consultant Selector</h3>
               </div>
               <button
                 onClick={() => setIsExpanded(false)}
-                className="text-white/80 hover:text-white transition-colors"
+                aria-label="Close consultant selector"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'rgba(237,237,245,0.75)',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  lineHeight: 1,
+                  padding: '2px 4px',
+                  transition: 'color 0.15s',
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(237,237,245,0.75)'; }}
               >
                 ✕
               </button>
             </div>
           </div>
 
+          {/* Error banner */}
+          {error && (
+            <div
+              style={{
+                padding: '8px 16px',
+                background: 'rgba(239,68,68,0.15)',
+                borderBottom: '1px solid #1e1e30',
+                color: '#f87171',
+                fontSize: '13px',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
           {/* Consultant List */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-2">
-              {consultants.map((consultant) => (
-                <div
-                  key={consultant.id}
-                  className={`p-3 rounded-lg border transition-all cursor-pointer ${
-                    selectedId === consultant.id
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
-                  }`}
-                  onClick={() => handleSelect(consultant)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        {consultant.first_name} {consultant.last_name}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {consultants.map((consultant) => {
+                const isSelected = selectedId === consultant.id;
+                return (
+                  <div
+                    key={consultant.id}
+                    onClick={() => handleSelect(consultant)}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: isSelected ? '1px solid #4f6ef7' : '1px solid #1e1e30',
+                      background: isSelected ? 'rgba(79,110,247,0.12)' : 'rgba(18,18,31,0.8)',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.15s, background 0.15s',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) (e.currentTarget as HTMLElement).style.borderColor = '#5a5a72';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 500, color: '#ededf5' }}>
+                          {consultant.first_name} {consultant.last_name}
+                        </div>
+                        <div style={{ fontSize: '13px', color: '#9090a8', marginTop: '2px' }}>
+                          {consultant.email}
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '12px', color: '#5a5a72', flexWrap: 'wrap' }}>
+                          <span>📊 {consultant.memory_count} memories</span>
+                          <span>💬 {consultant.conversation_count} chats</span>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {consultant.email}
-                      </div>
-                      <div className="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-500">
-                        <span>📊 {consultant.memory_count} memories</span>
-                        <span>💬 {consultant.conversation_count} chats</span>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClearMemories(consultant.id);
+                        }}
+                        aria-label="Clear all memories for this consultant"
+                        disabled={isClearingId === consultant.id}
+                        style={{
+                          marginLeft: '8px',
+                          padding: '6px',
+                          background: 'none',
+                          border: 'none',
+                          color: isClearingId === consultant.id ? '#5a5a72' : '#f87171',
+                          cursor: isClearingId === consultant.id ? 'not-allowed' : 'pointer',
+                          borderRadius: '6px',
+                          transition: 'background 0.15s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (isClearingId !== consultant.id)
+                            (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.12)';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.background = 'none';
+                        }}
+                      >
+                        {isClearingId === consultant.id ? (
+                          <RefreshCw className="w-4 h-4" style={{ animation: 'spin 1s linear infinite' }} />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleClearMemories(consultant.id);
-                      }}
-                      className="ml-2 p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      title="Clear all memories"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Create New Consultant */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/50">
+          <div
+            style={{
+              borderTop: '1px solid #1e1e30',
+              padding: '16px',
+              background: 'rgba(18,18,31,0.8)',
+            }}
+          >
             {!isCreating ? (
               <button
                 onClick={() => setIsCreating(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  background: '#fcc824',
+                  color: '#09090f',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
               >
                 <Plus className="w-4 h-4" />
                 Create New Consultant
               </button>
             ) : (
-              <form onSubmit={handleCreateConsultant} className="space-y-2">
+              <form onSubmit={handleCreateConsultant} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <input
                   type="email"
                   placeholder="Email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #1e1e30',
+                    borderRadius: '8px',
+                    background: '#09090f',
+                    color: '#ededf5',
+                    fontSize: '13px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
                 />
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     placeholder="First Name"
                     value={newFirstName}
                     onChange={(e) => setNewFirstName(e.target.value)}
                     required
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                    style={{
+                      flex: '1 1 100px',
+                      padding: '8px 12px',
+                      border: '1px solid #1e1e30',
+                      borderRadius: '8px',
+                      background: '#09090f',
+                      color: '#ededf5',
+                      fontSize: '13px',
+                      outline: 'none',
+                    }}
                   />
                   <input
                     type="text"
                     placeholder="Last Name"
                     value={newLastName}
                     onChange={(e) => setNewLastName(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                    style={{
+                      flex: '1 1 100px',
+                      padding: '8px 12px',
+                      border: '1px solid #1e1e30',
+                      borderRadius: '8px',
+                      background: '#09090f',
+                      color: '#ededf5',
+                      fontSize: '13px',
+                      outline: 'none',
+                    }}
                   />
                 </div>
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    disabled={isSubmitting}
+                    style={{
+                      flex: '1 1 80px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '8px 16px',
+                      background: isSubmitting ? '#5a5a72' : '#fcc824',
+                      color: '#09090f',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      transition: 'opacity 0.15s',
+                    }}
+                    onMouseEnter={(e) => { if (!isSubmitting) (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
                   >
-                    Create
+                    {isSubmitting ? (
+                      <RefreshCw className="w-3.5 h-3.5" style={{ animation: 'spin 1s linear infinite' }} />
+                    ) : null}
+                    {isSubmitting ? 'Creating…' : 'Create'}
                   </button>
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={() => {
                       setIsCreating(false);
                       setNewEmail('');
                       setNewFirstName('');
                       setNewLastName('');
+                      setError(null);
                     }}
-                    className="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors text-sm font-medium"
+                    style={{
+                      flex: '1 1 80px',
+                      padding: '8px 16px',
+                      background: '#1e1e30',
+                      color: '#9090a8',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      transition: 'opacity 0.15s',
+                    }}
+                    onMouseEnter={(e) => { if (!isSubmitting) (e.currentTarget as HTMLElement).style.opacity = '0.75'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
                   >
                     Cancel
                   </button>
@@ -256,10 +449,27 @@ export default function AdminConsultantSelector({ onSelectConsultant }: AdminCon
           </div>
 
           {/* Refresh Button */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+          <div style={{ borderTop: '1px solid #1e1e30', padding: '12px' }}>
             <button
               onClick={fetchConsultants}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label="Refresh consultant list"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                background: 'none',
+                border: 'none',
+                color: '#9090a8',
+                cursor: 'pointer',
+                fontSize: '13px',
+                borderRadius: '8px',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'none'; }}
             >
               <RefreshCw className="w-4 h-4" />
               Refresh List

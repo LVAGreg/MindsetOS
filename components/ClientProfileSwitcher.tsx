@@ -2,19 +2,33 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, ChevronDown, Plus, User, Check, Settings } from 'lucide-react';
+import { Building2, ChevronDown, Plus, User, Check, Settings, Loader2 } from 'lucide-react';
 import { useAppStore } from '../lib/store';
 import type { ClientProfile } from '../lib/store';
 
-const PROFILE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+// Design tokens
+const T = {
+  bg:        '#09090f',
+  bgPanel:   'rgba(18,18,31,0.8)',
+  bgCard:    '#1e1e30',
+  textMain:  '#ededf5',
+  textMuted: '#9090a8',
+  textDim:   '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  purple:    '#7c5bf6',
+} as const;
+
+const PROFILE_COLORS = ['#4f6ef7', '#10b981', '#fcc824', '#ef4444', '#7c5bf6', '#ec4899', '#06b6d4', '#f97316'];
 
 export function ClientProfileSwitcher() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]             = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName]       = useState('');
   const [newIndustry, setNewIndustry] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating]     = useState(false);
+  const [error, setError]           = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -27,8 +41,8 @@ export function ClientProfileSwitcher() {
     setActiveClientProfile,
   } = useAppStore();
 
-  const effectiveUser = viewAsUser || user;
-  const isAgencyOrAdmin = effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin';
+  const effectiveUser    = viewAsUser || user;
+  const isAgencyOrAdmin  = effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin';
 
   // Fetch profiles on mount, when role changes, or when viewAs user changes
   useEffect(() => {
@@ -57,19 +71,20 @@ export function ClientProfileSwitcher() {
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
+    setError(null);
     try {
       const colorIdx = clientProfiles.length % PROFILE_COLORS.length;
       const profile = await createClientProfile({
         clientName: newName.trim(),
-        industry: newIndustry.trim() || undefined,
-        color: PROFILE_COLORS[colorIdx],
+        industry:   newIndustry.trim() || undefined,
+        color:      PROFILE_COLORS[colorIdx],
       });
       setActiveClientProfile(profile.id);
       setNewName('');
       setNewIndustry('');
       setShowCreate(false);
     } catch (err) {
-      console.error('Failed to create client profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create client profile');
     } finally {
       setCreating(false);
     }
@@ -80,110 +95,236 @@ export function ClientProfileSwitcher() {
     setOpen(false);
   };
 
+  // Trigger button: active profile style vs default style
+  const triggerStyle: React.CSSProperties = activeProfile
+    ? {
+        display: 'flex', alignItems: 'center', gap: '0.5rem',
+        padding: '0.375rem 0.75rem',
+        border: `1px solid ${T.blue}`,
+        borderRadius: '0.5rem',
+        background: `linear-gradient(to right, rgba(79,110,247,0.15), rgba(124,91,246,0.12))`,
+        cursor: 'pointer',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+        transition: 'box-shadow 0.15s',
+      }
+    : {
+        display: 'flex', alignItems: 'center', gap: '0.5rem',
+        padding: '0.375rem 0.75rem',
+        border: `1px solid ${T.bgCard}`,
+        borderRadius: '0.5rem',
+        background: T.bgCard,
+        cursor: 'pointer',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
+        transition: 'box-shadow 0.15s',
+      };
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div style={{ position: 'relative' }} ref={dropdownRef}>
+      {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-all shadow-sm hover:shadow-md ${
-          activeProfile
-            ? 'bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-300 dark:border-indigo-700'
-            : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600'
-        }`}
+        style={triggerStyle}
+        aria-haspopup="listbox"
+        aria-expanded={open}
       >
         {activeProfile ? (
           <div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: activeProfile.color || '#3b82f6' }}
+            style={{
+              width: '0.625rem', height: '0.625rem',
+              borderRadius: '50%', flexShrink: 0,
+              backgroundColor: activeProfile.color || T.blue,
+            }}
           />
         ) : (
-          <Building2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          <Building2 style={{ width: '1rem', height: '1rem', color: T.textMuted, flexShrink: 0 }} />
         )}
-        <div className="text-left">
-          <div className="text-[10px] font-semibold uppercase tracking-wide leading-none text-indigo-600 dark:text-indigo-400">
+        <div style={{ textAlign: 'left' }}>
+          <div style={{
+            fontSize: '0.625rem', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.07em',
+            lineHeight: 1, color: T.blue,
+          }}>
             Client
           </div>
-          <div className="text-sm font-bold text-gray-900 dark:text-white leading-tight max-w-[120px] truncate">
+          <div style={{
+            fontSize: '0.875rem', fontWeight: 700,
+            color: T.textMain, lineHeight: 1.25,
+            maxWidth: '7.5rem', overflow: 'hidden',
+            textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {activeProfile?.clientName || 'My Business'}
           </div>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown style={{
+          width: '0.875rem', height: '0.875rem',
+          color: T.textDim,
+          transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.2s',
+        }} />
       </button>
 
+      {/* Dropdown */}
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+        <div
+          role="listbox"
+          style={{
+            position: 'absolute', top: '100%', left: 0,
+            marginTop: '0.5rem', width: '18rem',
+            background: T.bgCard,
+            border: `1px solid ${T.textDim}`,
+            borderRadius: '0.75rem',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            zIndex: 50, overflow: 'hidden',
+          }}
+        >
           {/* Header */}
-          <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-indigo-500" />
-              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Client Profiles</span>
+          <div style={{
+            padding: '0.5rem 0.75rem',
+            borderBottom: `1px solid ${T.textDim}`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Building2 style={{ width: '1rem', height: '1rem', color: T.blue }} />
+              <span style={{ fontSize: '0.875rem', fontWeight: 600, color: T.textMain }}>
+                Client Profiles
+              </span>
             </div>
           </div>
 
-          {/* Personal context option */}
-          <div className="p-2">
+          {/* Profile list */}
+          <div style={{ padding: '0.5rem' }}>
+            {/* Personal context option */}
             <button
+              role="option"
+              aria-selected={!activeClientProfileId}
               onClick={() => handleSelect(null)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                !activeClientProfileId
-                  ? 'bg-indigo-50 dark:bg-indigo-900/20'
-                  : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-              }`}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center',
+                gap: '0.75rem', padding: '0.5rem 0.75rem',
+                borderRadius: '0.5rem', textAlign: 'left',
+                background: !activeClientProfileId
+                  ? `rgba(79,110,247,0.15)`
+                  : 'transparent',
+                border: 'none', cursor: 'pointer',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (activeClientProfileId)
+                  (e.currentTarget as HTMLElement).style.background = `rgba(144,144,168,0.1)`;
+              }}
+              onMouseLeave={(e) => {
+                if (activeClientProfileId)
+                  (e.currentTarget as HTMLElement).style.background = 'transparent';
+              }}
             >
-              <User className={`w-4 h-4 flex-shrink-0 ${!activeClientProfileId ? 'text-indigo-500' : 'text-gray-400'}`} />
-              <div className="flex-1 min-w-0">
-                <div className={`text-sm font-medium ${!activeClientProfileId ? 'text-gray-800 dark:text-gray-200' : 'text-gray-600 dark:text-gray-400'}`}>
+              <User style={{
+                width: '1rem', height: '1rem', flexShrink: 0,
+                color: !activeClientProfileId ? T.blue : T.textMuted,
+              }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '0.875rem', fontWeight: 500,
+                  color: !activeClientProfileId ? T.textMain : T.textMuted,
+                }}>
                   My Business
                 </div>
-                <div className="text-xs text-gray-400 dark:text-gray-500">Personal context</div>
+                <div style={{ fontSize: '0.75rem', color: T.textDim }}>
+                  Personal context
+                </div>
               </div>
-              {!activeClientProfileId && <Check className="w-4 h-4 text-indigo-500" />}
+              {!activeClientProfileId && (
+                <Check style={{ width: '1rem', height: '1rem', color: T.blue }} />
+              )}
             </button>
 
             {/* Client profile list */}
             {clientProfiles.map((cp) => (
               <button
                 key={cp.id}
+                role="option"
+                aria-selected={activeClientProfileId === cp.id}
                 onClick={() => handleSelect(cp.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                  activeClientProfileId === cp.id
-                    ? 'bg-indigo-50 dark:bg-indigo-900/20'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                }`}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center',
+                  gap: '0.75rem', padding: '0.5rem 0.75rem',
+                  borderRadius: '0.5rem', textAlign: 'left',
+                  background: activeClientProfileId === cp.id
+                    ? `rgba(79,110,247,0.15)`
+                    : 'transparent',
+                  border: 'none', cursor: 'pointer',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (activeClientProfileId !== cp.id)
+                    (e.currentTarget as HTMLElement).style.background = `rgba(144,144,168,0.1)`;
+                }}
+                onMouseLeave={(e) => {
+                  if (activeClientProfileId !== cp.id)
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                }}
               >
                 <div
-                  className="w-4 h-4 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: cp.color || '#3b82f6' }}
+                  style={{
+                    width: '1rem', height: '1rem',
+                    borderRadius: '50%', flexShrink: 0,
+                    backgroundColor: cp.color || T.blue,
+                  }}
                 />
-                <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-medium truncate ${
-                    activeClientProfileId === cp.id ? 'text-gray-800 dark:text-gray-200' : 'text-gray-600 dark:text-gray-400'
-                  }`}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '0.875rem', fontWeight: 500,
+                    color: activeClientProfileId === cp.id ? T.textMain : T.textMuted,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
                     {cp.clientName}
                   </div>
                   {cp.industry && (
-                    <div className="text-xs text-gray-400 dark:text-gray-500 truncate">{cp.industry}</div>
+                    <div style={{
+                      fontSize: '0.75rem', color: T.textDim,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {cp.industry}
+                    </div>
                   )}
                 </div>
-                <div className="text-[10px] text-gray-400 dark:text-gray-500">
+                <div style={{ fontSize: '0.625rem', color: T.textDim, flexShrink: 0 }}>
                   {cp.conversationCount}c
                 </div>
-                {activeClientProfileId === cp.id && <Check className="w-4 h-4 text-indigo-500" />}
+                {activeClientProfileId === cp.id && (
+                  <Check style={{ width: '1rem', height: '1rem', color: T.blue }} />
+                )}
               </button>
             ))}
           </div>
 
           {/* Create new client */}
-          <div className="border-t border-gray-100 dark:border-gray-700 p-2">
+          <div style={{ borderTop: `1px solid ${T.textDim}`, padding: '0.5rem' }}>
             {showCreate ? (
-              <div className="space-y-2 px-1">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0 0.25rem' }}>
                 <input
                   type="text"
                   placeholder="Client name..."
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   autoFocus
+                  style={{
+                    width: '100%', padding: '0.375rem 0.75rem',
+                    fontSize: '0.875rem',
+                    border: `1px solid ${T.textDim}`,
+                    borderRadius: '0.5rem',
+                    background: T.bg,
+                    color: T.textMain,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = T.blue;
+                    (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 2px rgba(79,110,247,0.25)`;
+                  }}
+                  onBlur={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = T.textDim;
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  }}
                 />
                 <input
                   type="text"
@@ -191,45 +332,134 @@ export function ClientProfileSwitcher() {
                   value={newIndustry}
                   onChange={(e) => setNewIndustry(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                  className="w-full px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  style={{
+                    width: '100%', padding: '0.375rem 0.75rem',
+                    fontSize: '0.875rem',
+                    border: `1px solid ${T.textDim}`,
+                    borderRadius: '0.5rem',
+                    background: T.bg,
+                    color: T.textMain,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = T.blue;
+                    (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 2px rgba(79,110,247,0.25)`;
+                  }}
+                  onBlur={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = T.textDim;
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  }}
                 />
-                <div className="flex gap-2">
+                {error && (
+                  <div style={{ fontSize: '0.75rem', color: '#ef4444', padding: '0 0.25rem' }}>
+                    {error}
+                  </div>
+                )}
+                {/* Button row — flex-wrap for mobile */}
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <button
                     onClick={handleCreate}
                     disabled={!newName.trim() || creating}
-                    className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 rounded-lg transition-colors"
+                    style={{
+                      flex: 1, display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', gap: '0.375rem',
+                      padding: '0.375rem 0.75rem',
+                      fontSize: '0.875rem', fontWeight: 500,
+                      color: T.bg,
+                      background: creating || !newName.trim() ? T.textDim : T.blue,
+                      border: 'none', borderRadius: '0.5rem',
+                      cursor: creating || !newName.trim() ? 'not-allowed' : 'pointer',
+                      transition: 'background 0.15s',
+                      opacity: creating || !newName.trim() ? 0.6 : 1,
+                      minWidth: '5rem',
+                    }}
+                    aria-busy={creating}
                   >
-                    {creating ? 'Creating...' : 'Create'}
+                    {creating ? (
+                      <>
+                        <Loader2
+                          style={{ width: '0.875rem', height: '0.875rem', animation: 'spin 1s linear infinite' }}
+                        />
+                        Creating…
+                      </>
+                    ) : (
+                      'Create'
+                    )}
                   </button>
                   <button
-                    onClick={() => { setShowCreate(false); setNewName(''); setNewIndustry(''); }}
-                    className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg transition-colors"
+                    onClick={() => { setShowCreate(false); setNewName(''); setNewIndustry(''); setError(null); }}
+                    style={{
+                      padding: '0.375rem 0.75rem',
+                      fontSize: '0.875rem',
+                      color: T.textMuted,
+                      background: 'transparent',
+                      border: 'none', borderRadius: '0.5rem',
+                      cursor: 'pointer', transition: 'color 0.15s',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.color = T.textMain;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.color = T.textMuted;
+                    }}
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex gap-2">
+              /* Action row — flex-wrap for mobile */
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="flex-1 flex items-center gap-2 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                  style={{
+                    flex: 1, display: 'flex', alignItems: 'center',
+                    gap: '0.5rem', padding: '0.5rem 0.75rem',
+                    fontSize: '0.875rem', color: T.blue,
+                    background: 'transparent',
+                    border: 'none', borderRadius: '0.5rem',
+                    cursor: 'pointer', transition: 'background 0.15s',
+                    minWidth: '7rem',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = `rgba(79,110,247,0.12)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus style={{ width: '1rem', height: '1rem', flexShrink: 0 }} />
                   <span>Add Client</span>
                 </button>
                 <button
                   onClick={() => { setOpen(false); router.push('/dashboard/clients'); }}
-                  className="flex items-center gap-1 px-2 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  title="Manage all clients"
+                  aria-label="Manage all clients"
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    gap: '0.25rem', padding: '0.5rem',
+                    fontSize: '0.875rem', color: T.textMuted,
+                    background: 'transparent',
+                    border: 'none', borderRadius: '0.5rem',
+                    cursor: 'pointer', transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = `rgba(144,144,168,0.1)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings style={{ width: '1rem', height: '1rem' }} />
                 </button>
               </div>
             )}
           </div>
         </div>
       )}
+
+      {/* Keyframe for spinner — injected inline */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
