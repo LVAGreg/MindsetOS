@@ -188,7 +188,7 @@ export default function AdminDashboard() {
             <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(234,179,8,0.15)' }}>
-                  <Zap className="w-6 h-6" style={{ color: '#eab308' }} />
+                  <Zap className="w-6 h-6" style={{ color: '#fcc824' }} />
                 </div>
                 <div>
                   <p className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Tokens Used</p>
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-yellow-500" />
+                        <Zap className="w-4 h-4 text-[#fcc824]" />
                         <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           {((user.totalTokens || 0) / 1000).toFixed(1)}K
                         </span>
@@ -315,7 +315,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-green-500" />
+                        <DollarSign className="w-4 h-4 text-[#4ade80]" />
                         <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           ${(user.estimatedCost || 0).toFixed(4)}
                         </span>

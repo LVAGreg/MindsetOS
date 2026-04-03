@@ -75,7 +75,7 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
   // Knowledge base upload state
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [knowledgeFiles, setKnowledgeFiles] = useState<any[]>([]);
+  const [knowledgeFiles, setKnowledgeFiles] = useState<{ id: string; title: string; created_at: string }[]>([]);
 
   useEffect(() => {
     loadAgent();
@@ -282,7 +282,7 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
   if (error && !agent) {
     return (
       <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
-        <div className="text-lg text-red-400">Error: {error}</div>
+        <div className="text-lg text-[#fca5a5]">Error: {error}</div>
       </div>
     );
   }
@@ -749,7 +749,7 @@ export default function EditAgentPage({ params }: { params: { agentId: string } 
                           className="p-1 rounded-md transition-colors"
                           title="Delete document"
                         >
-                          <X className="w-4 h-4 text-red-400" />
+                          <X className="w-4 h-4 text-[#fca5a5]" />
                         </button>
                       </div>
                     ))}

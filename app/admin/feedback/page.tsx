@@ -25,17 +25,17 @@ const STATUSES = ['new', 'in_progress', 'resolved', 'closed'];
 const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
 
 const STATUS_COLORS = {
-  new:         'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-  in_progress: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-  resolved:    'bg-green-500/20 text-green-300 border border-green-500/30',
+  new:         'bg-[#4f6ef7]/20 text-[#7b8ff8] border border-[#4f6ef7]/30',
+  in_progress: 'bg-[#fcc824]/20 text-[#fcc824] border border-[#fcc824]/30',
+  resolved:    'bg-[#4ade80]/20 text-[#4ade80] border border-[#4ade80]/30',
   closed:      'bg-[#1e1e30] text-[#9090a8] border border-[#1e1e30]',
 };
 
 const PRIORITY_COLORS = {
   low:    'bg-[#4f6ef7]/20 text-[#8fa6ff] border border-[#4f6ef7]/30',
-  normal: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-  high:   'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-  urgent: 'bg-red-500/20 text-red-300 border border-red-500/30',
+  normal: 'bg-[#4f6ef7]/20 text-[#7b8ff8] border border-[#4f6ef7]/30',
+  high:   'bg-[#fcc824]/20 text-[#fcc824] border border-[#fcc824]/30',
+  urgent: 'bg-[#f87171]/20 text-[#fca5a5] border border-[#f87171]/30',
 };
 
 const PRIORITY_LEFT_BORDER: Record<string, string> = {

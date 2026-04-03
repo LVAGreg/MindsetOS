@@ -143,6 +143,7 @@ export default function SecurityPage() {
   const [events, setEvents] = useState<SecurityEvent[]>([]);
   const [stats, setStats] = useState<SecurityStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
@@ -163,8 +164,8 @@ export default function SecurityPage() {
         const data = await eventsRes.json();
         setEvents(data.events || []);
       }
-    } catch (e) {
-      console.error('Failed to fetch security data:', e);
+    } catch {
+      setFetchError('Failed to load security data. Please refresh.');
     }
     setLoading(false);
   };
@@ -179,6 +180,12 @@ export default function SecurityPage() {
 
   return (
     <div style={{ background: '#09090f', minHeight: '100vh', padding: 24 }}>
+      {fetchError && (
+        <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm mb-4" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
+          <span>{fetchError}</span>
+          <button onClick={() => setFetchError(null)} aria-label="Dismiss error">✕</button>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

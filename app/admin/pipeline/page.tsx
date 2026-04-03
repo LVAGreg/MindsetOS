@@ -6,12 +6,12 @@ import { Target, RefreshCw, Plus, Search, X, ChevronDown, Users, UserCheck, Arro
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
 
 const STAGES = [
-  { key: 'lead',               label: 'Lead',             color: 'text-[#9090a8]',     accent: '#6b7280', iconBg: 'rgba(107,114,128,0.15)' },
-  { key: 'trial',              label: 'Trial',            color: 'text-blue-300',       accent: '#60a5fa', iconBg: 'rgba(96,165,250,0.15)' },
-  { key: 'reset_47',          label: '$47 Reset',        color: 'text-violet-300',     accent: '#a78bfa', iconBg: 'rgba(167,139,250,0.15)' },
-  { key: 'architecture_997', label: '$997 Architecture', color: 'text-indigo-300',     accent: '#818cf8', iconBg: 'rgba(129,140,248,0.15)' },
-  { key: 'intensive_1997',   label: '$1997 Intensive',   color: 'text-amber-300',      accent: '#fbbf24', iconBg: 'rgba(251,191,36,0.15)' },
-  { key: 'client',            label: 'Client',           color: 'text-green-300',      accent: '#4ade80', iconBg: 'rgba(74,222,128,0.15)' },
+  { key: 'lead',               label: 'Lead',             color: '#9090a8',  accent: '#6b7280', iconBg: 'rgba(107,114,128,0.15)' },
+  { key: 'trial',              label: 'Trial',            color: '#7b8ff8',  accent: '#60a5fa', iconBg: 'rgba(96,165,250,0.15)' },
+  { key: 'reset_47',          label: '$47 Reset',        color: '#7c5bf6',  accent: '#a78bfa', iconBg: 'rgba(167,139,250,0.15)' },
+  { key: 'architecture_997', label: '$997 Architecture', color: '#818cf8',  accent: '#818cf8', iconBg: 'rgba(129,140,248,0.15)' },
+  { key: 'intensive_1997',   label: '$1997 Intensive',   color: '#fcc824',  accent: '#fcc824', iconBg: 'rgba(252,200,36,0.15)' },
+  { key: 'client',            label: 'Client',           color: '#4ade80',  accent: '#4ade80', iconBg: 'rgba(74,222,128,0.15)' },
 ];
 
 const SOURCES = ['quiz', 'scorecard', 'os-audit', '7days', 'manual'];
@@ -75,6 +75,7 @@ export default function PipelinePage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [stageFilter, setStageFilter] = useState('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -88,7 +89,9 @@ export default function PipelinePage() {
     try {
       const r = await fetch(`${API}/api/admin/pipeline/summary`, { headers: authHeaders() });
       if (r.ok) setSummary(await r.json());
-    } catch {}
+    } catch {
+      setPageError('Failed to load pipeline summary.');
+    }
   }, []);
 
   const fetchContacts = useCallback(async (p = 1) => {
@@ -104,8 +107,12 @@ export default function PipelinePage() {
         setContacts(data.contacts);
         setTotal(data.total);
         setPage(p);
+      } else {
+        setPageError('Failed to load contacts. Please refresh.');
       }
-    } catch {}
+    } catch {
+      setPageError('Network error loading contacts. Please refresh.');
+    }
     setLoading(false);
   }, [stageFilter, sourceFilter, search]);
 
@@ -113,33 +120,52 @@ export default function PipelinePage() {
 
   const handleSync = async () => {
     setSyncing(true);
+    setPageError(null);
     try {
       const r = await fetch(`${API}/api/admin/pipeline/sync`, { method: 'POST', headers: authHeaders() });
       if (r.ok) await Promise.all([fetchSummary(), fetchContacts(1)]);
-    } catch {}
+      else setPageError('Sync failed. Try again.');
+    } catch {
+      setPageError('Sync failed — network error.');
+    }
     setSyncing(false);
   };
 
-  const handleStageChange = async (contactId: number, newStage: string) => {
+  const handleStageChange = async (contactId: number, newStage: string, prevStage: string) => {
     setEditingStage(null);
     setContacts(prev => prev.map(c => c.id === contactId ? { ...c, funnel_stage: newStage } : c));
     try {
-      await fetch(`${API}/api/admin/pipeline/contacts/${contactId}`, {
+      const r = await fetch(`${API}/api/admin/pipeline/contacts/${contactId}`, {
         method: 'PATCH', headers: authHeaders(),
         body: JSON.stringify({ funnelStage: newStage }),
       });
-      fetchSummary();
-    } catch {}
+      if (r.ok) fetchSummary();
+      else {
+        setContacts(prev => prev.map(c => c.id === contactId ? { ...c, funnel_stage: prevStage } : c));
+        setPageError('Stage update failed — change reverted.');
+      }
+    } catch {
+      setContacts(prev => prev.map(c => c.id === contactId ? { ...c, funnel_stage: prevStage } : c));
+      setPageError('Stage update failed — change reverted.');
+    }
   };
 
   const handleMarkContacted = async (contactId: number) => {
+    const prev_ts = contacts.find(c => c.id === contactId)?.last_contacted_at ?? null;
     setContacts(prev => prev.map(c => c.id === contactId ? { ...c, last_contacted_at: new Date().toISOString() } : c));
     try {
-      await fetch(`${API}/api/admin/pipeline/contacts/${contactId}`, {
+      const r = await fetch(`${API}/api/admin/pipeline/contacts/${contactId}`, {
         method: 'PATCH', headers: authHeaders(),
         body: JSON.stringify({ lastContactedAt: true }),
       });
-    } catch {}
+      if (!r.ok) {
+        setContacts(prev => prev.map(c => c.id === contactId ? { ...c, last_contacted_at: prev_ts } : c));
+        setPageError('Failed to mark contacted — change reverted.');
+      }
+    } catch {
+      setContacts(prev => prev.map(c => c.id === contactId ? { ...c, last_contacted_at: prev_ts } : c));
+      setPageError('Failed to mark contacted — change reverted.');
+    }
   };
 
   const handleAddContact = async () => {
@@ -167,6 +193,12 @@ export default function PipelinePage() {
 
   return (
     <div className="space-y-6">
+      {pageError && (
+        <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
+          <span>{pageError}</span>
+          <button onClick={() => setPageError(null)} aria-label="Dismiss error" style={{ color: '#f87171' }}>✕</button>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
@@ -339,8 +371,8 @@ export default function PipelinePage() {
                         <select
                           autoFocus
                           defaultValue={c.funnel_stage}
-                          onBlur={e => handleStageChange(c.id, e.target.value)}
-                          onChange={e => handleStageChange(c.id, e.target.value)}
+                          onBlur={e => handleStageChange(c.id, e.target.value, c.funnel_stage)}
+                          onChange={e => handleStageChange(c.id, e.target.value, c.funnel_stage)}
                           className="bg-[#09090f] border border-[#4f6ef7] text-[#ededf5] rounded-xl px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                         >
                           {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}

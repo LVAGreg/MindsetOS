@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -62,11 +61,11 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsPage() {
-  const router = useRouter();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnalytics();
@@ -89,15 +88,13 @@ export default function AnalyticsPage() {
 
       if (response.ok) {
         const analyticsData = await response.json();
-        console.log('📊 Analytics data received:', analyticsData);
         setData(analyticsData);
+        setFetchError(null);
       } else {
-        console.error('❌ Analytics fetch failed:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
+        setFetchError(`Failed to load analytics (${response.status}). Try again.`);
       }
-    } catch (error) {
-      console.error('❌ Failed to fetch analytics:', error);
+    } catch {
+      setFetchError('Network error loading analytics. Please refresh.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -139,6 +136,12 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ background: '#09090f' }} className="space-y-6 min-h-screen p-6">
+      {fetchError && (
+        <div className="flex items-center justify-between px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
+          <span>{fetchError}</span>
+          <button onClick={() => setFetchError(null)} aria-label="Dismiss error">✕</button>
+        </div>
+      )}
       {/* Header */}
       <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="px-6 py-6">
@@ -146,6 +149,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/admin"
+                aria-label="Back to admin dashboard"
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
@@ -218,7 +222,7 @@ export default function AnalyticsPage() {
           <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg" style={{ background: 'rgba(234,179,8,0.12)' }}>
-                <Zap className="w-6 h-6" style={{ color: '#eab308' }} />
+                <Zap className="w-6 h-6" style={{ color: '#fcc824' }} />
               </div>
               <div>
                 <p style={{ color: '#9090a8' }} className="text-sm">Total Tokens</p>
@@ -300,7 +304,7 @@ export default function AnalyticsPage() {
                         </span>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-2">
-                            <Zap className="w-4 h-4" style={{ color: '#eab308' }} />
+                            <Zap className="w-4 h-4" style={{ color: '#fcc824' }} />
                             <span style={{ color: '#ededf5' }} className="font-medium">
                               {formatNumber(Number(day.tokens))}
                             </span>
@@ -321,7 +325,7 @@ export default function AnalyticsPage() {
                           <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30' }}>
                             <div
                               className="h-full rounded-full transition-all duration-300"
-                              style={{ width: `${tokensPercent}%`, background: '#eab308' }}
+                              style={{ width: `${tokensPercent}%`, background: '#fcc824' }}
                             />
                           </div>
                         </div>

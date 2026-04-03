@@ -152,7 +152,7 @@ export default function AgentsAdminPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
-        <div className="text-lg text-red-400">Error: {error}</div>
+        <div className="text-lg text-[#fca5a5]">Error: {error}</div>
       </div>
     );
   }

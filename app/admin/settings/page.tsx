@@ -315,7 +315,7 @@ export default function SystemSettingsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-[#f87171] mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>
             Access Denied
           </h1>
@@ -377,7 +377,7 @@ export default function SystemSettingsPage() {
               onClick={() => setShowPromptConfirm(true)}
               disabled={updatingPrompts}
               className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#7c3aed' }}
+              style={{ background: '#7c5bf6' }}
               title="Update all agent prompts from instruction files"
             >
               {updatingPrompts ? (
@@ -398,17 +398,17 @@ export default function SystemSettingsPage() {
         {/* Alerts */}
         {error && (
           <div className="mb-6 p-4 rounded-xl flex items-start gap-3" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}>
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-[#fca5a5] flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-red-400">Error</h3>
-              <p className="text-red-300 text-sm">{error}</p>
+              <h3 className="font-semibold text-[#fca5a5]">Error</h3>
+              <p className="text-[#fca5a5] text-sm">{error}</p>
             </div>
           </div>
         )}
 
         {success && (
           <div className="mb-6 p-4 rounded-xl" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}>
-            <p className="text-green-400 font-medium">{success}</p>
+            <p className="text-[#4ade80] font-medium">{success}</p>
           </div>
         )}
 
@@ -416,7 +416,7 @@ export default function SystemSettingsPage() {
         <div className="mb-6 overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="p-6 border-b border-[#1e1e30]">
             <div className="flex items-center gap-3 mb-2">
-              <Bug className="w-6 h-6 text-red-400" />
+              <Bug className="w-6 h-6 text-[#fca5a5]" />
               <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>
                 Debug Mode
               </h2>
@@ -455,7 +455,7 @@ export default function SystemSettingsPage() {
 
               {debugMode && (
                 <div className="text-right">
-                  <p className="text-sm text-red-400 font-semibold">
+                  <p className="text-sm text-[#fca5a5] font-semibold">
                     🔍 Active - Check server console for logs
                   </p>
                   <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
@@ -467,13 +467,13 @@ export default function SystemSettingsPage() {
 
             {debugMode && (
               <div className="mt-4 p-3 rounded-xl" style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.2)' }}>
-                <p className="text-sm text-yellow-400 font-medium">
+                <p className="text-sm text-[#fcc824] font-medium">
                   ⚠️ Debug Output Active
                 </p>
-                <p className="text-xs text-yellow-300/70 mt-1">
+                <p className="text-xs text-[#fcc824]/70 mt-1">
                   Verbose logging is enabled. The server console will show:
                 </p>
-                <ul className="text-xs text-yellow-300/70 mt-2 space-y-1 list-disc list-inside">
+                <ul className="text-xs text-[#fcc824]/70 mt-2 space-y-1 list-disc list-inside">
                   <li>Vector database searches with similarity scores</li>
                   <li>Full AI prompts sent to OpenRouter</li>
                   <li>Memory loading operations</li>
@@ -574,7 +574,7 @@ export default function SystemSettingsPage() {
                   </button>
 
                   {hasChanges(config.config_key) && (
-                    <span className="text-sm font-medium" style={{ color: '#eab308' }}>
+                    <span className="text-sm font-medium" style={{ color: '#fcc824' }}>
                       Unsaved changes
                     </span>
                   )}
@@ -611,20 +611,15 @@ export default function SystemSettingsPage() {
                     <div key={config.id} className="p-4 flex items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                            category === 'Feature Flag'
-                              ? 'text-orange-300'
-                              : category === 'Trial'
-                              ? 'text-blue-300'
-                              : ''
-                          }`}
-                          style={
-                            category === 'Feature Flag'
-                              ? { background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.2)' }
-                              : category === 'Trial'
-                              ? { background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.2)' }
-                              : { background: 'rgba(144,144,168,0.1)', border: '1px solid #1e1e30', color: '#9090a8' }
-                          }>
+                          <span
+                            className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={
+                              category === 'Feature Flag'
+                                ? { background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.2)', color: '#fb923c' }
+                                : category === 'Trial'
+                                ? { background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.2)', color: '#7b8ff8' }
+                                : { background: 'rgba(144,144,168,0.1)', border: '1px solid #1e1e30', color: '#9090a8' }
+                            }>
                             {category}
                           </span>
                           <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>
@@ -739,7 +734,7 @@ export default function SystemSettingsPage() {
               <button
                 onClick={handleUpdateAgentPrompts}
                 className="px-4 py-2 text-sm font-medium text-white rounded-xl transition-colors"
-                style={{ background: '#7c3aed' }}
+                style={{ background: '#7c5bf6' }}
               >
                 Yes, Update All Prompts
               </button>

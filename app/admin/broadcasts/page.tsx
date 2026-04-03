@@ -18,6 +18,18 @@ import {
 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
+interface BroadcastPayload {
+  title: string;
+  message: string;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  target_type: 'all' | 'role' | 'users';
+  target_roles?: string[];
+  target_user_ids?: string[];
+  scheduled_for?: string;
+  expires_at?: string;
+  data?: unknown;
+}
+
 interface Broadcast {
   id: string;
   title: string;
@@ -121,7 +133,7 @@ export default function AdminBroadcastsPage() {
 
   const createBroadcast = async () => {
     try {
-      const payload: any = {
+      const payload: BroadcastPayload = {
         title: formData.title,
         message: formData.message,
         priority: formData.priority,
@@ -214,10 +226,10 @@ export default function AdminBroadcastsPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'sent': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'scheduled': return <Clock className="w-4 h-4 text-yellow-500" />;
+      case 'sent': return <CheckCircle className="w-4 h-4" style={{ color: '#4ade80' }} />;
+      case 'scheduled': return <Clock className="w-4 h-4" style={{ color: '#fcc824' }} />;
       case 'draft': return <Edit className="w-4 h-4" style={{ color: '#9090a8' }} />;
-      case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'cancelled': return <XCircle className="w-4 h-4" style={{ color: '#f87171' }} />;
       default: return null;
     }
   };
@@ -350,6 +362,7 @@ export default function AdminBroadcastsPage() {
           <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Broadcasts</h2>
           <button
             onClick={fetchBroadcasts}
+            aria-label="Refresh broadcasts"
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} style={{ color: '#9090a8' }} />
@@ -470,6 +483,7 @@ export default function AdminBroadcastsPage() {
                         )}
                         <button
                           className="p-1.5 hover:bg-white/5 rounded-lg transition-colors"
+                          aria-label="View broadcast details"
                           title="View details"
                         >
                           <Eye className="w-4 h-4" style={{ color: '#9090a8' }} />

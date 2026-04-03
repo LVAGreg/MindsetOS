@@ -56,9 +56,12 @@ export default function ClapsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const [curR, histR] = await Promise.all([
         fetch(`${API}/api/admin/claps/current`, { headers: authHeaders() }),
@@ -76,9 +79,14 @@ export default function ClapsPage() {
           revenue: Number(data.revenue) || 0,
           notes: data.notes || '',
         });
+      } else {
+        setFetchError(`Failed to load current week (${curR.status})`);
       }
       if (histR.ok) setHistory(await histR.json());
-    } catch {}
+    } catch (err) {
+      console.error('Failed to fetch CLAPS data:', err);
+      setFetchError(err instanceof Error ? err.message : 'Failed to load CLAPS data');
+    }
     setLoading(false);
   }, []);
 
@@ -86,6 +94,7 @@ export default function ClapsPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       const r = await fetch(`${API}/api/admin/claps`, {
         method: 'POST', headers: authHeaders(),
@@ -95,8 +104,13 @@ export default function ClapsPage() {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
         fetchData();
+      } else {
+        setSaveError(`Save failed (${r.status})`);
       }
-    } catch {}
+    } catch (err) {
+      console.error('Failed to save CLAPS data:', err);
+      setSaveError(err instanceof Error ? err.message : 'Failed to save');
+    }
     setSaving(false);
   };
 
@@ -128,6 +142,18 @@ export default function ClapsPage() {
           Connections · Leads · Appointments · Presentations · Sales
         </p>
       </div>
+
+      {/* Error banners */}
+      {fetchError && (
+        <div className="px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>
+          {fetchError}
+        </div>
+      )}
+      {saveError && (
+        <div className="px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>
+          {saveError}
+        </div>
+      )}
 
       {/* Current Week */}
       <div className="p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>

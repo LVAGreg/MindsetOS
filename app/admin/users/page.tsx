@@ -515,7 +515,7 @@ export default function AdminUsersPage() {
     return (
       <div className="flex items-center justify-center py-20" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-[#f87171] mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>Access Denied</h1>
           <p style={{ color: '#9090a8' }}>
             This page is only accessible to administrators and power users.

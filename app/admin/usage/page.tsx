@@ -66,7 +66,7 @@ const getModelAccent = (modelId: string): string => {
   if (modelId.includes('claude')) return '#f97316';
   if (modelId.includes('perplexity')) return '#4f6ef7';
   if (modelId.includes('gpt') || modelId.includes('openai')) return '#22c55e';
-  if (modelId.includes('gemini') || modelId.includes('google')) return '#eab308';
+  if (modelId.includes('gemini') || modelId.includes('google')) return '#fcc824';
   return '#9090a8';
 };
 
@@ -180,7 +180,7 @@ export default function UsageDashboardPage() {
           { label: 'Today', value: formatCost(stats.totals.today), icon: <Clock className="w-6 h-6" />, accent: '#22c55e' },
           { label: 'This Week', value: formatCost(stats.totals.week), icon: <Calendar className="w-6 h-6" />, accent: '#4f6ef7' },
           { label: 'This Month', value: formatCost(stats.totals.month), icon: <TrendingUp className="w-6 h-6" />, accent: '#7c5bf6' },
-          { label: 'All Time', value: formatCost(stats.totals.all_time), icon: <DollarSign className="w-6 h-6" />, accent: '#f59e0b' },
+          { label: 'All Time', value: formatCost(stats.totals.all_time), icon: <DollarSign className="w-6 h-6" />, accent: '#fcc824' },
         ].map(({ label, value, icon, accent }) => (
           <div key={label} className="p-6" style={cardStyle}>
             <div className="flex items-center justify-between">
