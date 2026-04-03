@@ -26,18 +26,20 @@ export default function AgentSelector() {
   const { currentAgent, setCurrentAgent } = useAppStore();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAgents = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/agents`, {
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/agents`,
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
 
         if (!response.ok) {
-          console.error('Failed to fetch agents:', response.status);
+          setFetchError(`Failed to load agents (${response.status}). Please refresh.`);
           return;
         }
 
@@ -46,6 +48,7 @@ export default function AgentSelector() {
         setMembershipTier(data.membershipTier || null);
       } catch (error) {
         console.error('Error fetching agents:', error);
+        setFetchError('Could not load agents. Check your connection and refresh.');
       } finally {
         setLoading(false);
       }
@@ -58,99 +61,266 @@ export default function AgentSelector() {
     setCurrentAgent(agentId as any);
   };
 
+  /* ── loading skeleton ── */
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
-        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+      <div
+        style={{
+          borderBottom: '1px solid #1e1e30',
+          padding: '1rem',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            color: '#9090a8',
+            marginBottom: '0.75rem',
+          }}
+        >
           Select Agent
         </h2>
-        <div className="text-sm text-gray-500 dark:text-gray-400">Loading agents...</div>
+        <div style={{ fontSize: '0.875rem', color: '#9090a8' }}>
+          Loading agents…
+        </div>
+      </div>
+    );
+  }
+
+  /* ── error state ── */
+  if (fetchError) {
+    return (
+      <div
+        style={{
+          borderBottom: '1px solid #1e1e30',
+          padding: '1rem',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            color: '#9090a8',
+            marginBottom: '0.75rem',
+          }}
+        >
+          Select Agent
+        </h2>
+        <div
+          style={{
+            fontSize: '0.875rem',
+            color: '#f87171',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '0.375rem',
+            border: '1px solid rgba(248,113,113,0.3)',
+            background: 'rgba(248,113,113,0.08)',
+          }}
+        >
+          {fetchError}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div
+      style={{
+        borderBottom: '1px solid #1e1e30',
+        padding: '1rem',
+      }}
+    >
+      {/* header row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          marginBottom: '0.75rem',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            color: '#9090a8',
+          }}
+        >
           Select Agent
         </h2>
+
         {membershipTier === 'trial' && (
           <a
             href="https://www.mindset.show"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-md text-xs font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors"
+            aria-label="Upgrade for full access to all agents"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              padding: '0.25rem 0.5rem',
+              background: 'rgba(252,200,36,0.12)',
+              color: '#fcc824',
+              border: '1px solid rgba(252,200,36,0.3)',
+              borderRadius: '0.375rem',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background =
+                'rgba(252,200,36,0.22)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background =
+                'rgba(252,200,36,0.12)';
+            }}
           >
             <Zap className="w-3 h-3" />
             Upgrade for Full Access
           </a>
         )}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {agents.map((agent) => {
-          const isActive = currentAgent === agent.id;
-          const accentColor = agent.accent_color || '#3B82F6';
-          const isTrial = agent.isTrialAgent;
 
-          return (
-            <button
-              key={agent.id}
-              onClick={() => handleSelectAgent(agent.id)}
-              disabled={agent.locked}
-              className={`p-3 rounded-lg border-2 transition-all text-left relative ${
-                agent.locked
-                  ? 'opacity-50 cursor-not-allowed border-gray-200 dark:border-gray-700'
-                  : isActive
-                  ? ''
-                  : isTrial
-                    ? 'border-amber-300 dark:border-amber-600'
-                    : 'border-gray-200 dark:border-gray-700'
-              }`}
-              style={
-                !agent.locked && isActive
-                  ? {
-                      borderColor: accentColor,
-                      backgroundColor: `${accentColor}10`,
-                    }
-                  : {}
-              }
-              onMouseEnter={(e) => {
-                if (!agent.locked && !isActive) {
-                  e.currentTarget.style.borderColor = `${accentColor}60`;
+      {/* agent grid */}
+      <div
+        style={{ overflowX: 'auto' }}
+      >
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {agents.map((agent) => {
+            const isActive = currentAgent === agent.id;
+            const accentColor = agent.accent_color || '#4f6ef7';
+            const isTrial = agent.isTrialAgent;
+
+            /* base border */
+            const baseBorder = agent.locked
+              ? '#1e1e30'
+              : isTrial && !isActive
+              ? 'rgba(252,200,36,0.45)'
+              : isActive
+              ? accentColor
+              : '#1e1e30';
+
+            const baseBackground = isActive && !agent.locked
+              ? `${accentColor}18`
+              : 'rgba(18,18,31,0.8)';
+
+            return (
+              <button
+                key={agent.id}
+                onClick={() => handleSelectAgent(agent.id)}
+                disabled={agent.locked}
+                aria-label={
+                  agent.locked
+                    ? `${agent.name} — ${agent.lockedReason || 'Upgrade to unlock'}`
+                    : `Select ${agent.name}`
                 }
-              }}
-              onMouseLeave={(e) => {
-                if (!agent.locked && !isActive) {
-                  e.currentTarget.style.borderColor = '';
+                aria-pressed={isActive}
+                title={
+                  agent.locked
+                    ? agent.lockedReason || 'Upgrade to unlock this agent'
+                    : undefined
                 }
-              }}
-              title={agent.locked ? agent.lockedReason || 'Upgrade to unlock this agent' : ''}
-            >
-              {/* Trial badge */}
-              {isTrial && (
-                <div className="absolute -top-1.5 -right-1.5 bg-amber-400 text-black text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                  <Star className="w-2.5 h-2.5" />
-                  TRIAL
+                style={{
+                  position: 'relative',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `2px solid ${baseBorder}`,
+                  background: baseBackground,
+                  textAlign: 'left',
+                  cursor: agent.locked ? 'not-allowed' : 'pointer',
+                  opacity: agent.locked ? 0.5 : 1,
+                  transition: 'border-color 0.15s, background 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!agent.locked && !isActive) {
+                    (e.currentTarget as HTMLElement).style.borderColor =
+                      `${accentColor}60`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!agent.locked && !isActive) {
+                    (e.currentTarget as HTMLElement).style.borderColor =
+                      isTrial ? 'rgba(252,200,36,0.45)' : '#1e1e30';
+                  }
+                }}
+              >
+                {/* Trial badge */}
+                {isTrial && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '-6px',
+                      right: '-6px',
+                      background: '#fcc824',
+                      color: '#09090f',
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: '9999px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <Star className="w-2.5 h-2.5" aria-hidden="true" />
+                    TRIAL
+                  </div>
+                )}
+
+                {/* icon */}
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <AgentIcon
+                    agentId={agent.id}
+                    className="w-8 h-8"
+                    style={!agent.locked ? { color: accentColor } : {}}
+                  />
                 </div>
-              )}
-              <div className="mb-2">
-                <AgentIcon
-                  agentId={agent.id}
-                  className="w-8 h-8"
-                  style={!agent.locked ? { color: accentColor } : {}}
-                />
-              </div>
-              <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-1">
-                {agent.name}
-                {agent.locked && <Lock className="w-3 h-3 text-gray-500" />}
-              </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                {agent.locked ? (agent.lockedReason || 'Upgrade to unlock') : agent.description}
-              </div>
-            </button>
-          );
-        })}
+
+                {/* name */}
+                <div
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#ededf5',
+                    marginBottom: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                  }}
+                >
+                  {agent.name}
+                  {agent.locked && (
+                    <Lock
+                      className="w-3 h-3"
+                      aria-label="Locked"
+                      style={{ color: '#5a5a72', flexShrink: 0 }}
+                    />
+                  )}
+                </div>
+
+                {/* description */}
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    color: '#9090a8',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {agent.locked
+                    ? agent.lockedReason || 'Upgrade to unlock'
+                    : agent.description}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
