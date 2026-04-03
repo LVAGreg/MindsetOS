@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Plus, ChevronRight, Trash2, Phone, Building2,
-  Linkedin, Mail, X, Check, ArrowLeft, Clock, FileText,
+  Linkedin, Mail, X, Check, ArrowLeft, Clock, FileText, Loader2,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -231,6 +231,7 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
           <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>Add Contact</h2>
           <button
             onClick={onClose}
+            aria-label="Close modal"
             className="p-1.5 rounded-lg transition-colors"
             style={{ color: '#9090a8' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
@@ -371,7 +372,7 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-1">
+          <div className="flex flex-wrap gap-3 pt-1">
             <button
               type="submit"
               disabled={saving || !email.trim()}
@@ -380,7 +381,7 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
               onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
             >
-              <Check className="w-4 h-4" />
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               {saving ? 'Adding...' : 'Add Contact'}
             </button>
             <button
@@ -523,6 +524,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
           </div>
           <button
             onClick={onClose}
+            aria-label="Close drawer"
             className="p-1.5 rounded-lg transition-colors flex-shrink-0"
             style={{ color: '#9090a8' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
@@ -540,7 +542,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
             >
               <span>{drawerError}</span>
-              <button onClick={() => setDrawerError(null)} className="ml-2" style={{ color: '#f87171' }}>✕</button>
+              <button onClick={() => setDrawerError(null)} aria-label="Dismiss error" className="ml-2" style={{ color: '#f87171' }}>✕</button>
             </div>
           )}
 
@@ -627,7 +629,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.18)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.1)'; }}
             >
-              <Check className="w-3.5 h-3.5" />
+              {markingContacted ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
               {markingContacted ? 'Saving...' : 'Mark Contacted'}
             </button>
           </div>
@@ -677,7 +679,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between gap-3 px-6 py-4 flex-shrink-0"
+          className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 flex-shrink-0"
           style={{ borderTop: '1px solid #1e1e30' }}
         >
           <button
@@ -688,7 +690,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
-            <Trash2 className="w-4 h-4" />
+            {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             {deleting ? 'Deleting...' : 'Delete'}
           </button>
 
@@ -701,7 +703,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
             >
-              <Check className="w-4 h-4" />
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
           )}
@@ -760,6 +762,7 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
         {/* Delete button — visible on hover */}
         <button
           onClick={handleDelete}
+          aria-label="Delete contact"
           className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
           title="Delete contact"
           style={{ color: '#f87171' }}
@@ -873,6 +876,7 @@ export default function PipelinePage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/dashboard')}
+                aria-label="Back to dashboard"
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
@@ -910,7 +914,7 @@ export default function PipelinePage() {
             style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
           >
             <span>{pageError}</span>
-            <button onClick={() => setPageError(null)} className="ml-2" style={{ color: '#f87171' }}>✕</button>
+            <button onClick={() => setPageError(null)} aria-label="Dismiss error" className="ml-2" style={{ color: '#f87171' }}>✕</button>
           </div>
         </div>
       )}
