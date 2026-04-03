@@ -336,7 +336,7 @@ function MobileSplineBackground({ className = '', opacity = 0.75 }: { className?
 
 export default function TrialV3B() {
   return (
-    <div className="min-h-screen bg-[#07080f] text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden" style={{ background: '#09090f' }}>
 
       <style jsx global>{`
         /* ── Ambient motion ── */
@@ -427,7 +427,7 @@ export default function TrialV3B() {
       `}</style>
 
       {/* ── NAVIGATION ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl bg-[#07080f]/70 border-b border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl border-b border-white/[0.06]" style={{ background: 'rgba(9,9,15,0.7)' }}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link href="/trial-v3b" className="flex items-center gap-2.5 group">
             <MindsetOSLogo size="sm" variant="light" />
@@ -465,12 +465,12 @@ export default function TrialV3B() {
         </div>
 
         {/* Bottom fade to page bg */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#07080f] to-transparent z-[1]" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 z-[1]" style={{ background: 'linear-gradient(to top, #09090f, transparent)' }} />
 
         {/* Mobile: Robot positioned BEHIND hero text as background element */}
         <MobileSplineBackground className="absolute inset-0 z-[1] lg:hidden" opacity={0.75} />
         {/* Mobile: dark overlay on top of robot for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07080f]/10 via-transparent to-[#07080f]/40 z-[1] lg:hidden" />
+        <div className="absolute inset-0 z-[1] lg:hidden" style={{ background: 'linear-gradient(to bottom, rgba(9,9,15,0.1), transparent, rgba(9,9,15,0.4))' }} />
 
         <div className="relative z-[2] max-w-7xl mx-auto px-5 sm:px-8 pt-28 lg:pt-24 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -960,7 +960,7 @@ export default function TrialV3B() {
 
         {/* Mobile: Robot behind CTA text */}
         <MobileSplineBackground className="absolute inset-0 lg:hidden" opacity={0.5} />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07080f]/25 via-[#07080f]/15 to-[#07080f]/40 z-[1] lg:hidden" />
+        <div className="absolute inset-0 z-[1] lg:hidden" style={{ background: 'linear-gradient(to bottom, rgba(9,9,15,0.25), rgba(9,9,15,0.15), rgba(9,9,15,0.4))' }} />
 
         <div className="relative z-[2] max-w-7xl mx-auto px-5 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -992,7 +992,7 @@ export default function TrialV3B() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="relative py-12 border-t border-white/[0.06] bg-[#050610]">
+      <footer className="relative py-12 border-t border-white/[0.06]" style={{ background: '#09090f' }}>
         {/* Subtle top glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[2px] bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
