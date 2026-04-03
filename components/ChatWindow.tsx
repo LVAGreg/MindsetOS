@@ -2511,7 +2511,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   description: agentData.description || '',
                   systemPrompt: agentData.systemPrompt,
                   category: agentData.category || 'custom',
-                  color: agentData.color || '#8b5cf6',
+                  color: agentData.color || '#7c5bf6',
                   conversationStarters: agentData.conversationStarters || ["Let's GO!"],
                   icon: agentData.icon || 'Wand2',
                   visibility: 'private',
@@ -2541,9 +2541,12 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
       setRetryCount(0);
 
       // Explicit scroll after streaming completes and options render
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      // Double rAF ensures the DOM has painted before scroll is triggered
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
     } catch (error) {
       // Check if error is from abort
       if (error instanceof Error && error.name === 'AbortError') {
@@ -2561,14 +2564,17 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
         setLastFailedMessage(userMessage);
         setShowError(true);
-        setErrorMessage(isNetworkError
-          ? 'Connection error. The message will be retried automatically...'
+        const nextRetry = retryCount + 1;
+        setErrorMessage(isNetworkError && retryCount < MAX_RETRIES
+          ? `Connection error. Retrying (${nextRetry}/${MAX_RETRIES})...`
+          : isNetworkError
+          ? `Connection error. Failed after ${MAX_RETRIES} attempts.`
           : errorMessage);
 
         // Auto-retry for network errors (with exponential backoff)
         if (isNetworkError && retryCount < MAX_RETRIES) {
           const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 8000); // 1s, 2s, 4s, max 8s
-          console.log(`🔄 Network error detected, retry ${retryCount + 1}/${MAX_RETRIES} in ${retryDelay}ms...`);
+          console.log(`🔄 Network error detected, retry ${nextRetry}/${MAX_RETRIES} in ${retryDelay}ms...`);
 
           // Remove the failed user message before retrying to prevent duplicates
           if (convId) {
@@ -2610,9 +2616,9 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
             });
           }
 
-          setRetryCount(retryCount + 1);
+          setRetryCount(nextRetry);
           setTimeout(() => {
-            console.log(`🔄 Retrying message (attempt ${retryCount + 1})...`);
+            console.log(`🔄 Retrying message (attempt ${nextRetry})...`);
             setShowError(false);
             handleSendMessage(userMessage);
           }, retryDelay);
