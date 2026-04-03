@@ -181,14 +181,14 @@ export default function SystemPromptsPage() {
   return (
     <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+      <div className="rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
         <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: '#ededf5' }}>System Prompts</h1>
               <p className="text-sm mt-1" style={{ color: '#9090a8' }}>Configure AI system prompts and models</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/admin/settings"
                 className="flex items-center gap-2 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
@@ -226,6 +226,12 @@ export default function SystemPromptsPage() {
         )}
 
         {/* Prompt Tabs */}
+        {prompts.length === 0 && !loading && (
+          <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
+            <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#9090a8' }} />
+            <p className="text-sm" style={{ color: '#9090a8' }}>No system prompts found. Prompts are seeded by the backend on first run.</p>
+          </div>
+        )}
         <div className="flex flex-wrap gap-3">
           {prompts.map((prompt) => (
             <button
@@ -235,7 +241,7 @@ export default function SystemPromptsPage() {
               style={
                 selectedPrompt?.id === prompt.id
                   ? { background: 'rgba(79,110,247,0.15)', border: '2px solid #4f6ef7', color: '#ededf5' }
-                  : { background: 'rgba(18,18,31,0.7)', border: '2px solid #1e1e30', color: '#9090a8' }
+                  : { background: 'rgba(18,18,31,0.8)', border: '2px solid #1e1e30', color: '#9090a8' }
               }
             >
               {prompt.promptType === 'memory_agent' ? (
@@ -250,7 +256,7 @@ export default function SystemPromptsPage() {
 
         {/* Prompt Editor */}
         {editedPrompt && (
-          <div className="rounded-2xl p-8" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+          <div className="rounded-2xl p-8" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
             {/* Prompt Info */}
             <div className="mb-6">
               <h2 className="text-2xl font-bold mb-2" style={{ color: '#ededf5' }}>
@@ -310,7 +316,10 @@ export default function SystemPromptsPage() {
                 <input
                   type="number"
                   value={editedPrompt.maxTokens}
-                  onChange={(e) => setEditedPrompt({ ...editedPrompt, maxTokens: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val)) setEditedPrompt({ ...editedPrompt, maxTokens: val });
+                  }}
                   className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                   min="100"
                   max="10000"
@@ -328,7 +337,7 @@ export default function SystemPromptsPage() {
                 value={editedPrompt.systemPrompt}
                 onChange={(e) => setEditedPrompt({ ...editedPrompt, systemPrompt: e.target.value })}
                 rows={20}
-                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
+                className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7] max-h-[60vh] resize-y"
                 placeholder="Enter system prompt..."
               />
               <p className="text-xs mt-2" style={{ color: '#9090a8' }}>
@@ -337,13 +346,13 @@ export default function SystemPromptsPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between pt-6" style={{ borderTop: '1px solid #1e1e30' }}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6" style={{ borderTop: '1px solid #1e1e30' }}>
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
                   disabled={!hasChanges()}
                   className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e30', color: '#9090a8' }}
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#9090a8' }}
                 >
                   <RotateCcw className="w-4 h-4" />
                   Reset Changes
@@ -352,7 +361,7 @@ export default function SystemPromptsPage() {
 
               <div className="flex gap-3 items-center">
                 {hasChanges() && (
-                  <span className="text-sm font-medium" style={{ color: '#f8c824' }}>
+                  <span className="text-sm font-medium" style={{ color: '#fcc824' }}>
                     Unsaved changes
                   </span>
                 )}
