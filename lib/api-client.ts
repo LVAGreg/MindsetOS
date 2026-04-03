@@ -170,7 +170,8 @@ class APIClient {
   async sendMessage(agentId: string, message: string) {
     // Convert KEY format to database id format
     const { MINDSET_AGENTS } = await import('./store');
-    const dbAgentId = MINDSET_AGENTS[agentId as keyof typeof MINDSET_AGENTS]?.id || agentId.toLowerCase().replace(/_/g, '-');
+    const safeAgentId = agentId ?? 'mindset-score';
+    const dbAgentId = MINDSET_AGENTS[safeAgentId as keyof typeof MINDSET_AGENTS]?.id || safeAgentId.toLowerCase().replace(/_/g, '-');
 
     const response = await this.client.post('/api/letta/chat', {
       agentId: dbAgentId,
@@ -183,7 +184,8 @@ class APIClient {
     // Import MINDSET_AGENTS to get the database ID
     const { MINDSET_AGENTS } = await import('./store');
     // Convert KEY format to database id format
-    const dbAgentId = MINDSET_AGENTS[agentId as keyof typeof MINDSET_AGENTS]?.id || agentId.toLowerCase().replace(/_/g, '-');
+    const safeAgentId = agentId ?? 'mindset-score';
+    const dbAgentId = MINDSET_AGENTS[safeAgentId as keyof typeof MINDSET_AGENTS]?.id || safeAgentId.toLowerCase().replace(/_/g, '-');
 
     // Build request body, only include modelOverride if it's set
     const requestBody: Record<string, unknown> = { agentId: dbAgentId, message, messages, memoryEnabled, conversationId, documentIds, widgetFormattingEnabled };
@@ -204,6 +206,18 @@ class APIClient {
       console.log(`🔄 [API] Model override requested: ${modelOverride}`);
     }
 
+    // Set up 60s stall timeout — aborts if stream produces no data for 60s
+    const stallController = new AbortController();
+    let stallTimeoutId: ReturnType<typeof setTimeout> = setTimeout(() => stallController.abort(), 60000);
+    const resetStallTimeout = () => {
+      clearTimeout(stallTimeoutId);
+      stallTimeoutId = setTimeout(() => stallController.abort(), 60000);
+    };
+    // Combine external signal with internal stall timeout
+    const combinedSignal = signal
+      ? (AbortSignal.any ? AbortSignal.any([signal, stallController.signal]) : stallController.signal)
+      : stallController.signal;
+
     const response = await fetch(`${API_URL}/api/letta/chat/stream`, {
       method: 'POST',
       headers: {
@@ -212,10 +226,11 @@ class APIClient {
       },
       body: JSON.stringify(requestBody),
       credentials: 'include',
-      signal, // Add AbortSignal support
+      signal: combinedSignal,
     });
 
     if (!response.ok) {
+      clearTimeout(stallTimeoutId);
       throw new Error('Stream failed');
     }
 
@@ -223,6 +238,7 @@ class APIClient {
     const decoder = new TextDecoder();
 
     if (!reader) {
+      clearTimeout(stallTimeoutId);
       throw new Error('No reader available');
     }
 
@@ -230,6 +246,7 @@ class APIClient {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        resetStallTimeout(); // Reset stall timeout on each received chunk
 
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n');
@@ -289,6 +306,7 @@ class APIClient {
         }
       }
     } finally {
+      clearTimeout(stallTimeoutId);
       reader.releaseLock();
     }
   }
@@ -683,7 +701,7 @@ export async function fetchArtifacts(params?: {
   if (params?.tag) searchParams.set('tag', params.tag);
 
   const url = `${API_URL}/api/artifacts?${searchParams}`;
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+  const res = await fetch(url, { credentials: 'include', headers: { 'Authorization': `Bearer ${token}` } });
   if (!res.ok) throw new Error('Failed to fetch artifacts');
   const data = await res.json();
   return Array.isArray(data) ? data : data?.artifacts || [];
@@ -704,6 +722,7 @@ export async function createArtifact(data: {
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
@@ -719,6 +738,7 @@ export async function updateArtifact(id: string, data: {
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts/${id}`, {
     method: 'PUT',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
@@ -730,6 +750,7 @@ export async function deleteArtifact(id: string): Promise<void> {
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts/${id}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to delete artifact');
@@ -739,6 +760,7 @@ export async function cleanupArtifact(id: string): Promise<{ trimmed: boolean; c
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts/${id}/cleanup`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to cleanup artifact');
@@ -749,6 +771,7 @@ export async function toggleArtifactStar(id: string): Promise<any> {
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts/${id}/star`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}` },
   });
   if (!res.ok) throw new Error('Failed to toggle star');
@@ -759,6 +782,7 @@ export async function updateArtifactTags(id: string, tags: string[]): Promise<an
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${API_URL}/api/artifacts/${id}/tags`, {
     method: 'PATCH',
+    credentials: 'include',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ tags }),
   });
