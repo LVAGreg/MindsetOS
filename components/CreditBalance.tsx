@@ -47,7 +47,8 @@ export function CreditBalance({ userId, compact = false }: CreditBalanceProps) {
       const data = await response.json();
       setCredits(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setError(msg);
       console.error('Error fetching credit balance:', err);
     } finally {
       setLoading(false);
@@ -71,7 +72,9 @@ export function CreditBalance({ userId, compact = false }: CreditBalanceProps) {
   // Only show error if we had a real fetch error (not just missing auth)
   if (error && error !== 'Not authenticated') {
     return (
-      <div className="p-2 text-xs text-red-600 dark:text-red-400">
+      <div
+        style={{ padding: '8px', fontSize: '12px', color: '#f87171' }}
+      >
         Failed to load credits
       </div>
     );
@@ -86,125 +89,193 @@ export function CreditBalance({ userId, compact = false }: CreditBalanceProps) {
   const totalEarned = credits.total_earned;
   const percentageRemaining = totalEarned > 0 ? (balance / totalEarned) * 100 : 100;
 
-  // Determine color based on balance
-  const getBalanceColor = () => {
-    if (percentageRemaining > 50) return 'text-green-600 dark:text-green-400';
-    if (percentageRemaining > 25) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+  // Determine color based on balance — using design tokens
+  const getBalanceColor = (): string => {
+    if (percentageRemaining > 50) return '#4ade80'; // green
+    if (percentageRemaining > 25) return '#fcc824'; // amber token
+    return '#f87171'; // red
   };
 
-  const getProgressColor = () => {
-    if (percentageRemaining > 50) return 'bg-green-500';
-    if (percentageRemaining > 25) return 'bg-yellow-500';
-    return 'bg-red-500';
+  const getProgressColor = (): string => {
+    if (percentageRemaining > 50) return '#4ade80';
+    if (percentageRemaining > 25) return '#fcc824'; // amber token
+    return '#f87171';
   };
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-        <Coins className={`w-5 h-5 ${getBalanceColor()}`} />
-        <div className="flex-1">
-          <div className="flex items-baseline gap-2">
-            <span className={`text-lg font-bold ${getBalanceColor()}`}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          padding: '12px',
+          background: 'rgba(18,18,31,0.8)',
+          border: '1px solid #1e1e30',
+          borderRadius: '8px',
+        }}
+      >
+        <Coins style={{ width: '20px', height: '20px', color: getBalanceColor(), flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: getBalanceColor() }}>
               {balance.toLocaleString()}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">credits</span>
+            <span style={{ fontSize: '12px', color: '#9090a8' }}>credits</span>
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
+          <div style={{ fontSize: '12px', color: '#9090a8' }}>
             ${balanceUsd.toFixed(2)} remaining
           </div>
         </div>
         <button
           onClick={fetchBalance}
-          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          title="Refresh balance"
+          aria-label="Refresh balance"
+          style={{
+            padding: '6px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
-          <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          <RefreshCw style={{ width: '16px', height: '16px', color: '#9090a8' }} />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border border-blue-200 dark:border-gray-700 rounded-xl shadow-lg">
+    <div
+      style={{
+        padding: '24px',
+        background: 'rgba(18,18,31,0.8)',
+        border: '1px solid #1e1e30',
+        borderRadius: '12px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Coins className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Coins style={{ width: '24px', height: '24px', color: '#4f6ef7' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#ededf5', margin: 0 }}>
             Credit Balance
           </h3>
         </div>
         <button
           onClick={fetchBalance}
-          className="p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-          title="Refresh balance"
+          aria-label="Refresh balance"
+          style={{
+            padding: '8px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
-          <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <RefreshCw style={{ width: '16px', height: '16px', color: '#9090a8' }} />
         </button>
       </div>
 
       {/* Main Balance */}
-      <div className="mb-4">
-        <div className="flex items-baseline gap-3 mb-1">
-          <span className={`text-4xl font-bold ${getBalanceColor()}`}>
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
+          <span style={{ fontSize: '36px', fontWeight: 700, color: getBalanceColor() }}>
             {balance.toLocaleString()}
           </span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">credits</span>
+          <span style={{ fontSize: '14px', color: '#9090a8' }}>credits</span>
         </div>
-        <div className="text-2xl font-semibold text-gray-700 dark:text-gray-300">
+        <div style={{ fontSize: '22px', fontWeight: 600, color: '#9090a8' }}>
           ${balanceUsd.toFixed(2)} USD
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#9090a8', marginBottom: '4px' }}>
           <span>Balance</span>
           <span>{percentageRemaining.toFixed(0)}% remaining</span>
         </div>
-        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div
+          style={{
+            height: '8px',
+            background: '#1e1e30',
+            borderRadius: '9999px',
+            overflow: 'hidden',
+          }}
+        >
           <div
-            className={`h-full ${getProgressColor()} transition-all duration-500`}
-            style={{ width: `${percentageRemaining}%` }}
-          ></div>
+            style={{
+              height: '100%',
+              width: `${percentageRemaining}%`,
+              background: getProgressColor(),
+              transition: 'width 500ms ease',
+            }}
+          />
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         {/* Total Spent */}
-        <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingDown className="w-4 h-4 text-red-500" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Spent</span>
+        <div
+          style={{
+            padding: '12px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid #1e1e30',
+            borderRadius: '8px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <TrendingDown style={{ width: '16px', height: '16px', color: '#f87171' }} />
+            <span style={{ fontSize: '12px', color: '#9090a8' }}>Spent</span>
           </div>
-          <div className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#ededf5' }}>
             {totalSpent.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div style={{ fontSize: '12px', color: '#5a5a72' }}>
             ${totalSpentUsd.toFixed(2)}
           </div>
         </div>
 
         {/* Total Earned */}
-        <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Earned</span>
+        <div
+          style={{
+            padding: '12px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid #1e1e30',
+            borderRadius: '8px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <TrendingUp style={{ width: '16px', height: '16px', color: '#4ade80' }} />
+            <span style={{ fontSize: '12px', color: '#9090a8' }}>Earned</span>
           </div>
-          <div className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div style={{ fontSize: '14px', fontWeight: 600, color: '#ededf5' }}>
             {totalEarned.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div style={{ fontSize: '12px', color: '#5a5a72' }}>
             ${parseFloat(credits.total_earned_usd).toFixed(2)}
           </div>
         </div>
       </div>
 
       {/* Info Text */}
-      <div className="mt-4 pt-4 border-t border-blue-200 dark:border-gray-700">
-        <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+      <div
+        style={{
+          marginTop: '16px',
+          paddingTop: '16px',
+          borderTop: '1px solid #1e1e30',
+          textAlign: 'center',
+        }}
+      >
+        <p style={{ fontSize: '12px', color: '#5a5a72', margin: 0 }}>
           1 credit = $0.001 USD • Credits deducted automatically on AI usage
         </p>
       </div>

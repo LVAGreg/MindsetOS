@@ -51,6 +51,52 @@ interface CoreMemoriesEditorProps {
   showHistory?: boolean;
 }
 
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const T = {
+  pageBg:    '#09090f',
+  cardBg:    'rgba(18,18,31,0.8)',
+  border:    '#1e1e30',
+  textPrim:  '#ededf5',
+  textMuted: '#9090a8',
+  textDim:   '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  purple:    '#7c5bf6',
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 16px',
+  border: `1px solid ${T.border}`,
+  borderRadius: '6px',
+  background: 'rgba(18,18,31,0.6)',
+  color: T.textPrim,
+  outline: 'none',
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  color: T.textMuted,
+  marginBottom: '8px',
+};
+
+const sectionStyle: React.CSSProperties = {
+  background: T.cardBg,
+  borderRadius: '8px',
+  border: `1px solid ${T.border}`,
+  padding: '24px',
+};
+
+const sectionHeadingStyle: React.CSSProperties = {
+  fontSize: '1.125rem',
+  fontWeight: 600,
+  color: T.textPrim,
+  marginBottom: '16px',
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function CoreMemoriesEditor({ onSave, showHistory = false }: CoreMemoriesEditorProps) {
   const [memories, setMemories] = useState<CoreMemories>({});
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
@@ -134,19 +180,19 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 0' }}>
+        <Loader2 style={{ width: 32, height: 32, color: T.purple }} className="animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Core Memories</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: T.textPrim }}>Core Memories</h2>
+          <p style={{ fontSize: '0.875rem', color: T.textMuted, marginTop: '4px' }}>
             Manage your business profile and key information
           </p>
         </div>
@@ -154,9 +200,20 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
         {showHistory && auditLog.length > 0 && (
           <button
             onClick={() => setShowAuditLog(!showAuditLog)}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              fontSize: '0.875rem',
+              background: 'rgba(18,18,31,0.6)',
+              color: T.textMuted,
+              border: `1px solid ${T.border}`,
+              borderRadius: '8px',
+              cursor: 'pointer',
+            }}
           >
-            <History className="h-4 w-4" />
+            <History style={{ width: 16, height: 16 }} />
             {showAuditLog ? 'Hide' : 'Show'} History
           </button>
         )}
@@ -164,36 +221,54 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
 
       {/* Success Message */}
       {success && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg">
-          <CheckCircle className="h-5 w-5" />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px',
+          background: 'rgba(34,197,94,0.1)',
+          color: '#4ade80',
+          borderRadius: '8px',
+          border: '1px solid rgba(34,197,94,0.2)',
+        }}>
+          <CheckCircle style={{ width: 20, height: 20, flexShrink: 0 }} />
           <span>Core memories updated successfully!</span>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">
-          <AlertCircle className="h-5 w-5" />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px',
+          background: 'rgba(239,68,68,0.1)',
+          color: '#f87171',
+          borderRadius: '8px',
+          border: '1px solid rgba(239,68,68,0.2)',
+        }}>
+          <AlertCircle style={{ width: 20, height: 20, flexShrink: 0 }} />
           <span>{error}</span>
         </div>
       )}
 
       {/* Audit Log */}
       {showAuditLog && auditLog.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Change History</h3>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+        <div style={{ ...sectionStyle }}>
+          <h3 style={{ fontWeight: 600, color: T.textPrim, marginBottom: '12px' }}>Change History</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '256px', overflowY: 'auto' }}>
             {auditLog.map((entry) => (
-              <div key={entry.id} className="text-sm border-l-2 border-purple-400 pl-3 py-1">
-                <div className="font-medium text-gray-900 dark:text-gray-100">
+              <div key={entry.id} style={{ fontSize: '0.875rem', borderLeft: `2px solid ${T.purple}`, paddingLeft: '12px', paddingTop: '4px', paddingBottom: '4px' }}>
+                <div style={{ fontWeight: 500, color: T.textPrim }}>
                   {entry.field_name.replace(/_/g, ' ')}
                 </div>
-                <div className="text-gray-600 dark:text-gray-400">
+                <div style={{ color: T.textMuted }}>
                   {entry.source === 'agent' && entry.agent_name && (
-                    <span className="text-purple-600 dark:text-purple-400">Updated by {entry.agent_name}</span>
+                    <span style={{ color: T.purple }}>Updated by {entry.agent_name}</span>
                   )}
                   {entry.source === 'manual' && (
-                    <span className="text-blue-600 dark:text-blue-400">Updated manually</span>
+                    <span style={{ color: T.blue }}>Updated manually</span>
                   )}
                   {' • '}
                   {new Date(entry.changed_at).toLocaleString()}
@@ -205,46 +280,41 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
       )}
 
       {/* Form Sections */}
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
         {/* Section 1: Business Identity */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Business Identity</h3>
-          <div className="space-y-4">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeadingStyle}>Business Identity</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name
-              </label>
+              <label style={labelStyle}>Full Name</label>
               <input
                 type="text"
                 value={memories.full_name || ''}
                 onChange={(e) => updateField('full_name', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="Your full name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Company Name
-              </label>
+              <label style={labelStyle}>Company Name</label>
               <input
                 type="text"
                 value={memories.company_name || ''}
                 onChange={(e) => updateField('company_name', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="Your company name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Business Outcome
-              </label>
+              <label style={labelStyle}>Business Outcome</label>
               <textarea
                 value={memories.business_outcome || ''}
                 onChange={(e) => updateField('business_outcome', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="What outcome do you deliver for clients?"
               />
             </div>
@@ -252,61 +322,75 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
         </div>
 
         {/* Section 2: Client Profile */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Client Profile</h3>
-          <div className="space-y-4">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeadingStyle}>Client Profile</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Target Clients
-              </label>
+              <label style={labelStyle}>Target Clients</label>
               <input
                 type="text"
                 value={memories.target_clients || ''}
                 onChange={(e) => updateField('target_clients', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="Who are your ideal clients?"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Client Problems
-              </label>
+              <label style={labelStyle}>Client Problems</label>
               {(memories.client_problems || []).map((problem, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     value={problem}
                     onChange={(e) => updateArrayItem('client_problems', index, e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style={{ ...inputStyle, flex: '1 1 200px' }}
                     placeholder={`Problem ${index + 1}`}
                   />
                   <button
                     onClick={() => removeArrayItem('client_problems', index)}
-                    className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50"
+                    aria-label={`Remove problem ${index + 1}`}
+                    style={{
+                      padding: '8px 12px',
+                      background: 'rgba(239,68,68,0.1)',
+                      color: '#f87171',
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 style={{ width: 16, height: 16 }} />
                   </button>
                 </div>
               ))}
               <button
                 onClick={() => addArrayItem('client_problems')}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  fontSize: '0.875rem',
+                  background: `rgba(124,91,246,0.1)`,
+                  color: T.purple,
+                  border: `1px solid rgba(124,91,246,0.2)`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
               >
-                <Plus className="h-4 w-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 Add Problem
               </button>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Client Results
-              </label>
+              <label style={labelStyle}>Client Results</label>
               <textarea
                 value={memories.client_results || ''}
                 onChange={(e) => updateField('client_results', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="What tangible results do clients get?"
               />
             </div>
@@ -314,48 +398,64 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
         </div>
 
         {/* Section 3: Methodology */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Methodology</h3>
-          <div className="space-y-4">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeadingStyle}>Methodology</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Core Method
-              </label>
+              <label style={labelStyle}>Core Method</label>
               <textarea
                 value={memories.core_method || ''}
                 onChange={(e) => updateField('core_method', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="Your core methodology or approach"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Frameworks
-              </label>
+              <label style={labelStyle}>Frameworks</label>
               {(memories.frameworks || []).map((framework, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     value={framework}
                     onChange={(e) => updateArrayItem('frameworks', index, e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style={{ ...inputStyle, flex: '1 1 200px' }}
                     placeholder={`Framework ${index + 1}`}
                   />
                   <button
                     onClick={() => removeArrayItem('frameworks', index)}
-                    className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50"
+                    aria-label={`Remove framework ${index + 1}`}
+                    style={{
+                      padding: '8px 12px',
+                      background: 'rgba(239,68,68,0.1)',
+                      color: '#f87171',
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 style={{ width: 16, height: 16 }} />
                   </button>
                 </div>
               ))}
               <button
                 onClick={() => addArrayItem('frameworks')}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  fontSize: '0.875rem',
+                  background: `rgba(124,91,246,0.1)`,
+                  color: T.purple,
+                  border: `1px solid rgba(124,91,246,0.2)`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
               >
-                <Plus className="h-4 w-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 Add Framework
               </button>
             </div>
@@ -363,45 +463,39 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
         </div>
 
         {/* Section 4: Service Details */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Service Details</h3>
-          <div className="space-y-4">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeadingStyle}>Service Details</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Service Description
-              </label>
+              <label style={labelStyle}>Service Description</label>
               <textarea
                 value={memories.service_description || ''}
                 onChange={(e) => updateField('service_description', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="Describe your service offering"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Pricing Model
-                </label>
+                <label style={labelStyle}>Pricing Model</label>
                 <input
                   type="text"
                   value={memories.pricing_model || ''}
                   onChange={(e) => updateField('pricing_model', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={inputStyle}
                   placeholder="e.g., monthly retainer, project-based"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Delivery Timeline
-                </label>
+                <label style={labelStyle}>Delivery Timeline</label>
                 <input
                   type="text"
                   value={memories.delivery_timeline || ''}
                   onChange={(e) => updateField('delivery_timeline', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  style={inputStyle}
                   placeholder="e.g., 90 days, 6 months"
                 />
               </div>
@@ -410,61 +504,75 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
         </div>
 
         {/* Section 5: Current State */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current State</h3>
-          <div className="space-y-4">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeadingStyle}>Current State</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Revenue Range
-              </label>
+              <label style={labelStyle}>Revenue Range</label>
               <input
                 type="text"
                 value={memories.revenue_range || ''}
                 onChange={(e) => updateField('revenue_range', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="e.g., $10k-$30k/month"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Growth Goals
-              </label>
+              <label style={labelStyle}>Growth Goals</label>
               <textarea
                 value={memories.growth_goals || ''}
                 onChange={(e) => updateField('growth_goals', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                style={inputStyle}
                 placeholder="What are your business growth goals?"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Biggest Challenges
-              </label>
+              <label style={labelStyle}>Biggest Challenges</label>
               {(memories.biggest_challenges || []).map((challenge, index) => (
-                <div key={index} className="flex gap-2 mb-2">
+                <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     value={challenge}
                     onChange={(e) => updateArrayItem('biggest_challenges', index, e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style={{ ...inputStyle, flex: '1 1 200px' }}
                     placeholder={`Challenge ${index + 1}`}
                   />
                   <button
                     onClick={() => removeArrayItem('biggest_challenges', index)}
-                    className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50"
+                    aria-label={`Remove challenge ${index + 1}`}
+                    style={{
+                      padding: '8px 12px',
+                      background: 'rgba(239,68,68,0.1)',
+                      color: '#f87171',
+                      border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 style={{ width: 16, height: 16 }} />
                   </button>
                 </div>
               ))}
               <button
                 onClick={() => addArrayItem('biggest_challenges')}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  fontSize: '0.875rem',
+                  background: `rgba(124,91,246,0.1)`,
+                  color: T.purple,
+                  border: `1px solid rgba(124,91,246,0.2)`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
               >
-                <Plus className="h-4 w-4" />
+                <Plus style={{ width: 16, height: 16 }} />
                 Add Challenge
               </button>
             </div>
@@ -473,25 +581,34 @@ export default function CoreMemoriesEditor({ onSave, showHistory = false }: Core
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="
-            flex items-center gap-2 px-6 py-3
-            bg-purple-600 text-white rounded-md
-            hover:bg-purple-700 transition-colors
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 24px',
+            background: saving ? 'rgba(79,110,247,0.5)' : T.blue,
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.7 : 1,
+            fontWeight: 500,
+            fontSize: '0.875rem',
+            transition: 'opacity 0.15s',
+          }}
         >
           {saving ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />
               <span>Saving...</span>
             </>
           ) : (
             <>
-              <Save className="h-4 w-4" />
+              <Save style={{ width: 16, height: 16 }} />
               <span>Save Core Memories</span>
             </>
           )}
