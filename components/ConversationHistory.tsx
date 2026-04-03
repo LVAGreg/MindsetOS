@@ -1,9 +1,9 @@
 'use client';
 
-import { MessageSquare, Star, List, BarChart2, ArrowRight } from 'lucide-react';
+import { MessageSquare, Star, List, BarChart2, ArrowRight, Pin } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { format, formatDistanceToNow, isToday, isYesterday, isThisWeek } from 'date-fns';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ConversationMenu from './ConversationMenu';
 import RenameDialog from './RenameDialog';
 import ProjectSelector from './ProjectSelector';
@@ -205,10 +205,20 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
            date.getFullYear() === lastMonth.getFullYear();
   };
 
-  // Sort conversations by most recent
-  const sortedConversations = agentConversations.sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  // Sort conversations: pinned first (by pinned_at DESC), then unpinned by updatedAt DESC
+  const sortedConversations = useMemo(() => {
+    const pinned = agentConversations
+      .filter((c) => c.is_pinned === true)
+      .sort((a, b) => {
+        const aTime = a.pinned_at ? new Date(a.pinned_at).getTime() : 0;
+        const bTime = b.pinned_at ? new Date(b.pinned_at).getTime() : 0;
+        return bTime - aTime;
+      });
+    const unpinned = agentConversations
+      .filter((c) => c.is_pinned !== true)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return [...pinned, ...unpinned];
+  }, [agentConversations]);
 
   // For starred: show top 5, expandable to all
   // For recent: show top 5, expandable to 30, then "All Chats" dialog
@@ -266,6 +276,23 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
           borderLeftColor: accentColor,
         }}
       >
+        {/* Pin indicator — top-right corner */}
+        {conversation.is_pinned === true && (
+          <Pin
+            aria-label="Pinned"
+            style={{
+              position: 'absolute',
+              top: '4px',
+              right: '4px',
+              width: '12px',
+              height: '12px',
+              color: '#fcc824',
+              flexShrink: 0,
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+
         <div className="flex items-center justify-between gap-1">
           <div className="flex-1 min-w-0 flex items-center gap-1">
             {conversation.isStarred && (
@@ -365,12 +392,59 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
           )
         ) : (
           <div className="space-y-3">
-            {/* For starred or recent (not expanded): show simple list */}
+            {/* For starred or recent (not expanded): show simple list with Pinned/Recent sections */}
             {!shouldGroupByDate && (
               <>
-                <div className="space-y-1">
-                  {displayedConversations.map(renderConversation)}
-                </div>
+                {(() => {
+                  const pinnedInView = displayedConversations.filter((c) => c.is_pinned === true);
+                  const unpinnedInView = displayedConversations.filter((c) => c.is_pinned !== true);
+                  const hasPinned = pinnedInView.length > 0;
+                  return (
+                    <div className="space-y-2">
+                      {hasPinned && (
+                        <div>
+                          <div
+                            style={{
+                              paddingLeft: '8px',
+                              paddingBottom: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              color: '#9090a8',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            Pinned
+                          </div>
+                          <div className="space-y-1">
+                            {pinnedInView.map(renderConversation)}
+                          </div>
+                        </div>
+                      )}
+                      <div>
+                        {hasPinned && (
+                          <div
+                            style={{
+                              paddingLeft: '8px',
+                              paddingBottom: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              color: '#9090a8',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            Recent
+                          </div>
+                        )}
+                        <div className="space-y-1">
+                          {unpinnedInView.map(renderConversation)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
 
                 {/* Show More button */}
                 {isStarredView && !showAllStarred && sortedConversations.length > 5 && (

@@ -357,6 +357,8 @@ export interface Conversation {
   isArchived?: boolean;
   archivedAt?: Date | string | null;
   modelOverride?: string | null;
+  is_pinned?: boolean;
+  pinned_at?: string | null;
 }
 
 export interface Project {
