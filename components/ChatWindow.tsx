@@ -20,6 +20,11 @@ import ConversationStats from './ConversationStats';
 import { buildMessageChain, MessageNode } from '../types/conversation';
 import { AgentIcon } from '@/lib/agent-icons';
 import dynamic from 'next/dynamic';
+import MessageReactionsAndSave from './features/MessageReactionsAndSave';
+import ChatMemoryHeader from './features/ChatMemoryHeader';
+import ConversationSummaryBanner from './features/ConversationSummaryBanner';
+import { AgentSwitcherButton } from './features/AgentSwitcherButton';
+import InlineAnnotation from './features/InlineAnnotation';
 
 // Agent accent hex map (for inline styles / opacity variants)
 const AGENT_HEX: Record<string, string> = {
@@ -309,6 +314,13 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
   // Agent data from API
   const [agentDataFromAPI, setAgentDataFromAPI] = useState<any>(null);
+  const [allAgents, setAllAgents] = useState<any[]>([]);
+
+  // Conversation summary state (for ConversationSummaryBanner)
+  const [conversationSummary, setConversationSummary] = useState<string | null>(null);
+
+  // Memory panel visibility (for ChatMemoryHeader)
+  const [showMemoryPanel, setShowMemoryPanel] = useState(false);
 
   // Multi-select state for v4 agent - keyed by message ID to prevent cross-widget contamination
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
@@ -769,6 +781,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
         const data = await response.json();
         const agents = data.agents || [];
+        setAllAgents(agents);
         const agent = agents.find((a: any) => a.id === agentId);
 
         if (agent) {
@@ -2738,6 +2751,32 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
     setShowSuggestion(false);
   };
 
+  // InlineAnnotation handlers
+  const handleSaveMessageNote = async (messageId: string, note: string) => {
+    try {
+      await apiClient.put(`/api/messages/${messageId}/note`, { note });
+    } catch (err) {
+      console.error('Failed to save note:', err);
+    }
+  };
+
+  const handleDeleteMessageNote = async (messageId: string) => {
+    try {
+      await apiClient.delete(`/api/messages/${messageId}/note`);
+    } catch (err) {
+      console.error('Failed to delete note:', err);
+    }
+  };
+
+  // AgentSwitcherButton handler — switch agent and clear conversation
+  const handleSelectAgent = (slug: string) => {
+    const agentEntry = Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === slug);
+    if (agentEntry) {
+      useAppStore.getState().setCurrentAgent(agentEntry[0] as AgentId);
+      useAppStore.getState().setCurrentConversation(null);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full chat-area-bg">
       {/* Agent context bar — shown once conversation is active */}
@@ -2764,10 +2803,28 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
         </div>
       )}
 
+      {/* Chat Memory Header — shown when recent memories exist */}
+      {recentMemories?.length > 0 && (
+        <ChatMemoryHeader
+          recentMemories={recentMemories}
+          totalMemoryCount={recentMemories.length}
+          onViewAllMemories={() => setShowMemoryPanel(true)}
+        />
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6 space-y-4 sm:space-y-6 chat-content-layer">
         {/* Conversation Stats - Hidden from user view (admin only in /admin/analytics) */}
         {/* {currentConversationId && <ConversationStats conversationId={currentConversationId} />} */}
+
+        {/* Conversation Summary Banner — shown when conversation has 10+ messages */}
+        {messages.length >= 10 && (
+          <ConversationSummaryBanner
+            messages={messages}
+            summary={conversationSummary || undefined}
+            onDismiss={() => setConversationSummary(null)}
+          />
+        )}
 
         {/* Memory Context Suggestion */}
         {showSuggestion && contextSuggestion && (
@@ -3126,6 +3183,18 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                 </div>
               )}
 
+              {/* MessageReactionsAndSave — below each assistant message bubble */}
+              {message.role === 'assistant' && !isStreamingResponse && (
+                <MessageReactionsAndSave
+                  messageId={message.id}
+                  conversationId={currentConversationId || ''}
+                  agentId={agentId}
+                  agentName={agentDataFromAPI?.name || agentData?.name || agentId}
+                  content={message.content}
+                  existingReaction={(message as any).feedback_type || null}
+                />
+              )}
+
               {/* Quick Add (renders BELOW the message) - Uses structured options from backend */}
               {message.role === 'assistant' && (quickAddOptions?.length >= 2 || hasBackendWidget) && isLastAssistantMessage && widgetFormattingEnabled && (
                 <div className="mt-3">
@@ -3180,6 +3249,14 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   </div>
                 </div>
               )}
+
+              {/* InlineAnnotation — below each message (hover to reveal) */}
+              <InlineAnnotation
+                messageId={message.id}
+                initialNote={(message as any).user_note || undefined}
+                onSave={handleSaveMessageNote}
+                onDelete={handleDeleteMessageNote}
+              />
             </div>
           );
         })}
@@ -3332,6 +3409,17 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
               onTranscriptUpdate={handleTranscriptUpdate}
               disabled={isLoading || uploading}
             />
+
+            {/* Agent Switcher */}
+            {allAgents.length > 1 && (
+              <AgentSwitcherButton
+                currentAgentSlug={agentId}
+                currentAgentName={agentDataFromAPI?.name || agentData?.name || agentId}
+                agents={allAgents.map((a: any) => ({ slug: a.id, name: a.name, color: a.accent_color || '#4f6ef7' }))}
+                onSwitch={handleSelectAgent}
+                disabled={messages.length === 0}
+              />
+            )}
 
             <textarea
               ref={textareaRef}
