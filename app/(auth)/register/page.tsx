@@ -75,6 +75,7 @@ function RegisterForm() {
       }
     } catch {
       setInviteCodeValid(false);
+      setError('Unable to validate invite code. Please try again.');
     } finally {
       setInviteCodeChecking(false);
     }
@@ -231,7 +232,7 @@ function RegisterForm() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-[15%] h-[500px] w-[500px] rounded-full bg-[#fcc824]/[0.06] blur-[140px]" />
         <div className="absolute bottom-[-5%] right-[10%] h-[400px] w-[400px] rounded-full bg-amber-600/[0.05] blur-[120px]" />
-        <div className="absolute top-[40%] right-[30%] h-[300px] w-[300px] rounded-full bg-violet-600/[0.03] blur-[120px]" />
+        <div className="absolute top-[40%] right-[30%] h-[300px] w-[300px] rounded-full blur-[120px]" style={{ backgroundColor: 'rgba(124,91,246,0.03)' }} />
         {/* dot grid */}
         <div
           className="absolute inset-0 opacity-[0.025]"
@@ -369,6 +370,7 @@ function RegisterForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
@@ -420,6 +422,7 @@ function RegisterForm() {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
+                    aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
@@ -554,7 +557,7 @@ function RegisterForm() {
           >
             <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
               <h3 className="text-xl font-bold text-white">Terms & Conditions</h3>
-              <button onClick={() => setShowTermsModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
+              <button aria-label="Close Terms & Conditions" onClick={() => setShowTermsModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -617,7 +620,7 @@ function RegisterForm() {
           >
             <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
               <h3 className="text-xl font-bold text-white">Privacy Policy</h3>
-              <button onClick={() => setShowPrivacyModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
+              <button aria-label="Close Privacy Policy" onClick={() => setShowPrivacyModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>

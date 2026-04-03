@@ -24,26 +24,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://mindset-os-backend-p
 const STATUSES = ['new', 'in_progress', 'resolved', 'closed'];
 const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
 
-const STATUS_COLORS = {
-  new:         'bg-[#4f6ef7]/20 text-[#7b8ff8] border border-[#4f6ef7]/30',
-  in_progress: 'bg-[#fcc824]/20 text-[#fcc824] border border-[#fcc824]/30',
-  resolved:    'bg-[#4ade80]/20 text-[#4ade80] border border-[#4ade80]/30',
-  closed:      'bg-[#1e1e30] text-[#9090a8] border border-[#1e1e30]',
+const STATUS_STYLES: Record<string, React.CSSProperties> = {
+  new:         { background: 'rgba(79,110,247,0.18)', color: '#7b8ff8', border: '1px solid rgba(79,110,247,0.3)' },
+  in_progress: { background: 'rgba(252,200,36,0.18)', color: '#fcc824', border: '1px solid rgba(252,200,36,0.3)' },
+  resolved:    { background: 'rgba(74,222,128,0.18)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.3)' },
+  closed:      { background: '#1e1e30',               color: '#9090a8', border: '1px solid #1e1e30' },
 };
 
-const PRIORITY_COLORS = {
-  low:    'bg-[#4f6ef7]/20 text-[#8fa6ff] border border-[#4f6ef7]/30',
-  normal: 'bg-[#4f6ef7]/20 text-[#7b8ff8] border border-[#4f6ef7]/30',
-  high:   'bg-[#fcc824]/20 text-[#fcc824] border border-[#fcc824]/30',
-  urgent: 'bg-[#f87171]/20 text-[#fca5a5] border border-[#f87171]/30',
+const PRIORITY_STYLES: Record<string, React.CSSProperties> = {
+  low:    { background: 'rgba(79,110,247,0.18)', color: '#8fa6ff', border: '1px solid rgba(79,110,247,0.3)' },
+  normal: { background: 'rgba(79,110,247,0.18)', color: '#7b8ff8', border: '1px solid rgba(79,110,247,0.3)' },
+  high:   { background: 'rgba(252,200,36,0.18)', color: '#fcc824', border: '1px solid rgba(252,200,36,0.3)' },
+  urgent: { background: 'rgba(248,113,113,0.18)', color: '#fca5a5', border: '1px solid rgba(248,113,113,0.3)' },
 };
 
-const PRIORITY_LEFT_BORDER: Record<string, string> = {
-  high:   'borderLeft: 3px solid #f87171',
-  urgent: 'borderLeft: 3px solid #f87171',
-  normal: 'borderLeft: 3px solid #fcc824',
-  low:    'borderLeft: 3px solid #4f6ef7',
-};
 
 interface Feedback {
   id: string;
@@ -287,7 +281,7 @@ export default function AdminFeedbackPage() {
                 <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
                 <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
               </div>
-              <button onClick={() => setError(null)} style={{ color: '#f87171' }}>
+              <button onClick={() => setError(null)} style={{ color: '#f87171' }} aria-label="Dismiss error">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -300,7 +294,7 @@ export default function AdminFeedbackPage() {
                 <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#4ade80' }} />
                 <p className="text-sm" style={{ color: '#86efac' }}>{success}</p>
               </div>
-              <button onClick={() => setSuccess(null)} style={{ color: '#4ade80' }}>
+              <button onClick={() => setSuccess(null)} style={{ color: '#4ade80' }} aria-label="Dismiss success message">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -428,14 +422,10 @@ export default function AdminFeedbackPage() {
                     <button
                       key={status}
                       onClick={() => handleUpdateStatus(selectedFeedback.id, status)}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-opacity capitalize text-sm ${
-                        selectedFeedback.status === status
-                          ? STATUS_COLORS[status as keyof typeof STATUS_COLORS]
-                          : ''
-                      }`}
-                      style={selectedFeedback.status !== status
-                        ? { background: '#1e1e30', color: '#9090a8' }
-                        : undefined
+                      className="w-full text-left px-3 py-2 rounded-lg transition-opacity capitalize text-sm"
+                      style={selectedFeedback.status === status
+                        ? STATUS_STYLES[status]
+                        : { background: '#1e1e30', color: '#9090a8' }
                       }
                     >
                       {status.replace('_', ' ')}
@@ -452,14 +442,10 @@ export default function AdminFeedbackPage() {
                     <button
                       key={priority}
                       onClick={() => handleUpdatePriority(selectedFeedback.id, priority)}
-                      className={`w-full text-left px-3 py-2 rounded-lg transition-opacity capitalize text-sm ${
-                        selectedFeedback.priority === priority
-                          ? PRIORITY_COLORS[priority as keyof typeof PRIORITY_COLORS]
-                          : ''
-                      }`}
-                      style={selectedFeedback.priority !== priority
-                        ? { background: '#1e1e30', color: '#9090a8' }
-                        : undefined
+                      className="w-full text-left px-3 py-2 rounded-lg transition-opacity capitalize text-sm"
+                      style={selectedFeedback.priority === priority
+                        ? PRIORITY_STYLES[priority]
+                        : { background: '#1e1e30', color: '#9090a8' }
                       }
                     >
                       {priority}
@@ -494,7 +480,7 @@ export default function AdminFeedbackPage() {
               <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f87171' }} />
               <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
             </div>
-            <button onClick={() => setError(null)} style={{ color: '#f87171' }}>
+            <button onClick={() => setError(null)} style={{ color: '#f87171' }} aria-label="Dismiss error">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -507,7 +493,7 @@ export default function AdminFeedbackPage() {
               <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#4ade80' }} />
               <p className="text-sm" style={{ color: '#86efac' }}>{success}</p>
             </div>
-            <button onClick={() => setSuccess(null)} style={{ color: '#4ade80' }}>
+            <button onClick={() => setSuccess(null)} style={{ color: '#4ade80' }} aria-label="Dismiss success message">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -539,7 +525,7 @@ export default function AdminFeedbackPage() {
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    background: status === 'new' ? '#60a5fa' : status === 'in_progress' ? '#fbbf24' : status === 'resolved' ? '#4ade80' : '#6b7280',
+                    background: status === 'new' ? '#60a5fa' : status === 'in_progress' ? '#fcc824' : status === 'resolved' ? '#4ade80' : '#5a5a72',
                     boxShadow: statusFilter === status ? '0 0 0 4px rgba(79,110,247,0.3)' : undefined,
                   }}
                 />
@@ -549,7 +535,7 @@ export default function AdminFeedbackPage() {
         </div>
 
         {/* Date Range Filter */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 flex-wrap mb-4">
           <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Show:</span>
           {[
             { label: 'Last 7 days', value: 7 },
@@ -582,14 +568,16 @@ export default function AdminFeedbackPage() {
                   placeholder="Search by name, email, or message..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+                  className="w-full pl-10 pr-4 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+                  style={{ background: '#09090f', border: '1px solid #1e1e30', color: '#ededf5' }}
                 />
               </div>
             </div>
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+              className="rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+              style={{ background: '#09090f', border: '1px solid #1e1e30', color: '#ededf5' }}
             >
               <option value="">All Priorities</option>
               {PRIORITIES.map((p) => (
@@ -656,10 +644,16 @@ export default function AdminFeedbackPage() {
                       <h3 className="font-semibold" style={{ color: '#ededf5' }}>
                         {feedback.name}
                       </h3>
-                      <span className={`px-2 py-1 rounded text-xs ${STATUS_COLORS[feedback.status as keyof typeof STATUS_COLORS]}`}>
+                      <span
+                        className="px-2 py-1 rounded text-xs"
+                        style={STATUS_STYLES[feedback.status] ?? { background: '#1e1e30', color: '#9090a8' }}
+                      >
                         {feedback.status.replace('_', ' ')}
                       </span>
-                      <span className={`px-2 py-1 rounded text-xs capitalize ${PRIORITY_COLORS[feedback.priority as keyof typeof PRIORITY_COLORS]}`}>
+                      <span
+                        className="px-2 py-1 rounded text-xs capitalize"
+                        style={PRIORITY_STYLES[feedback.priority] ?? { background: '#1e1e30', color: '#9090a8' }}
+                      >
                         {feedback.priority}
                       </span>
                     </div>
@@ -698,7 +692,7 @@ export default function AdminFeedbackPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between px-4 py-3" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-4 py-3" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
                 <p className="text-sm" style={{ color: '#9090a8' }}>
                   Showing {((currentPage - 1) * PAGE_SIZE) + 1}–{Math.min(currentPage * PAGE_SIZE, totalFeedback)} of {totalFeedback} items
                 </p>
