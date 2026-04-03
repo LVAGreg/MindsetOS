@@ -332,6 +332,7 @@ function DashboardContent() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [conversationBrowserProjectId, setConversationBrowserProjectId] = useState<string | null>(null);
   const [displayAgents, setDisplayAgents] = useState<any[]>([]);
+  const [agentLoadError, setAgentLoadError] = useState<string | null>(null);
   const [agentBrowserTab, setAgentBrowserTab] = useState<'core' | 'custom'>('core');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [quickSwitchOpen, setQuickSwitchOpen] = useState(false);
@@ -508,6 +509,7 @@ function DashboardContent() {
   // Fetch agents from database for Browse All Agents dialog
   useEffect(() => {
     const fetchAgents = async () => {
+      setAgentLoadError(null);
       try {
         const token = localStorage.getItem('accessToken');
         const viewAsUserId = viewAsUser?.id || '';
@@ -518,6 +520,7 @@ function DashboardContent() {
 
         if (!response.ok) {
           console.error('Failed to fetch agents:', response.status);
+          setAgentLoadError('Failed to load agents. Please refresh.');
           return;
         }
 
@@ -552,6 +555,7 @@ function DashboardContent() {
         console.log('✅ Unlocked agents count:', transformedAgents.filter((a: any) => !a.locked).length);
       } catch (error) {
         console.error('Error fetching agents:', error);
+        setAgentLoadError('Could not load agents. Check your connection.');
       }
     };
 
@@ -913,7 +917,7 @@ function DashboardContent() {
 
       {/* Trial Days Remaining Banner */}
       {user?.membershipTier === 'trial' && user?.trialExpiresAt && new Date(user.trialExpiresAt) > new Date() && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#fcc824] via-amber-400 to-[#fcc824] text-black text-center py-1.5 text-[13px] font-semibold shadow-lg shadow-amber-500/10">
+        <div className="fixed top-0 left-0 right-0 z-50 text-center py-1.5 text-[13px] font-semibold" style={{ background: 'linear-gradient(to right, #fcc824, #fcc824cc, #fcc824)', color: '#000', boxShadow: '0 4px 12px rgba(252,200,36,0.1)' }}>
           <span className="opacity-80">Free trial:</span> {Math.max(0, Math.ceil((new Date(user.trialExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days left &mdash;{' '}
           <a href="/join" className="underline font-bold transition-colors" style={{ color: '#000' }} onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#7a5a00')} onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#000')}>Upgrade now</a>
         </div>
@@ -1125,6 +1129,12 @@ function DashboardContent() {
           {showAgentBrowser ? (
             <div className="h-full overflow-y-auto custom-scrollbar px-3 sm:px-6 py-4 sm:py-5" style={{ background: '#09090f' }}>
               <div className="max-w-3xl mx-auto">
+                {/* Agent load error banner */}
+                {agentLoadError && (
+                  <div className="mb-4 px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', color: '#f87171' }}>
+                    {agentLoadError}
+                  </div>
+                )}
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                   <div>
@@ -1232,7 +1242,7 @@ function DashboardContent() {
                             onMouseLeave={e => { if (agentBrowserTab !== 'core') (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
                           >
                             Core Agents
-                            {agentBrowserTab === 'core' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffc82c]" />}
+                            {agentBrowserTab === 'core' && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: '#fcc824' }} />}
                           </button>
                           <button
                             onClick={() => setAgentBrowserTab('custom')}
@@ -1243,7 +1253,7 @@ function DashboardContent() {
                           >
                             My Agents
                             {customAgents.length > 0 && <span className="ml-1 text-xs" style={{ color: '#9090a8' }}>({customAgents.length})</span>}
-                            {agentBrowserTab === 'custom' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffc82c]" />}
+                            {agentBrowserTab === 'custom' && <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: '#fcc824' }} />}
                           </button>
                         </div>
                       )}
