@@ -616,6 +616,11 @@ interface AppState {
   setUIPreference: <K extends keyof UIPreferences>(key: K, value: UIPreferences[K]) => void;
 }
 
+/** SSR-safe token accessor — returns null on the server where localStorage is unavailable. */
+function getToken(): string | null {
+  return typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -798,7 +803,7 @@ export const useAppStore = create<AppState>()(
       },
 
       updateConversation: async (id, updates) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         const user = get().user;
 
         console.log('[updateConversation] Token exists:', !!token, 'User exists:', !!user);
@@ -863,7 +868,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteConversation: async (id) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/conversations/${id}`, {
@@ -886,7 +891,7 @@ export const useAppStore = create<AppState>()(
 
       // Fork/Branch management functions
       editMessage: async (messageId, newContent) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         try {
@@ -917,7 +922,7 @@ export const useAppStore = create<AppState>()(
       },
 
       regenerateMessage: async (messageId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         try {
@@ -943,7 +948,7 @@ export const useAppStore = create<AppState>()(
       },
 
       switchBranch: async (conversationId, messageId, branchIndex) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         try {
@@ -970,7 +975,7 @@ export const useAppStore = create<AppState>()(
       },
 
       getSiblings: async (messageId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         try {
@@ -997,7 +1002,7 @@ export const useAppStore = create<AppState>()(
       projects: {},
 
       fetchProjects: async () => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) {
           // Silently return if not authenticated - user might not be logged in yet
           return;
@@ -1031,7 +1036,7 @@ export const useAppStore = create<AppState>()(
       },
 
       createProject: async (name, description, color) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) {
           throw new Error('Not authenticated');
         }
@@ -1067,7 +1072,7 @@ export const useAppStore = create<AppState>()(
       },
 
       updateProject: async (projectId, updates) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/projects/${projectId}`, {
@@ -1094,7 +1099,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteProject: async (projectId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/projects/${projectId}`, {
@@ -1117,7 +1122,7 @@ export const useAppStore = create<AppState>()(
       activeClientProfileId: null,
 
       fetchClientProfiles: async () => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) return;
         try {
           // If admin is viewing as another user, fetch that user's client profiles
@@ -1135,7 +1140,7 @@ export const useAppStore = create<AppState>()(
       },
 
       createClientProfile: async (profileData) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/client-profiles`, {
@@ -1155,7 +1160,7 @@ export const useAppStore = create<AppState>()(
       },
 
       updateClientProfile: async (profileId, updates) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/client-profiles/${profileId}`, {
@@ -1175,7 +1180,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteClientProfile: async (profileId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/client-profiles/${profileId}`, {
@@ -1199,7 +1204,7 @@ export const useAppStore = create<AppState>()(
       customAgents: [],
 
       fetchCustomAgents: async () => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) return;
 
         try {
@@ -1216,7 +1221,7 @@ export const useAppStore = create<AppState>()(
       },
 
       createCustomAgent: async (agentData) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/custom-agents`, {
@@ -1234,6 +1239,7 @@ export const useAppStore = create<AppState>()(
         }
 
         const data = await response.json();
+        if (!data?.customAgent) throw new Error('Invalid response from server');
         const customAgent = data.customAgent;
 
         set((state) => ({
@@ -1244,7 +1250,7 @@ export const useAppStore = create<AppState>()(
       },
 
       updateCustomAgent: async (agentId, updates) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/custom-agents/${encodeURIComponent(agentId)}`, {
@@ -1259,6 +1265,7 @@ export const useAppStore = create<AppState>()(
         if (!response.ok) throw new Error('Failed to update custom agent');
 
         const data = await response.json();
+        if (!data?.customAgent) throw new Error('Invalid response from server');
         const updatedAgent = data.customAgent;
 
         set((state) => ({
@@ -1269,7 +1276,7 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteCustomAgent: async (agentId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = getToken();
         if (!token) throw new Error('Not authenticated');
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/custom-agents/${encodeURIComponent(agentId)}`, {
