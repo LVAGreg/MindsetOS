@@ -41,6 +41,23 @@ interface AgentOption {
   description: string;
 }
 
+function InlineError({ message, onDismiss }: { message: string; onDismiss?: () => void }) {
+  return (
+    <div
+      className="flex items-center gap-2 text-sm rounded-lg p-3"
+      style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
+    >
+      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+      <span className="flex-1">{message}</span>
+      {onDismiss && (
+        <button onClick={onDismiss} style={{ color: '#f87171' }}>
+          <X className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function TeamPage() {
   const router = useRouter();
   const { user } = useAppStore();
@@ -49,13 +66,20 @@ export default function TeamPage() {
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [agents, setAgents] = useState<AgentOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteAgents, setInviteAgents] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Per-invite revoke errors keyed by invite id
+  const [revokeErrors, setRevokeErrors] = useState<Record<string, string>>({});
+  // Per-member remove errors keyed by userId
+  const [removeErrors, setRemoveErrors] = useState<Record<string, string>>({});
+  // Per-member agent-toggle errors keyed by userId
+  const [toggleErrors, setToggleErrors] = useState<Record<string, string>>({});
 
   const isAgencyOrAdmin = user?.role === 'agency' || user?.role === 'admin';
 
@@ -70,12 +94,13 @@ export default function TeamPage() {
 
   const fetchTeam = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const data = await apiClient.get('/api/agency/team') as any;
       setManagedUsers(data.managedUsers || []);
       setPendingInvites(data.pendingInvites || []);
-    } catch (err) {
-      console.error('Failed to fetch team:', err);
+    } catch (err: any) {
+      setFetchError(err?.message || 'Failed to load team. Please refresh and try again.');
     } finally {
       setLoading(false);
     }
@@ -85,15 +110,16 @@ export default function TeamPage() {
     try {
       const data = await apiClient.get('/api/agents') as any;
       setAgents((data.agents || []).map((a: any) => ({ id: a.id, name: a.name, description: a.description })));
-    } catch (err) {
-      console.error('Failed to fetch agents:', err);
+    } catch (err: any) {
+      // Agent list is non-critical UI — surface a non-blocking notice rather than crashing the page
+      console.warn('Agent list unavailable:', err?.message);
     }
   };
 
   const handleInvite = async () => {
     if (!inviteEmail.includes('@')) return;
     setSending(true);
-    setError(null);
+    setInviteError(null);
     try {
       const invite = await apiClient.post('/api/agency/invite', {
         email: inviteEmail,
@@ -104,32 +130,37 @@ export default function TeamPage() {
       setInviteAgents([]);
       setShowInvite(false);
     } catch (err: any) {
-      setError(err?.message || 'Failed to send invite');
+      setInviteError(err?.message || 'Failed to send invite. Please try again.');
     } finally {
       setSending(false);
     }
   };
 
   const handleRevokeInvite = async (inviteId: string) => {
-    setError(null);
+    setRevokeErrors(prev => { const next = { ...prev }; delete next[inviteId]; return next; });
     try {
       await apiClient.delete(`/api/agency/invite/${inviteId}`);
       setPendingInvites(prev => prev.filter(i => i.id !== inviteId));
     } catch (err: any) {
-      console.error('Failed to revoke invite:', err);
-      setError(err?.message || 'Failed to revoke invite. Please try again.');
+      setRevokeErrors(prev => ({
+        ...prev,
+        [inviteId]: err?.message || 'Failed to revoke invite. Please try again.',
+      }));
     }
   };
 
   const handleRemoveUser = async (userId: string) => {
     if (!confirm('Remove this user from your team? They will keep their account but lose managed access.')) return;
-    setError(null);
+    setRemoveErrors(prev => { const next = { ...prev }; delete next[userId]; return next; });
+    setToggleErrors(prev => { const next = { ...prev }; delete next[userId]; return next; });
     try {
       await apiClient.delete(`/api/agency/team/${userId}`);
       setManagedUsers(prev => prev.filter(u => u.userId !== userId));
     } catch (err: any) {
-      console.error('Failed to remove user:', err);
-      setError(err?.message || 'Failed to remove user. Please try again.');
+      setRemoveErrors(prev => ({
+        ...prev,
+        [userId]: err?.message || 'Failed to remove user. Please try again.',
+      }));
     }
   };
 
@@ -140,14 +171,17 @@ export default function TeamPage() {
 
     // Optimistic update
     setManagedUsers(prev => prev.map(u => u.userId === userId ? { ...u, allowedAgents: newAgents } : u));
+    setToggleErrors(prev => { const next = { ...prev }; delete next[userId]; return next; });
 
     try {
       await apiClient.patch(`/api/agency/team/${userId}`, { allowedAgents: newAgents });
     } catch (err: any) {
       // Revert optimistic update
       setManagedUsers(prev => prev.map(u => u.userId === userId ? { ...u, allowedAgents: currentAgents } : u));
-      console.error('Failed to update user agents:', err);
-      setError(err?.message || 'Failed to update agent access. Please try again.');
+      setToggleErrors(prev => ({
+        ...prev,
+        [userId]: err?.message || 'Failed to update agent access. Please try again.',
+      }));
     }
   };
 
@@ -199,22 +233,18 @@ export default function TeamPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Global error banner (for revoke/remove failures outside the invite form) */}
-        {error && !showInvite && (
-          <div className="flex items-center gap-2 text-sm rounded-xl p-3" style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1">{error}</span>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300">✕</button>
-          </div>
+        {/* Fetch / load error */}
+        {fetchError && (
+          <InlineError message={fetchError} onDismiss={() => setFetchError(null)} />
         )}
+
         {/* Invite form */}
         {showInvite && (
           <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <h2 className="text-base font-bold mb-4" style={{ color: '#ededf5' }}>Invite a Team Member</h2>
-            {error && (
-              <div className="flex items-center gap-2 text-sm rounded-lg p-3 mb-4" style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                {error}
+            {inviteError && (
+              <div className="mb-4">
+                <InlineError message={inviteError} onDismiss={() => setInviteError(null)} />
               </div>
             )}
             <div className="space-y-4">
@@ -258,7 +288,7 @@ export default function TeamPage() {
                   {sending ? 'Sending...' : 'Send Invite'}
                 </button>
                 <button
-                  onClick={() => { setShowInvite(false); setError(null); setInviteEmail(''); setInviteAgents([]); }}
+                  onClick={() => { setShowInvite(false); setInviteError(null); setInviteEmail(''); setInviteAgents([]); }}
                   className="px-4 py-2 text-sm rounded-xl transition-colors"
                   style={{ color: '#9090a8' }}
                 >
@@ -273,42 +303,51 @@ export default function TeamPage() {
         {pendingInvites.length > 0 && (
           <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <h2 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
-              <Clock className="w-5 h-5" style={{ color: '#f59e0b' }} />
+              <Clock className="w-5 h-5" style={{ color: '#fcc824' }} />
               Pending Invites ({pendingInvites.length})
             </h2>
             <div className="space-y-2">
               {pendingInvites.map(invite => (
-                <div
-                  key={invite.id}
-                  className="flex items-center gap-4 p-3 rounded-lg"
-                  style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}
-                >
-                  <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#f59e0b' }} />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium" style={{ color: '#ededf5' }}>{invite.email}</div>
-                    <div className="text-xs" style={{ color: '#9090a8' }}>
-                      Expires {new Date(invite.expiresAt).toLocaleDateString()}
+                <div key={invite.id} className="space-y-1">
+                  <div
+                    className="flex items-center gap-4 p-3 rounded-lg"
+                    style={{ background: 'rgba(252,200,36,0.06)', border: '1px solid rgba(252,200,36,0.15)' }}
+                  >
+                    <Mail className="w-4 h-4 flex-shrink-0" style={{ color: '#fcc824' }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium" style={{ color: '#ededf5' }}>{invite.email}</div>
+                      <div className="text-xs" style={{ color: '#9090a8' }}>
+                        Expires {new Date(invite.expiresAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCopyCode(invite.inviteCode)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #1e1e30', color: '#9090a8' }}
+                        title="Copy invite code"
+                      >
+                        {copiedCode === invite.inviteCode
+                          ? <Check className="w-3 h-3" style={{ color: '#4ade80' }} />
+                          : <Copy className="w-3 h-3" />}
+                        <span className="font-mono">{invite.inviteCode}</span>
+                      </button>
+                      <button
+                        onClick={() => handleRevokeInvite(invite.id)}
+                        className="p-1 rounded transition-colors"
+                        style={{ color: '#f87171' }}
+                        title="Revoke invite"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleCopyCode(invite.inviteCode)}
-                      className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-colors"
-                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid #1e1e30', color: '#9090a8' }}
-                      title="Copy invite code"
-                    >
-                      {copiedCode === invite.inviteCode ? <Check className="w-3 h-3" style={{ color: '#4ade80' }} /> : <Copy className="w-3 h-3" />}
-                      <span className="font-mono">{invite.inviteCode}</span>
-                    </button>
-                    <button
-                      onClick={() => handleRevokeInvite(invite.id)}
-                      className="p-1 rounded transition-colors"
-                      style={{ color: '#f87171' }}
-                      title="Revoke invite"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {revokeErrors[invite.id] && (
+                    <InlineError
+                      message={revokeErrors[invite.id]}
+                      onDismiss={() => setRevokeErrors(prev => { const next = { ...prev }; delete next[invite.id]; return next; })}
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -333,74 +372,92 @@ export default function TeamPage() {
           ) : (
             <div className="space-y-2">
               {managedUsers.map(mu => (
-                <div key={mu.id} style={{ border: '1px solid #1e1e30', borderRadius: 12, overflow: 'hidden' }}>
-                  {/* User row */}
-                  <div className="flex items-center gap-4 p-3 transition-colors" style={{ cursor: 'default' }}>
-                    <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                      style={{ background: 'rgba(79,110,247,0.2)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8' }}
-                    >
-                      {(mu.firstName?.[0] || mu.email[0]).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
-                        {mu.firstName || mu.lastName ? `${mu.firstName || ''} ${mu.lastName || ''}`.trim() : mu.email}
+                <div key={mu.id} className="space-y-1">
+                  <div style={{ border: '1px solid #1e1e30', borderRadius: 12, overflow: 'hidden' }}>
+                    {/* User row */}
+                    <div className="flex items-center gap-4 p-3 transition-colors" style={{ cursor: 'default' }}>
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                        style={{ background: 'rgba(79,110,247,0.2)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8' }}
+                      >
+                        {(mu.firstName?.[0] || mu.email[0]).toUpperCase()}
                       </div>
-                      <div className="text-xs" style={{ color: '#9090a8' }}>{mu.email}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
+                          {mu.firstName || mu.lastName ? `${mu.firstName || ''} ${mu.lastName || ''}`.trim() : mu.email}
+                        </div>
+                        <div className="text-xs" style={{ color: '#9090a8' }}>{mu.email}</div>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs" style={{ color: '#9090a8' }}>
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{mu.conversationCount}</span>
+                      </div>
+                      <span
+                        className="text-[10px] font-bold"
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11 }}
+                      >
+                        {mu.role}
+                      </span>
+                      <button
+                        onClick={() => setExpandedUser(expandedUser === mu.userId ? null : mu.userId)}
+                        className="p-1 rounded transition-colors"
+                        style={{ color: '#9090a8' }}
+                      >
+                        {expandedUser === mu.userId ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleRemoveUser(mu.userId)}
+                        className="p-1 rounded transition-colors"
+                        style={{ color: '#f87171' }}
+                        title="Remove from team"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: '#9090a8' }}>
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>{mu.conversationCount}</span>
-                    </div>
-                    <span
-                      className="text-[10px] font-bold"
-                      style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11 }}
-                    >
-                      {mu.role}
-                    </span>
-                    <button
-                      onClick={() => setExpandedUser(expandedUser === mu.userId ? null : mu.userId)}
-                      className="p-1 rounded transition-colors"
-                      style={{ color: '#9090a8' }}
-                    >
-                      {expandedUser === mu.userId ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleRemoveUser(mu.userId)}
-                      className="p-1 rounded transition-colors"
-                      style={{ color: '#f87171' }}
-                      title="Remove from team"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                    {/* Expanded agent toggles */}
+                    {expandedUser === mu.userId && (
+                      <div className="px-4 py-3" style={{ background: 'rgba(9,9,15,0.6)', borderTop: '1px solid #1e1e30' }}>
+                        <p className="text-xs font-medium mb-2" style={{ color: '#9090a8' }}>
+                          Agent Access {mu.allowedAgents.length === 0 ? '(all agents)' : `(${mu.allowedAgents.length} selected)`}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {agents.slice(0, 14).map(agent => {
+                            const allowed = mu.allowedAgents.length === 0 || mu.allowedAgents.includes(agent.id);
+                            return (
+                              <button
+                                key={agent.id}
+                                onClick={() => handleToggleUserAgent(mu.userId, agent.id, mu.allowedAgents)}
+                                className="px-2.5 py-1 text-xs rounded-full transition-colors"
+                                style={
+                                  allowed
+                                    ? { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }
+                                    : { background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30', color: '#5a5a72' }
+                                }
+                              >
+                                {agent.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {toggleErrors[mu.userId] && (
+                          <div className="mt-2">
+                            <InlineError
+                              message={toggleErrors[mu.userId]}
+                              onDismiss={() => setToggleErrors(prev => { const next = { ...prev }; delete next[mu.userId]; return next; })}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Expanded agent toggles */}
-                  {expandedUser === mu.userId && (
-                    <div className="px-4 py-3" style={{ background: 'rgba(9,9,15,0.6)', borderTop: '1px solid #1e1e30' }}>
-                      <p className="text-xs font-medium mb-2" style={{ color: '#9090a8' }}>
-                        Agent Access {mu.allowedAgents.length === 0 ? '(all agents)' : `(${mu.allowedAgents.length} selected)`}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {agents.slice(0, 14).map(agent => {
-                          const allowed = mu.allowedAgents.length === 0 || mu.allowedAgents.includes(agent.id);
-                          return (
-                            <button
-                              key={agent.id}
-                              onClick={() => handleToggleUserAgent(mu.userId, agent.id, mu.allowedAgents)}
-                              className="px-2.5 py-1 text-xs rounded-full transition-colors"
-                              style={
-                                allowed
-                                  ? { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }
-                                  : { background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30', color: '#5a5a72' }
-                              }
-                            >
-                              {agent.name}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                  {/* Per-member remove error shown below the row */}
+                  {removeErrors[mu.userId] && (
+                    <InlineError
+                      message={removeErrors[mu.userId]}
+                      onDismiss={() => setRemoveErrors(prev => { const next = { ...prev }; delete next[mu.userId]; return next; })}
+                    />
                   )}
                 </div>
               ))}
