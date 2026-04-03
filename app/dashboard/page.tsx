@@ -152,8 +152,8 @@ function AgentBrowserRow({ agent, accentColor, isActive, isCustom, onSelect, use
           onClick={(e) => e.stopPropagation()}
           className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
           style={{ background: 'transparent' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.8)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.8)')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
           title="Manage agent & knowledge base"
         >
           <Settings2 className="w-3.5 h-3.5" style={{ color: '#9090a8' }} />
@@ -904,7 +904,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="h-screen flex relative dark:dashboard-bg" style={{ background: '#09090f' }}>
+    <div className="h-screen flex relative" style={{ background: '#09090f' }}>
       {/* Trial Expired Popup */}
       <TrialExpiredPopup
         membershipTier={user?.membershipTier}
@@ -1109,7 +1109,7 @@ function DashboardContent() {
           >
             <MessageCircle className="w-5 h-5" />
             {unreadFeedbackCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full px-1">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold rounded-full px-1" style={{ color: '#ededf5', background: '#dc2626' }}>
                 {unreadFeedbackCount > 99 ? '99+' : unreadFeedbackCount}
               </span>
             )}
@@ -1207,11 +1207,14 @@ function DashboardContent() {
                           >
                             {tab.label}
                             {tabCounts[tab.key] > 0 && (
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                                categoryFilter === tab.key
-                                  ? 'bg-[#fcc824]/20 text-[#fcc824]'
-                                  : 'bg-white/[0.06] text-[#9090a8]'
-                              }`}>
+                              <span
+                                className="text-[10px] px-1.5 py-0.5 rounded-full"
+                                style={
+                                  categoryFilter === tab.key
+                                    ? { background: 'rgba(252,200,36,0.2)', color: '#fcc824' }
+                                    : { background: 'rgba(30,30,48,0.6)', color: '#9090a8' }
+                                }
+                              >
                                 {tabCounts[tab.key]}
                               </span>
                             )}
@@ -1291,8 +1294,8 @@ function DashboardContent() {
                                     handleSelectAgent('agent-creator');
                                     setShowAgentBrowser(false);
                                   }}
-                                  className="px-4 py-2 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2"
-                                  style={{ background: '#7c5bf6' }}
+                                  className="px-4 py-2 text-sm rounded-lg transition-colors font-medium flex items-center gap-2"
+                                  style={{ background: '#7c5bf6', color: '#ededf5' }}
                                   onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#6a4de0')}
                                   onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#7c5bf6')}
                                 >
@@ -1723,7 +1726,10 @@ function DashboardContent() {
                           <button
                             type="button"
                             onClick={() => setFeedbackForm({ ...feedbackForm, attachment: null })}
-                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="p-2 rounded-lg transition-colors"
+                            style={{ color: '#f87171' }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(220,38,38,0.12)'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -1761,7 +1767,7 @@ function DashboardContent() {
                     >
                       View your feedback history
                       {unreadFeedbackCount > 0 && (
-                        <span className="ml-2 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold text-white bg-red-500 rounded-full px-1">
+                        <span className="ml-2 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold rounded-full px-1" style={{ color: '#ededf5', background: '#dc2626' }}>
                           {unreadFeedbackCount}
                         </span>
                       )}
