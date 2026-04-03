@@ -170,12 +170,12 @@ function RegisterForm() {
 
   /* ── shared input classes ──────────────────────────────── */
   const inputCls =
-    'w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none transition-all duration-300 focus:border-[#fcc824]/60 focus:ring-2 focus:ring-[#fcc824]/20 focus:bg-white/[0.07] hover:border-white/20';
+    'w-full px-4 py-3 bg-[#12121f] border border-[#1e1e30] rounded-xl text-[#ededf5] placeholder-[#9090a8] outline-none transition-all duration-300 focus:border-[#4f6ef7] focus:ring-2 focus:ring-[#4f6ef7]/20 hover:border-[#2e2e45]';
 
   /* ── success state ─────────────────────────────────────── */
   if (registrationComplete) {
     return (
-      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#060611] px-4">
+      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#09090f] px-4">
         {/* BG atmosphere */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute top-[-10%] left-[15%] h-[500px] w-[500px] rounded-full bg-[#fcc824]/[0.06] blur-[140px]" />
@@ -189,7 +189,7 @@ function RegisterForm() {
 
         {/* Card */}
         <div className="relative z-10 w-full max-w-md animate-[fadeSlideUp_0.6s_0.15s_ease-out_both]">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl shadow-[0_8px_60px_-12px_rgba(252,200,36,0.15)] text-center">
+          <div className="rounded-2xl border border-[#1e1e30] p-8 backdrop-blur-xl shadow-[0_8px_60px_-12px_rgba(79,110,247,0.2)] text-center" style={{ background: 'rgba(18,18,31,0.9)' }}>
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#fcc824]/10">
               <CheckCircle className="h-9 w-9 text-[#fcc824]" />
             </div>
@@ -226,7 +226,7 @@ function RegisterForm() {
 
   /* ── main form ─────────────────────────────────────────── */
   return (
-    <div className="relative min-h-screen flex flex-col items-center overflow-hidden bg-[#060611] px-4 py-8">
+    <div className="relative min-h-screen flex flex-col items-center overflow-hidden bg-[#09090f] px-4 py-8">
       {/* ── BG atmosphere ────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-[15%] h-[500px] w-[500px] rounded-full bg-[#fcc824]/[0.06] blur-[140px]" />
@@ -255,8 +255,8 @@ function RegisterForm() {
       {/* ── Card ─────────────────────────────────────────── */}
       <div className="relative z-10 w-full max-w-md animate-[fadeSlideUp_0.6s_0.1s_ease-out_both]">
         {/* gradient border wrapper */}
-        <div className="rounded-2xl p-[1px] bg-gradient-to-b from-[#fcc824]/30 via-white/[0.06] to-transparent">
-          <div className="rounded-2xl bg-[#0c0c1d]/90 backdrop-blur-xl p-7 sm:p-8 shadow-[0_8px_60px_-12px_rgba(252,200,36,0.12)]">
+        <div className="rounded-2xl p-[1px]" style={{ background: 'linear-gradient(160deg, rgba(79,110,247,0.45) 0%, rgba(30,30,48,0.9) 55%, rgba(252,200,36,0.12) 100%)' }}>
+          <div className="rounded-2xl backdrop-blur-xl p-7 sm:p-8 shadow-[0_8px_60px_-12px_rgba(79,110,247,0.15)]" style={{ background: 'rgba(18,18,31,0.9)' }}>
             <h2 className="text-2xl font-bold tracking-tight text-white mb-6">
               Create Account
             </h2>
@@ -487,7 +487,7 @@ function RegisterForm() {
                 <div className="w-full border-t border-white/[0.06]" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-[#0c0c1d] px-3 text-xs text-gray-600">
+                <span className="px-3 text-xs text-[#9090a8]" style={{ background: 'rgba(18,18,31,1)' }}>
                   Or continue with
                 </span>
               </div>
@@ -521,7 +521,7 @@ function RegisterForm() {
             {/* Sign in link */}
             <p className="mt-6 text-center text-sm text-gray-500">
               Already have an account?{' '}
-              <Link href="/login" className="font-semibold text-[#fcc824]/80 hover:text-[#fcc824] transition-colors">
+              <Link href="/login" className="font-semibold text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors">
                 Sign in
               </Link>
             </p>

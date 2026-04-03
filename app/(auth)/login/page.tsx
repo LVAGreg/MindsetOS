@@ -124,7 +124,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#050510]">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#09090f]">
 
       {/* --- Atmospheric background layers --- */}
 
@@ -183,10 +183,10 @@ export default function LoginPage() {
 
           {/* --- Glass card with gradient border --- */}
           <div className="login-float-3 relative rounded-2xl p-[1px]"
-               style={{ background: 'linear-gradient(135deg, rgba(252,200,36,0.5) 0%, rgba(252,200,36,0.08) 40%, rgba(6,182,212,0.15) 100%)' }}>
+               style={{ background: 'linear-gradient(135deg, rgba(79,110,247,0.4) 0%, rgba(30,30,48,0.9) 60%, rgba(252,200,36,0.15) 100%)' }}>
 
             {/* Inner card */}
-            <div className="relative rounded-2xl bg-[#0d0d24]/90 backdrop-blur-xl p-7 sm:p-8 overflow-hidden">
+            <div className="relative rounded-2xl backdrop-blur-xl p-7 sm:p-8 overflow-hidden" style={{ background: 'rgba(18,18,31,0.9)' }}>
 
               {/* Subtle inner glow at top of card */}
               <div
@@ -221,7 +221,7 @@ export default function LoginPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="login-input w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-gray-500 text-sm transition-all duration-300 focus:outline-none focus:border-[#fcc824]/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(252,200,36,0.1),0_0_20px_rgba(252,200,36,0.05)]"
+                    className="login-input w-full px-4 py-3 bg-[#12121f] border border-[#1e1e30] rounded-xl text-[#ededf5] placeholder-[#9090a8] text-sm transition-all duration-300 focus:outline-none focus:border-[#4f6ef7] focus:shadow-[0_0_0_3px_rgba(79,110,247,0.15)]"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -242,7 +242,7 @@ export default function LoginPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="login-input w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-gray-500 text-sm transition-all duration-300 focus:outline-none focus:border-[#fcc824]/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(252,200,36,0.1),0_0_20px_rgba(252,200,36,0.05)]"
+                    className="login-input w-full px-4 py-3 bg-[#12121f] border border-[#1e1e30] rounded-xl text-[#ededf5] placeholder-[#9090a8] text-sm transition-all duration-300 focus:outline-none focus:border-[#4f6ef7] focus:shadow-[0_0_0_3px_rgba(79,110,247,0.15)]"
                     placeholder="••••••••"
                   />
                 </div>
@@ -266,7 +266,7 @@ export default function LoginPage() {
 
                   <Link
                     href="/forgot-password"
-                    className="text-sm font-medium text-[#fcc824] hover:text-[#fdd84e] transition-colors duration-200"
+                    className="text-sm font-medium text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors duration-200"
                   >
                     Forgot password?
                   </Link>
@@ -296,7 +296,7 @@ export default function LoginPage() {
                   <div className="w-full border-t border-white/[0.06]"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-[#0d0d24] text-gray-500 text-xs uppercase tracking-wider">
+                  <span className="px-3 text-[#9090a8] text-xs uppercase tracking-wider" style={{ background: 'rgba(18,18,31,1)' }}>
                     Or continue with
                   </span>
                 </div>
@@ -345,7 +345,7 @@ export default function LoginPage() {
                   Don&apos;t have an account?{' '}
                   <Link
                     href="/register/trial"
-                    className="font-semibold text-[#fcc824] hover:text-[#fdd84e] transition-colors duration-200"
+                    className="font-semibold text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors duration-200"
                   >
                     Sign up free
                   </Link>

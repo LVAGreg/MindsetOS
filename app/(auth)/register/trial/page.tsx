@@ -94,12 +94,12 @@ export default function TrialRegisterPage() {
 
   /* ── shared input classes ──────────────────────────────── */
   const inputCls =
-    'w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 outline-none transition-all duration-300 focus:border-[#fcc824]/60 focus:ring-2 focus:ring-[#fcc824]/20 focus:bg-white/[0.07] hover:border-white/20';
+    'w-full px-4 py-3 bg-[#12121f] border border-[#1e1e30] rounded-xl text-[#ededf5] placeholder-[#9090a8] outline-none transition-all duration-300 focus:border-[#4f6ef7] focus:ring-2 focus:ring-[#4f6ef7]/20 hover:border-[#2e2e45]';
 
   /* ── success state ─────────────────────────────────────── */
   if (registrationComplete) {
     return (
-      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#060611] px-4">
+      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#09090f] px-4">
         {/* BG atmosphere */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute top-[-10%] left-[20%] h-[500px] w-[500px] rounded-full bg-[#fcc824]/[0.08] blur-[140px]" />
@@ -114,8 +114,8 @@ export default function TrialRegisterPage() {
 
         {/* Success Card */}
         <div className="relative z-10 w-full max-w-md animate-[fadeSlideUp_0.6s_0.15s_ease-out_both]">
-          <div className="rounded-2xl p-[1px] bg-gradient-to-b from-emerald-400/30 via-[#fcc824]/20 to-transparent">
-            <div className="rounded-2xl bg-[#0c0c1d]/90 backdrop-blur-xl p-8 shadow-[0_8px_60px_-12px_rgba(252,200,36,0.18)] text-center">
+          <div className="rounded-2xl p-[1px]" style={{ background: 'linear-gradient(160deg, rgba(79,110,247,0.45) 0%, rgba(30,30,48,0.9) 55%, rgba(252,200,36,0.15) 100%)' }}>
+            <div className="rounded-2xl backdrop-blur-xl p-8 shadow-[0_8px_60px_-12px_rgba(79,110,247,0.2)] text-center" style={{ background: 'rgba(18,18,31,0.9)' }}>
               {/* Celebration icon */}
               <div className="relative mx-auto mb-5 flex h-20 w-20 items-center justify-center">
                 <div className="absolute inset-0 rounded-full bg-[#fcc824]/10 animate-ping" style={{ animationDuration: '2s' }} />
@@ -198,7 +198,7 @@ export default function TrialRegisterPage() {
 
   /* ── main form ─────────────────────────────────────────── */
   return (
-    <div className="relative min-h-screen flex flex-col items-center overflow-hidden bg-[#060611] px-4 py-8">
+    <div className="relative min-h-screen flex flex-col items-center overflow-hidden bg-[#09090f] px-4 py-8">
       {/* ── BG atmosphere ────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-[10%] h-[500px] w-[500px] rounded-full bg-[#fcc824]/[0.07] blur-[140px]" />
@@ -237,7 +237,7 @@ export default function TrialRegisterPage() {
 
       {/* ── "What's included" feature strip ───────────────── */}
       <div className="relative z-10 w-full max-w-md mb-5 animate-[fadeSlideUp_0.5s_0.12s_ease-out_both]">
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] backdrop-blur-sm p-4">
+        <div className="rounded-xl border border-[#1e1e30] backdrop-blur-sm p-4" style={{ background: 'rgba(18,18,31,0.7)' }}>
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
             What&apos;s included in your trial
           </h3>
@@ -262,8 +262,8 @@ export default function TrialRegisterPage() {
       {/* ── Card ─────────────────────────────────────────── */}
       <div className="relative z-10 w-full max-w-md animate-[fadeSlideUp_0.6s_0.16s_ease-out_both]">
         {/* gradient border wrapper */}
-        <div className="rounded-2xl p-[1px] bg-gradient-to-b from-[#fcc824]/30 via-white/[0.06] to-transparent">
-          <div className="rounded-2xl bg-[#0c0c1d]/90 backdrop-blur-xl p-7 sm:p-8 shadow-[0_8px_60px_-12px_rgba(252,200,36,0.12)]">
+        <div className="rounded-2xl p-[1px]" style={{ background: 'linear-gradient(160deg, rgba(79,110,247,0.45) 0%, rgba(30,30,48,0.9) 55%, rgba(252,200,36,0.12) 100%)' }}>
+          <div className="rounded-2xl backdrop-blur-xl p-7 sm:p-8 shadow-[0_8px_60px_-12px_rgba(79,110,247,0.15)]" style={{ background: 'rgba(18,18,31,0.9)' }}>
             <h2 className="text-2xl font-bold tracking-tight text-white mb-1">
               Start Your Free Trial
             </h2>
@@ -426,7 +426,7 @@ export default function TrialRegisterPage() {
             {/* Sign in link */}
             <p className="mt-6 text-center text-sm text-gray-500">
               Already have an account?{' '}
-              <Link href="/login" className="font-semibold text-[#fcc824]/80 hover:text-[#fcc824] transition-colors">
+              <Link href="/login" className="font-semibold text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors">
                 Sign in
               </Link>
             </p>
