@@ -56,24 +56,22 @@ const IMAGES = [
 ];
 
 /**
- * POST to OpenRouter image generation endpoint.
- * Returns the URL string of the generated image.
+ * Generate image via OpenRouter chat completions (Gemini Flash image).
+ * Returns a Buffer of the PNG image data.
  * @param {string} prompt
- * @returns {Promise<string>}
+ * @returns {Promise<Buffer>}
  */
 function generateImage(prompt) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
-      model: 'black-forest-labs/flux-schnell',
-      prompt,
-      n: 1,
-      size: '1024x1024'
+      model: 'google/gemini-2.5-flash-image',
+      messages: [{ role: 'user', content: prompt }]
     });
 
     const options = {
       hostname: 'openrouter.ai',
       port: 443,
-      path: '/api/v1/images/generations',
+      path: '/api/v1/chat/completions',
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
@@ -85,19 +83,22 @@ function generateImage(prompt) {
     };
 
     const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => { data += chunk; });
+      const chunks = [];
+      res.on('data', chunk => { chunks.push(chunk); });
       res.on('end', () => {
         try {
-          const parsed = JSON.parse(data);
-          const imageUrl = parsed?.data?.[0]?.url;
-          if (imageUrl) {
-            resolve(imageUrl);
-          } else {
-            reject(new Error(`No image URL in response: ${data}`));
+          const parsed = JSON.parse(Buffer.concat(chunks).toString());
+          // Image comes back as base64 in message.images[0].image_url.url
+          const dataUrl = parsed?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          if (!dataUrl) {
+            reject(new Error(`No image in response: ${JSON.stringify(parsed).slice(0, 300)}`));
+            return;
           }
+          // Strip "data:image/png;base64," prefix and decode
+          const base64 = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+          resolve(Buffer.from(base64, 'base64'));
         } catch (e) {
-          reject(new Error(`Failed to parse response: ${data}`));
+          reject(new Error(`Failed to parse response: ${e.message}`));
         }
       });
     });
@@ -105,51 +106,6 @@ function generateImage(prompt) {
     req.on('error', reject);
     req.write(body);
     req.end();
-  });
-}
-
-/**
- * Download an image from a URL and save it to filepath.
- * Handles one level of HTTP redirect (301/302).
- * @param {string} imageUrl
- * @param {string} filepath
- * @returns {Promise<void>}
- */
-function downloadImage(imageUrl, filepath) {
-  return new Promise((resolve, reject) => {
-    function doGet(targetUrl, redirectCount) {
-      if (redirectCount > 5) {
-        return reject(new Error('Too many redirects'));
-      }
-
-      https.get(targetUrl, (res) => {
-        if (res.statusCode === 301 || res.statusCode === 302) {
-          // Consume and discard this response so the socket closes
-          res.resume();
-          const location = res.headers.location;
-          if (!location) {
-            return reject(new Error('Redirect with no Location header'));
-          }
-          doGet(location, redirectCount + 1);
-          return;
-        }
-
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          res.resume();
-          return reject(new Error(`HTTP ${res.statusCode} downloading image`));
-        }
-
-        const file = fs.createWriteStream(filepath);
-        res.pipe(file);
-        file.on('finish', () => { file.close(); resolve(); });
-        file.on('error', (err) => {
-          fs.unlink(filepath, () => {}); // clean up partial file
-          reject(err);
-        });
-      }).on('error', reject);
-    }
-
-    doGet(imageUrl, 0);
   });
 }
 
@@ -174,12 +130,14 @@ async function main() {
 
     process.stdout.write(`  generating  ${filename} ... `);
     try {
-      const imageUrl = await generateImage(prompt);
-      await downloadImage(imageUrl, filepath);
-      console.log('saved');
+      const imageBuffer = await generateImage(prompt);
+      fs.writeFileSync(filepath, imageBuffer);
+      console.log(`saved (${Math.round(imageBuffer.length / 1024)}KB)`);
       generated++;
     } catch (err) {
       console.log(`FAILED: ${err.message}`);
+      // Remove partial file if it exists
+      if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
       failed++;
     }
   }
