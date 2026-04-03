@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
 interface RenameDialogProps {
@@ -19,10 +19,12 @@ export default function RenameDialog({
 }: RenameDialogProps) {
   const [title, setTitle] = useState(currentTitle);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { renameConversation } = useAppStore();
 
   useEffect(() => {
     setTitle(currentTitle);
+    setError(null);
   }, [currentTitle, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,11 +32,13 @@ export default function RenameDialog({
     if (!title.trim()) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       await renameConversation(conversationId, title);
       onClose();
-    } catch (error) {
-      console.error('Failed to rename conversation:', error);
+    } catch (err) {
+      console.error('Failed to rename conversation:', err);
+      setError('Failed to rename. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -46,54 +50,168 @@ export default function RenameDialog({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        style={{ background: 'rgba(0,0,0,0.6)' }}
+        className="fixed inset-0 z-40"
         onClick={onClose}
       />
 
       {/* Dialog */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+        <div
+          style={{
+            background: 'rgba(18,18,31,0.95)',
+            border: '1px solid #1e1e30',
+            borderRadius: '0.75rem',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            width: '100%',
+            maxWidth: '28rem',
+          }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1rem',
+              borderBottom: '1px solid #1e1e30',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '1.125rem',
+                fontWeight: 600,
+                color: '#ededf5',
+                margin: 0,
+              }}
+            >
               Rename Conversation
             </h2>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+              aria-label="Close dialog"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0.25rem',
+                borderRadius: '0.375rem',
+                color: '#9090a8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#ededf5';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.color = '#9090a8';
+              }}
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-4">
+          <form onSubmit={handleSubmit} style={{ padding: '1rem' }}>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter conversation title"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              style={{
+                width: '100%',
+                padding: '0.5rem 0.75rem',
+                background: 'rgba(18,18,31,0.6)',
+                border: '1px solid #1e1e30',
+                borderRadius: '0.5rem',
+                color: '#ededf5',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+              onFocus={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = '#4f6ef7';
+              }}
+              onBlur={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+              }}
               autoFocus
               disabled={isSubmitting}
             />
 
+            {/* Error message */}
+            {error && (
+              <p
+                style={{
+                  color: '#f87171',
+                  fontSize: '0.8125rem',
+                  marginTop: '0.5rem',
+                  marginBottom: 0,
+                }}
+              >
+                {error}
+              </p>
+            )}
+
             {/* Buttons */}
-            <div className="flex justify-end gap-2 mt-4">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '0.5rem',
+                marginTop: '1rem',
+                flexWrap: 'wrap',
+              }}
+            >
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 disabled={isSubmitting}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#9090a8',
+                  background: 'none',
+                  border: '1px solid #1e1e30',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  transition: 'color 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#ededf5';
+                  (e.currentTarget as HTMLElement).style.borderColor = '#5a5a72';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.color = '#9090a8';
+                  (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+                }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-black bg-yellow-500 hover:bg-yellow-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSubmitting || !title.trim()}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#09090f',
+                  background: '#fcc824',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  cursor: isSubmitting || !title.trim() ? 'not-allowed' : 'pointer',
+                  opacity: isSubmitting || !title.trim() ? 0.5 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  transition: 'opacity 0.15s',
+                }}
               >
-                {isSubmitting ? 'Renaming...' : 'Rename'}
+                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isSubmitting ? 'Renaming…' : 'Rename'}
               </button>
             </div>
           </form>

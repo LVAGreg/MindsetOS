@@ -66,15 +66,20 @@ export default function TrialExpiredPopup({
       {/* Popup — z-[9999]: top-priority upgrade gate, above CoworkModal and all other overlays */}
       <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4">
         <div
-          className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 overflow-hidden animate-in fade-in zoom-in-95 duration-300"
-          style={{ borderColor: '#fcc824' }}
+          className="relative w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300"
+          style={{
+            background: 'rgba(18,18,31,0.97)',
+            border: '2px solid #fcc824',
+          }}
         >
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-10"
+            aria-label="Dismiss popup"
+            className="absolute top-4 right-4 p-1.5 rounded-full transition-colors z-10"
+            style={{ background: '#1e1e30', color: '#9090a8' }}
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4" />
           </button>
 
           {/* Gold header bar */}
@@ -88,16 +93,16 @@ export default function TrialExpiredPopup({
           {/* Content */}
           <div className="p-6 sm:p-8">
             <div className="text-center mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#ededf5' }}>
                 Keep Your AI Agents <span style={{ color: '#fcc824' }}>+ Level Up</span>
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                You've seen what the AI can do. Now get the full system &mdash; AI agents, live coaching, and implementation training.
+              <p className="text-sm" style={{ color: '#9090a8' }}>
+                You&apos;ve seen what the AI can do. Now get the full system &mdash; AI agents, live coaching, and implementation training.
               </p>
             </div>
 
             {/* What you get */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
+            <div className="rounded-xl p-4 mb-6" style={{ background: '#1e1e30' }}>
               <div className="space-y-2.5">
                 {[
                   { icon: Zap, text: 'All 12+ AI agents + future releases' },
@@ -106,10 +111,13 @@ export default function TrialExpiredPopup({
                   { icon: Award, text: 'MindsetOS community + private support' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-7 h-7 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'rgba(252,200,36,0.12)' }}
+                    >
                       <item.icon className="w-3.5 h-3.5" style={{ color: '#fcc824' }} />
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{item.text}</span>
+                    <span className="text-sm" style={{ color: '#ededf5' }}>{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -119,9 +127,9 @@ export default function TrialExpiredPopup({
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <span className="text-4xl font-bold" style={{ color: '#fcc824' }}>$87</span>
-                <span className="text-lg text-gray-500">/week</span>
+                <span className="text-lg" style={{ color: '#9090a8' }}>/week</span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs" style={{ color: '#9090a8' }}>
                 12-week program &middot; Or save $294 with upfront payment
               </p>
             </div>
@@ -129,7 +137,8 @@ export default function TrialExpiredPopup({
             {/* CTA Button */}
             <Link
               href="/join"
-              className="w-full px-6 py-3.5 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg transform hover:scale-[1.02]"
+              className="w-full px-6 py-3.5 font-bold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg transform hover:scale-[1.02]"
+              style={{ background: '#fcc824', color: '#09090f' }}
               onClick={handleDismiss}
             >
               See What&apos;s Inside
@@ -139,13 +148,14 @@ export default function TrialExpiredPopup({
             {/* Secondary action */}
             <button
               onClick={handleDismiss}
-              className="w-full mt-3 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors text-center py-2"
+              className="w-full mt-3 text-sm transition-colors text-center py-2"
+              style={{ color: '#5a5a72' }}
             >
               Maybe later
             </button>
 
             {/* Guarantee */}
-            <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-400">
+            <div className="flex items-center justify-center gap-2 mt-3 text-xs" style={{ color: '#5a5a72' }}>
               <Shield className="w-3.5 h-3.5" />
               30-day money-back guarantee &middot; Secure payment
             </div>
