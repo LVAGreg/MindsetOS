@@ -13,31 +13,52 @@ export default function ScorecardPage() {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    try { posthog.capture('lead_magnet_viewed', { source: 'scorecard' }); } catch {}
+    // PostHog is fire-and-forget — swallowing errors intentionally
+    try { posthog.capture('lead_magnet_viewed', { source: 'scorecard' }); } catch (_) {}
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim() || submitting) return;
-    setSubmitting(true);
     setFormError('');
+
+    // Client-side validation
+    const trimmedEmail = email.trim();
+    const trimmedName = firstName.trim();
+
+    if (!trimmedEmail) {
+      setFormError('Email is required.');
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(trimmedEmail)) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
+    if (trimmedName && trimmedName.length < 2) {
+      setFormError('First name must be at least 2 characters.');
+      return;
+    }
+
+    if (submitting) return;
+    setSubmitting(true);
 
     try {
       const res = await fetch('/api/leads/capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          firstName: firstName.trim(),
+          email: trimmedEmail.toLowerCase(),
+          firstName: trimmedName,
           magnetType: 'scorecard',
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
-      try { posthog.capture('lead_magnet_submitted', { source: 'scorecard' }); } catch {}
+      // PostHog is fire-and-forget — swallowing errors intentionally
+      try { posthog.capture('lead_magnet_submitted', { source: 'scorecard' }); } catch (_) {}
       setSubmitted(true);
     } catch (err: any) {
-      setFormError(err.message);
+      setFormError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -177,7 +198,7 @@ export default function ScorecardPage() {
 
                     <button
                       type="submit"
-                      disabled={submitting || !email.trim()}
+                      disabled={submitting}
                       className="w-full bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold py-3.5 px-6 rounded-xl text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {submitting ? (
