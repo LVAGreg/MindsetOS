@@ -233,8 +233,8 @@ export default function AgentsAdminPage() {
                 onClick={() => setFilterStatus('all')}
                 className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
                 style={filterStatus === 'all'
-                  ? { background: '#4f6ef7', color: '#fff' }
-                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
+                  ? { background: '#4f6ef7', color: '#ededf5' }
+                  : { background: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
               >
                 All ({agents.length})
               </button>
@@ -243,7 +243,7 @@ export default function AgentsAdminPage() {
                 className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
                 style={filterStatus === 'active'
                   ? { background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.4)', color: '#4ade80' }
-                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
+                  : { background: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
               >
                 Active ({agents.filter(a => a.is_active).length})
               </button>
@@ -252,7 +252,7 @@ export default function AgentsAdminPage() {
                 className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
                 style={filterStatus === 'inactive'
                   ? { background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#f87171' }
-                  : { background: 'rgba(255,255,255,0.05)', color: '#9090a8' }}
+                  : { background: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
               >
                 Inactive ({agents.filter(a => !a.is_active).length})
               </button>
@@ -569,7 +569,7 @@ export default function AgentsAdminPage() {
                 <button
                   onClick={() => setShowCreateModal(false)}
                   className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-                  style={{ background: 'rgba(255,255,255,0.06)', color: '#9090a8', border: '1px solid #1e1e30' }}
+                  style={{ background: 'rgba(30,30,48,0.6)', color: '#9090a8', border: '1px solid #1e1e30' }}
                 >
                   Cancel
                 </button>
