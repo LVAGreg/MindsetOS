@@ -31,6 +31,31 @@ const LERP_SPEED = 0.08;
 const PARTICLE_COUNT = 200;
 const SCENE_SCALE = 1.0; // world-space scale applied to positions
 
+// ─── Particle data (module-level so Math.random() is never called inside
+//     a component render or unstable useEffect) ─────────────────────────────
+
+const _particlePositions = (() => {
+  const arr = new Float32Array(PARTICLE_COUNT * 3);
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const i3 = i * 3;
+    arr[i3]     = (Math.random() - 0.5) * 5;
+    arr[i3 + 1] = (Math.random() - 0.5) * 5;
+    arr[i3 + 2] = (Math.random() - 0.5) * 5;
+  }
+  return arr;
+})();
+
+const _particleVelocities = (() => {
+  const arr = new Float32Array(PARTICLE_COUNT * 3);
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const i3 = i * 3;
+    arr[i3]     = (Math.random() - 0.5) * 0.0003;
+    arr[i3 + 1] = (Math.random() - 0.5) * 0.0003;
+    arr[i3 + 2] = (Math.random() - 0.5) * 0.0003;
+  }
+  return arr;
+})();
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function BrainVariantA({
@@ -175,19 +200,10 @@ export default function BrainVariantA({
     }
 
     // ── Background Particles ──────────────────────────────────────────────────
-    const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
-    const particleVelocities = new Float32Array(PARTICLE_COUNT * 3);
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const i3 = i * 3;
-      particlePositions[i3] = (Math.random() - 0.5) * 5;
-      particlePositions[i3 + 1] = (Math.random() - 0.5) * 5;
-      particlePositions[i3 + 2] = (Math.random() - 0.5) * 5;
-
-      particleVelocities[i3] = (Math.random() - 0.5) * 0.0003;
-      particleVelocities[i3 + 1] = (Math.random() - 0.5) * 0.0003;
-      particleVelocities[i3 + 2] = (Math.random() - 0.5) * 0.0003;
-    }
+    // Copy from module-level arrays so each mount starts with its own mutable
+    // buffer (two mounts would otherwise share the same Float32Array).
+    const particlePositions = _particlePositions.slice();
+    const particleVelocities = _particleVelocities.slice();
 
     const particleGeo = new THREE.BufferGeometry();
     particleGeo.setAttribute(
