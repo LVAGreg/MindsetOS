@@ -57,20 +57,42 @@ export default function AgentSearchBar({
     <div className="space-y-3">
       {/* Search input */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+          style={{ color: '#9090a8' }}
+        />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Search agents..."
-          className="w-full pl-11 pr-11 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 dark:focus:border-amber-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm transition-colors"
+          className="w-full pl-11 pr-11 py-3 rounded-xl text-sm transition-colors focus:outline-none"
+          style={{
+            background: 'rgba(18,18,31,0.8)',
+            border: '2px solid #1e1e30',
+            color: '#ededf5',
+          }}
+          onFocus={(e) => {
+            (e.currentTarget as HTMLInputElement).style.borderColor = '#fcc824';
+          }}
+          onBlur={(e) => {
+            (e.currentTarget as HTMLInputElement).style.borderColor = '#1e1e30';
+          }}
         />
         {searchQuery && (
           <button
             onClick={handleClearSearch}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'transparent';
+            }}
           >
-            <X className="w-4 h-4 text-gray-400" />
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
@@ -85,11 +107,33 @@ export default function AgentSearchBar({
             <button
               key={filter.id}
               onClick={() => toggleFilter(filter.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+              aria-pressed={active}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200"
+              style={
                 active
-                  ? 'bg-amber-400 text-black border-amber-400 shadow-sm'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 hover:text-gray-900 dark:hover:text-white'
-              }`}
+                  ? {
+                      background: '#fcc824',
+                      color: '#09090f',
+                      border: '1px solid #fcc824',
+                    }
+                  : {
+                      background: 'rgba(18,18,31,0.8)',
+                      color: '#9090a8',
+                      border: '1px solid #1e1e30',
+                    }
+              }
+              onMouseEnter={(e) => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.borderColor = '#fcc824';
+                  (e.currentTarget as HTMLElement).style.color = '#ededf5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!active) {
+                  (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+                  (e.currentTarget as HTMLElement).style.color = '#9090a8';
+                }
+              }}
             >
               {Icon && <Icon className="w-3 h-3" />}
               {filter.label}
@@ -101,12 +145,22 @@ export default function AgentSearchBar({
       {/* Active filter summary */}
       {activeFilters.length > 0 && (
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
+          <span
+            className="text-xs"
+            style={{ color: '#5a5a72' }}
+          >
             {activeFilters.length} filter{activeFilters.length > 1 ? 's' : ''} active
           </span>
           <button
             onClick={() => onFilterChange([])}
-            className="text-xs text-gray-500 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400 font-medium transition-colors"
+            className="text-xs font-medium transition-colors"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = '#fcc824';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color = '#9090a8';
+            }}
           >
             Clear all
           </button>
