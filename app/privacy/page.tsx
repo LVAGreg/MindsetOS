@@ -2,24 +2,27 @@ import Link from 'next/link';
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-2xl border-2 p-8 md:p-12" style={{ borderColor: '#fcc824' }}>
+    <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
+      <div
+        className="max-w-4xl mx-auto backdrop-blur-sm rounded-xl shadow-2xl border p-8 md:p-12"
+        style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}
+      >
 
         {/* Header */}
         <div className="mb-8">
-          <Link href="/" className="inline-block mb-6 text-sm hover:opacity-80" style={{ color: '#fcc824' }}>
+          <Link href="/" className="inline-block mb-6 text-sm hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>
             ← Back to Home
           </Link>
-          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+          <h1 className="text-4xl font-bold mb-2" style={{ color: '#ededf5' }}>
             Privacy Policy
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p style={{ color: '#9090a8' }}>
             Last Updated: March 27, 2026
           </p>
         </div>
 
         {/* Content */}
-        <div className="prose prose-gray dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300">
+        <div className="max-w-none space-y-6" style={{ color: '#9090a8' }}>
 
           {/* Introduction */}
           <section>
@@ -27,7 +30,7 @@ export default function PrivacyPage() {
               This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information
               when You use the Service and tells You about Your privacy rights and how the law protects You.
             </p>
-            <p>
+            <p className="mt-4">
               We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and
               use of information in accordance with this Privacy Policy.
             </p>
@@ -35,40 +38,40 @@ export default function PrivacyPage() {
 
           {/* Interpretation and Definitions */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Interpretation and Definitions</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Interpretation and Definitions</h2>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Interpretation</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Interpretation</h3>
             <p>
               The words of which the initial letter is capitalized have meanings defined under the following conditions.
               The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.
             </p>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Definitions</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Definitions</h3>
             <p>For the purposes of this Privacy Policy:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
-              <li><strong>Company</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to MindsetOS Pty. Ltd., Level 3 / 33 Longland Street, Newstead QLD 4006 Brisbane.</li>
-              <li><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</li>
-              <li><strong>Website</strong> refers to MindsetOS — Mindset Operating System, accessible from <a href="https://mindset.show" className="font-medium" style={{ color: '#fcc824' }}>https://mindset.show</a></li>
-              <li><strong>Service</strong> refers to the Website and AI-powered mindset coaching services.</li>
-              <li><strong>Country</strong> refers to: Queensland, Australia</li>
-              <li><strong>Service Provider</strong> means any natural or legal person who processes the data on behalf of the Company.</li>
-              <li><strong>Personal Data</strong> is any information that relates to an identified or identifiable individual.</li>
-              <li><strong>Cookies</strong> are small files that are placed on Your computer, mobile device or any other device by a website.</li>
-              <li><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</li>
-              <li><strong>Usage Data</strong> refers to data collected automatically, either generated by the use of the Service.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
+              <li><strong style={{ color: '#ededf5' }}>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to MindsetOS Pty. Ltd., Level 3 / 33 Longland Street, Newstead QLD 4006 Brisbane.</li>
+              <li><strong style={{ color: '#ededf5' }}>Account</strong> means a unique account created for You to access our Service or parts of our Service.</li>
+              <li><strong style={{ color: '#ededf5' }}>Website</strong> refers to MindsetOS — Mindset Operating System, accessible from <a href="https://mindset.show" className="font-medium hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>https://mindset.show</a></li>
+              <li><strong style={{ color: '#ededf5' }}>Service</strong> refers to the Website and AI-powered mindset coaching services.</li>
+              <li><strong style={{ color: '#ededf5' }}>Country</strong> refers to: Queensland, Australia</li>
+              <li><strong style={{ color: '#ededf5' }}>Service Provider</strong> means any natural or legal person who processes the data on behalf of the Company.</li>
+              <li><strong style={{ color: '#ededf5' }}>Personal Data</strong> is any information that relates to an identified or identifiable individual.</li>
+              <li><strong style={{ color: '#ededf5' }}>Cookies</strong> are small files that are placed on Your computer, mobile device or any other device by a website.</li>
+              <li><strong style={{ color: '#ededf5' }}>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</li>
+              <li><strong style={{ color: '#ededf5' }}>Usage Data</strong> refers to data collected automatically, either generated by the use of the Service.</li>
             </ul>
           </section>
 
           {/* Collecting and Using Your Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Collecting and Using Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Collecting and Using Your Personal Data</h2>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Types of Data Collected</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Types of Data Collected</h3>
 
-            <h4 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">Personal Data</h4>
+            <h4 className="text-lg font-semibold mt-4 mb-2" style={{ color: '#ededf5' }}>Personal Data</h4>
             <p>While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to:</p>
-            <ul className="list-disc pl-6 space-y-2">
+            <ul className="list-disc pl-6 space-y-2 mt-2">
               <li>Email address</li>
               <li>First name and last name</li>
               <li>Phone number (optional)</li>
@@ -76,9 +79,9 @@ export default function PrivacyPage() {
               <li>Usage Data</li>
             </ul>
 
-            <h4 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">AI Interaction Data</h4>
+            <h4 className="text-lg font-semibold mt-4 mb-2" style={{ color: '#ededf5' }}>AI Interaction Data</h4>
             <p>In addition to standard personal data, we collect and process:</p>
-            <ul className="list-disc pl-6 space-y-2">
+            <ul className="list-disc pl-6 space-y-2 mt-2">
               <li>Conversation history with AI agents</li>
               <li>AI-generated content and recommendations</li>
               <li>Agent interaction patterns and preferences</li>
@@ -86,9 +89,9 @@ export default function PrivacyPage() {
               <li>API usage logs and token consumption data</li>
             </ul>
 
-            <h4 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">Usage Data</h4>
+            <h4 className="text-lg font-semibold mt-4 mb-2" style={{ color: '#ededf5' }}>Usage Data</h4>
             <p>
-              Usage Data is collected automatically when using the Service. Usage Data may include information such as Your Device's
+              Usage Data is collected automatically when using the Service. Usage Data may include information such as Your Device&apos;s
               Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit,
               the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.
             </p>
@@ -96,51 +99,51 @@ export default function PrivacyPage() {
 
           {/* Tracking Technologies and Cookies */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Tracking Technologies and Cookies</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Tracking Technologies and Cookies</h2>
             <p>
               We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information.
               Tracking technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze Our Service.
             </p>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Types of Cookies We Use</h3>
-            <ul className="list-disc pl-6 space-y-3">
-              <li><strong>Necessary / Essential Cookies</strong>: These Cookies are essential to provide You with services available through the Website and to enable You to use some of its features.</li>
-              <li><strong>Cookies Policy / Notice Acceptance Cookies</strong>: These Cookies identify if users have accepted the use of cookies on the Website.</li>
-              <li><strong>Functionality Cookies</strong>: These Cookies allow us to remember choices You make when You use the Website, such as remembering your login details or language preference.</li>
-              <li><strong>Tracking and Performance Cookies</strong>: These Cookies are used to track information about traffic to the Website and how users use the Website.</li>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Types of Cookies We Use</h3>
+            <ul className="list-disc pl-6 space-y-3 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>Necessary / Essential Cookies</strong>: These Cookies are essential to provide You with services available through the Website and to enable You to use some of its features.</li>
+              <li><strong style={{ color: '#ededf5' }}>Cookies Policy / Notice Acceptance Cookies</strong>: These Cookies identify if users have accepted the use of cookies on the Website.</li>
+              <li><strong style={{ color: '#ededf5' }}>Functionality Cookies</strong>: These Cookies allow us to remember choices You make when You use the Website, such as remembering your login details or language preference.</li>
+              <li><strong style={{ color: '#ededf5' }}>Tracking and Performance Cookies</strong>: These Cookies are used to track information about traffic to the Website and how users use the Website.</li>
             </ul>
           </section>
 
           {/* Use of Your Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Use of Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Use of Your Personal Data</h2>
             <p>The Company may use Personal Data for the following purposes:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong>To provide and maintain our Service</strong>, including to monitor the usage of our Service.</li>
-              <li><strong>To manage Your Account</strong>: to manage Your registration as a user of the Service.</li>
-              <li><strong>To provide AI-powered mindset coaching services</strong>: to deliver personalized AI agent interactions and recommendations.</li>
-              <li><strong>To improve AI models</strong>: Your conversations and interactions may be used to improve AI service quality.</li>
-              <li><strong>To contact You</strong>: To contact You by email regarding updates, new features, or service announcements.</li>
-              <li><strong>To manage Your requests</strong>: To attend and manage Your requests to Us.</li>
-              <li><strong>For business analytics</strong>: To analyze platform usage and improve user experience.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>To provide and maintain our Service</strong>, including to monitor the usage of our Service.</li>
+              <li><strong style={{ color: '#ededf5' }}>To manage Your Account</strong>: to manage Your registration as a user of the Service.</li>
+              <li><strong style={{ color: '#ededf5' }}>To provide AI-powered mindset coaching services</strong>: to deliver personalized AI agent interactions and recommendations.</li>
+              <li><strong style={{ color: '#ededf5' }}>To improve AI models</strong>: Your conversations and interactions may be used to improve AI service quality.</li>
+              <li><strong style={{ color: '#ededf5' }}>To contact You</strong>: To contact You by email regarding updates, new features, or service announcements.</li>
+              <li><strong style={{ color: '#ededf5' }}>To manage Your requests</strong>: To attend and manage Your requests to Us.</li>
+              <li><strong style={{ color: '#ededf5' }}>For business analytics</strong>: To analyze platform usage and improve user experience.</li>
             </ul>
           </section>
 
           {/* Sharing of Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Sharing of Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Sharing of Your Personal Data</h2>
             <p>We may share your personal information in the following situations:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong>With Service Providers</strong>: We share data with third-party AI providers (OpenAI, Anthropic, Perplexity) to deliver AI services.</li>
-              <li><strong>For Business transfers</strong>: We may share or transfer Your personal information in connection with any merger, sale of Company assets, or acquisition.</li>
-              <li><strong>With Affiliates</strong>: We may share Your information with Our affiliates, including MindsetOS and related companies.</li>
-              <li><strong>With Your consent</strong>: We may disclose Your personal information for any other purpose with Your consent.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>With Service Providers</strong>: We share data with third-party AI providers (OpenAI, Anthropic, Perplexity) to deliver AI services.</li>
+              <li><strong style={{ color: '#ededf5' }}>For Business transfers</strong>: We may share or transfer Your personal information in connection with any merger, sale of Company assets, or acquisition.</li>
+              <li><strong style={{ color: '#ededf5' }}>With Affiliates</strong>: We may share Your information with Our affiliates, including MindsetOS and related companies.</li>
+              <li><strong style={{ color: '#ededf5' }}>With Your consent</strong>: We may disclose Your personal information for any other purpose with Your consent.</li>
             </ul>
           </section>
 
           {/* Retention of Your Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Retention of Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Retention of Your Personal Data</h2>
             <p>
               The Company will retain Your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy.
               We will retain and use Your Personal Data to the extent necessary to comply with our legal obligations, resolve disputes,
@@ -154,9 +157,9 @@ export default function PrivacyPage() {
 
           {/* Transfer of Your Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Transfer of Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Transfer of Your Personal Data</h2>
             <p>
-              Your information, including Personal Data, is processed at the Company's operating offices and in any other places where
+              Your information, including Personal Data, is processed at the Company&apos;s operating offices and in any other places where
               the parties involved in the processing are located. This may include transfer to servers located in the United States and
               other countries where our AI service providers operate.
             </p>
@@ -164,7 +167,7 @@ export default function PrivacyPage() {
 
           {/* Security of Your Personal Data */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Security of Your Personal Data</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Security of Your Personal Data</h2>
             <p>
               The security of Your Personal Data is important to Us, but remember that no method of transmission over the Internet,
               or method of electronic storage is 100% secure. While We strive to use commercially acceptable means to protect Your
@@ -174,7 +177,7 @@ export default function PrivacyPage() {
 
           {/* Children's Privacy */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Children's Privacy</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Children&apos;s Privacy</h2>
             <p>
               Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information
               from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with
@@ -184,79 +187,79 @@ export default function PrivacyPage() {
 
           {/* GDPR Privacy */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">GDPR Privacy</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>GDPR Privacy</h2>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Your Rights under the GDPR</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Your Rights under the GDPR</h3>
             <p>If You are within the EU, You have the right to:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Request access to Your Personal Data</strong>: You can access, update or request deletion of Your Personal Data.</li>
-              <li><strong>Request correction</strong>: You have the right to have any incomplete or inaccurate information corrected.</li>
-              <li><strong>Object to processing</strong>: You have the right to object to our processing of Your Personal Data.</li>
-              <li><strong>Request erasure</strong>: You have the right to ask Us to delete or remove Personal Data.</li>
-              <li><strong>Request transfer</strong>: We will provide Your Personal Data in a structured, machine-readable format.</li>
-              <li><strong>Withdraw consent</strong>: You have the right to withdraw Your consent on using your Personal Data.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>Request access to Your Personal Data</strong>: You can access, update or request deletion of Your Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>Request correction</strong>: You have the right to have any incomplete or inaccurate information corrected.</li>
+              <li><strong style={{ color: '#ededf5' }}>Object to processing</strong>: You have the right to object to our processing of Your Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>Request erasure</strong>: You have the right to ask Us to delete or remove Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>Request transfer</strong>: We will provide Your Personal Data in a structured, machine-readable format.</li>
+              <li><strong style={{ color: '#ededf5' }}>Withdraw consent</strong>: You have the right to withdraw Your consent on using your Personal Data.</li>
             </ul>
           </section>
 
           {/* CCPA Privacy */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">CCPA Privacy (California Residents)</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>CCPA Privacy (California Residents)</h2>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Your Rights under the CCPA</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Your Rights under the CCPA</h3>
             <p>If You are a resident of California, You have the following rights:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li><strong>The right to notice</strong>: You must be properly notified which categories of Personal Data are being collected.</li>
-              <li><strong>The right to access / the right to request</strong>: You can request information regarding disclosure of Your Personal Data.</li>
-              <li><strong>The right to say no to the sale of Personal Data</strong>: You have the right to ask us not to sell Your Personal Data.</li>
-              <li><strong>The right to know about Your Personal Data</strong>: You have the right to request information about collected data.</li>
-              <li><strong>The right to delete Personal Data</strong>: You have the right to request deletion of Your Personal Data.</li>
-              <li><strong>The right not to be discriminated against</strong>: You will not be discriminated against for exercising Your rights.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li><strong style={{ color: '#ededf5' }}>The right to notice</strong>: You must be properly notified which categories of Personal Data are being collected.</li>
+              <li><strong style={{ color: '#ededf5' }}>The right to access / the right to request</strong>: You can request information regarding disclosure of Your Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>The right to say no to the sale of Personal Data</strong>: You have the right to ask us not to sell Your Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>The right to know about Your Personal Data</strong>: You have the right to request information about collected data.</li>
+              <li><strong style={{ color: '#ededf5' }}>The right to delete Personal Data</strong>: You have the right to request deletion of Your Personal Data.</li>
+              <li><strong style={{ color: '#ededf5' }}>The right not to be discriminated against</strong>: You will not be discriminated against for exercising Your rights.</li>
             </ul>
 
-            <h3 className="text-xl font-bold mt-6 mb-3 text-gray-900 dark:text-gray-100">Do Not Sell My Personal Information</h3>
+            <h3 className="text-xl font-bold mt-6 mb-3" style={{ color: '#ededf5' }}>Do Not Sell My Personal Information</h3>
             <p>
               We do not sell personal information. However, our Service Providers (such as our AI model providers) may use technology
-              that processes personal information in ways that may be considered a "sale" under CCPA. You can opt out by contacting us.
+              that processes personal information in ways that may be considered a &quot;sale&quot; under CCPA. You can opt out by contacting us.
             </p>
           </section>
 
           {/* Links to Other Websites */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Links to Other Websites</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Links to Other Websites</h2>
             <p>
               Our Service may contain links to other websites that are not operated by Us. If You click on a third party link,
-              You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.
+              You will be directed to that third party&apos;s site. We strongly advise You to review the Privacy Policy of every site You visit.
             </p>
           </section>
 
           {/* Changes to this Privacy Policy */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Changes to this Privacy Policy</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Changes to this Privacy Policy</h2>
             <p>
               We may update our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy
-              on this page and updating the "Last updated" date at the top of this Privacy Policy.
+              on this page and updating the &quot;Last updated&quot; date at the top of this Privacy Policy.
             </p>
           </section>
 
           {/* Contact Us */}
           <section>
-            <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-gray-100">Contact Us</h2>
+            <h2 className="text-2xl font-bold mt-8 mb-4" style={{ color: '#ededf5' }}>Contact Us</h2>
             <p>
               If you have any questions about this Privacy Policy, You can contact us:
             </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>By email: <a href="mailto:hello@mindset.show" className="font-medium" style={{ color: '#fcc824' }}>hello@mindset.show</a></li>
-              <li>By visiting this page on our website: <a href="https://mindset.show/contact/" className="font-medium" style={{ color: '#fcc824' }}>https://mindset.show/contact/</a></li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li>By email: <a href="mailto:hello@mindset.show" className="font-medium hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>hello@mindset.show</a></li>
+              <li>By visiting this page on our website: <a href="https://mindset.show/contact/" className="font-medium hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>https://mindset.show/contact/</a></li>
               <li>By mail: Level 3 / 33 Longland Street, Newstead QLD 4006 Brisbane, Australia</li>
             </ul>
           </section>
 
           {/* Parent Company */}
-          <section className="mt-8 pt-6 border-t border-gray-300 dark:border-gray-600">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <section className="mt-8 pt-6 border-t" style={{ borderColor: '#1e1e30' }}>
+            <p className="text-sm" style={{ color: '#5a5a72' }}>
               MindsetOS — Mindset Operating System is operated by MindsetOS Pty. Ltd.
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-sm mt-2" style={{ color: '#5a5a72' }}>
               Copyright © 2026 MindsetOS | All rights reserved.
             </p>
           </section>
@@ -264,18 +267,18 @@ export default function PrivacyPage() {
         </div>
 
         {/* Footer Links */}
-        <div className="mt-12 pt-6 border-t border-gray-300 dark:border-gray-600">
+        <div className="mt-12 pt-6 border-t" style={{ borderColor: '#1e1e30' }}>
           <div className="flex flex-wrap gap-4 justify-center text-sm">
-            <Link href="/" className="hover:opacity-80" style={{ color: '#fcc824' }}>
+            <Link href="/" className="hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>
               Home
             </Link>
-            <Link href="/terms" className="hover:opacity-80" style={{ color: '#fcc824' }}>
-              Terms & Conditions
+            <Link href="/terms" className="hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>
+              Terms &amp; Conditions
             </Link>
-            <Link href="/register" className="hover:opacity-80" style={{ color: '#fcc824' }}>
+            <Link href="/register" className="hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>
               Register
             </Link>
-            <Link href="/login" className="hover:opacity-80" style={{ color: '#fcc824' }}>
+            <Link href="/login" className="hover:opacity-80 transition-opacity" style={{ color: '#fcc824' }}>
               Login
             </Link>
           </div>
