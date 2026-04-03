@@ -552,7 +552,10 @@ export default function AdminUsersPage() {
             </div>
             <button
               onClick={() => router.push('/admin')}
-              className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors"
+              className="text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors"
+              style={{ background: '#4f6ef7' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#3d5ce0')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#4f6ef7')}
             >
               Back to Admin
             </button>
@@ -908,8 +911,8 @@ export default function AdminUsersPage() {
                     <tr
                       key={user.id}
                       style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(18,18,31,0.8)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)')}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -985,7 +988,7 @@ export default function AdminUsersPage() {
                               : user.membership_status === 'grace_period'
                               ? { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
                               : user.membership_status === 'paused'
-                              ? { background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
+                              ? { background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.2)', color: '#fcc824', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
                               : user.membership_status === 'cancelled'
                               ? { background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.2)', color: '#fb923c', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
                               : { background: '#4f6ef720', border: '1px solid #4f6ef730', color: '#7b8ff8', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }
@@ -1032,7 +1035,7 @@ export default function AdminUsersPage() {
                         ${Number(user.estimated_cost || 0).toFixed(4)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
                           {/* Reset Password Button */}
                           <button
                             onClick={() => setPasswordResetModal(user)}
@@ -1185,7 +1188,7 @@ export default function AdminUsersPage() {
               {/* User Info */}
               <div className="rounded-lg p-4" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#4f6ef7] flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: '#4f6ef7' }}>
                     {(membershipModal.first_name?.[0] || membershipModal.email[0]).toUpperCase()}
                   </div>
                   <div>
@@ -1255,7 +1258,7 @@ export default function AdminUsersPage() {
                     <button
                       onClick={() => handleMembershipAction(membershipModal.id, 'pause')}
                       className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:opacity-80 transition-opacity"
-                      style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)', color: '#fbbf24' }}
+                      style={{ background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.2)', color: '#fcc824' }}
                     >
                       <Pause className="w-4 h-4" />
                       Pause Membership (7-day grace)
@@ -1395,7 +1398,7 @@ export default function AdminUsersPage() {
               {/* User Info */}
               <div className="rounded-lg p-4" style={{ background: 'rgba(9,9,15,0.5)', border: '1px solid #1e1e30' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#4f6ef7] flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ background: '#4f6ef7' }}>
                     {(passwordResetModal.first_name?.[0] || passwordResetModal.email[0]).toUpperCase()}
                   </div>
                   <div>
@@ -1455,8 +1458,8 @@ export default function AdminUsersPage() {
                   </div>
 
                   {/* Warning */}
-                  <div className="text-xs rounded-lg p-3" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)', borderLeft: '4px solid #fbbf24', color: '#9090a8' }}>
-                    <p className="font-medium mb-1" style={{ color: '#fbbf24' }}>Important:</p>
+                  <div className="text-xs rounded-lg p-3" style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.2)', borderLeft: '4px solid #fcc824', color: '#9090a8' }}>
+                    <p className="font-medium mb-1" style={{ color: '#fcc824' }}>Important:</p>
                     <ul className="space-y-0.5">
                       <li>• The user&apos;s current password will be replaced</li>
                       <li>• All active sessions will remain valid</li>
@@ -1468,7 +1471,10 @@ export default function AdminUsersPage() {
                   <button
                     onClick={() => handlePasswordReset(passwordResetModal.id)}
                     disabled={resettingPassword}
-                    className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full flex items-center justify-center gap-2 py-2.5"
+                    className="text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full flex items-center justify-center gap-2"
+                    style={{ background: '#4f6ef7' }}
+                    onMouseEnter={(e) => { if (!resettingPassword) (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
+                    onMouseLeave={(e) => { if (!resettingPassword) (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
                   >
                     {resettingPassword ? (
                       <>
