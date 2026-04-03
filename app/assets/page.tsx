@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, Copy, MessageSquare, Check, AlertCircle } from 'lucide-react';
+import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, Copy, MessageSquare, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 
@@ -22,11 +22,14 @@ export default function AssetsPage() {
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [dbUserId, setDbUserId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'importance' | 'agent'>('recent');
   const [agentFilter, setAgentFilter] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [continuingId, setContinuingId] = useState<string | null>(null);
+  const [continueError, setContinueError] = useState<string | null>(null);
 
   // Fetch database user ID
   useEffect(() => {
@@ -38,9 +41,12 @@ export default function AssetsPage() {
         if (res.ok) {
           const data = await res.json();
           setDbUserId(data.id);
+        } else {
+          setFetchError('Failed to load user profile. Please refresh.');
         }
       } catch (error) {
         console.error('Failed to fetch database user ID:', error);
+        setFetchError('Could not connect to server. Please check your connection and refresh.');
       }
     };
 
@@ -53,14 +59,18 @@ export default function AssetsPage() {
       if (!dbUserId) return;
 
       setIsLoading(true);
+      setFetchError(null);
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/memories/assets/${dbUserId}`);
         if (res.ok) {
           const data = await res.json();
           setAssets(data);
+        } else {
+          setFetchError('Failed to load assets. Please try refreshing.');
         }
       } catch (error) {
         console.error('Failed to fetch assets:', error);
+        setFetchError('Could not load assets. Please check your connection and refresh.');
       } finally {
         setIsLoading(false);
       }
@@ -155,8 +165,10 @@ export default function AssetsPage() {
 
   // Continue working on an asset - create new conversation with context
   const handleContinue = async (asset: Asset) => {
-    if (!dbUserId) return;
+    if (!dbUserId || continuingId) return;
 
+    setContinueError(null);
+    setContinuingId(asset.id);
     try {
       // Create new conversation
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/conversations`, {
@@ -188,7 +200,10 @@ export default function AssetsPage() {
       router.push(`/dashboard?conversation=${conversationId}`);
     } catch (error) {
       console.error('Failed to continue conversation:', error);
-      alert('Failed to start conversation. Please try again.');
+      setContinueError('Failed to start conversation. Please try again.');
+      setTimeout(() => setContinueError(null), 4000);
+    } finally {
+      setContinuingId(null);
     }
   };
 
@@ -213,18 +228,34 @@ export default function AssetsPage() {
         </div>
       )}
 
+      {/* Continue Error Banner */}
+      {continueError && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: '#fca5a5' }}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {continueError}
+        </div>
+      )}
+
+      {/* Fetch Error Banner */}
+      {fetchError && (
+        <div className="flex items-center gap-2 px-4 py-3 text-sm font-medium" style={{ background: 'rgba(239,68,68,0.12)', borderBottom: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5' }}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {fetchError}
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ background: 'rgba(18,18,31,0.8)', borderBottom: '1px solid #1e1e30' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard')}
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                title="Back to Dashboard"
+                aria-label="Back to Dashboard"
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -238,7 +269,7 @@ export default function AssetsPage() {
             </div>
 
             {/* Export Buttons */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleExportJSON}
                 className="px-4 py-2 rounded-lg transition-opacity flex items-center gap-2 text-sm font-medium hover:opacity-90"
@@ -389,12 +420,12 @@ export default function AssetsPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => handleCopy(asset)}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-opacity text-sm font-medium hover:opacity-80"
                       style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.3)' }}
-                      title="Copy to clipboard"
+                      aria-label="Copy to clipboard"
                     >
                       {copiedId === asset.id ? (
                         <>
@@ -410,12 +441,22 @@ export default function AssetsPage() {
                     </button>
                     <button
                       onClick={() => handleContinue(asset)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-opacity text-sm font-medium hover:opacity-80"
+                      disabled={continuingId === asset.id}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-opacity text-sm font-medium hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ background: 'rgba(124,91,246,0.15)', color: '#7c5bf6', border: '1px solid rgba(124,91,246,0.3)' }}
-                      title="Continue working on this asset"
+                      aria-label="Continue working on this asset"
                     >
-                      <MessageSquare className="w-4 h-4" />
-                      Continue
+                      {continuingId === asset.id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Starting...
+                        </>
+                      ) : (
+                        <>
+                          <MessageSquare className="w-4 h-4" />
+                          Continue
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
