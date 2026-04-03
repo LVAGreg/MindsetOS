@@ -6,6 +6,26 @@ import { useAppStore } from '@/lib/store';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
 
+// ─── Design tokens ─────────────────────────────────────────────────────────
+const T = {
+  pageBg:       '#09090f',
+  cardBg:       'rgba(18,18,31,0.97)',
+  border:       '#1e1e30',
+  borderHover:  '#2e2e48',
+  textPrimary:  '#ededf5',
+  textMuted:    '#9090a8',
+  textDim:      '#5a5a72',
+  blue:         '#4f6ef7',
+  blueHover:    '#3d5ce5',
+  amber:        '#fcc824',
+  purple:       '#7c5bf6',
+  inputBg:      'rgba(14,14,24,0.8)',
+  previewBg:    'rgba(12,12,22,0.6)',
+  selectedBg:   'rgba(79,110,247,0.12)',
+  selectedBorder:'#4f6ef7',
+  dangerText:   '#f87171',
+} as const;
+
 interface CoworkModalProps {
   onClose: () => void;
 }
@@ -32,7 +52,9 @@ export function CoworkModal({ onClose }: CoworkModalProps) {
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState('');
   const [downloading, setDownloading] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [downloadDone, setDownloadDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: user?.name || user?.email?.split('@')[0] || '',
@@ -48,6 +70,7 @@ export function CoworkModal({ onClose }: CoworkModalProps) {
 
   const generate = async () => {
     setGenerating(true);
+    setError(null);
     try {
       const token = localStorage.getItem('accessToken');
       const prompt = `Generate a concise, professional "Working with ${form.name}" instruction guide for a VA or EA.
@@ -79,7 +102,7 @@ Keep it practical, specific, and under 600 words. Write in second person ("You w
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          agentId: 'mindset-score',  // Use any available agent for generation
+          agentId: 'mindset-score',
           message: prompt,
           systemOverride: 'You are a professional business writer. Generate a clear, actionable working guide. No preamble. Start directly with "# Working with [Name]".',
         }),
@@ -89,14 +112,15 @@ Keep it practical, specific, and under 600 words. Write in second person ("You w
         const data = await r.json();
         setGenerated(data.response || data.content || data.text || '');
       } else {
-        // Fallback template if API fails
         setGenerated(generateFallback());
       }
-    } catch {
+    } catch (err) {
+      console.error('[CoworkModal] generate failed:', err);
       setGenerated(generateFallback());
+    } finally {
+      setGenerating(false);
+      setStep(3);
     }
-    setGenerating(false);
-    setStep(3);
   };
 
   const generateFallback = () => `# Working with ${form.name}
@@ -124,6 +148,7 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
 
   const downloadDocx = async () => {
     setDownloading(true);
+    setError(null);
     try {
       const { Document, Paragraph, TextRun, HeadingLevel, Packer } = await import('docx');
       const lines = generated.split('\n');
@@ -152,94 +177,143 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
       a.download = `working-with-${(form.name || 'me').toLowerCase().replace(/\s+/g, '-')}.docx`;
       a.click();
       URL.revokeObjectURL(url);
-      setDownloaded(true);
-      setTimeout(() => setDownloaded(false), 3000);
+      setDownloadDone(true);
+      setTimeout(() => setDownloadDone(false), 3000);
     } catch (err) {
       console.error('[CoworkModal] DOCX export failed:', err);
+      setError('Download failed — try Copy Text instead.');
+    } finally {
+      setDownloading(false);
     }
-    setDownloading(false);
   };
 
   const copyText = () => {
     navigator.clipboard.writeText(generated).then(() => {
-      setDownloaded(true);
-      setTimeout(() => setDownloaded(false), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }).catch((err: unknown) => {
       console.error('[CoworkModal] Failed to copy to clipboard:', err);
-      // Fallback: still show the button briefly so user can manually copy
-      setDownloaded(false);
+      setError('Copy failed — please select and copy the text manually.');
     });
+  };
+
+  // ─── Shared input style ─────────────────────────────────────────────────
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '8px 12px',
+    fontSize: '0.875rem',
+    border: `1px solid ${T.border}`,
+    borderRadius: '8px',
+    background: T.inputBg,
+    color: T.textPrimary,
+    outline: 'none',
+    boxSizing: 'border-box',
   };
 
   return (
     /* z-[9999]: highest-priority modal — sits above TrialExpiredPopup (z-[9999]) and all other overlays */
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={onClose}
+    >
       <div
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden"
+        className="w-full max-w-xl overflow-hidden rounded-2xl shadow-2xl"
+        style={{ background: T.cardBg, border: `1px solid ${T.border}` }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: `1px solid ${T.border}` }}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
-              <Wand2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(124,91,246,0.15)', border: `1px solid rgba(124,91,246,0.25)` }}
+            >
+              <Wand2 className="w-4 h-4" style={{ color: T.purple }} aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-gray-900 dark:text-white">Cowork Instruction Generator</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Step {step} of 3</p>
+              <h2 className="text-sm font-bold" style={{ color: T.textPrimary }}>Cowork Instruction Generator</h2>
+              <p className="text-xs" style={{ color: T.textMuted }}>Step {step} of 3</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <X className="w-4 h-4 text-gray-500" />
+          <button
+            onClick={onClose}
+            aria-label="Close cowork generator"
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: T.textMuted }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Step progress */}
         <div className="flex gap-1 px-6 pt-4">
           {([1, 2, 3] as Step[]).map(s => (
-            <div key={s} className={`flex-1 h-1 rounded-full transition-colors ${s <= step ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'}`} />
+            <div
+              key={s}
+              className="flex-1 h-1 rounded-full transition-colors"
+              style={{ background: s <= step ? T.blue : T.border }}
+            />
           ))}
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div
+            className="mx-6 mt-3 px-3 py-2 rounded-lg text-xs"
+            style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.25)', color: T.dangerText }}
+          >
+            {error}
+          </div>
+        )}
 
         {/* Step 1: About you */}
         {step === 1 && (
           <div className="px-6 py-5 space-y-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Who are you?</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">This becomes the guide your VA follows.</p>
+              <p className="text-sm font-semibold mb-1" style={{ color: T.textPrimary }}>Who are you?</p>
+              <p className="text-xs mb-3" style={{ color: T.textMuted }}>This becomes the guide your VA follows.</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your name</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: T.textMuted }}>Your name</label>
               <input
                 value={form.name}
                 onChange={e => updateForm('name', e.target.value)}
                 placeholder="Greg"
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your coaching niche</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: T.textMuted }}>Your coaching niche</label>
               <input
                 value={form.coachingNiche}
                 onChange={e => updateForm('coachingNiche', e.target.value)}
                 placeholder="Mindset coaching for entrepreneurs"
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Top weekly priorities</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: T.textMuted }}>Top weekly priorities</label>
               <textarea
                 value={form.priorities}
                 onChange={e => updateForm('priorities', e.target.value)}
                 rows={3}
                 placeholder="Recording podcast content, client sessions, outreach to 5 new leads, newsletter..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                style={{ ...inputStyle, resize: 'none' }}
               />
             </div>
             <button
               onClick={() => setStep(2)}
               disabled={!form.name || !form.coachingNiche}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-40 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-40"
+              style={{ background: T.blue, color: '#fff' }}
+              onMouseEnter={e => { if (!(!form.name || !form.coachingNiche)) (e.currentTarget as HTMLElement).style.background = T.blueHover; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = T.blue; }}
             >
               Next <ChevronRight className="w-4 h-4" />
             </button>
@@ -250,21 +324,22 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
         {step === 2 && (
           <div className="px-6 py-5 space-y-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">How you like to work</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">This shapes how your VA should approach their work.</p>
+              <p className="text-sm font-semibold mb-1" style={{ color: T.textPrimary }}>How you like to work</p>
+              <p className="text-xs mb-3" style={{ color: T.textMuted }}>This shapes how your VA should approach their work.</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Work style</label>
+              <label className="block text-xs font-medium mb-2" style={{ color: T.textMuted }}>Work style</label>
               <div className="space-y-2">
                 {WORK_STYLES.map(s => (
                   <button
                     key={s}
                     onClick={() => updateForm('workStyle', s)}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-colors ${
-                      form.workStyle === s
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors"
+                    style={{
+                      border: `1px solid ${form.workStyle === s ? T.selectedBorder : T.border}`,
+                      background: form.workStyle === s ? T.selectedBg : 'transparent',
+                      color: form.workStyle === s ? T.textPrimary : T.textMuted,
+                    }}
                   >
                     {s}
                   </button>
@@ -272,17 +347,18 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Communication preference</label>
+              <label className="block text-xs font-medium mb-2" style={{ color: T.textMuted }}>Communication preference</label>
               <div className="space-y-2">
                 {COMM_PREFS.map(c => (
                   <button
                     key={c}
                     onClick={() => updateForm('commPref', c)}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-colors ${
-                      form.commPref === c
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
+                    className="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors"
+                    style={{
+                      border: `1px solid ${form.commPref === c ? T.selectedBorder : T.border}`,
+                      background: form.commPref === c ? T.selectedBg : 'transparent',
+                      color: form.commPref === c ? T.textPrimary : T.textMuted,
+                    }}
                   >
                     {c}
                   </button>
@@ -290,26 +366,32 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">What NOT to do (pet peeves, hard no's)</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: T.textMuted }}>What NOT to do (pet peeves, hard no's)</label>
               <textarea
                 value={form.doNotDo}
                 onChange={e => updateForm('doNotDo', e.target.value)}
                 rows={2}
                 placeholder="Don't send emails without my review, don't reschedule clients without asking, don't use jargon..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                style={{ ...inputStyle, resize: 'none' }}
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setStep(1)}
-                className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors"
+                style={{ border: `1px solid ${T.border}`, color: T.textMuted, background: 'transparent' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 Back
               </button>
               <button
                 onClick={generate}
                 disabled={!form.workStyle || !form.commPref || generating}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-40 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-40"
+                style={{ background: T.blue, color: '#fff' }}
+                onMouseEnter={e => { if (!(!form.workStyle || !form.commPref || generating)) (e.currentTarget as HTMLElement).style.background = T.blueHover; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = T.blue; }}
               >
                 {generating ? (
                   <>
@@ -318,7 +400,7 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
                   </>
                 ) : (
                   <>
-                    <Wand2 className="w-4 h-4" />
+                    <Wand2 className="w-4 h-4" aria-hidden="true" />
                     Generate Guide
                   </>
                 )}
@@ -331,33 +413,44 @@ Bring decisions to ${form.name} when they involve: client relationships, money o
         {step === 3 && (
           <div className="px-6 py-5 space-y-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Your cowork guide is ready</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Share this with your VA or EA. Edit as needed.</p>
+              <p className="text-sm font-semibold mb-1" style={{ color: T.textPrimary }}>Your cowork guide is ready</p>
+              <p className="text-xs" style={{ color: T.textMuted }}>Share this with your VA or EA. Edit as needed.</p>
             </div>
-            <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
-              <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
+            <div
+              className="max-h-64 overflow-y-auto rounded-lg p-4"
+              style={{ border: `1px solid ${T.border}`, background: T.previewBg }}
+            >
+              <pre className="text-xs whitespace-pre-wrap font-mono leading-relaxed" style={{ color: T.textMuted }}>
                 {generated}
               </pre>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={copyText}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-colors"
+                style={{ border: `1px solid ${T.border}`, color: T.textMuted, background: 'transparent' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                {downloaded ? <Check className="w-4 h-4 text-green-500" /> : <span>Copy Text</span>}
+                {copied
+                  ? <><Check className="w-4 h-4" style={{ color: T.amber }} aria-hidden="true" /><span>Copied</span></>
+                  : <span>Copy Text</span>
+                }
               </button>
               <button
                 onClick={downloadDocx}
                 disabled={downloading}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                style={{ background: T.blue, color: '#fff' }}
+                onMouseEnter={e => { if (!downloading) (e.currentTarget as HTMLElement).style.background = T.blueHover; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = T.blue; }}
               >
                 {downloading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : downloadDone ? (
+                  <><Check className="w-4 h-4" aria-hidden="true" /><span>Downloaded</span></>
                 ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    Download .docx
-                  </>
+                  <><Download className="w-4 h-4" aria-hidden="true" /><span>Download .docx</span></>
                 )}
               </button>
             </div>

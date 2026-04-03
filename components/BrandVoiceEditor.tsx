@@ -123,8 +123,8 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading brand voice profile...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" style={{ color: '#7c5bf6' }} />
+          <p style={{ color: '#9090a8' }}>Loading brand voice profile...</p>
         </div>
       </div>
     );
@@ -133,14 +133,18 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
   if (error && !profile) {
     return (
       <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-3">
-          <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+        <div
+          className="rounded-lg p-6 flex items-start gap-3"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}
+        >
+          <AlertCircle className="h-6 w-6 flex-shrink-0 mt-0.5" style={{ color: '#f87171' }} />
           <div className="flex-1">
-            <p className="font-medium text-red-900">Failed to load profile</p>
-            <p className="text-sm text-red-700 mt-1">{error}</p>
+            <p className="font-medium" style={{ color: '#ededf5' }}>Failed to load profile</p>
+            <p className="text-sm mt-1" style={{ color: '#9090a8' }}>{error}</p>
             <button
               onClick={loadProfile}
-              className="mt-4 text-sm text-red-700 hover:text-red-800 font-medium flex items-center gap-2"
+              className="mt-4 text-sm font-medium flex items-center gap-2"
+              style={{ color: '#f87171' }}
             >
               <RefreshCw className="h-4 w-4" />
               Try Again
@@ -154,12 +158,15 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
   if (!profile) {
     return (
       <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <Sparkles className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+        <div
+          className="rounded-lg p-6 text-center"
+          style={{ background: 'rgba(79,110,247,0.1)', border: '1px solid rgba(79,110,247,0.3)' }}
+        >
+          <Sparkles className="h-12 w-12 mx-auto mb-4" style={{ color: '#4f6ef7' }} />
+          <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>
             No Brand Voice Profile Yet
           </h3>
-          <p className="text-blue-700 mb-4">
+          <p style={{ color: '#9090a8' }} className="mb-4">
             Upload writing samples first to create your brand voice profile.
           </p>
         </div>
@@ -167,25 +174,55 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
     );
   }
 
+  const inputStyle: React.CSSProperties = {
+    background: 'rgba(18,18,31,0.8)',
+    border: '1px solid #1e1e30',
+    color: '#ededf5',
+    borderRadius: '0.5rem',
+    padding: '0.5rem 1rem',
+    width: '100%',
+    outline: 'none',
+  };
+
+  const cardStyle: React.CSSProperties = {
+    background: 'rgba(18,18,31,0.8)',
+    border: '1px solid #1e1e30',
+    borderRadius: '0.5rem',
+    padding: '1.5rem',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: '#9090a8',
+    marginBottom: '0.5rem',
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-        <div className="flex items-center justify-between">
+      <div
+        className="rounded-lg p-6"
+        style={{ background: 'linear-gradient(to right, #7c5bf6, #4f6ef7)' }}
+      >
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <Edit3 className="h-8 w-8" />
-              <h2 className="text-2xl font-bold">Edit Brand Voice</h2>
+              <Edit3 className="h-8 w-8" style={{ color: '#ededf5' }} />
+              <h2 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Edit Brand Voice</h2>
             </div>
-            <p className="text-purple-100">
+            <p style={{ color: 'rgba(237,237,245,0.75)' }}>
               Fine-tune your brand voice profile to match your unique writing style.
             </p>
           </div>
           {profile.lastAnalysisAt && (
             <div className="text-right text-sm">
-              <p className="text-purple-100">Last analyzed</p>
-              <p className="font-medium">{new Date(profile.lastAnalysisAt).toLocaleDateString()}</p>
-              <p className="text-xs text-purple-200 mt-1">
+              <p style={{ color: 'rgba(237,237,245,0.75)' }}>Last analyzed</p>
+              <p className="font-medium" style={{ color: '#ededf5' }}>
+                {new Date(profile.lastAnalysisAt).toLocaleDateString()}
+              </p>
+              <p className="text-xs mt-1" style={{ color: 'rgba(237,237,245,0.55)' }}>
                 {profile.analyzedDocuments} documents
               </p>
             </div>
@@ -195,51 +232,53 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
 
       {/* Status Messages */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div
+          className="rounded-lg p-4 flex items-start gap-3"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}
+        >
+          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: '#f87171' }} />
           <div className="flex-1">
-            <p className="text-sm font-medium text-red-900">Error</p>
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm font-medium" style={{ color: '#ededf5' }}>Error</p>
+            <p className="text-sm" style={{ color: '#9090a8' }}>{error}</p>
           </div>
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+        <div
+          className="rounded-lg p-4 flex items-start gap-3"
+          style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}
+        >
+          <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: '#4ade80' }} />
           <div className="flex-1">
-            <p className="text-sm font-medium text-green-900">Success</p>
-            <p className="text-sm text-green-700">Brand voice profile updated successfully!</p>
+            <p className="text-sm font-medium" style={{ color: '#ededf5' }}>Success</p>
+            <p className="text-sm" style={{ color: '#9090a8' }}>Brand voice profile updated successfully!</p>
           </div>
         </div>
       )}
 
       {/* Voice Characteristics */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Voice Characteristics</h3>
+      <div style={cardStyle} className="space-y-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Voice Characteristics</h3>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tone
-            </label>
+            <label style={labelStyle}>Tone</label>
             <input
               type="text"
               value={profile.tone || ''}
               onChange={(e) => updateProfile('tone', e.target.value)}
               placeholder="e.g., professional yet approachable"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              style={inputStyle}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Formality Level
-            </label>
+            <label style={labelStyle}>Formality Level</label>
             <select
               value={profile.formalityLevel || ''}
               onChange={(e) => updateProfile('formalityLevel', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              style={inputStyle}
             >
               <option value="">Select...</option>
               <option value="formal">Formal</option>
@@ -249,26 +288,22 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sentence Structure
-            </label>
+            <label style={labelStyle}>Sentence Structure</label>
             <input
               type="text"
               value={profile.sentenceStructure || ''}
               onChange={(e) => updateProfile('sentenceStructure', e.target.value)}
               placeholder="e.g., varied - short and long"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              style={inputStyle}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Vocabulary Complexity
-            </label>
+            <label style={labelStyle}>Vocabulary Complexity</label>
             <select
               value={profile.vocabularyComplexity || ''}
               onChange={(e) => updateProfile('vocabularyComplexity', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              style={inputStyle}
             >
               <option value="">Select...</option>
               <option value="simple">Simple</option>
@@ -278,13 +313,11 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Paragraph Length
-            </label>
+            <label style={labelStyle}>Paragraph Length</label>
             <select
               value={profile.paragraphLength || ''}
               onChange={(e) => updateProfile('paragraphLength', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              style={inputStyle}
             >
               <option value="">Select...</option>
               <option value="short">Short (1-2 sentences)</option>
@@ -295,15 +328,19 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
         </div>
 
         {/* Toggles */}
-        <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+        <div
+          className="grid md:grid-cols-3 gap-4 pt-4"
+          style={{ borderTop: '1px solid #1e1e30' }}
+        >
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={profile.usesContractions}
               onChange={(e) => updateProfile('usesContractions', e.target.checked)}
-              className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: '#7c5bf6' }}
             />
-            <span className="text-sm font-medium text-gray-700">Uses Contractions</span>
+            <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Uses Contractions</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -311,9 +348,10 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
               type="checkbox"
               checked={profile.usesEmojis}
               onChange={(e) => updateProfile('usesEmojis', e.target.checked)}
-              className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: '#7c5bf6' }}
             />
-            <span className="text-sm font-medium text-gray-700">Uses Emojis</span>
+            <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Uses Emojis</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
@@ -321,38 +359,45 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
               type="checkbox"
               checked={profile.usesMetaphors}
               onChange={(e) => updateProfile('usesMetaphors', e.target.checked)}
-              className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: '#7c5bf6' }}
             />
-            <span className="text-sm font-medium text-gray-700">Uses Metaphors</span>
+            <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Uses Metaphors</span>
           </label>
         </div>
       </div>
 
       {/* Voice Summary */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Voice Summary</h3>
+      <div style={cardStyle} className="space-y-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Voice Summary</h3>
         <textarea
           value={profile.voiceSummary || ''}
           onChange={(e) => updateProfile('voiceSummary', e.target.value)}
           placeholder="Describe your overall writing voice..."
-          className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+          className="resize-none"
+          style={{ ...inputStyle, height: '8rem', padding: '0.75rem 1rem' }}
         />
       </div>
 
       {/* Example Phrases */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Example Phrases</h3>
-        <p className="text-sm text-gray-600">
+      <div style={cardStyle} className="space-y-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Example Phrases</h3>
+        <p className="text-sm" style={{ color: '#9090a8' }}>
           Phrases and expressions you frequently use in your writing
         </p>
 
         <div className="space-y-2">
           {profile.examplePhrases.map((phrase, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-              <span className="flex-1 text-sm text-gray-900">{phrase}</span>
+            <div
+              key={index}
+              className="flex items-center gap-2 p-2 rounded-lg"
+              style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+            >
+              <span className="flex-1 text-sm" style={{ color: '#ededf5' }}>{phrase}</span>
               <button
                 onClick={() => removeExamplePhrase(index)}
-                className="text-red-600 hover:text-red-700"
+                aria-label={`Remove example phrase: ${phrase}`}
+                style={{ color: '#f87171' }}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -360,18 +405,19 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
           ))}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <input
             type="text"
             value={newExamplePhrase}
             onChange={(e) => setNewExamplePhrase(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addExamplePhrase()}
             placeholder="Add a phrase you use often..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            style={{ ...inputStyle, width: 'auto', flex: 1, minWidth: '12rem' }}
           />
           <button
             onClick={addExamplePhrase}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium"
+            style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}
           >
             <Plus className="h-4 w-4" />
             Add
@@ -380,19 +426,24 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
       </div>
 
       {/* Avoid Phrases */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Phrases to Avoid</h3>
-        <p className="text-sm text-gray-600">
+      <div style={cardStyle} className="space-y-4">
+        <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Phrases to Avoid</h3>
+        <p className="text-sm" style={{ color: '#9090a8' }}>
           Clichés or phrases you never use in your writing
         </p>
 
         <div className="space-y-2">
           {profile.avoidPhrases.map((phrase, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
-              <span className="flex-1 text-sm text-gray-900">{phrase}</span>
+            <div
+              key={index}
+              className="flex items-center gap-2 p-2 rounded-lg"
+              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
+            >
+              <span className="flex-1 text-sm" style={{ color: '#ededf5' }}>{phrase}</span>
               <button
                 onClick={() => removeAvoidPhrase(index)}
-                className="text-red-600 hover:text-red-700"
+                aria-label={`Remove avoid phrase: ${phrase}`}
+                style={{ color: '#f87171' }}
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -400,18 +451,19 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
           ))}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <input
             type="text"
             value={newAvoidPhrase}
             onChange={(e) => setNewAvoidPhrase(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addAvoidPhrase()}
             placeholder="Add a phrase to avoid..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            style={{ ...inputStyle, width: 'auto', flex: 1, minWidth: '12rem' }}
           />
           <button
             onClick={addAvoidPhrase}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium"
+            style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}
           >
             <Plus className="h-4 w-4" />
             Add
@@ -424,7 +476,13 @@ export default function BrandVoiceEditor({ onSave }: BrandVoiceEditorProps) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-purple-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-8 py-3 rounded-lg font-medium flex items-center gap-2"
+          style={{
+            background: saving ? '#5a5a72' : '#7c5bf6',
+            color: '#ededf5',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.7 : 1,
+          }}
         >
           {saving ? (
             <>
