@@ -1,14 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Star, FolderInput, Edit, Archive, Trash2, Loader2 } from 'lucide-react';
+import { MoreVertical, Star, FolderInput, Edit, Archive, Trash2, Loader2, Download, Pin, PinOff } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import type { Conversation } from '@/lib/store';
+import { exportAsMarkdown } from '@/lib/export-utils';
 
 interface ConversationMenuProps {
   conversationId: string;
   isStarred: boolean;
   onRename: () => void;
   onMoveToProject: () => void;
+  /** Full conversation object — required for Export action. When absent, Export renders as disabled. */
+  conversation?: Conversation;
+  /** Agent display name for export filename and header. */
+  agentName?: string;
+  /** Whether this conversation is pinned. When undefined/absent, Pin option is not rendered. */
+  isPinned?: boolean;
+  /** Called when user pins the conversation. Required together with onUnpin to show Pin option. */
+  onPin?: (id: string) => void;
+  /** Called when user unpins the conversation. Required together with onPin to show Pin option. */
+  onUnpin?: (id: string) => void;
 }
 
 // Design tokens
@@ -42,10 +54,18 @@ export default function ConversationMenu({
   isStarred,
   onRename,
   onMoveToProject,
+  conversation,
+  agentName = 'Agent',
+  isPinned,
+  onPin,
+  onUnpin,
 }: ConversationMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [busy, setBusy] = useState<'star' | 'archive' | 'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Pin option is only shown when both callbacks are provided
+  const showPinOption = typeof onPin === 'function' && typeof onUnpin === 'function';
 
   const { toggleStarConversation, archiveConversation, deleteConversation } = useAppStore();
 
@@ -94,6 +114,34 @@ export default function ConversationMenu({
       setError('Could not delete — please try again.');
     } finally {
       setBusy(null);
+    }
+  };
+
+  const handleExport = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!conversation) return; // disabled state — button is aria-disabled, but guard anyway
+    try {
+      exportAsMarkdown(conversation, agentName);
+      setIsOpen(false);
+    } catch (err) {
+      console.error('[ConversationMenu] Export failed:', err);
+      setError('Could not export — please try again.');
+    }
+  };
+
+  const handlePin = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!showPinOption) return;
+    try {
+      if (isPinned) {
+        onUnpin!(conversationId);
+      } else {
+        onPin!(conversationId);
+      }
+      setIsOpen(false);
+    } catch (err) {
+      console.error('[ConversationMenu] Pin/unpin failed:', err);
+      setError('Could not update pin — please try again.');
     }
   };
 
@@ -242,6 +290,48 @@ export default function ConversationMenu({
                 <Edit style={{ width: '16px', height: '16px', color: T.muted }} />
                 <span>Rename</span>
               </button>
+
+              {/* Export as Markdown */}
+              <button
+                onClick={handleExport}
+                disabled={!!busy || !conversation}
+                aria-label={conversation ? 'Export conversation as Markdown' : 'Open conversation to export'}
+                title={conversation ? undefined : 'Open conversation to export'}
+                style={{
+                  ...T.rowBase,
+                  color: conversation ? T.text : T.dim,
+                  opacity: (busy || !conversation) ? 0.5 : 1,
+                  cursor: conversation ? 'pointer' : 'not-allowed',
+                }}
+                onMouseEnter={(e) => { if (!busy && conversation) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <Download style={{ width: '16px', height: '16px', color: conversation ? T.muted : T.dim }} />
+                <span>Export as Markdown</span>
+              </button>
+
+              {/* Pin / Unpin */}
+              {showPinOption && (
+                <button
+                  onClick={handlePin}
+                  disabled={!!busy}
+                  aria-label={isPinned ? 'Unpin conversation' : 'Pin conversation'}
+                  style={{
+                    ...T.rowBase,
+                    color: T.text,
+                    opacity: busy ? 0.5 : 1,
+                  }}
+                  onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                >
+                  {isPinned ? (
+                    <PinOff style={{ width: '16px', height: '16px', color: T.muted }} />
+                  ) : (
+                    <Pin style={{ width: '16px', height: '16px', color: T.muted }} />
+                  )}
+                  <span>{isPinned ? 'Unpin conversation' : 'Pin conversation'}</span>
+                </button>
+              )}
 
               {/* Archive */}
               <button
