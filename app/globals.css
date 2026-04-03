@@ -839,3 +839,20 @@ html, body {
   padding: 1px;
   border-radius: 16px;
 }
+
+/* ── Pillars section — scroll reveal ────────────────────── */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-up.revealed.delay-150 {
+  transition-delay: 0.15s;
+}
+.reveal-up.revealed.delay-300 {
+  transition-delay: 0.3s;
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
@@ -51,6 +51,28 @@ export default function LandingPage() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  /* ── Pillars scroll reveal — IntersectionObserver ────────── */
+  const pillarsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const section = pillarsRef.current;
+    if (!section) return;
+    const targets = section.querySelectorAll<HTMLElement>('.reveal-up');
+    if (!targets.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   /* ── Data ─────────────────────────────────────────────── */
@@ -356,8 +378,24 @@ export default function LandingPage() {
       </section>
 
       {/* ── 3 Pillars ─────────────────────────────────── */}
-      <section className="relative z-10 py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
-        <div className="max-w-7xl mx-auto px-6">
+      <section
+        ref={pillarsRef}
+        className="relative z-10 py-28 overflow-hidden"
+        style={{ background: 'rgba(13,13,24,0.6)' }}
+      >
+        {/* Texture overlay — architecture divider */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/generated/architecture-divider.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.06,
+            zIndex: 0,
+          }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
 
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The Framework</p>
@@ -369,32 +407,66 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            {pillars.map((p, i) => (
-              <div key={i} className="relative p-8 rounded-2xl transition-all duration-300 group hover:translate-y-[-2px]"
-                style={{
-                  background: 'rgba(18,18,31,0.8)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  backdropFilter: 'blur(14px)',
-                }}>
-                {/* Big ghost number */}
-                <div className="absolute top-6 right-6 text-7xl font-black leading-none pointer-events-none select-none"
-                  style={{ color: p.color, opacity: 0.07 }}>
-                  {p.number}
-                </div>
+          {/* Cards wrapper — relative for the desktop connector line */}
+          <div className="relative max-w-5xl mx-auto">
 
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: `${p.color}18`, border: `1px solid ${p.color}2a` }}>
-                  <p.Icon className="w-5 h-5" style={{ color: p.color }} aria-hidden="true" />
-                </div>
+            {/* Desktop horizontal connector line */}
+            <div
+              className="hidden md:block absolute pointer-events-none"
+              style={{
+                top: 50,
+                left: '8%',
+                right: '8%',
+                height: 1,
+                background: 'linear-gradient(90deg, #4f6ef7 0%, #7c5bf6 50%, rgba(124,91,246,0.4) 100%)',
+                zIndex: 0,
+              }}
+            />
 
-                <div className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: p.color }}>
-                  Layer {i + 1} · {p.subtitle}
-                </div>
-                <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>{p.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{p.description}</p>
-              </div>
-            ))}
+            <div className="grid md:grid-cols-3 gap-5 relative z-10">
+              {pillars.map((p, i) => {
+                const revealClass = i === 0 ? 'reveal-up' : i === 1 ? 'reveal-up delay-150' : 'reveal-up delay-300';
+                const isDestination = i === 2;
+                const PillarIcon = p.Icon;
+                const cardInner = (
+                  <div
+                    className={`relative p-8 rounded-2xl transition-all duration-300 group hover:translate-y-[-2px]${isDestination ? ' h-full' : ''}`}
+                    style={{
+                      background: 'rgba(18,18,31,0.8)',
+                      border: isDestination ? undefined : '1px solid rgba(255,255,255,0.07)',
+                      backdropFilter: 'blur(14px)',
+                      borderLeft: '2px solid rgba(79,110,247,0.3)',
+                      borderRadius: isDestination ? 15 : undefined,
+                    }}
+                  >
+                    {/* Big ghost number */}
+                    <div className="absolute top-6 right-6 text-7xl font-black leading-none pointer-events-none select-none"
+                      style={{ color: p.color, opacity: 0.07 }}>
+                      {p.number}
+                    </div>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
+                      style={{ background: `${p.color}18`, border: `1px solid ${p.color}2a` }}>
+                      <PillarIcon className="w-5 h-5" style={{ color: p.color }} aria-hidden="true" />
+                    </div>
+                    <div className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: p.color }}>
+                      Layer {i + 1} · {p.subtitle}
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>{p.title}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{p.description}</p>
+                  </div>
+                );
+
+                return isDestination ? (
+                  <div key={i} className={`${revealClass} gradient-border-blue`}>
+                    {cardInner}
+                  </div>
+                ) : (
+                  <div key={i} className={revealClass}>
+                    {cardInner}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
