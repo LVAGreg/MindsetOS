@@ -27,35 +27,47 @@ export default function ForkNavigation({
   // Compact inline mode: [<] (2/3) [>]
   if (compact) {
     return (
-      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#9090a8', fontSize: '12px' }}
+      >
         <button
           onClick={() => canGoPrevious && onBranchChange(currentBranchIndex - 1)}
           disabled={!canGoPrevious}
-          className={`p-0.5 ${
-            canGoPrevious
-              ? 'hover:text-gray-700 dark:hover:text-gray-200'
-              : 'opacity-30 cursor-not-allowed'
-          }`}
-          title="Previous branch"
+          aria-label="Previous branch"
+          style={{
+            padding: '2px',
+            background: 'none',
+            border: 'none',
+            cursor: canGoPrevious ? 'pointer' : 'not-allowed',
+            opacity: canGoPrevious ? 1 : 0.3,
+            color: 'inherit',
+            display: 'flex',
+            alignItems: 'center',
+          }}
         >
-          <ChevronLeft className="w-3 h-3" />
+          <ChevronLeft style={{ width: '12px', height: '12px' }} />
         </button>
 
-        <span className="font-mono text-[10px]">
+        <span style={{ fontFamily: 'monospace', fontSize: '10px' }}>
           ({currentBranchIndex + 1}/{totalBranches})
         </span>
 
         <button
           onClick={() => canGoNext && onBranchChange(currentBranchIndex + 1)}
           disabled={!canGoNext}
-          className={`p-0.5 ${
-            canGoNext
-              ? 'hover:text-gray-700 dark:hover:text-gray-200'
-              : 'opacity-30 cursor-not-allowed'
-          }`}
-          title="Next branch"
+          aria-label="Next branch"
+          style={{
+            padding: '2px',
+            background: 'none',
+            border: 'none',
+            cursor: canGoNext ? 'pointer' : 'not-allowed',
+            opacity: canGoNext ? 1 : 0.3,
+            color: 'inherit',
+            display: 'flex',
+            alignItems: 'center',
+          }}
         >
-          <ChevronRight className="w-3 h-3" />
+          <ChevronRight style={{ width: '12px', height: '12px' }} />
         </button>
       </div>
     );
@@ -63,23 +75,49 @@ export default function ForkNavigation({
 
   // Standard mode (standalone below message)
   return (
-    <div className="flex items-center justify-center gap-2 mt-2 py-1 px-3 bg-gray-100 dark:bg-gray-700 rounded-md text-xs">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        marginTop: '8px',
+        padding: '4px 12px',
+        background: 'rgba(18,18,31,0.8)',
+        border: '1px solid #1e1e30',
+        borderRadius: '6px',
+        fontSize: '12px',
+      }}
+    >
       <button
         onClick={() => canGoPrevious && onBranchChange(currentBranchIndex - 1)}
         disabled={!canGoPrevious}
-        className={`p-1 rounded transition-colors ${
-          canGoPrevious
-            ? 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-            : 'opacity-30 cursor-not-allowed text-gray-400'
-        }`}
-        title="Previous branch"
+        aria-label="Previous branch"
+        style={{
+          padding: '4px',
+          borderRadius: '4px',
+          border: 'none',
+          background: 'none',
+          cursor: canGoPrevious ? 'pointer' : 'not-allowed',
+          opacity: canGoPrevious ? 1 : 0.3,
+          color: canGoPrevious ? '#ededf5' : '#5a5a72',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'background 0.15s',
+        }}
+        onMouseEnter={(e) => {
+          if (canGoPrevious) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.background = 'none';
+        }}
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft style={{ width: '16px', height: '16px' }} />
       </button>
 
-      <div className="flex items-center gap-1.5 px-2">
-        <GitBranch className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-        <span className="font-medium text-gray-700 dark:text-gray-300">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 8px' }}>
+        <GitBranch style={{ width: '14px', height: '14px', color: '#9090a8' }} />
+        <span style={{ fontWeight: 500, color: '#ededf5' }}>
           {currentBranchIndex + 1} of {totalBranches}
         </span>
       </div>
@@ -87,14 +125,27 @@ export default function ForkNavigation({
       <button
         onClick={() => canGoNext && onBranchChange(currentBranchIndex + 1)}
         disabled={!canGoNext}
-        className={`p-1 rounded transition-colors ${
-          canGoNext
-            ? 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300'
-            : 'opacity-30 cursor-not-allowed text-gray-400'
-        }`}
-        title="Next branch"
+        aria-label="Next branch"
+        style={{
+          padding: '4px',
+          borderRadius: '4px',
+          border: 'none',
+          background: 'none',
+          cursor: canGoNext ? 'pointer' : 'not-allowed',
+          opacity: canGoNext ? 1 : 0.3,
+          color: canGoNext ? '#ededf5' : '#5a5a72',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'background 0.15s',
+        }}
+        onMouseEnter={(e) => {
+          if (canGoNext) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.background = 'none';
+        }}
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight style={{ width: '16px', height: '16px' }} />
       </button>
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreVertical, Star, FolderInput, Edit, Archive, Trash2 } from 'lucide-react';
+import { MoreVertical, Star, FolderInput, Edit, Archive, Trash2, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
 interface ConversationMenuProps {
@@ -11,6 +11,32 @@ interface ConversationMenuProps {
   onMoveToProject: () => void;
 }
 
+// Design tokens
+const T = {
+  card:    'rgba(18,18,31,0.95)',
+  border:  '#1e1e30',
+  text:    '#ededf5',
+  muted:   '#9090a8',
+  dim:     '#5a5a72',
+  amber:   '#fcc824',
+  red:     '#f87171',
+  redHover:'rgba(248,113,113,0.1)',
+  hover:   'rgba(255,255,255,0.05)',
+  rowBase: {
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    gap: '8px',
+    width: '100%',
+    padding: '8px 16px',
+    textAlign: 'left' as const,
+    fontSize: '14px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'background 0.15s',
+  },
+};
+
 export default function ConversationMenu({
   conversationId,
   isStarred,
@@ -18,70 +44,162 @@ export default function ConversationMenu({
   onMoveToProject,
 }: ConversationMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [busy, setBusy] = useState<'star' | 'archive' | 'delete' | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const { toggleStarConversation, archiveConversation, deleteConversation } = useAppStore();
+
+  const clearError = () => setError(null);
 
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (busy) return;
+    setError(null);
+    setBusy('star');
     try {
       await toggleStarConversation(conversationId);
       setIsOpen(false);
-    } catch (error) {
-      console.error('Failed to toggle star:', error);
+    } catch {
+      setError('Could not update star — please try again.');
+    } finally {
+      setBusy(null);
     }
   };
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (busy) return;
+    setError(null);
+    setBusy('archive');
     try {
       await archiveConversation(conversationId);
       setIsOpen(false);
-    } catch (error) {
-      console.error('Failed to archive conversation:', error);
+    } catch {
+      setError('Could not archive — please try again.');
+    } finally {
+      setBusy(null);
     }
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
-      try {
-        await deleteConversation(conversationId);
-        setIsOpen(false);
-      } catch (error) {
-        console.error('Failed to delete conversation:', error);
-      }
+    if (busy) return;
+    if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) return;
+    setError(null);
+    setBusy('delete');
+    try {
+      await deleteConversation(conversationId);
+      setIsOpen(false);
+    } catch {
+      setError('Could not delete — please try again.');
+    } finally {
+      setBusy(null);
     }
   };
 
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
+      {/* Trigger */}
       <button
         onClick={(e) => {
           e.stopPropagation();
+          setError(null);
           setIsOpen(!isOpen);
         }}
-        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
         aria-label="Conversation options"
+        style={{
+          padding: '4px',
+          background: 'transparent',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'background 0.15s',
+          color: T.muted,
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = T.hover; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
       >
-        <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        <MoreVertical style={{ width: '16px', height: '16px' }} />
       </button>
 
       {isOpen && (
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 10 }}
+            onClick={() => { setIsOpen(false); setError(null); }}
           />
 
           {/* Menu */}
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
-            <div className="py-1">
-              {/* Star/Unstar */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: '100%',
+              marginTop: '4px',
+              width: '192px',
+              background: T.card,
+              border: `1px solid ${T.border}`,
+              borderRadius: '8px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              zIndex: 20,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Error banner */}
+            {error && (
+              <div
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  color: T.red,
+                  background: 'rgba(248,113,113,0.08)',
+                  borderBottom: `1px solid ${T.border}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                }}
+              >
+                <span>{error}</span>
+                <button
+                  onClick={clearError}
+                  aria-label="Dismiss error"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.red, lineHeight: 1 }}
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
+            <div style={{ padding: '4px 0' }}>
+              {/* Star / Unstar */}
               <button
                 onClick={handleToggleStar}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                disabled={!!busy}
+                style={{
+                  ...T.rowBase,
+                  color: T.text,
+                  opacity: busy && busy !== 'star' ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <Star className={`w-4 h-4 ${isStarred ? 'fill-yellow-400 text-yellow-400' : 'text-gray-500'}`} />
+                {busy === 'star' ? (
+                  <Loader2 style={{ width: '16px', height: '16px', color: T.amber, animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <Star
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      color: T.amber,
+                      fill: isStarred ? T.amber : 'none',
+                    }}
+                  />
+                )}
                 <span>{isStarred ? 'Unstar' : 'Star'} conversation</span>
               </button>
 
@@ -92,9 +210,16 @@ export default function ConversationMenu({
                   setIsOpen(false);
                   onMoveToProject();
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                disabled={!!busy}
+                style={{
+                  ...T.rowBase,
+                  color: T.text,
+                  opacity: busy ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <FolderInput className="w-4 h-4 text-gray-500" />
+                <FolderInput style={{ width: '16px', height: '16px', color: T.muted }} />
                 <span>Move to project</span>
               </button>
 
@@ -105,27 +230,57 @@ export default function ConversationMenu({
                   setIsOpen(false);
                   onRename();
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                disabled={!!busy}
+                style={{
+                  ...T.rowBase,
+                  color: T.text,
+                  opacity: busy ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <Edit className="w-4 h-4 text-gray-500" />
+                <Edit style={{ width: '16px', height: '16px', color: T.muted }} />
                 <span>Rename</span>
               </button>
 
               {/* Archive */}
               <button
                 onClick={handleArchive}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                disabled={!!busy}
+                style={{
+                  ...T.rowBase,
+                  color: T.text,
+                  opacity: busy && busy !== 'archive' ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.hover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <Archive className="w-4 h-4 text-gray-500" />
+                {busy === 'archive' ? (
+                  <Loader2 style={{ width: '16px', height: '16px', color: T.muted, animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <Archive style={{ width: '16px', height: '16px', color: T.muted }} />
+                )}
                 <span>Archive</span>
               </button>
 
               {/* Delete */}
               <button
                 onClick={handleDelete}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700"
+                disabled={!!busy}
+                style={{
+                  ...T.rowBase,
+                  color: T.red,
+                  borderTop: `1px solid ${T.border}`,
+                  opacity: busy && busy !== 'delete' ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => { if (!busy) (e.currentTarget as HTMLElement).style.background = T.redHover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
-                <Trash2 className="w-4 h-4" />
+                {busy === 'delete' ? (
+                  <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <Trash2 style={{ width: '16px', height: '16px' }} />
+                )}
                 <span>Delete</span>
               </button>
             </div>
