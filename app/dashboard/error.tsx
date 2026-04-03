@@ -32,19 +32,13 @@ export default function DashboardError({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={reset}
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
-            style={{ background: '#4f6ef7', color: '#ffffff' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#4060e8'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#4f6ef7'; }}
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium text-sm transition-colors bg-[#4f6ef7] text-white hover:bg-[#4060e8]"
           >
             Try Again
           </button>
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium text-sm transition-colors"
-            style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#2e2e40'; (e.currentTarget as HTMLAnchorElement).style.color = '#ededf5'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLAnchorElement).style.color = '#9090a8'; }}
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg font-medium text-sm transition-colors border border-[#1e1e30] text-[#9090a8] hover:border-[#2e2e40] hover:text-[#ededf5]"
           >
             Back to Dashboard
           </Link>

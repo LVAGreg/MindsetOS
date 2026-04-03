@@ -141,7 +141,7 @@ export default function CoachingPracticeCheckoutSuccessPage() {
                   href={CIRCLE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group/btn inline-flex items-center gap-2 px-6 py-3 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-white font-bold rounded-xl transition-all duration-300 hover:border-white/[0.15]"
+                  className="group/btn inline-flex items-center gap-2 px-6 py-3 bg-white/[0.06] hover:bg-white/[0.1] border border-[#1e1e30] text-white font-bold rounded-xl transition-all duration-300 hover:border-white/[0.15]"
                 >
                   Join the Community &amp; Access Content
                   <ExternalLink className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
@@ -203,7 +203,7 @@ export default function CoachingPracticeCheckoutSuccessPage() {
             </p>
             <Link
               href="/dashboard"
-              className="group inline-flex items-center gap-2 px-6 py-3 bg-white/[0.06] hover:bg-white/[0.1] text-white font-semibold rounded-xl transition-all duration-300 text-sm border border-white/[0.1] hover:border-white/[0.15]"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-white/[0.06] hover:bg-white/[0.1] text-white font-semibold rounded-xl transition-all duration-300 text-sm border border-[#1e1e30] hover:border-white/[0.15]"
             >
               Go to Dashboard
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

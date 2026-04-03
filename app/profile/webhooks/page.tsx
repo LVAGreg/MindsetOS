@@ -52,7 +52,9 @@ export default function WebhooksPage() {
       if (res.status === 401) { router.push('/login'); return; }
       const data = await res.json();
       setWebhooks(Array.isArray(data) ? data : []);
-    } catch {}
+    } catch (err) {
+      setError('Failed to load webhooks.');
+    }
     setLoading(false);
   }
 
@@ -109,7 +111,7 @@ export default function WebhooksPage() {
           </div>
           {!showForm && (
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => { setShowForm(true); setError(''); }}
               className="flex items-center gap-1.5 bg-[#fcc824] text-black text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#e6b420] transition-colors"
             >
               <Plus className="w-4 h-4" /> Add Webhook
@@ -126,9 +128,15 @@ export default function WebhooksPage() {
                 <label className="text-xs block mb-1" style={{ color: '#9090a8' }}>Endpoint URL</label>
                 <input
                   type="url"
+                  pattern="https?://.+"
                   placeholder="https://hooks.zapier.com/..."
                   value={newUrl}
-                  onChange={e => setNewUrl(e.target.value)}
+                  onChange={e => { setNewUrl(e.target.value); if (error === 'Enter a valid URL (http/https)') setError(''); }}
+                  onBlur={e => {
+                    if (e.target.value && !/^https?:\/\/.+/.test(e.target.value)) {
+                      setError('Enter a valid URL (http/https)');
+                    }
+                  }}
                   className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7] text-sm transition-colors"
                 />
               </div>

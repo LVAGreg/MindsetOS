@@ -42,46 +42,56 @@ interface PipelineResponse {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const STAGES: { key: Stage; label: string; color: string; bg: string; border: string; badge: string }[] = [
+const STAGES: { key: Stage; label: string; dotColor: string; headerBg: string; headerBorder: string; badgeBg: string; badgeText: string; emptyBorder: string }[] = [
   {
     key: 'lead',
     label: 'Lead',
-    color: 'text-blue-700 dark:text-blue-300',
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
-    border: 'border-blue-200 dark:border-blue-800',
-    badge: 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300',
+    dotColor: '#4f6ef7',
+    headerBg: 'rgba(79,110,247,0.08)',
+    headerBorder: 'rgba(79,110,247,0.25)',
+    badgeBg: 'rgba(79,110,247,0.18)',
+    badgeText: '#8ba4fa',
+    emptyBorder: 'rgba(79,110,247,0.2)',
   },
   {
     key: 'connected',
     label: 'Connected',
-    color: 'text-purple-700 dark:text-purple-300',
-    bg: 'bg-purple-50 dark:bg-purple-950/30',
-    border: 'border-purple-200 dark:border-purple-800',
-    badge: 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300',
+    dotColor: '#7c5bf6',
+    headerBg: 'rgba(124,91,246,0.08)',
+    headerBorder: 'rgba(124,91,246,0.25)',
+    badgeBg: 'rgba(124,91,246,0.18)',
+    badgeText: '#a98cf8',
+    emptyBorder: 'rgba(124,91,246,0.2)',
   },
   {
     key: 'call_booked',
     label: 'Call Booked',
-    color: 'text-indigo-700 dark:text-indigo-300',
-    bg: 'bg-indigo-50 dark:bg-indigo-950/30',
-    border: 'border-indigo-200 dark:border-indigo-800',
-    badge: 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300',
+    dotColor: '#fcc824',
+    headerBg: 'rgba(252,200,36,0.08)',
+    headerBorder: 'rgba(252,200,36,0.25)',
+    badgeBg: 'rgba(252,200,36,0.18)',
+    badgeText: '#fcc824',
+    emptyBorder: 'rgba(252,200,36,0.2)',
   },
   {
     key: 'pitch_done',
     label: 'Pitch Done',
-    color: 'text-orange-700 dark:text-orange-300',
-    bg: 'bg-orange-50 dark:bg-orange-950/30',
-    border: 'border-orange-200 dark:border-orange-800',
-    badge: 'bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300',
+    dotColor: '#f97316',
+    headerBg: 'rgba(249,115,22,0.08)',
+    headerBorder: 'rgba(249,115,22,0.25)',
+    badgeBg: 'rgba(249,115,22,0.18)',
+    badgeText: '#fb923c',
+    emptyBorder: 'rgba(249,115,22,0.2)',
   },
   {
     key: 'client',
     label: 'Client',
-    color: 'text-green-700 dark:text-green-300',
-    bg: 'bg-green-50 dark:bg-green-950/30',
-    border: 'border-green-200 dark:border-green-800',
-    badge: 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300',
+    dotColor: '#22c55e',
+    headerBg: 'rgba(34,197,94,0.08)',
+    headerBorder: 'rgba(34,197,94,0.25)',
+    badgeBg: 'rgba(34,197,94,0.18)',
+    badgeText: '#4ade80',
+    emptyBorder: 'rgba(34,197,94,0.2)',
   },
 ];
 
@@ -106,14 +116,31 @@ function formatDate(iso: string | null): string | null {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function sourceBadgeClass(source: Source | null): string {
+function sourceBadgeStyle(source: Source | null): React.CSSProperties {
   switch (source) {
-    case 'linkedin': return 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300';
-    case 'zoom': return 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300';
-    case 'lead_magnet': return 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300';
-    default: return 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+    case 'linkedin':   return { background: 'rgba(79,110,247,0.15)', color: '#8ba4fa' };
+    case 'zoom':       return { background: 'rgba(124,91,246,0.15)', color: '#a98cf8' };
+    case 'lead_magnet':return { background: 'rgba(252,200,36,0.15)', color: '#fcc824' };
+    default:           return { background: 'rgba(144,144,168,0.15)', color: '#9090a8' };
   }
 }
+
+// ─── Input class shared across both modals ────────────────────────────────────
+
+const inputCls = [
+  'w-full px-3 py-2 text-sm rounded-lg',
+  'border focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]',
+  'placeholder-[#5a5a72]',
+].join(' ');
+
+const inputStyle: React.CSSProperties = {
+  background: 'rgba(9,9,15,0.6)',
+  borderColor: '#1e1e30',
+  color: '#ededf5',
+};
+
+const labelCls = 'block text-sm font-medium mb-1';
+const labelStyle: React.CSSProperties = { color: '#9090a8' };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -121,7 +148,7 @@ function ColumnSkeleton() {
   return (
     <div className="flex flex-col gap-2 animate-pulse">
       {[1, 2, 3].map(i => (
-        <div key={i} className="h-24 rounded-xl bg-gray-200 dark:bg-gray-700" />
+        <div key={i} className="h-24 rounded-xl" style={{ background: '#1e1e30' }} />
       ))}
     </div>
   );
@@ -182,34 +209,59 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+        style={{
+          background: 'rgba(18,18,31,0.95)',
+          border: '1px solid #1e1e30',
+          backdropFilter: 'blur(20px)',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Add Contact</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: '1px solid #1e1e30' }}
+        >
+          <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>Add Contact</h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
           {error && (
-            <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+            <div
+              className="px-3 py-2 rounded-lg text-sm"
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
+            >
               {error}
             </div>
           )}
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email <span className="text-red-500">*</span>
+            <label className={labelCls} style={labelStyle}>
+              Email <span style={{ color: '#f87171' }}>*</span>
             </label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="jane@example.com"
-              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={inputCls}
+              style={inputStyle}
               autoFocus
             />
           </div>
@@ -217,23 +269,25 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
           {/* Name row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+              <label className={labelCls} style={labelStyle}>First Name</label>
               <input
                 type="text"
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
                 placeholder="Jane"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+              <label className={labelCls} style={labelStyle}>Last Name</label>
               <input
                 type="text"
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
                 placeholder="Doe"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               />
             </div>
           </div>
@@ -241,57 +295,62 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
           {/* Company + Phone */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
+              <label className={labelCls} style={labelStyle}>Company</label>
               <input
                 type="text"
                 value={company}
                 onChange={e => setCompany(e.target.value)}
                 placeholder="Acme Inc."
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+              <label className={labelCls} style={labelStyle}>Phone</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 placeholder="+1 555 000 0000"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               />
             </div>
           </div>
 
           {/* LinkedIn */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">LinkedIn URL</label>
+            <label className={labelCls} style={labelStyle}>LinkedIn URL</label>
             <input
               type="url"
               value={linkedin}
               onChange={e => setLinkedin(e.target.value)}
               placeholder="https://linkedin.com/in/janedoe"
-              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={inputCls}
+              style={inputStyle}
             />
           </div>
 
           {/* Source + Stage */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Source</label>
+              <label className={labelCls} style={labelStyle}>Source</label>
               <select
                 value={source}
                 onChange={e => setSource(e.target.value as Source)}
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               >
                 {SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stage</label>
+              <label className={labelCls} style={labelStyle}>Stage</label>
               <select
                 value={stage}
                 onChange={e => setStage(e.target.value as Stage)}
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={inputCls}
+                style={inputStyle}
               >
                 {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
               </select>
@@ -300,13 +359,14 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+            <label className={labelCls} style={labelStyle}>Notes</label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={3}
               placeholder="Any context about this contact..."
-              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className={`${inputCls} resize-none`}
+              style={inputStyle}
             />
           </div>
 
@@ -315,7 +375,10 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
             <button
               type="submit"
               disabled={saving || !email.trim()}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+              style={{ background: '#4f6ef7' }}
+              onMouseEnter={e => !saving && (e.currentTarget.style.background = '#3d5ce0')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
             >
               <Check className="w-4 h-4" />
               {saving ? 'Adding...' : 'Add Contact'}
@@ -323,7 +386,10 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg transition-colors"
+              className="px-4 py-2.5 text-sm rounded-lg transition-colors"
+              style={{ color: '#9090a8' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ededf5'; e.currentTarget.style.background = '#1e1e30'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#9090a8'; e.currentTarget.style.background = 'transparent'; }}
             >
               Cancel
             </button>
@@ -428,42 +494,72 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
   return (
     <>
-      {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      {/* Overlay — closes on click */}
+      <div
+        className="fixed inset-0 z-40"
+        style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+        onClick={onClose}
+      />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl flex flex-col">
+      <div
+        className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md shadow-2xl flex flex-col"
+        style={{
+          background: 'rgba(18,18,31,0.97)',
+          borderLeft: '1px solid #1e1e30',
+          backdropFilter: 'blur(20px)',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div
+          className="flex items-start justify-between px-6 py-5 flex-shrink-0"
+          style={{ borderBottom: '1px solid #1e1e30' }}
+        >
           <div className="flex-1 min-w-0 pr-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">{displayName(contact)}</h2>
+            <h2 className="text-lg font-bold truncate" style={{ color: '#ededf5' }}>{displayName(contact)}</h2>
             {contact.email && displayName(contact) !== contact.email && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">{contact.email}</p>
+              <p className="text-sm mt-0.5 truncate" style={{ color: '#9090a8' }}>{contact.email}</p>
             )}
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0">
-            <X className="w-5 h-5 text-gray-500" />
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg transition-colors flex-shrink-0"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           {drawerError && (
-            <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400 flex items-center justify-between">
+            <div
+              className="px-3 py-2 rounded-lg text-sm flex items-center justify-between"
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
+            >
               <span>{drawerError}</span>
-              <button onClick={() => setDrawerError(null)} className="ml-2 text-red-400 hover:text-red-600">✕</button>
+              <button onClick={() => setDrawerError(null)} className="ml-2" style={{ color: '#f87171' }}>✕</button>
             </div>
           )}
+
           {/* Meta chips */}
           <div className="flex flex-wrap gap-2">
             {contact.company && (
-              <span className="flex items-center gap-1 text-xs px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
+              <span
+                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(144,144,168,0.12)', color: '#9090a8' }}
+              >
                 <Building2 className="w-3 h-3" />
                 {contact.company}
               </span>
             )}
             {contact.source && (
-              <span className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${sourceBadgeClass(contact.source)}`}>
+              <span
+                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
+                style={sourceBadgeStyle(contact.source)}
+              >
                 {contact.source === 'linkedin' && <Linkedin className="w-3 h-3" />}
                 {contact.source.replace('_', ' ')}
               </span>
@@ -473,19 +569,39 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
           {/* Contact links */}
           <div className="space-y-2">
             {contact.email && (
-              <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <a
+                href={`mailto:${contact.email}`}
+                className="flex items-center gap-2 text-sm transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+              >
                 <Mail className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">{contact.email}</span>
               </a>
             )}
             {contact.phone && (
-              <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <a
+                href={`tel:${contact.phone}`}
+                className="flex items-center gap-2 text-sm transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+              >
                 <Phone className="w-4 h-4 flex-shrink-0" />
                 <span>{contact.phone}</span>
               </a>
             )}
             {contact.linkedin_url && (
-              <a href={contact.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              <a
+                href={contact.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+              >
                 <Linkedin className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">LinkedIn Profile</span>
                 <ChevronRight className="w-3 h-3 flex-shrink-0 opacity-50" />
@@ -495,7 +611,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
           {/* Last contacted */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm" style={{ color: '#9090a8' }}>
               <Clock className="w-4 h-4" />
               <span>
                 {lastContacted
@@ -506,7 +622,10 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
             <button
               onClick={handleMarkContacted}
               disabled={markingContacted}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+              style={{ background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.2)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.18)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.1)')}
             >
               <Check className="w-3.5 h-3.5" />
               {markingContacted ? 'Saving...' : 'Mark Contacted'}
@@ -515,11 +634,16 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
           {/* Stage selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stage</label>
+            <label className={labelCls} style={labelStyle}>Stage</label>
             <select
               value={stage}
               onChange={e => handleStageChange(e.target.value as Stage)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium ${stageMeta.color} ${stageMeta.bg} ${stageMeta.border} dark:bg-opacity-20`}
+              className={`${inputCls} font-medium`}
+              style={{
+                background: stageMeta.headerBg,
+                borderColor: stageMeta.headerBorder,
+                color: stageMeta.dotColor,
+              }}
             >
               {STAGES.map(s => (
                 <option key={s.key} value={s.key}>{s.label}</option>
@@ -529,7 +653,7 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className={labelCls} style={labelStyle}>
               <span className="flex items-center gap-1.5">
                 <FileText className="w-4 h-4" />
                 Notes
@@ -540,22 +664,29 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               onChange={e => handleNotesChange(e.target.value)}
               rows={5}
               placeholder="Add notes about this contact..."
-              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className={`${inputCls} resize-none`}
+              style={inputStyle}
             />
           </div>
 
           {/* Added date */}
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs" style={{ color: '#5a5a72' }}>
             Added {formatDate(contact.created_at)}
           </p>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div
+          className="flex items-center justify-between gap-3 px-6 py-4 flex-shrink-0"
+          style={{ borderTop: '1px solid #1e1e30' }}
+        >
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="flex items-center gap-1.5 text-sm rounded-lg px-3 py-2 transition-colors disabled:opacity-50"
+            style={{ color: '#f87171' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? 'Deleting...' : 'Delete'}
@@ -565,7 +696,10 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+              style={{ background: '#4f6ef7' }}
+              onMouseEnter={e => !saving && (e.currentTarget.style.background = '#3d5ce0')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
             >
               <Check className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save Changes'}
@@ -595,18 +729,27 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm p-3.5 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      className="w-full text-left group rounded-xl p-3.5 transition-all focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
+      style={{
+        background: 'rgba(18,18,31,0.8)',
+        border: '1px solid #1e1e30',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = '#2a2a42')}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e1e30')}
     >
       <div className="flex items-start justify-between gap-2">
         {/* Avatar + name */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+          <div
+            className="w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center text-white text-xs font-bold"
+            style={{ background: 'linear-gradient(135deg, #4f6ef7, #7c5bf6)' }}
+          >
             {(displayName(contact)[0] || '?').toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">{displayName(contact)}</div>
+            <div className="text-sm font-semibold truncate" style={{ color: '#ededf5' }}>{displayName(contact)}</div>
             {contact.company && (
-              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              <div className="flex items-center gap-1 text-xs mt-0.5" style={{ color: '#5a5a72' }}>
                 <Building2 className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{contact.company}</span>
               </div>
@@ -617,22 +760,28 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
         {/* Delete button — visible on hover */}
         <button
           onClick={handleDelete}
-          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all"
+          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
           title="Delete contact"
+          style={{ color: '#f87171' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
         >
-          <Trash2 className="w-3.5 h-3.5 text-red-400" />
+          <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Source + last contacted */}
       <div className="flex items-center gap-2 mt-2.5 flex-wrap">
         {contact.source && (
-          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${sourceBadgeClass(contact.source)}`}>
+          <span
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+            style={sourceBadgeStyle(contact.source)}
+          >
             {contact.source.replace('_', ' ')}
           </span>
         )}
         {contact.last_contacted_at && (
-          <span className="flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500">
+          <span className="flex items-center gap-0.5 text-[10px]" style={{ color: '#5a5a72' }}>
             <Clock className="w-3 h-3" />
             {formatDate(contact.last_contacted_at)}
           </span>
@@ -641,7 +790,7 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
 
       {/* Notes preview */}
       {contact.notes && (
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+        <p className="mt-2 text-xs line-clamp-2 leading-relaxed" style={{ color: '#9090a8' }}>
           {contact.notes}
         </p>
       )}
@@ -712,29 +861,38 @@ export default function PipelinePage() {
   if (!isAllowed) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+      <div
+        className="flex-shrink-0"
+        style={{ background: 'rgba(18,18,31,0.9)', borderBottom: '1px solid #1e1e30', backdropFilter: 'blur(12px)' }}
+      >
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-500" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <Users className="w-6 h-6 text-indigo-500" />
+              <Users className="w-6 h-6" style={{ color: '#4f6ef7' }} />
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">Pipeline</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h1 className="text-xl font-bold" style={{ color: '#ededf5' }}>Pipeline</h1>
+                <p className="text-sm" style={{ color: '#9090a8' }}>
                   {totalContacts} contact{totalContacts !== 1 ? 's' : ''} across {STAGES.length} stages
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              style={{ background: '#4f6ef7' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#3d5ce0')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
             >
               <Plus className="w-4 h-4" />
               Add Contact
@@ -746,25 +904,40 @@ export default function PipelinePage() {
       {/* Page-level error */}
       {pageError && (
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 pt-4">
-          <div className="px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400 flex items-center justify-between">
+          <div
+            className="px-4 py-3 rounded-lg text-sm flex items-center justify-between"
+            style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
+          >
             <span>{pageError}</span>
-            <button onClick={() => setPageError(null)} className="ml-2 text-red-400 hover:text-red-600">✕</button>
+            <button onClick={() => setPageError(null)} className="ml-2" style={{ color: '#f87171' }}>✕</button>
           </div>
         </div>
       )}
 
-      {/* Board */}
+      {/* Board — horizontal scroll on mobile */}
       <div className="flex-1 overflow-x-auto">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-          <div className="flex gap-4 min-w-max pb-4">
+          <div className="flex gap-4 pb-4" style={{ minWidth: 'max-content' }}>
             {STAGES.map(stage => {
               const contacts = grouped[stage.key];
               return (
-                <div key={stage.key} className="w-72 flex-shrink-0 flex flex-col gap-3">
+                <div key={stage.key} className="flex-shrink-0 flex flex-col gap-3" style={{ width: '288px', minWidth: '288px' }}>
                   {/* Column header */}
-                  <div className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl ${stage.bg} border ${stage.border}`}>
-                    <span className={`text-sm font-semibold ${stage.color}`}>{stage.label}</span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${stage.badge}`}>
+                  <div
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl"
+                    style={{ background: stage.headerBg, border: `1px solid ${stage.headerBorder}` }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: stage.dotColor }}
+                      />
+                      <span className="text-sm font-semibold" style={{ color: stage.dotColor }}>{stage.label}</span>
+                    </div>
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
+                      style={{ background: stage.badgeBg, color: stage.badgeText }}
+                    >
                       {contacts.length}
                     </span>
                   </div>
@@ -775,7 +948,10 @@ export default function PipelinePage() {
                       <ColumnSkeleton />
                     ) : contacts.length === 0 ? (
                       /* Empty state */
-                      <div className={`flex flex-col items-center justify-center py-8 rounded-xl border-2 border-dashed ${stage.border} text-gray-400 dark:text-gray-500`}>
+                      <div
+                        className="flex flex-col items-center justify-center py-8 rounded-xl border-2 border-dashed"
+                        style={{ borderColor: stage.emptyBorder, color: '#5a5a72' }}
+                      >
                         <Users className="w-6 h-6 mb-2 opacity-40" />
                         <span className="text-xs">No contacts</span>
                       </div>
@@ -794,7 +970,8 @@ export default function PipelinePage() {
                   {/* Add to this column shortcut */}
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className={`flex items-center justify-center gap-1.5 w-full py-2 text-xs rounded-lg border border-dashed ${stage.border} ${stage.color} opacity-60 hover:opacity-100 transition-opacity`}
+                    className="flex items-center justify-center gap-1.5 w-full py-2 text-xs rounded-lg border border-dashed transition-opacity opacity-50 hover:opacity-100"
+                    style={{ borderColor: stage.emptyBorder, color: stage.dotColor }}
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add

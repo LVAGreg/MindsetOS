@@ -47,7 +47,7 @@ const MINDSET_PILLARS = [
   {
     score: 51,
     label: 'Pattern Awareness',
-    color: '#8b5cf6',
+    color: '#7c5bf6',
     desc: 'How well you see the loops you keep running',
   },
 ];
@@ -93,7 +93,7 @@ const PRODUCT_LADDER = [
     desc: 'Everything in the cohort, plus 1:1 direct access to Greg. For founders who need to move fast and go deep.',
     cta: 'Apply Now',
     href: '/checkout',
-    accent: '#8b5cf6',
+    accent: '#7c5bf6',
     highlight: false,
     details: ['Everything in 90-Day cohort', '1:1 sessions with Greg', 'Private Slack access'],
   },
@@ -101,7 +101,7 @@ const PRODUCT_LADDER = [
 
 const WORKFLOW_STAGES = [
   {
-    phase: 'Awareness', phaseNum: '01', accent: '#f59e0b',
+    phase: 'Awareness', phaseNum: '01', accent: '#fcc824',
     agents: [
       { name: 'Mindset Score Agent', icon: '📊', desc: '5-question assessment with personalized pillar scores' },
       { name: 'Inner World Mapper', icon: '🗺️', desc: 'Map your beliefs, stories, and self-talk patterns' },
@@ -116,7 +116,7 @@ const WORKFLOW_STAGES = [
     ],
   },
   {
-    phase: 'Architecture', phaseNum: '03', accent: '#eab308',
+    phase: 'Architecture', phaseNum: '03', accent: '#fcc824',
     agents: [
       { name: 'Practice Builder', icon: '🧘', desc: 'Personalized 5-10 min daily mindset routines' },
       { name: 'Accountability Partner', icon: '🤝', desc: 'Daily check-ins, reflections, and streak tracking' },
@@ -159,7 +159,7 @@ const SOCIAL_PROOF = [
     name: 'Priya L.',
     role: 'Entrepreneur & consultant',
     initial: 'P',
-    color: '#8b5cf6',
+    color: '#7c5bf6',
   },
 ];
 
@@ -372,7 +372,7 @@ export default function TrialV3B() {
           100% { background-position: 200% center; }
         }
         .shimmer-gold {
-          background: linear-gradient(90deg, #fcc824 0%, #ffe082 40%, #fcc824 60%, #f59e0b 100%);
+          background: linear-gradient(90deg, #fcc824 0%, #ffe082 40%, #fcc824 60%, #fcc824 100%);
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -433,7 +433,7 @@ export default function TrialV3B() {
             <MindsetOSLogo size="sm" variant="light" />
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="inline-flex px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300">Sign in</Link>
+            <Link href="/login" className="inline-flex px-4 py-2 text-sm font-medium text-[#9090a8] hover:text-white transition-colors duration-300">Sign in</Link>
             <Link href="/register/trial" className="group relative px-5 py-2.5 text-sm font-bold rounded-full transition-all duration-300 hover:-translate-y-0.5 bg-[#fcc824] text-black hover:bg-[#f0be1e] shadow-[0_0_20px_rgba(252,200,36,0.25)] hover:shadow-[0_0_30px_rgba(252,200,36,0.4)]">
               Get Your Score Free <ArrowRight className="inline-block w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
             </Link>
@@ -454,7 +454,7 @@ export default function TrialV3B() {
           <div className="absolute top-[10%] left-[5%] w-[500px] h-[500px] rounded-full opacity-[0.12]"
             style={{ background: 'radial-gradient(circle, #fcc824 0%, transparent 65%)', filter: 'blur(100px)', animation: 'orb-float-1 8s ease-in-out infinite' }} />
           <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] rounded-full opacity-[0.08]"
-            style={{ background: 'radial-gradient(circle, #8b5cf6 0%, transparent 65%)', filter: 'blur(120px)', animation: 'orb-float-2 10s ease-in-out infinite' }} />
+            style={{ background: 'radial-gradient(circle, #7c5bf6 0%, transparent 65%)', filter: 'blur(120px)', animation: 'orb-float-2 10s ease-in-out infinite' }} />
           <div className="absolute bottom-[15%] left-[40%] w-[350px] h-[350px] rounded-full opacity-[0.06]"
             style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 65%)', filter: 'blur(110px)', animation: 'orb-float-1 12s ease-in-out infinite reverse' }} />
           {/* Noise grain overlay */}
@@ -481,7 +481,7 @@ export default function TrialV3B() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fcc824] opacity-60"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#fcc824]"></span>
                 </span>
-                <span className="text-sm font-semibold text-gray-300 tracking-wide">Free Mindset Score &mdash; takes 3 minutes</span>
+                <span className="text-sm font-semibold text-[#9090a8] tracking-wide">Free Mindset Score &mdash; takes 3 minutes</span>
               </div>
 
               <h1 className="anim-hero-2 text-[2rem] xs:text-[2.75rem] sm:text-6xl lg:text-[5rem] font-black leading-[1.05] tracking-tighter mb-6 sm:mb-7">
@@ -490,7 +490,7 @@ export default function TrialV3B() {
                 <span className="shimmer-gold">your mind.</span>
               </h1>
 
-              <p className="anim-hero-3 text-lg sm:text-xl text-gray-400 max-w-xl leading-relaxed mb-10">
+              <p className="anim-hero-3 text-lg sm:text-xl text-[#9090a8] max-w-xl leading-relaxed mb-10">
                 Most entrepreneurs have systemised their business and ignored their operating system.
                 MindsetOS gives you a score, a plan, and 10 AI coaches to actually fix it.
               </p>
@@ -499,7 +499,7 @@ export default function TrialV3B() {
                 <Link href="/register/trial" className="group relative inline-flex items-center gap-2.5 px-6 sm:px-8 py-4 bg-[#fcc824] text-black font-extrabold text-base sm:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.25)] hover:shadow-[0_0_50px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center sm:justify-start">
                   Get your Mindset Score &mdash; free <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-sm text-gray-500 sm:mt-3.5">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-sm text-[#5a5a72] sm:mt-3.5">
                   <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> No credit card</span>
                   <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400/70" /> 3 minutes</span>
                 </div>
@@ -523,7 +523,7 @@ export default function TrialV3B() {
                 <div className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white transition-colors duration-300 group-hover:text-[#fcc824]">
                   <AnimatedNumber target={stat.value} />
                 </div>
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-[0.18em] mt-1.5">{stat.label}</div>
+                <div className="text-xs font-bold text-[#5a5a72] uppercase tracking-[0.18em] mt-1.5">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -545,7 +545,7 @@ export default function TrialV3B() {
                 Know your number.<br />
                 <span className="text-[#fcc824]">Fix the right thing.</span>
               </h2>
-              <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-lg text-[#5a5a72] max-w-2xl mx-auto leading-relaxed">
                 Most entrepreneurs work harder. MindsetOS shows you which pillar is actually holding you back &mdash; then gives you a plan.
               </p>
             </div>
@@ -562,24 +562,24 @@ export default function TrialV3B() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-white">Your Mindset Score</div>
-                    <div className="text-xs text-gray-500">Example report</div>
+                    <div className="text-xs text-[#5a5a72]">Example report</div>
                   </div>
                 </div>
                 <div className="space-y-6">
                   {MINDSET_PILLARS.map((pillar, i) => (
                     <div key={i}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-300">{pillar.label}</span>
+                        <span className="text-sm font-semibold text-[#9090a8]">{pillar.label}</span>
                         <span className="text-sm font-black tabular-nums" style={{ color: pillar.color }}>{pillar.score}/100</span>
                       </div>
                       <ScoreBar score={pillar.score} color={pillar.color} delay={i * 200} />
-                      <p className="text-xs text-gray-600 mt-1.5">{pillar.desc}</p>
+                      <p className="text-xs text-[#5a5a72] mt-1.5">{pillar.desc}</p>
                     </div>
                   ))}
                 </div>
                 <div className="mt-8 p-4 rounded-xl bg-[#fcc824]/[0.06] border border-[#fcc824]/10">
                   <div className="text-xs font-bold text-[#fcc824] uppercase tracking-wider mb-2">Your personalised insight</div>
-                  <p className="text-sm text-gray-300 leading-relaxed">
+                  <p className="text-sm text-[#9090a8] leading-relaxed">
                     Your biggest leverage point right now is <strong className="text-white">Pattern Awareness</strong>. You&apos;re reacting before you even know you&apos;ve been triggered. Start with the Story Excavator.
                   </p>
                 </div>
@@ -593,7 +593,7 @@ export default function TrialV3B() {
                   5 questions.<br />
                   <span className="text-[#fcc824]">Clarity that takes months to get elsewhere.</span>
                 </h3>
-                <p className="text-gray-400 leading-relaxed">
+                <p className="text-[#9090a8] leading-relaxed">
                   The Mindset Score isn&apos;t a personality quiz. It&apos;s a diagnostic. It measures the three pillars that determine how you perform under real pressure &mdash; and tells you exactly where to start.
                 </p>
                 <div className="space-y-4">
@@ -607,7 +607,7 @@ export default function TrialV3B() {
                       <div className="w-9 h-9 rounded-xl bg-[#fcc824]/10 border border-[#fcc824]/15 flex items-center justify-center flex-shrink-0">
                         <item.icon className="w-4 h-4 text-[#fcc824]" />
                       </div>
-                      <span className="text-[15px] text-gray-300 font-medium">{item.text}</span>
+                      <span className="text-[15px] text-[#9090a8] font-medium">{item.text}</span>
                     </div>
                   ))}
                 </div>
@@ -637,7 +637,7 @@ export default function TrialV3B() {
                 Start free. Go as deep<br />
                 <span className="text-[#fcc824]">as you need to.</span>
               </h2>
-              <p className="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
+              <p className="text-lg text-[#5a5a72] max-w-xl mx-auto leading-relaxed">
                 Most people start with the free Score and never look back. Some go all the way.
               </p>
             </div>
@@ -667,12 +667,12 @@ export default function TrialV3B() {
                       )}
                     </div>
                     <h3 className="text-[15px] font-extrabold text-white mb-3 leading-snug">{tier.name}</h3>
-                    <p className="text-[13px] text-gray-500 leading-relaxed mb-6 flex-1">{tier.desc}</p>
+                    <p className="text-[13px] text-[#5a5a72] leading-relaxed mb-6 flex-1">{tier.desc}</p>
                     <div className="space-y-2 mb-6">
                       {tier.details.map((d, di) => (
                         <div key={di} className="flex items-center gap-2">
                           <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: tier.accent }} />
-                          <span className="text-[12px] text-gray-400">{d}</span>
+                          <span className="text-[12px] text-[#9090a8]">{d}</span>
                         </div>
                       ))}
                     </div>
@@ -680,7 +680,7 @@ export default function TrialV3B() {
                       className={`group flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
                         tier.highlight
                           ? 'bg-[#fcc824] text-black hover:bg-[#f0be1e] hover:shadow-[0_0_20px_rgba(252,200,36,0.3)]'
-                          : 'bg-white/[0.05] border border-white/[0.08] text-gray-300 hover:bg-white/[0.1] hover:text-white'
+                          : 'bg-white/[0.05] border border-white/[0.08] text-[#9090a8] hover:bg-white/[0.1] hover:text-white'
                       }`}>
                       {tier.cta} <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                     </Link>
@@ -691,15 +691,15 @@ export default function TrialV3B() {
           </div>
 
           <RevealSection delay={400}>
-            <div className="hidden lg:flex items-center justify-center gap-0 mt-6 text-xs text-gray-700 font-semibold uppercase tracking-wider">
+            <div className="hidden lg:flex items-center justify-center gap-0 mt-6 text-xs text-[#5a5a72] font-semibold uppercase tracking-wider">
               <span>Free</span>
-              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <ArrowRight className="w-4 h-4 mx-3 text-[#5a5a72]/50" />
               <span>$47</span>
-              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <ArrowRight className="w-4 h-4 mx-3 text-[#5a5a72]/50" />
               <span>$997</span>
-              <ArrowRight className="w-4 h-4 mx-3 text-gray-700/50" />
+              <ArrowRight className="w-4 h-4 mx-3 text-[#5a5a72]/50" />
               <span>$1,997</span>
-              <span className="ml-4 text-gray-600">&mdash; your pace, your call.</span>
+              <span className="ml-4 text-[#5a5a72]">&mdash; your pace, your call.</span>
             </div>
           </RevealSection>
         </div>
@@ -724,7 +724,7 @@ export default function TrialV3B() {
               <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black tracking-tighter mb-6">
                 From reactive thinking to{' '}<span className="text-[#fcc824]">designed operating system</span>
               </h2>
-              <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">10 AI coaches. One through-line. Built to move you from chaos to clarity to compounding.</p>
+              <p className="text-base sm:text-lg text-[#5a5a72] max-w-2xl mx-auto leading-relaxed">10 AI coaches. One through-line. Built to move you from chaos to clarity to compounding.</p>
             </div>
           </RevealSection>
 
@@ -751,7 +751,7 @@ export default function TrialV3B() {
                       <div className="flex items-center gap-4 px-6 py-5 border-b border-white/[0.04]">
                         <div className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{ backgroundColor: `${stage.accent}20` }}>{stage.phaseNum}</div>
                         <h3 className="text-lg font-extrabold tracking-tight uppercase" style={{ color: stage.accent }}>{stage.phase}</h3>
-                        <span className="ml-auto text-xs font-semibold text-gray-600 tabular-nums">{stage.agents.length} agent{stage.agents.length > 1 ? 's' : ''}</span>
+                        <span className="ml-auto text-xs font-semibold text-[#5a5a72] tabular-nums">{stage.agents.length} agent{stage.agents.length > 1 ? 's' : ''}</span>
                       </div>
                       <div className="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {stage.agents.map((agent, agentIdx) => (
@@ -759,7 +759,7 @@ export default function TrialV3B() {
                             <span className="text-2xl flex-shrink-0 mt-0.5 transition-transform duration-300 group-hover/agent:scale-110">{agent.icon}</span>
                             <div className="min-w-0">
                               <div className="text-sm font-bold text-white leading-snug">{agent.name}</div>
-                              <div className="text-xs text-gray-500 mt-1 leading-relaxed">{agent.desc}</div>
+                              <div className="text-xs text-[#5a5a72] mt-1 leading-relaxed">{agent.desc}</div>
                             </div>
                           </div>
                         ))}
@@ -787,7 +787,7 @@ export default function TrialV3B() {
       {/* ── HOW IT WORKS ── */}
       <section className="relative py-16 sm:py-28 lg:py-36 overflow-hidden">
         {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-500/[0.04] blur-[200px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#7c5bf6]/[0.04] blur-[200px] pointer-events-none" />
         <div className="absolute bottom-0 right-[10%] w-[300px] h-[300px] rounded-full bg-[#fcc824]/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-3 10s ease-in-out infinite' }} />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
@@ -817,7 +817,7 @@ export default function TrialV3B() {
                       <step.icon className="w-6 h-6 text-[#fcc824]" />
                     </div>
                     <h3 className="text-xl font-extrabold mb-3 tracking-tight">{step.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-[15px]">{step.desc}</p>
+                    <p className="text-[#9090a8] leading-relaxed text-[15px]">{step.desc}</p>
                   </div>
                 </div>
               </RevealSection>
@@ -833,7 +833,7 @@ export default function TrialV3B() {
       <section className="relative py-14 sm:py-24 lg:py-32 overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-[#fcc824]/[0.03] blur-[180px] pointer-events-none" style={{ animation: 'orb-float-2 9s ease-in-out infinite' }} />
-        <div className="absolute bottom-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[10%] right-[15%] w-[300px] h-[300px] rounded-full bg-[#7c5bf6]/[0.03] blur-[150px] pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
           <RevealSection>
@@ -859,7 +859,7 @@ export default function TrialV3B() {
                     ))}
                   </div>
                   <Quote className="w-7 h-7 text-white/[0.08] mb-4 group-hover:text-[#fcc824]/20 transition-colors duration-500" />
-                  <p className="text-[15px] text-gray-300 leading-relaxed mb-8 font-medium">&ldquo;{testimonial.quote}&rdquo;</p>
+                  <p className="text-[15px] text-[#9090a8] leading-relaxed mb-8 font-medium">&ldquo;{testimonial.quote}&rdquo;</p>
                   <div className="mt-auto flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full border border-white/[0.08] flex items-center justify-center text-sm font-black"
                       style={{ background: `linear-gradient(135deg, ${testimonial.color}20, ${testimonial.color}08)`, color: testimonial.color }}>
@@ -867,7 +867,7 @@ export default function TrialV3B() {
                     </div>
                     <div>
                       <div className="text-sm font-bold text-white">{testimonial.name}</div>
-                      <div className="text-xs text-gray-500">{testimonial.role}</div>
+                      <div className="text-xs text-[#5a5a72]">{testimonial.role}</div>
                     </div>
                   </div>
                 </div>
@@ -908,7 +908,7 @@ export default function TrialV3B() {
                       </div>
                       <div>
                         <div className="text-sm font-extrabold text-white uppercase tracking-wider mb-1">{item.title}</div>
-                        <div className="text-[15px] text-gray-400 leading-relaxed">{item.text}</div>
+                        <div className="text-[15px] text-[#9090a8] leading-relaxed">{item.text}</div>
                       </div>
                     </div>
                   </RevealSection>
@@ -922,25 +922,25 @@ export default function TrialV3B() {
                 <div className="relative rounded-3xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.02] backdrop-blur-xl p-8 sm:p-10 overflow-hidden hover:border-white/[0.12] transition-all duration-500">
                   {/* Card glow accents */}
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#fcc824]/10 rounded-full blur-[80px] pointer-events-none" />
-                  <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-violet-500/10 rounded-full blur-[60px] pointer-events-none" />
+                  <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-[#7c5bf6]/10 rounded-full blur-[60px] pointer-events-none" />
                   <div className="relative">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#fcc824]/10 border border-[#fcc824]/20 text-[#fcc824] text-xs font-bold uppercase tracking-wider mb-6"><Sparkles className="w-3.5 h-3.5" /> Free &mdash; no card needed</div>
                     <h3 className="text-2xl font-black tracking-tight mb-2">Get your Mindset Score.</h3>
-                    <p className="text-gray-500 mb-8">3 minutes. Real answers. No fluff.</p>
+                    <p className="text-[#5a5a72] mb-8">3 minutes. Real answers. No fluff.</p>
                     <div className="space-y-3.5 mb-8">
                       {['Your 3-pillar score breakdown', 'Personalised coaching path', '10 AI coaches activated', 'Conversation history saved', '7-day full access trial', 'No credit card to start'].map((item, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-[#fcc824]/10 flex items-center justify-center flex-shrink-0">
                             <CheckCircle className="w-3.5 h-3.5 text-[#fcc824]" />
                           </div>
-                          <span className="text-sm text-gray-300">{item}</span>
+                          <span className="text-sm text-[#9090a8]">{item}</span>
                         </div>
                       ))}
                     </div>
                     <Link href="/register/trial" className="group w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-extrabold rounded-2xl transition-all duration-300 shadow-[0_0_30px_rgba(252,200,36,0.2)] hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:-translate-y-0.5 hover:scale-[1.01] active:scale-[0.98]">
                       Get your free Mindset Score <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Link>
-                    <p className="text-center text-xs text-gray-600 mt-4">Takes less than 3 minutes</p>
+                    <p className="text-center text-xs text-[#5a5a72] mt-4">Takes less than 3 minutes</p>
                   </div>
                 </div>
               </RevealSection>
@@ -956,7 +956,7 @@ export default function TrialV3B() {
       <section className="relative py-20 sm:py-32 lg:py-40 overflow-hidden">
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full bg-[#fcc824]/[0.05] blur-[200px] pointer-events-none" />
-        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] rounded-full bg-violet-500/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-2 12s ease-in-out infinite' }} />
+        <div className="absolute bottom-[20%] left-[10%] w-[300px] h-[300px] rounded-full bg-[#7c5bf6]/[0.03] blur-[150px] pointer-events-none" style={{ animation: 'orb-float-2 12s ease-in-out infinite' }} />
 
         {/* Mobile: Robot behind CTA text */}
         <MobileSplineBackground className="absolute inset-0 lg:hidden" opacity={0.5} />
@@ -978,13 +978,13 @@ export default function TrialV3B() {
                   Your mind is the last system
                   <span className="text-[#fcc824]"> you haven&apos;t built.</span>
                 </h2>
-                <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-8 sm:mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
+                <p className="text-base sm:text-lg lg:text-xl text-[#9090a8] mb-8 sm:mb-10 max-w-xl leading-relaxed mx-auto lg:mx-0">
                   Get your Mindset Score in 3 minutes. Understand the patterns running your decisions. Start building a system that runs itself.
                 </p>
                 <Link href="/register/trial" className="group inline-flex items-center gap-3 px-7 sm:px-10 py-4 sm:py-5 bg-[#fcc824] text-black font-extrabold text-base sm:text-lg rounded-2xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.25)] hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:-translate-y-1 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center">
                   Get your free Mindset Score <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
-                <p className="text-sm text-gray-600 mt-6 font-medium">No credit card &middot; 3 minutes &middot; Full 7-day access</p>
+                <p className="text-sm text-[#5a5a72] mt-6 font-medium">No credit card &middot; 3 minutes &middot; Full 7-day access</p>
               </RevealSection>
             </div>
           </div>
@@ -999,9 +999,9 @@ export default function TrialV3B() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <MindsetOSLogo size="xs" variant="light" />
-              <span className="text-sm text-gray-500">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline transition-colors duration-300">Greg</a></span>
+              <span className="text-sm text-[#5a5a72]">MindsetOS &mdash; powered by{' '}<a href="https://mindset.show" target="_blank" rel="noopener noreferrer" className="text-[#fcc824] hover:underline transition-colors duration-300">Greg</a></span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[#5a5a72]">
               <Link href="/agency" className="hover:text-white transition-colors duration-300">Coaching Practice</Link>
               <Link href="/join" className="hover:text-white transition-colors duration-300">Join</Link>
               <Link href="/terms" className="hover:text-white transition-colors duration-300">Terms</Link>
@@ -1010,7 +1010,7 @@ export default function TrialV3B() {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-white/[0.04] text-center">
-            <p className="text-xs text-gray-700">&copy; 2026 MindsetOS. All rights reserved.</p>
+            <p className="text-xs text-[#5a5a72]">&copy; 2026 MindsetOS. All rights reserved.</p>
           </div>
         </div>
       </footer>

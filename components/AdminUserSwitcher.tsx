@@ -23,7 +23,9 @@ export function AdminUserSwitcher() {
   const [requestingEdit, setRequestingEdit] = useState(false);
   const [confirmingEdit, setConfirmingEdit] = useState(false);
   const [endingSession, setEndingSession] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const { user, viewAsUser, setViewAsUser, impersonationSession, setImpersonationSession } = useAppStore();
 
@@ -87,25 +89,48 @@ export function AdminUserSwitcher() {
 
   // Poll for session status changes (when edit_requested, check if approved/declined)
   useEffect(() => {
+    // Clear any existing interval before potentially creating a new one
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (!impersonationSession || impersonationSession.status !== 'edit_requested') return;
-    const interval = setInterval(() => {
-      apiClient.getActiveImpersonation()
-        .then((data: { session: any }) => {
-          if (data.session && data.session.status !== 'edit_requested') {
-            setImpersonationSession({
-              id: data.session.id,
-              status: data.session.status,
-              permissions: data.session.permissions,
-              expires_at: data.session.expires_at,
-            });
+
+    intervalRef.current = setInterval(async () => {
+      try {
+        const data: { session: any } = await apiClient.getActiveImpersonation();
+        if (data.session && data.session.status !== 'edit_requested') {
+          setImpersonationSession({
+            id: data.session.id,
+            status: data.session.status,
+            permissions: data.session.permissions,
+            expires_at: data.session.expires_at,
+          });
+          // Terminal state reached — stop polling
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
           }
-        })
-        .catch((err: unknown) => {
-          // Polling failure — non-blocking but log so transient errors are visible
-          console.error('[AdminUserSwitcher] Failed to poll impersonation session status:', err);
-        });
+        }
+      } catch (err: any) {
+        if (err?.status === 401) {
+          // Unauthorized — stop polling immediately
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }
+        console.error('[AdminUserSwitcher] Failed to poll impersonation session status:', err);
+      }
     }, 5000);
-    return () => clearInterval(interval);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [impersonationSession?.status]);
 
   if (!isAdmin) return null;
@@ -138,11 +163,13 @@ export function AdminUserSwitcher() {
       setSearch('');
     } catch (err) {
       console.error('Failed to start impersonation:', err);
+      setActionError('Failed to switch user. Try again.');
     }
   };
 
   const handleRequestEdit = async () => {
     setRequestingEdit(true);
+    setActionError(null);
     try {
       await apiClient.requestEditAccess();
       setImpersonationSession({
@@ -151,6 +178,7 @@ export function AdminUserSwitcher() {
       });
     } catch (err) {
       console.error('Failed to request edit access:', err);
+      setActionError('Failed to request edit access.');
     } finally {
       setRequestingEdit(false);
     }
@@ -158,12 +186,14 @@ export function AdminUserSwitcher() {
 
   const handleEndSession = async () => {
     setEndingSession(true);
+    setActionError(null);
     try {
       await apiClient.endImpersonation();
       setViewAsUser(null);
       setImpersonationSession(null);
     } catch (err) {
       console.error('Failed to end session:', err);
+      setActionError('Failed to end session. Try again.');
     } finally {
       setEndingSession(false);
     }
@@ -287,6 +317,11 @@ export function AdminUserSwitcher() {
             )}
           </button>
         </div>
+        {actionError && (
+          <div className="mt-1 text-xs px-2 py-1 rounded" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+            {actionError}
+          </div>
+        )}
       </div>
     );
   }
@@ -330,7 +365,7 @@ export function AdminUserSwitcher() {
                 placeholder="Search by name, email, or role..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
                 autoFocus
               />
             </div>

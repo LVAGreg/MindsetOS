@@ -218,15 +218,25 @@ export default function NotificationsPage() {
               ) : (
                 <div style={{ borderTop: 'none' }}>
                   {filteredNotifications.map((notification) => (
-                    <div
+                    <button
                       key={notification.id}
+                      type="button"
                       onClick={() => {
                         setSelectedNotification(notification);
                         if (!notification.is_read) {
                           markAsRead(notification.id);
                         }
                       }}
-                      className="p-4 border-l-4 cursor-pointer transition-all hover:brightness-125"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedNotification(notification);
+                          if (!notification.is_read) {
+                            markAsRead(notification.id);
+                          }
+                        }
+                      }}
+                      className="w-full text-left p-4 border-l-4 cursor-pointer transition-all hover:brightness-125 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#4f6ef7]"
                       style={{
                         borderBottom: '1px solid #1e1e30',
                         ...getPriorityStyle(notification.priority),
@@ -250,15 +260,79 @@ export default function NotificationsPage() {
                           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#4f6ef7' }}></span>
                         )}
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Detail */}
-          <div className="lg:col-span-2 rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          {/* Mobile detail pane — visible only below lg breakpoint */}
+          {selectedNotification && (
+            <div className="lg:hidden rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{getTypeIcon(selectedNotification.type)}</span>
+                    <div>
+                      <h2 className="text-base font-semibold" style={{ color: '#ededf5' }}>{selectedNotification.title}</h2>
+                      <p className="text-xs mt-0.5" style={{ color: '#9090a8' }}>
+                        {formatTime(selectedNotification.created_at)} · {selectedNotification.source}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!selectedNotification.is_read && (
+                      <button onClick={() => markAsRead(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#9090a8' }} title="Mark as read">
+                        <Check className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button onClick={() => deleteNotification(selectedNotification.id)} className="p-1.5 rounded-lg" style={{ color: '#ef4444' }} title="Delete">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setSelectedNotification(null)} className="p-1.5 rounded-lg text-xs" style={{ color: '#9090a8' }} title="Close">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <span
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mb-3"
+                  style={
+                    selectedNotification.priority === 'urgent' ? { background: 'rgba(239,68,68,0.15)', color: '#f87171' } :
+                    selectedNotification.priority === 'high' ? { background: 'rgba(249,115,22,0.15)', color: '#fb923c' } :
+                    selectedNotification.priority === 'normal' ? { background: 'rgba(79,110,247,0.15)', color: '#818cf8' } :
+                    { background: 'rgba(144,144,168,0.15)', color: '#9090a8' }
+                  }
+                >
+                  {selectedNotification.priority} priority
+                </span>
+                {selectedNotification.message && (
+                  <div className="rounded-lg p-3 mb-4" style={{ background: 'rgba(9,9,15,0.6)' }}>
+                    <p className="text-sm whitespace-pre-wrap" style={{ color: '#ededf5' }}>{selectedNotification.message}</p>
+                  </div>
+                )}
+                {selectedNotification.data?.action_buttons && Array.isArray(selectedNotification.data.action_buttons) && (
+                  <div className="space-y-2">
+                    {selectedNotification.data.action_buttons.map((btn: { label: string; url: string; icon?: string; description?: string }, idx: number) => (
+                      <button
+                        key={idx}
+                        onClick={() => { window.location.href = btn.url; }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left"
+                        style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.25)' }}
+                      >
+                        {btn.icon && <span className="text-xl">{btn.icon}</span>}
+                        <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>{btn.label}</span>
+                        <ChevronRight className="w-4 h-4 ml-auto flex-shrink-0" style={{ color: '#fcc824' }} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Detail — desktop only */}
+          <div className="hidden lg:block lg:col-span-2 rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             {selectedNotification ? (
               <div className="p-6">
                 <div className="flex items-start justify-between mb-6">

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, AlertCircle } from 'lucide-react';
+import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, AlertCircle, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 
@@ -291,11 +292,21 @@ export default function OutcomesPage() {
             <h3 className="text-xl font-semibold mb-2" style={{ color: '#ededf5' }}>
               {outcomes.length === 0 ? 'No outcomes yet' : 'No matches'}
             </h3>
-            <p className="text-sm max-w-sm" style={{ color: '#9090a8' }}>
+            <p className="text-sm max-w-sm mb-6" style={{ color: '#9090a8' }}>
               {outcomes.length === 0
                 ? 'Start conversations with your agents — outcomes and deliverables will be captured and tracked here automatically.'
                 : 'Try adjusting your filters to see more outcomes.'}
             </p>
+            {outcomes.length === 0 && (
+              <Link
+                href="/agents"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:brightness-110"
+                style={{ background: '#fcc824', color: '#09090f' }}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Start a Conversation
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

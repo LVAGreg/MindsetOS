@@ -141,7 +141,7 @@ export default function CoachingPracticeLandingPage() {
       <section className="relative overflow-hidden">
         {/* Background depth layers */}
         <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-[#fcc824]/[0.04] rounded-full blur-[150px]" />
-        <div className="absolute top-[100px] left-[5%] w-[400px] h-[400px] bg-amber-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute top-[100px] left-[5%] w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'rgba(252,200,36,0.03)' }} />
         <div className="absolute top-[200px] right-[5%] w-[350px] h-[350px] bg-purple-500/[0.03] rounded-full blur-[120px]" />
         {/* Subtle dot grid */}
         <div className="absolute inset-0 opacity-[0.03]" style={{

@@ -125,13 +125,13 @@ export default function ReferralsPage() {
         {!loading && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: 'Total Referrals', value: stats?.totalReferrals ?? 0, icon: Users, color: 'text-blue-400' },
-              { label: 'Converted', value: stats?.paidReferrals ?? 0, icon: Check, color: 'text-emerald-400' },
-              { label: 'Total Earned', value: `$${((stats?.totalEarnedCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, color: 'text-[#fcc824]' },
-              { label: 'Paid Out', value: `$${((stats?.paidOutCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, color: 'text-emerald-400' },
+              { label: 'Total Referrals', value: stats?.totalReferrals ?? 0, icon: Users, iconColor: '#4f6ef7' },
+              { label: 'Converted', value: stats?.paidReferrals ?? 0, icon: Check, iconColor: '#fcc824' },
+              { label: 'Total Earned', value: `$${((stats?.totalEarnedCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, iconColor: '#fcc824' },
+              { label: 'Paid Out', value: `$${((stats?.paidOutCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, iconColor: '#fcc824' },
             ].map(s => (
               <div key={s.label} className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
-                <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
+                <s.icon className="w-5 h-5 mb-2" style={{ color: s.iconColor }} />
                 <div className="text-xl font-bold" style={{ color: '#ededf5' }}>{s.value}</div>
                 <div className="text-xs" style={{ color: '#9090a8' }}>{s.label}</div>
               </div>
@@ -166,14 +166,17 @@ export default function ReferralsPage() {
                     <div className="text-xs" style={{ color: '#9090a8' }}>{new Date(c.created_at).toLocaleDateString()}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-bold" style={{ color: '#4ade80', fontWeight: 700 }}>
+                    <div className="text-sm font-bold" style={{ color: '#fcc824', fontWeight: 700 }}>
                       +${(c.commission_amount_cents / 100).toFixed(2)}
                     </div>
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      c.status === 'paid'
-                        ? 'bg-emerald-500/10 text-emerald-400'
-                        : 'bg-yellow-500/10 text-yellow-400'
-                    }`}>
+                    <span
+                      className="text-xs px-1.5 py-0.5 rounded-full"
+                      style={
+                        c.status === 'paid'
+                          ? { background: 'rgba(79,110,247,0.12)', color: '#4f6ef7' }
+                          : { background: 'rgba(252,200,36,0.12)', color: '#fcc824' }
+                      }
+                    >
                       {c.status}
                     </span>
                   </div>
