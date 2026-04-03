@@ -64,6 +64,7 @@ export default function AdminInviteCodesPage() {
       setInviteCodes(data.inviteCodes || []);
     } catch (error) {
       console.error('Failed to fetch invite codes:', error);
+      showStatus('error', 'Failed to load invite codes — try refreshing');
     } finally {
       setLoading(false);
     }
@@ -122,16 +123,24 @@ export default function AdminInviteCodesPage() {
   };
 
   const copyToClipboard = async (code: string) => {
-    const registerUrl = `${window.location.origin}/register?code=${code}`;
-    await navigator.clipboard.writeText(registerUrl);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+    try {
+      const registerUrl = `${window.location.origin}/register?code=${code}`;
+      await navigator.clipboard.writeText(registerUrl);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch {
+      showStatus('error', 'Could not copy to clipboard — check browser permissions');
+    }
   };
 
   const copyCodeOnly = async (code: string) => {
-    await navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch {
+      showStatus('error', 'Could not copy to clipboard — check browser permissions');
+    }
   };
 
   const isExpired = (expiresAt: string | null) => {
@@ -256,8 +265,8 @@ export default function AdminInviteCodesPage() {
         </div>
         <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg" style={{ background: 'rgba(168,85,247,0.12)' }}>
-              <Users className="w-5 h-5" style={{ color: '#c084fc' }} />
+            <div className="p-2 rounded-lg" style={{ background: 'rgba(124,91,246,0.12)' }}>
+              <Users className="w-5 h-5" style={{ color: '#7c5bf6' }} />
             </div>
             <div>
               <p className="text-sm" style={{ color: '#9090a8' }}>Total Signups</p>
@@ -348,8 +357,8 @@ export default function AdminInviteCodesPage() {
                 onClick={() => setShowCreateForm(false)}
                 className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
                 style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 Cancel
               </button>
@@ -401,8 +410,8 @@ export default function AdminInviteCodesPage() {
                 key={inviteCode.id}
                 className="p-4 transition-colors"
                 style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.3)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -457,8 +466,8 @@ export default function AdminInviteCodesPage() {
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: '#9090a8' }}
                       title="Copy code"
-                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     >
                       {copiedCode === inviteCode.code ? (
                         <Check className="w-4 h-4" style={{ color: '#4ade80' }} />
@@ -473,8 +482,8 @@ export default function AdminInviteCodesPage() {
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: '#9090a8' }}
                       title="Copy registration link"
-                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     >
                       <LinkIcon className="w-4 h-4" />
                     </button>
@@ -508,8 +517,8 @@ export default function AdminInviteCodesPage() {
                       className="p-2 rounded-lg transition-colors"
                       style={{ color: '#f87171' }}
                       title="Delete code"
-                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.12)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.12)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
