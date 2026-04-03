@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { API_URL } from '@/lib/api-client';
 
@@ -22,7 +22,6 @@ interface AgentData {
 
 export default function AgentEditorPage() {
   const params = useParams();
-  const router = useRouter();
   const agentId = params.agentId as string;
   const version = params.version as string;
 
@@ -30,6 +29,7 @@ export default function AgentEditorPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('security');
   const [showPreview, setShowPreview] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -95,6 +95,8 @@ export default function AgentEditorPage() {
   }
 
   async function publishAgent() {
+    if (publishing) return;
+    setPublishing(true);
     setFeedbackMessage(null);
     try {
       const res = await fetch(`${API_URL}/api/v7/agents/${agentId}/${version}/publish`, {
@@ -110,6 +112,8 @@ export default function AgentEditorPage() {
       await loadAgent();
     } catch (err: any) {
       showFeedback('error', `Error publishing: ${err.message}`);
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -127,12 +131,13 @@ export default function AgentEditorPage() {
   if (loadError) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
-        <div className="rounded-2xl shadow-xl max-w-md p-8 text-center" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="rounded-2xl shadow-xl max-w-md p-8 text-center" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="text-lg font-semibold mb-2" style={{ color: '#f87171' }}>Failed to load agent</div>
           <p className="text-sm mb-4" style={{ color: '#9090a8' }}>{loadError}</p>
           <button
             onClick={() => { setLoading(true); loadAgent(); }}
-            className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
+            className="bg-[#4f6ef7] hover:bg-[#3d5ce0] font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors"
+          style={{ color: '#ededf5' }}
           >
             Retry
           </button>
@@ -184,33 +189,35 @@ export default function AgentEditorPage() {
                     Published
                   </span>
                 ) : (
-                  <span style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.25)', color: '#fbbf24', borderRadius: 8, padding: '3px 10px', fontSize: 12 }}>
+                  <span style={{ background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.25)', color: '#fcc824', borderRadius: 8, padding: '3px 10px', fontSize: 12 }}>
                     Draft
                   </span>
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               <button
                 onClick={() => setShowPreview(!showPreview)}
                 className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-                style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', color: '#9090a8' }}
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#9090a8' }}
               >
                 {showPreview ? 'Hide' : 'Show'} Preview
               </button>
               {!agent.is_published && (
                 <button
                   onClick={publishAgent}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                  disabled={publishing}
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
                   style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
                 >
-                  Publish
+                  {publishing ? 'Publishing...' : 'Publish'}
                 </button>
               )}
               <button
                 onClick={saveAgent}
                 disabled={saving}
-                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50"
+                className="font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50"
+                style={{ background: '#fcc824', color: '#09090f' }}
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -239,7 +246,7 @@ export default function AgentEditorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Editor */}
           <div className="lg:col-span-2">
-            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
               {/* Tabs */}
               <div style={{ borderBottom: '1px solid #1e1e30' }}>
                 <nav className="flex -mb-px overflow-x-auto">
@@ -272,7 +279,7 @@ export default function AgentEditorPage() {
                     })}
                     rows={20}
                     className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
-                    style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
+                    style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid #1e1e30', color: '#ededf5', fontFamily: 'monospace' }}
                     placeholder={`Enter ${currentTab?.label.toLowerCase()}...`}
                   />
                 </div>
@@ -287,7 +294,7 @@ export default function AgentEditorPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Metadata */}
-            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Agent Details</h3>
               <div className="space-y-4">
                 <div>
@@ -328,7 +335,7 @@ export default function AgentEditorPage() {
             </div>
 
             {/* Section Stats */}
-            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Section Stats</h3>
               <div className="space-y-2 text-sm">
                 {tabs.map((tab) => {
@@ -354,17 +361,18 @@ export default function AgentEditorPage() {
             </div>
 
             {/* Actions */}
-            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+            <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
               <h3 className="text-lg font-semibold mb-4" style={{ color: '#ededf5' }}>Actions</h3>
               <div className="space-y-2">
                 <Link
                   href={`/admin/agents/${agentId}/${version}/history`}
                   className="block w-full px-4 py-2.5 text-center rounded-xl text-sm font-semibold transition-colors"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #1e1e30', color: '#9090a8' }}
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#9090a8' }}
                 >
                   View History
                 </Link>
                 <button
+                  onClick={() => showFeedback('error', 'Delete is not yet implemented in this version.')}
                   className="block w-full px-4 py-2.5 text-center rounded-xl text-sm font-semibold transition-colors"
                   style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
                 >
@@ -383,8 +391,8 @@ export default function AgentEditorPage() {
                 <h2 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Assembled Prompt Preview</h2>
                 <button
                   onClick={() => setShowPreview(false)}
+                  className="transition-opacity hover:opacity-70"
                   style={{ color: '#9090a8' }}
-                  className="hover:text-[#ededf5] transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -394,7 +402,7 @@ export default function AgentEditorPage() {
               <div className="p-6 overflow-y-auto">
                 <pre
                   className="whitespace-pre-wrap text-sm p-4 rounded-xl"
-                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', fontFamily: 'monospace' }}
+                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid #1e1e30', color: '#ededf5', fontFamily: 'monospace' }}
                 >
                   {agent.full_prompt}
                 </pre>
