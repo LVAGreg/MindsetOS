@@ -6,5 +6,3 @@ scripts
 docs
 .claude
 *.backup
-*.png
-*.jpg

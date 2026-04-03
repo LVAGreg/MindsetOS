@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Build: 2026-04-03
 const nextConfig = {
   poweredByHeader: false,
   output: 'standalone', // Required for Railway Docker deployment
