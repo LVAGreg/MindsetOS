@@ -60,7 +60,8 @@ export default function KnowledgeBasePage() {
   });
 
   useEffect(() => {
-    if (currentUser && currentUser.role !== 'admin' && currentUser.role !== 'power_user') {
+    if (!currentUser) return;
+    if (currentUser.role !== 'admin' && currentUser.role !== 'power_user') {
       router.push('/dashboard');
     } else {
       loadData();
@@ -79,6 +80,8 @@ export default function KnowledgeBasePage() {
       if (docsResponse.ok) {
         const docsData = await docsResponse.json();
         setDocuments(Array.isArray(docsData.documents) ? docsData.documents : []);
+      } else {
+        setError('Failed to load documents');
       }
 
       const agentsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/letta/agents`, {
@@ -88,6 +91,8 @@ export default function KnowledgeBasePage() {
       if (agentsResponse.ok) {
         const agentsData = await agentsResponse.json();
         setAgents(Array.isArray(agentsData) ? agentsData : []);
+      } else {
+        setError('Failed to load agents');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -300,7 +305,7 @@ export default function KnowledgeBasePage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl" style={{ background: 'rgba(79,110,247,0.12)' }}>
               <Database className="w-6 h-6" style={{ color: '#7b8ff8' }} />
@@ -312,7 +317,7 @@ export default function KnowledgeBasePage() {
           </div>
         </div>
 
-        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl" style={{ background: 'rgba(79,110,247,0.12)' }}>
               <Globe className="w-6 h-6" style={{ color: '#7b8ff8' }} />
@@ -324,7 +329,7 @@ export default function KnowledgeBasePage() {
           </div>
         </div>
 
-        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+        <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl" style={{ background: 'rgba(79,110,247,0.12)' }}>
               <Sparkles className="w-6 h-6" style={{ color: '#7b8ff8' }} />
@@ -338,7 +343,7 @@ export default function KnowledgeBasePage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+      <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#9090a8' }} />
@@ -377,7 +382,7 @@ export default function KnowledgeBasePage() {
       </div>
 
       {/* Documents List */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead style={{ background: 'rgba(9,9,15,0.5)', borderBottom: '1px solid #1e1e30' }}>
@@ -402,8 +407,8 @@ export default function KnowledgeBasePage() {
                     key={doc.id}
                     className="transition-colors"
                     style={{ borderTop: '1px solid #1e1e30' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(79,110,247,0.04)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.04)')}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-start gap-3">
@@ -457,8 +462,8 @@ export default function KnowledgeBasePage() {
                           onClick={() => handleEdit(doc)}
                           className="p-2 rounded-xl transition-colors"
                           style={{ color: '#7b8ff8' }}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(79,110,247,0.12)')}
-                          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.12)')}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                           title="Edit document"
                         >
                           <FileText className="w-4 h-4" />
@@ -467,8 +472,8 @@ export default function KnowledgeBasePage() {
                           onClick={() => handleDelete(doc.id)}
                           className="p-2 rounded-xl transition-colors"
                           style={{ color: '#f87171' }}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
-                          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)')}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                           title="Delete document"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -486,15 +491,15 @@ export default function KnowledgeBasePage() {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
             <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>Upload Document</h2>
                 <button
                   onClick={() => setShowUploadModal(false)}
                   className="p-2 rounded-xl transition-colors"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   <X className="w-5 h-5" style={{ color: '#9090a8' }} />
                 </button>
@@ -593,8 +598,8 @@ export default function KnowledgeBasePage() {
                   disabled={uploading}
                   className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ border: '1px solid #1e1e30', color: '#9090a8', background: 'transparent' }}
-                  onMouseEnter={(e) => !uploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={(e) => !uploading && ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   Cancel
                 </button>
@@ -624,15 +629,15 @@ export default function KnowledgeBasePage() {
       {/* Edit Modal */}
       {showEditModal && editingDocument && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
             <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>Edit Document</h2>
                 <button
                   onClick={() => { setShowEditModal(false); setEditingDocument(null); }}
                   className="p-2 rounded-xl transition-colors"
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   <X className="w-5 h-5" style={{ color: '#9090a8' }} />
                 </button>
@@ -710,8 +715,8 @@ export default function KnowledgeBasePage() {
                   onClick={() => { setShowEditModal(false); setEditingDocument(null); }}
                   className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
                   style={{ border: '1px solid #1e1e30', color: '#9090a8', background: 'transparent' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   Cancel
                 </button>
