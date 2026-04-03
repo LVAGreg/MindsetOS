@@ -18,6 +18,19 @@ interface TranscriptMessage {
   timestamp: string;
 }
 
+// Design tokens
+const T = {
+  pageBg:   '#09090f',
+  cardBg:   'rgba(18,18,31,0.8)',
+  border:   '#1e1e30',
+  text:     '#ededf5',
+  muted:    '#9090a8',
+  dim:      '#5a5a72',
+  blue:     '#4f6ef7',
+  amber:    '#fcc824',
+  purple:   '#7c5bf6',
+};
+
 export default function VoiceChatLive({
   agentId,
   agentName,
@@ -141,7 +154,9 @@ export default function VoiceChatLive({
       console.error('Audio playback error:', err);
       isPlayingRef.current = false;
       setIsAgentSpeaking(false);
-      playNextAudio(); // Try next chunk
+      // Surface playback failure to the user then attempt next chunk
+      setError('Audio playback failed — retrying...');
+      playNextAudio();
     }
   }, [isSpeakerOn]);
 
@@ -305,7 +320,9 @@ export default function VoiceChatLive({
             setStatus('error');
           }
         } catch (err) {
+          // Surface parse failures so the user knows something went wrong
           console.error('Failed to parse message:', err);
+          setError('Received an unreadable message from the server.');
         }
       };
 
@@ -371,125 +388,198 @@ export default function VoiceChatLive({
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-[#0D1117]">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: T.pageBg }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/50">
-        <div className="flex items-center gap-3">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 16px',
+        borderBottom: `1px solid ${T.border}`,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ backgroundColor: `${accentColor}15` }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: `${accentColor}15`,
+            }}
           >
-            <span className="text-xl">🎙️</span>
+            <span style={{ fontSize: 20 }}>🎙️</span>
           </div>
           <div>
-            <h3 className="text-white font-semibold text-base">{agentName}</h3>
-            <div className="flex items-center gap-2">
+            <h3 style={{ color: T.text, fontWeight: 600, fontSize: 15, margin: 0 }}>{agentName}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {status === 'connected' && (
                 <>
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-medium" style={{ color: accentColor }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: '50%',
+                    backgroundColor: '#22c55e',
+                    animation: 'pulse 2s infinite',
+                  }} />
+                  <span style={{ fontSize: 11, fontWeight: 500, color: accentColor }}>
                     Live • {formatDuration(callDuration)}
                   </span>
                 </>
               )}
               {status === 'idle' && (
-                <span className="text-xs text-gray-500">Gemini Live Voice</span>
+                <span style={{ fontSize: 11, color: T.dim }}>Gemini Live Voice</span>
               )}
               {status === 'connecting' && (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin" style={{ color: accentColor }} />
-                  <span className="text-xs text-gray-400">Connecting...</span>
+                  <Loader2 style={{ width: 12, height: 12, color: accentColor, animation: 'spin 1s linear infinite' }} />
+                  <span style={{ fontSize: 11, color: T.muted }}>Connecting...</span>
                 </>
               )}
               {status === 'error' && (
-                <span className="text-xs text-red-400">Error</span>
+                <span style={{ fontSize: 11, color: '#f87171' }}>Error</span>
               )}
             </div>
           </div>
         </div>
         <button
+          aria-label="Close voice chat"
           onClick={onClose}
-          className="p-2 rounded-lg hover:bg-gray-800/50 text-gray-500 hover:text-gray-300"
+          style={{
+            padding: 8,
+            borderRadius: 8,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            color: T.dim,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = T.muted; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = T.dim; }}
         >
-          <X className="w-5 h-5" />
+          <X style={{ width: 20, height: 20 }} />
         </button>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        {status === 'idle' && (
-          <div className="text-center">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        {(status === 'idle' || status === 'error') && (
+          <div style={{ textAlign: 'center' }}>
             <div
-              className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ backgroundColor: `${accentColor}20` }}
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                backgroundColor: `${accentColor}20`,
+              }}
             >
-              <span className="text-5xl">🎙️</span>
+              <span style={{ fontSize: 48 }}>🎙️</span>
             </div>
-            <h3 className="text-white text-lg font-medium mb-2">Real-Time Voice Chat</h3>
-            <p className="text-gray-400 text-sm mb-6 max-w-xs">
+            <h3 style={{ color: T.text, fontSize: 17, fontWeight: 500, margin: '0 0 8px' }}>Real-Time Voice Chat</h3>
+            <p style={{ color: T.muted, fontSize: 13, margin: '0 0 24px', maxWidth: 280 }}>
               Powered by Gemini 2.0 Flash Live for instant, natural conversations
             </p>
             <button
               onClick={connect}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-medium mx-auto"
-              style={{ backgroundColor: accentColor }}
+              disabled={status === 'connecting'}
+              aria-label="Start voice call"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '12px 24px',
+                borderRadius: 12,
+                border: 'none',
+                cursor: status === 'connecting' ? 'not-allowed' : 'pointer',
+                color: T.text,
+                fontWeight: 500,
+                fontSize: 14,
+                margin: '0 auto',
+                backgroundColor: accentColor,
+                opacity: status === 'connecting' ? 0.6 : 1,
+              }}
             >
-              <Phone className="w-5 h-5" />
-              Start Call
+              {status === 'connecting'
+                ? <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} /> Connecting...</>
+                : <><Phone style={{ width: 18, height: 18 }} /> Start Call</>
+              }
             </button>
             {error && (
-              <p className="mt-4 text-red-400 text-sm">{error}</p>
+              <p style={{ marginTop: 16, color: '#f87171', fontSize: 13 }}>{error}</p>
             )}
           </div>
         )}
 
         {status === 'connecting' && (
-          <div className="text-center">
-            <Loader2 className="w-16 h-16 animate-spin mx-auto mb-4" style={{ color: accentColor }} />
-            <p className="text-gray-400">Connecting to Gemini Live...</p>
+          <div style={{ textAlign: 'center' }}>
+            <Loader2 style={{ width: 64, height: 64, color: accentColor, animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+            <p style={{ color: T.muted }}>Connecting to Gemini Live...</p>
           </div>
         )}
 
         {status === 'connected' && (
           <>
             {/* Audio visualization */}
-            <div className="relative flex items-center justify-center mb-8">
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 32 }}>
               <div
-                className={`absolute w-48 h-48 rounded-full transition-all duration-300 ${isAgentSpeaking ? 'animate-pulse' : ''}`}
                 style={{
+                  position: 'absolute',
+                  width: 192,
+                  height: 192,
+                  borderRadius: '50%',
                   backgroundColor: `${accentColor}10`,
+                  transition: 'transform 300ms',
                   transform: `scale(${1 + (isAgentSpeaking ? 0.2 : audioLevel * 0.2)})`,
                 }}
               />
               <div
-                className="absolute w-36 h-36 rounded-full transition-all duration-200"
                 style={{
+                  position: 'absolute',
+                  width: 144,
+                  height: 144,
+                  borderRadius: '50%',
                   backgroundColor: `${accentColor}20`,
+                  transition: 'transform 200ms',
                   transform: `scale(${1 + (isAgentSpeaking ? 0.15 : audioLevel * 0.15)})`,
                 }}
               />
               <div
-                className="relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-150"
                 style={{
+                  position: 'relative',
+                  width: 96,
+                  height: 96,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 150ms',
                   backgroundColor: `${accentColor}40`,
                   boxShadow: (isAgentSpeaking || isUserSpeaking) ? `0 0 30px ${accentColor}60` : 'none',
                 }}
               >
-                <span className="text-4xl">🎙️</span>
+                <span style={{ fontSize: 40 }}>🎙️</span>
               </div>
             </div>
 
             {/* Waveform — agent bins driven by interval state, not Math.random() in render */}
-            <div className="flex items-end justify-center gap-1 h-16 mb-6">
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 4, height: 64, marginBottom: 24 }}>
               {(isAgentSpeaking ? agentFrequencyBins : frequencyBins).map((bin, i) => {
                 const height = Math.max(8, bin * 60 + 8);
                 return (
                   <div
                     key={i}
-                    className="w-2.5 rounded-full transition-all duration-75"
                     style={{
+                      width: 10,
+                      borderRadius: 9999,
+                      transition: 'height 75ms',
                       height: `${height}px`,
-                      backgroundColor: isAgentSpeaking ? accentColor : isUserSpeaking ? '#60A5FA' : '#4B5563',
+                      backgroundColor: isAgentSpeaking ? accentColor : isUserSpeaking ? T.blue : T.dim,
                       opacity: (isAgentSpeaking || isUserSpeaking) ? 0.9 : 0.3,
                     }}
                   />
@@ -498,7 +588,7 @@ export default function VoiceChatLive({
             </div>
 
             {/* Status */}
-            <p className="text-gray-400 text-sm">
+            <p style={{ color: T.muted, fontSize: 13 }}>
               {isAgentSpeaking ? `${agentName} is speaking...` : isUserSpeaking ? 'Listening...' : 'Speak anytime...'}
             </p>
           </>
@@ -507,41 +597,79 @@ export default function VoiceChatLive({
 
       {/* Controls */}
       {status === 'connected' && (
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center justify-center gap-4">
+        <div style={{ padding: 16, borderTop: `1px solid ${T.border}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             <button
+              aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
               onClick={() => setIsMuted(!isMuted)}
-              className={`p-4 rounded-full transition-all ${
-                isMuted ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/50' : 'text-white hover:opacity-80'
-              }`}
-              style={!isMuted ? { backgroundColor: accentColor } : {}}
+              style={{
+                padding: 16,
+                borderRadius: '50%',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 200ms',
+                ...(isMuted
+                  ? { backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171', outline: '2px solid rgba(239,68,68,0.5)' }
+                  : { backgroundColor: accentColor, color: T.text }
+                ),
+              }}
             >
-              {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+              {isMuted ? <MicOff style={{ width: 24, height: 24 }} /> : <Mic style={{ width: 24, height: 24 }} />}
             </button>
             <button
+              aria-label="End call"
               onClick={disconnect}
-              className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600"
+              style={{
+                padding: 16,
+                borderRadius: '50%',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#ef4444',
+                color: T.text,
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#dc2626'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#ef4444'; }}
             >
-              <PhoneOff className="w-6 h-6" />
+              <PhoneOff style={{ width: 24, height: 24 }} />
             </button>
             <button
+              aria-label={isSpeakerOn ? 'Mute speaker' : 'Unmute speaker'}
               onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-              className={`p-4 rounded-full transition-all ${
-                !isSpeakerOn ? 'bg-gray-700 text-gray-400' : 'bg-gray-800 text-white hover:bg-gray-700'
-              }`}
+              style={{
+                padding: 16,
+                borderRadius: '50%',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 200ms',
+                backgroundColor: isSpeakerOn ? T.cardBg : 'rgba(30,30,48,0.6)',
+                color: isSpeakerOn ? T.text : T.dim,
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.8'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
             >
-              {isSpeakerOn ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+              {isSpeakerOn ? <Volume2 style={{ width: 24, height: 24 }} /> : <VolumeX style={{ width: 24, height: 24 }} />}
             </button>
           </div>
         </div>
       )}
 
       {status === 'idle' && transcript.length > 0 && (
-        <div className="p-4 border-t border-gray-800 max-h-48 overflow-y-auto">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Previous Call Transcript</p>
+        <div style={{ padding: 16, borderTop: `1px solid ${T.border}`, maxHeight: 192, overflowY: 'auto' }}>
+          <p style={{ fontSize: 11, color: T.dim, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+            Previous Call Transcript
+          </p>
           {transcript.map((msg, i) => (
-            <div key={i} className={`text-sm mb-1 ${msg.role === 'user' ? 'text-blue-400' : 'text-gray-300'}`}>
-              <span className="font-medium">{msg.role === 'user' ? 'You' : agentName}:</span> {msg.content}
+            <div key={i} style={{ fontSize: 13, marginBottom: 4, color: msg.role === 'user' ? T.blue : T.muted }}>
+              <span style={{ fontWeight: 500 }}>{msg.role === 'user' ? 'You' : agentName}:</span> {msg.content}
             </div>
           ))}
         </div>
