@@ -116,7 +116,7 @@ export default function AdminBroadcastsPage() {
       setTotalBroadcasts(data.total || (data.broadcasts || []).length);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
-      console.error('Failed to fetch broadcasts:', error);
+      showStatus('error', 'Failed to load broadcasts — please refresh');
     } finally {
       setLoading(false);
     }
@@ -214,16 +214,6 @@ export default function AdminBroadcastsPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'sent': return '';
-      case 'scheduled': return '';
-      case 'draft': return '';
-      case 'cancelled': return '';
-      default: return '';
-    }
-  };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'sent': return <CheckCircle className="w-4 h-4" style={{ color: '#4ade80' }} />;
@@ -251,7 +241,8 @@ export default function AdminBroadcastsPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 self-start sm:self-auto"
+          className="bg-[#4f6ef7] hover:bg-[#3d5ce0] font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 self-start sm:self-auto"
+          style={{ color: '#ededf5' }}
         >
           <Plus className="w-4 h-4" />
           New Broadcast
@@ -363,7 +354,9 @@ export default function AdminBroadcastsPage() {
           <button
             onClick={fetchBroadcasts}
             aria-label="Refresh broadcasts"
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} style={{ color: '#9090a8' }} />
           </button>
@@ -409,7 +402,10 @@ export default function AdminBroadcastsPage() {
               </thead>
               <tbody>
                 {broadcasts.map((broadcast) => (
-                  <tr key={broadcast.id} className="hover:bg-white/5" style={{ borderTop: '1px solid #1e1e30' }}>
+                  <tr key={broadcast.id} style={{ borderTop: '1px solid #1e1e30' }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+                  >
                     <td className="px-4 py-4">
                       <div>
                         <p className="font-medium" style={{ color: '#ededf5' }}>{broadcast.title}</p>
@@ -470,7 +466,7 @@ export default function AdminBroadcastsPage() {
                           <button
                             onClick={() => sendBroadcast(broadcast.id)}
                             disabled={sendingId === broadcast.id}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors text-sm text-white"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors text-sm"
                             style={{ background: 'rgba(34,197,94,0.2)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
                           >
                             {sendingId === broadcast.id ? (
@@ -482,7 +478,9 @@ export default function AdminBroadcastsPage() {
                           </button>
                         )}
                         <button
-                          className="p-1.5 hover:bg-white/5 rounded-lg transition-colors"
+                          className="p-1.5 rounded-lg transition-colors"
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                           aria-label="View broadcast details"
                           title="View details"
                         >
@@ -530,7 +528,7 @@ export default function AdminBroadcastsPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(9,9,15,0.7)' }}>
           <div className="rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="p-6" style={{ borderBottom: '1px solid #1e1e30' }}>
               <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>New Broadcast</h2>
@@ -640,7 +638,9 @@ export default function AdminBroadcastsPage() {
                     {users.map((user) => (
                       <label
                         key={user.id}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 cursor-pointer"
+                        className="flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors"
+                        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                       >
                         <input
                           type="checkbox"
@@ -670,15 +670,18 @@ export default function AdminBroadcastsPage() {
                   setShowCreateModal(false);
                   resetForm();
                 }}
-                className="px-4 py-2 rounded-lg transition-colors hover:bg-white/5"
+                className="px-4 py-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               >
                 Cancel
               </button>
               <button
                 onClick={createBroadcast}
                 disabled={!formData.title || !formData.message}
-                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                style={{ color: '#ededf5' }}
               >
                 <Plus className="w-4 h-4" />
                 Create Broadcast
