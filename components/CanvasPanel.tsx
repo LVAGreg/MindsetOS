@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   X,
   Copy,
@@ -65,8 +65,12 @@ export function CanvasPanel() {
   const [saving,       setSaving]       = useState(false);
   const [saved,        setSaved]        = useState(false);
   const [saveError,    setSaveError]    = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [browseError,  setBrowseError]  = useState<string | null>(null);
   const [starring,     setStarring]     = useState(false);
+  const [starError,    setStarError]    = useState<string | null>(null);
+  const [titleError,   setTitleError]   = useState<string | null>(null);
+  const [tagError,     setTagError]     = useState<string | null>(null);
   const [cleaning,     setCleaning]     = useState(false);
   const [cleanResult,  setCleanResult]  = useState<string | null>(null);
   const [isFullWidth,  setIsFullWidth]  = useState(false);
@@ -249,6 +253,8 @@ export function CanvasPanel() {
         URL.revokeObjectURL(url);
       } catch (err) {
         console.error('[CanvasPanel] DOCX export failed:', err);
+        setDownloadError('DOCX export failed. Please try again.');
+        setTimeout(() => setDownloadError(null), 4000);
       }
       setShowDownloadMenu(false);
       return;
@@ -280,6 +286,8 @@ export function CanvasPanel() {
         }).save();
       } catch (err) {
         console.error('[CanvasPanel] PDF export failed:', err);
+        setDownloadError('PDF export failed. Please try again.');
+        setTimeout(() => setDownloadError(null), 4000);
       } finally {
         if (document.body.contains(el)) document.body.removeChild(el);
       }
@@ -357,8 +365,11 @@ export function CanvasPanel() {
     try {
       const result = await updateArtifact(currentArtifact.id, { title: title.trim() });
       setCurrentArtifact({ ...currentArtifact, title: title.trim(), ...(result.artifact || {}) });
+      setTitleError(null);
     } catch (err) {
       console.error('[CanvasPanel] Failed to update title:', err);
+      setTitleError('Failed to save title.');
+      setTimeout(() => setTitleError(null), 3000);
     }
   };
 
@@ -366,10 +377,13 @@ export function CanvasPanel() {
     if (!currentArtifact || starring) return;
     try {
       setStarring(true);
+      setStarError(null);
       const updated = await toggleArtifactStar(currentArtifact.id);
       setCurrentArtifact({ ...currentArtifact, ...updated });
     } catch (err) {
       console.error('[CanvasPanel] Failed to toggle star:', err);
+      setStarError('Failed to update star.');
+      setTimeout(() => setStarError(null), 3000);
     } finally {
       setStarring(false);
     }
@@ -432,9 +446,12 @@ export function CanvasPanel() {
         metadata: { ...(currentArtifact.metadata || {}), tags: updatedTags },
       });
       setTagInput('');
+      setTagError(null);
       triggerPlaybookRefresh();
     } catch (err) {
       console.error('[CanvasPanel] Failed to add tag:', err);
+      setTagError('Failed to add tag.');
+      setTimeout(() => setTagError(null), 3000);
     } finally {
       setSavingTags(false);
     }
@@ -450,9 +467,12 @@ export function CanvasPanel() {
         ...currentArtifact,
         metadata: { ...(currentArtifact.metadata || {}), tags: updatedTags },
       });
+      setTagError(null);
       triggerPlaybookRefresh();
     } catch (err) {
       console.error('[CanvasPanel] Failed to remove tag:', err);
+      setTagError('Failed to remove tag.');
+      setTimeout(() => setTagError(null), 3000);
     } finally {
       setSavingTags(false);
     }
@@ -469,34 +489,32 @@ export function CanvasPanel() {
       />
     )}
     <div
-      className={`
-        ${isFullWidth ? 'w-1/2' : 'w-[420px]'}
-        h-full flex flex-col
-        border-l border-gray-200 dark:border-gray-700
-        bg-white dark:bg-gray-800
-        transition-all duration-200
-        overflow-hidden
-      `}
+      className={`${isFullWidth ? 'w-1/2' : 'w-[420px]'} h-full flex flex-col transition-all duration-200 overflow-hidden`}
+      style={{ borderLeft: '1px solid #1e1e30', background: 'rgba(18,18,31,0.8)' }}
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid #1e1e30', background: '#09090f' }}>
         <div className="flex items-center gap-2 min-w-0">
           {showBrowser ? (
             <button
               onClick={() => setShowBrowser(false)}
-              className="p-1 rounded-md text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="p-1 rounded-md transition-colors"
+              style={{ color: '#9090a8' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               title="Back to current play"
+              aria-label="Back to current play"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
           ) : (
             <FileText className="w-4 h-4 text-[#fcc824] shrink-0" />
           )}
-          <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+          <span className="text-sm font-semibold truncate" style={{ color: '#ededf5' }}>
             {showBrowser ? 'My Plays' : 'Playbook'}
           </span>
           {saved && !showBrowser && (
-            <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 shrink-0">
+            <span className="flex items-center gap-1 text-xs shrink-0" style={{ color: '#4ade80' }}>
               <Check className="w-3 h-3" />
               Saved
             </span>
@@ -512,16 +530,24 @@ export function CanvasPanel() {
           {!showBrowser && (
             <button
               onClick={() => setShowBrowser(true)}
-              className="p-1.5 rounded-md text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="p-1.5 rounded-md transition-colors"
+              style={{ color: '#9090a8' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               title="Browse all plays"
+              aria-label="Browse all plays"
             >
               <List className="w-4 h-4" />
             </button>
           )}
           <button
             onClick={() => setIsFullWidth(prev => !prev)}
-            className="p-1.5 rounded-md text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-md transition-colors"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             title={isFullWidth ? 'Collapse panel' : 'Expand panel'}
+            aria-label={isFullWidth ? 'Collapse panel' : 'Expand panel'}
           >
             {isFullWidth
               ? <Minimize2 className="w-4 h-4" />
@@ -530,8 +556,12 @@ export function CanvasPanel() {
           </button>
           <button
             onClick={closeCanvas}
-            className="p-1.5 rounded-md text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-md transition-colors"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             title="Close Playbook"
+            aria-label="Close Playbook"
           >
             <X className="w-4 h-4" />
           </button>
@@ -542,20 +572,23 @@ export function CanvasPanel() {
         /* ── Browse All Plays View ────────────────────────────────────── */
         <div className="flex-1 overflow-y-auto">
           {/* Browse search + tag filters */}
-          <div className="px-4 pt-3 pb-2 space-y-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+          <div className="px-4 pt-3 pb-2 space-y-2 sticky top-0 z-10" style={{ borderBottom: '1px solid #1e1e30', background: '#09090f' }}>
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5" style={{ color: '#5a5a72' }} />
               <input
                 type="text"
                 value={browseSearch}
                 onChange={e => setBrowseSearch(e.target.value)}
                 placeholder="Search plays..."
-                className="w-full text-xs pl-8 pr-8 py-2 bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-[#fcc824] focus:ring-1 focus:ring-[#fcc824]/30 transition-colors"
+                className="w-full text-xs pl-8 pr-8 py-2 rounded-lg outline-none focus:ring-1 transition-colors"
+                style={{ background: '#12121f', border: '1px solid #1e1e30', color: '#ededf5' }}
               />
               {browseSearch && (
                 <button
                   onClick={() => setBrowseSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 transition-colors"
+                  style={{ color: '#5a5a72' }}
+                  aria-label="Clear search"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -567,11 +600,10 @@ export function CanvasPanel() {
                   <button
                     key={tag}
                     onClick={() => setBrowseActiveTag(browseActiveTag === tag ? null : tag)}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-full border transition-colors ${
-                      browseActiveTag === tag
-                        ? 'bg-[#fcc824] border-[#fcc824] text-black font-medium'
-                        : 'bg-gray-100 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-[#fcc824]/50 hover:text-gray-700 dark:hover:text-gray-300'
-                    }`}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-full border transition-colors"
+                    style={browseActiveTag === tag
+                      ? { background: '#fcc824', borderColor: '#fcc824', color: '#000', fontWeight: 500 }
+                      : { background: '#12121f', borderColor: '#1e1e30', color: '#9090a8' }}
                   >
                     <Tag className="w-2.5 h-2.5" />
                     {tag}
@@ -583,43 +615,46 @@ export function CanvasPanel() {
           </div>
 
           {browseLoading ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-400">Loading plays...</div>
+            <div className="px-4 py-8 text-center text-sm" style={{ color: '#5a5a72' }}>Loading plays...</div>
           ) : browseError ? (
             <div className="px-4 py-8 text-center text-sm" style={{ color: '#ef4444' }}>
               {browseError}
             </div>
           ) : browseList.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-400">
+            <div className="px-4 py-8 text-center text-sm" style={{ color: '#5a5a72' }}>
               {(browseDebouncedSearch || browseActiveTag) ? 'No plays match your filters.' : 'No plays saved yet.'}
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
+            <div className="divide-y" style={{ borderColor: '#1e1e30' }}>
               {browseList.map(play => (
                 <div key={play.id} className="group">
                   {/* Play row */}
                   <div
-                    className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                    className="flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors"
+                    style={{}}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.5)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     onClick={() => setExpandedId(expandedId === play.id ? null : play.id)}
                   >
                     <FileText className="w-4 h-4 text-[#fcc824] shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        <span className="text-sm font-medium truncate" style={{ color: '#ededf5' }}>
                           {play.title || 'Untitled Play'}
                         </span>
                         {play.is_starred && (
-                          <Star className="w-3 h-3 text-yellow-500 shrink-0" fill="currentColor" />
+                          <Star className="w-3 h-3 shrink-0" style={{ color: '#fcc824' }} fill="currentColor" />
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded capitalize">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded capitalize" style={{ background: '#1e1e30', color: '#9090a8' }}>
                           {play.type}
                         </span>
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px]" style={{ color: '#5a5a72' }}>
                           {new Date(play.created_at).toLocaleDateString()}
                         </span>
                         {(play as any).metadata?.tags?.map((t: string) => (
-                          <span key={t} className="text-[9px] px-1.5 py-0.5 bg-[#fcc824]/10 text-[#b8941a] dark:text-[#fcc824]/70 rounded-full border border-[#fcc824]/20">
+                          <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(252,200,36,0.1)', color: '#fcc824', border: '1px solid rgba(252,200,36,0.2)' }}>
                             {t}
                           </span>
                         ))}
@@ -629,17 +664,24 @@ export function CanvasPanel() {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={(e) => copyBrowseItem(e, play)}
-                        className="p-1.5 rounded-md text-gray-400 hover:text-[#fcc824] hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                        className="p-1.5 rounded-md transition-colors"
+                        style={{ color: '#5a5a72' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fcc824'; (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#5a5a72'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                         title="Copy content"
+                        aria-label="Copy play content"
                       >
                         {copiedBrowseId === play.id
-                          ? <Check className="w-3.5 h-3.5 text-green-500" />
+                          ? <Check className="w-3.5 h-3.5" style={{ color: '#4ade80' }} />
                           : <Copy className="w-3.5 h-3.5" />
                         }
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); openBrowseItem(play); }}
-                        className="px-2 py-1 text-[10px] font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors"
+                        className="px-2 py-1 text-[10px] font-medium rounded-md transition-colors"
+                        style={{ color: '#9090a8', border: '1px solid #1e1e30' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                         title="Open in Playbook"
                       >
                         Open
@@ -650,8 +692,8 @@ export function CanvasPanel() {
                   {/* Expanded preview */}
                   {expandedId === play.id && (
                     <div className="px-4 pb-3">
-                      <div className="ml-7 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
-                        <pre className="text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words font-sans leading-relaxed">
+                      <div className="ml-7 p-3 rounded-lg max-h-48 overflow-y-auto" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+                        <pre className="text-xs whitespace-pre-wrap break-words font-sans leading-relaxed" style={{ color: '#9090a8' }}>
                           {play.content.length > 2000
                             ? play.content.substring(0, 2000) + '\n\n...[click Open to see full content]'
                             : play.content
@@ -670,7 +712,10 @@ export function CanvasPanel() {
                         </button>
                         <button
                           onClick={() => openBrowseItem(play)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                          style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                         >
                           <FileText className="w-3 h-3" /> Open Play
                         </button>
@@ -686,37 +731,23 @@ export function CanvasPanel() {
         /* ── Normal Play View ─────────────────────────────────────────── */
         <>
           {/* ── Title + Type ───────────────────────────────────────────── */}
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 space-y-2 shrink-0">
+          <div className="px-4 py-3 space-y-2 shrink-0" style={{ borderBottom: '1px solid #1e1e30' }}>
             <input
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
               onBlur={handleTitleBlur}
               onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
-              className="
-                w-full text-base font-bold
-                text-gray-900 dark:text-white
-                bg-transparent border-none outline-none
-                placeholder-gray-400 dark:placeholder-gray-500
-                hover:bg-gray-50 dark:hover:bg-gray-800/50
-                focus:bg-gray-50 dark:focus:bg-gray-800/50
-                rounded px-1 -mx-1 transition-colors
-              "
+              className="w-full text-base font-bold bg-transparent border-none outline-none rounded px-1 -mx-1 transition-colors"
+              style={{ color: '#ededf5' }}
               placeholder="Play title..."
             />
             <div className="flex items-center gap-2">
               <select
                 value={artifactType}
                 onChange={e => setArtifactType(e.target.value)}
-                className="
-                  text-xs px-2 py-1
-                  bg-gray-100 dark:bg-gray-700
-                  border border-gray-200 dark:border-gray-600
-                  rounded-md
-                  text-gray-700 dark:text-gray-300
-                  focus:outline-none focus:ring-1 focus:ring-[#4f6ef7]
-                  cursor-pointer
-                "
+                className="text-xs px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4f6ef7] cursor-pointer"
+                style={{ background: '#1e1e30', border: '1px solid #2a2a40', color: '#9090a8' }}
               >
                 {TYPE_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>
@@ -730,14 +761,10 @@ export function CanvasPanel() {
                 <button
                   onClick={handleToggleStar}
                   disabled={starring}
-                  className={`
-                    p-1 rounded-md transition-colors disabled:opacity-50
-                    ${currentArtifact.is_starred
-                      ? 'text-yellow-500 hover:text-yellow-600'
-                      : 'text-gray-400 hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-400'
-                    }
-                  `}
+                  className="p-1 rounded-md transition-colors disabled:opacity-50"
+                  style={{ color: currentArtifact.is_starred ? '#fcc824' : '#5a5a72' }}
                   title={currentArtifact.is_starred ? 'Unstar play' : 'Star play'}
+                  aria-label={currentArtifact.is_starred ? 'Unstar play' : 'Star play'}
                 >
                   <Star
                     className="w-4 h-4"
@@ -753,20 +780,27 @@ export function CanvasPanel() {
                 {currentTags.map(tag => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-full bg-[#fcc824]/10 text-[#b8941a] dark:text-[#fcc824]/70 border border-[#fcc824]/20"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-full"
+                    style={{ background: 'rgba(252,200,36,0.1)', color: '#fcc824', border: '1px solid rgba(252,200,36,0.2)' }}
                   >
                     <Tag className="w-2.5 h-2.5" />
                     {tag}
                     <button
                       onClick={() => handleRemoveTag(tag)}
                       disabled={savingTags}
-                      className="ml-0.5 hover:text-red-500 transition-colors disabled:opacity-50"
-                      title="Remove tag"
+                      className="ml-0.5 transition-colors disabled:opacity-50"
+                      title={`Remove tag ${tag}`}
+                      aria-label={`Remove tag ${tag}`}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = ''; }}
                     >
                       <X className="w-2.5 h-2.5" />
                     </button>
                   </span>
                 ))}
+                {tagError && (
+                  <span className="text-[11px]" style={{ color: '#ef4444' }}>{tagError}</span>
+                )}
                 {editingTags ? (
                   <div className="inline-flex items-center gap-1">
                     <input
@@ -782,14 +816,17 @@ export function CanvasPanel() {
                         if (!tagInput.trim()) setEditingTags(false);
                       }}
                       placeholder="tag name"
-                      className="w-20 text-[11px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-full text-gray-700 dark:text-gray-300 placeholder-gray-400 outline-none focus:border-[#fcc824]"
+                      className="w-20 text-[11px] px-1.5 py-0.5 rounded-full outline-none"
+                      style={{ background: '#12121f', border: '1px solid #1e1e30', color: '#ededf5' }}
                       autoFocus
                     />
                     <button
                       onClick={handleAddTag}
                       disabled={!tagInput.trim() || savingTags}
-                      className="p-0.5 text-[#fcc824] hover:text-[#f0be1e] disabled:opacity-30 transition-colors"
+                      className="p-0.5 disabled:opacity-30 transition-colors"
+                      style={{ color: '#fcc824' }}
                       title="Add tag"
+                      aria-label="Confirm add tag"
                     >
                       <Check className="w-3 h-3" />
                     </button>
@@ -797,8 +834,12 @@ export function CanvasPanel() {
                 ) : (
                   <button
                     onClick={() => { setEditingTags(true); setTimeout(() => tagInputRef.current?.focus(), 50); }}
-                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[11px] rounded-full border border-dashed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-[#fcc824] hover:text-[#fcc824] transition-colors"
+                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[11px] rounded-full transition-colors"
+                    style={{ border: '1px dashed #1e1e30', color: '#5a5a72' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#fcc824'; (e.currentTarget as HTMLElement).style.color = '#fcc824'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.color = '#5a5a72'; }}
                     title="Add tag"
+                    aria-label="Add tag"
                   >
                     <Plus className="w-2.5 h-2.5" />
                     tag
@@ -806,23 +847,24 @@ export function CanvasPanel() {
                 )}
               </div>
             )}
+            {/* Inline error feedback for title + star */}
+            {(titleError || starError) && (
+              <p className="text-[11px] mt-1" style={{ color: '#ef4444' }}>{titleError || starError}</p>
+            )}
           </div>
 
           {/* ── Toolbar ────────────────────────────────────────────────── */}
-          <div className="flex items-center gap-1 px-4 py-2 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <div className="flex items-center gap-1 flex-wrap px-4 py-2 shrink-0" style={{ borderBottom: '1px solid #1e1e30' }}>
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="
-                flex items-center gap-1.5 px-3 py-1.5
-                text-xs font-medium
-                text-gray-700 dark:text-gray-300
-                hover:bg-gray-100 dark:hover:bg-gray-700
-                rounded-md transition-colors
-              "
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+              style={{ color: '#9090a8' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
               {copied
-                ? <Check className="w-3.5 h-3.5 text-green-500" />
+                ? <Check className="w-3.5 h-3.5" style={{ color: '#4ade80' }} />
                 : <Copy  className="w-3.5 h-3.5" />
               }
               {copied ? 'Copied!' : 'Copy'}
@@ -833,17 +875,20 @@ export function CanvasPanel() {
               <button
                 onClick={handleAICleanup}
                 disabled={cleaning}
-                className="
-                  flex items-center gap-1.5 px-3 py-1.5
-                  text-xs font-medium
-                  text-purple-600 dark:text-purple-400
-                  hover:bg-purple-50 dark:hover:bg-purple-900/20
-                  rounded-md transition-colors
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                "
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ color: '#7c5bf6' }}
+                onMouseEnter={e => { if (!cleaning) (e.currentTarget as HTMLElement).style.background = 'rgba(124,91,246,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 title="Use AI to trim conversational intro/outro from the play"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                {cleaning ? (
+                  <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                ) : (
+                  <Sparkles className="w-3.5 h-3.5" />
+                )}
                 {cleaning ? 'Cleaning…' : cleanResult || 'AI Cleanup'}
               </button>
             )}
@@ -852,7 +897,10 @@ export function CanvasPanel() {
             {content.split('\n---\n').length >= 2 && (
               <button
                 onClick={() => setShowSlideView(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-md transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                style={{ color: '#fcc824' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(252,200,36,0.08)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 title="Present as slides"
               >
                 <Presentation className="w-3.5 h-3.5" />
@@ -864,49 +912,28 @@ export function CanvasPanel() {
             <div className="relative" ref={downloadMenuRef}>
               <button
                 onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                className="
-                  flex items-center gap-1.5 px-3 py-1.5
-                  text-xs font-medium
-                  text-gray-700 dark:text-gray-300
-                  hover:bg-gray-100 dark:hover:bg-gray-700
-                  rounded-md transition-colors
-                "
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <Download className="w-3.5 h-3.5" />
                 Download
               </button>
               {showDownloadMenu && (
-                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 min-w-[140px]">
-                  <button
-                    onClick={() => handleDownload('pdf')}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-md"
-                  >
-                    PDF (Print)
-                  </button>
-                  <button
-                    onClick={() => handleDownload('docx')}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Word Doc (.docx)
-                  </button>
-                  <button
-                    onClick={() => handleDownload('html')}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    HTML (.html)
-                  </button>
-                  <button
-                    onClick={() => handleDownload('md')}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Markdown (.md)
-                  </button>
-                  <button
-                    onClick={() => handleDownload('txt')}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-md"
-                  >
-                    Text (.txt)
-                  </button>
+                <div className="absolute top-full left-0 mt-1 rounded-md shadow-lg z-50 min-w-[140px]" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
+                  {(['pdf', 'docx', 'html', 'md', 'txt'] as const).map((fmt, i, arr) => (
+                    <button
+                      key={fmt}
+                      onClick={() => handleDownload(fmt)}
+                      className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${i === 0 ? 'rounded-t-md' : ''} ${i === arr.length - 1 ? 'rounded-b-md' : ''}`}
+                      style={{ color: '#9090a8' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                    >
+                      {fmt === 'pdf' ? 'PDF (Print)' : fmt === 'docx' ? 'Word Doc (.docx)' : fmt === 'html' ? 'HTML (.html)' : fmt === 'md' ? 'Markdown (.md)' : 'Text (.txt)'}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -916,24 +943,30 @@ export function CanvasPanel() {
               <button
                 onClick={handleSaveArtifact}
                 disabled={saving || !content}
-                className="
-                  flex items-center gap-1.5 px-3 py-1.5
-                  text-xs font-medium text-black
-                  bg-[#fcc824] hover:bg-[#f0be1e]
-                  rounded-md transition-colors
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                "
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: '#fcc824', color: '#000' }}
               >
-                <Star className="w-3.5 h-3.5" />
+                {saving ? (
+                  <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                ) : (
+                  <Star className="w-3.5 h-3.5" />
+                )}
                 {saving ? 'Saving…' : 'Save Play'}
               </button>
             )}
 
             {/* Version badge for saved artifacts */}
             {currentArtifact && (
-              <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+              <span className="ml-auto text-xs" style={{ color: '#5a5a72' }}>
                 v{currentArtifact.version} · Saved
               </span>
+            )}
+            {/* Download error feedback */}
+            {downloadError && (
+              <span className="text-[11px] ml-1" style={{ color: '#ef4444' }}>{downloadError}</span>
             )}
           </div>
 
@@ -942,41 +975,47 @@ export function CanvasPanel() {
             {content ? (
               <div
                 className="
-                  prose prose-sm dark:prose-invert max-w-none
+                  prose prose-sm max-w-none
 
                   prose-headings:font-semibold
-                  prose-headings:text-gray-900 dark:prose-headings:text-white
                   prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
 
-                  prose-p:text-gray-700 dark:prose-p:text-gray-300
                   prose-p:leading-relaxed
 
-                  prose-strong:text-gray-900 dark:prose-strong:text-white
-
-                  prose-li:text-gray-700 dark:prose-li:text-gray-300
-
-                  prose-a:text-[#4f6ef7] dark:prose-a:text-[#4f6ef7]
+                  prose-a:text-[#4f6ef7]
                   prose-a:no-underline hover:prose-a:underline
 
-                  prose-code:text-[#4f6ef7] dark:prose-code:text-[#4f6ef7]
-                  prose-code:bg-[#4f6ef7]/10 dark:prose-code:bg-[#4f6ef7]/10
+                  prose-code:text-[#4f6ef7]
+                  prose-code:bg-[#4f6ef7]/10
                   prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                   prose-code:before:content-none prose-code:after:content-none
 
-                  prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950
                   prose-pre:rounded-lg prose-pre:overflow-x-auto
 
-                  prose-blockquote:border-l-[#4f6ef7] dark:prose-blockquote:border-l-[#4f6ef7]
-                  prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-400
-
-                  prose-hr:border-gray-200 dark:prose-hr:border-gray-700
+                  prose-blockquote:border-l-[#4f6ef7]
 
                   prose-table:text-sm
-                  prose-th:bg-gray-100 dark:prose-th:bg-gray-700
                   prose-th:px-3 prose-th:py-2 prose-th:font-semibold
                   prose-td:px-3 prose-td:py-2
-                  prose-td:border-gray-200 dark:prose-td:border-gray-700
                 "
+                style={{
+                  '--tw-prose-body': '#ededf5',
+                  '--tw-prose-headings': '#ededf5',
+                  '--tw-prose-lead': '#9090a8',
+                  '--tw-prose-links': '#4f6ef7',
+                  '--tw-prose-bold': '#ededf5',
+                  '--tw-prose-counters': '#9090a8',
+                  '--tw-prose-bullets': '#5a5a72',
+                  '--tw-prose-hr': '#1e1e30',
+                  '--tw-prose-quotes': '#9090a8',
+                  '--tw-prose-quote-borders': '#4f6ef7',
+                  '--tw-prose-captions': '#5a5a72',
+                  '--tw-prose-code': '#4f6ef7',
+                  '--tw-prose-pre-code': '#ededf5',
+                  '--tw-prose-pre-bg': '#12121f',
+                  '--tw-prose-th-borders': '#1e1e30',
+                  '--tw-prose-td-borders': '#1e1e30',
+                } as React.CSSProperties}
               >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {content}
@@ -984,14 +1023,17 @@ export function CanvasPanel() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600" />
-                <p className="text-sm text-gray-400 dark:text-gray-500">
+                <FileText className="w-10 h-10" style={{ color: '#2a2a40' }} />
+                <p className="text-sm" style={{ color: '#5a5a72' }}>
                   No content yet. Ask an agent to generate a play &mdash;<br />
                   a document, framework, or script &mdash; and it&apos;ll appear here.
                 </p>
                 <button
                   onClick={() => setShowBrowser(true)}
-                  className="mt-2 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="mt-2 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                  style={{ color: '#9090a8', border: '1px solid #1e1e30' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
                   <List className="w-4 h-4" />
                   Browse My Plays
