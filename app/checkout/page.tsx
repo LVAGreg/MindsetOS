@@ -193,7 +193,7 @@ function CheckoutPageInner() {
         {/* Secondary cool orb bottom-right */}
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/[0.04] rounded-full blur-[180px]" />
         {/* Center subtle glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-violet-500/[0.02] rounded-full blur-[200px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full blur-[200px]" style={{ background: 'rgba(124,91,246,0.02)' }} />
         {/* Dot grid */}
         <div
           className="absolute inset-0 opacity-[0.025]"
@@ -356,11 +356,12 @@ function CheckoutPageInner() {
 
                   {/* 90-Day Architecture — $997 */}
                   <label
-                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                      plan === 'architecture_997'
-                        ? 'border-violet-500/60 bg-violet-500/[0.06]'
-                        : 'border-white/[0.06] bg-white/[0.02] hover:border-violet-500/20 hover:bg-violet-500/[0.03]'
-                    }`}
+                    className="group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300"
+                    style={plan === 'architecture_997'
+                      ? { borderColor: 'rgba(124,91,246,0.6)', background: 'rgba(124,91,246,0.06)' }
+                      : { borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+                    onMouseEnter={e => { if (plan !== 'architecture_997') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.2)'; (e.currentTarget as HTMLElement).style.background = 'rgba(124,91,246,0.03)'; } }}
+                    onMouseLeave={e => { if (plan !== 'architecture_997') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; } }}
                   >
                     <input
                       type="radio"
@@ -370,10 +371,9 @@ function CheckoutPageInner() {
                       onChange={() => handlePlanChange('architecture_997')}
                       className="sr-only"
                     />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
-                      plan === 'architecture_997' ? 'border-violet-400' : 'border-white/20'
-                    }`}>
-                      {plan === 'architecture_997' && <div className="w-2.5 h-2.5 rounded-full bg-violet-400" />}
+                    <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300"
+                      style={{ borderColor: plan === 'architecture_997' ? '#7c5bf6' : 'rgba(255,255,255,0.2)' }}>
+                      {plan === 'architecture_997' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#7c5bf6' }} />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2 flex-wrap mb-1">
@@ -387,13 +387,13 @@ function CheckoutPageInner() {
                       <ul className="space-y-1">
                         {['90 days of full agent access', 'Group cohort (10 people max)', 'Architecture Coach agent', 'Weekly group sessions', 'Memory across all agents'].map((f) => (
                           <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
-                            <CheckCircle className="w-3 h-3 text-violet-400 flex-shrink-0" />
+                            <CheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: '#7c5bf6' }} />
                             {f}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-violet-500 text-white text-[10px] font-bold rounded-full tracking-wide">
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 text-white text-[10px] font-bold rounded-full tracking-wide" style={{ background: '#7c5bf6' }}>
                       MOST POPULAR
                     </span>
                   </label>
@@ -403,11 +403,12 @@ function CheckoutPageInner() {
                     <div className="mt-1 ml-2">
                       <p className="text-[11px] text-white/30 uppercase tracking-widest font-semibold mb-2">Optional Add-On</p>
                       <label
-                        className={`group flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                          addons.has('1on1_intensive')
-                            ? 'border-indigo-500/60 bg-indigo-500/[0.06]'
-                            : 'border-dashed border-white/[0.10] bg-white/[0.01] hover:border-indigo-500/30 hover:bg-indigo-500/[0.03]'
-                        }`}
+                        className="group flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300"
+                        style={addons.has('1on1_intensive')
+                          ? { borderColor: 'rgba(79,110,247,0.6)', background: 'rgba(79,110,247,0.06)' }
+                          : { borderColor: 'rgba(255,255,255,0.10)', borderStyle: 'dashed', background: 'rgba(255,255,255,0.01)' }}
+                        onMouseEnter={e => { if (!addons.has('1on1_intensive')) { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.3)'; (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.03)'; } }}
+                        onMouseLeave={e => { if (!addons.has('1on1_intensive')) { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.01)'; } }}
                       >
                         <input
                           type="checkbox"
@@ -415,11 +416,10 @@ function CheckoutPageInner() {
                           onChange={() => toggleAddon('1on1_intensive')}
                           className="sr-only"
                         />
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-200 ${
-                          addons.has('1on1_intensive')
-                            ? 'border-indigo-400 bg-indigo-500'
-                            : 'border-white/20 bg-transparent'
-                        }`}>
+                        <div className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-200"
+                          style={addons.has('1on1_intensive')
+                            ? { borderColor: '#4f6ef7', background: '#4f6ef7' }
+                            : { borderColor: 'rgba(255,255,255,0.2)', background: 'transparent' }}>
                           {addons.has('1on1_intensive') && (
                             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M2 6l3 3 5-5" />
@@ -438,7 +438,7 @@ function CheckoutPageInner() {
                           <ul className="space-y-1">
                             {['3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support access'].map((f) => (
                               <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
-                                <CheckCircle className="w-3 h-3 text-indigo-400 flex-shrink-0" />
+                                <CheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: '#4f6ef7' }} />
                                 {f}
                               </li>
                             ))}
@@ -575,7 +575,7 @@ function CheckoutPageInner() {
                     {addons.has('1on1_intensive') && plan === 'architecture_997' && (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#4f6ef7' }} />
                           <span className="text-sm text-white/70">1:1 Architecture Intensive</span>
                         </div>
                         <span className="text-sm font-semibold text-white">+$1,000</span>
