@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Check, CheckCheck, Trash2, ArrowLeft, Search, Filter, ChevronRight } from 'lucide-react';
+import { Bell, Check, CheckCheck, Trash2, ArrowLeft, Filter, ChevronRight, AlertCircle } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import Link from 'next/link';
 
@@ -23,6 +23,7 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchNotifications();
@@ -31,10 +32,12 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await apiClient.getNotifications({ limit: 100 });
       setNotifications(data.notifications);
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+      setError('Failed to load notifications. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -51,8 +54,9 @@ export default function NotificationsPage() {
       if (selectedNotification?.id === notificationId) {
         setSelectedNotification({ ...selectedNotification, is_read: true, read_at: new Date().toISOString() });
       }
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error);
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
+      setError('Failed to mark notification as read. Please try again.');
     }
   };
 
@@ -60,8 +64,9 @@ export default function NotificationsPage() {
     try {
       await apiClient.markAllNotificationsAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true, read_at: new Date().toISOString() })));
-    } catch (error) {
-      console.error('Failed to mark all as read:', error);
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+      setError('Failed to mark all notifications as read. Please try again.');
     }
   };
 
@@ -72,8 +77,9 @@ export default function NotificationsPage() {
       if (selectedNotification?.id === notificationId) {
         setSelectedNotification(null);
       }
-    } catch (error) {
-      console.error('Failed to delete notification:', error);
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
+      setError('Failed to delete notification. Please try again.');
     }
   };
 
@@ -126,7 +132,7 @@ export default function NotificationsPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-3">
-                <Bell className="w-6 h-6 text-amber-500" />
+                <Bell className="w-6 h-6" style={{ color: '#fcc824' }} />
                 <h1 className="text-xl font-bold" style={{ color: '#ededf5' }}>Notifications</h1>
                 {unreadCount > 0 && (
                   <span className="px-2 py-0.5 text-xs font-medium rounded-full" style={{ color: '#fbbf24', background: 'rgba(251,191,36,0.12)' }}>
@@ -160,7 +166,7 @@ export default function NotificationsPage() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors hover:text-[#ededf5] hover:bg-[rgba(144,144,168,0.08)]"
                   style={{ color: '#9090a8' }}
                 >
                   <CheckCheck className="w-4 h-4" />
@@ -174,18 +180,40 @@ export default function NotificationsPage() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Error Banner */}
+        {error && (
+          <div className="flex items-center gap-3 p-4 rounded-xl mb-6" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-xs underline"
+              style={{ color: '#f87171' }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* List */}
           <div className="lg:col-span-1 rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderBottomColor: '#fcc824' }}></div>
                 </div>
               ) : filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12" style={{ color: '#9090a8' }}>
-                  <Bell className="w-12 h-12 mb-3 opacity-30" />
-                  <p className="text-sm">No notifications</p>
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(144,144,168,0.08)', border: '1px solid rgba(144,144,168,0.12)' }}>
+                    <Bell className="w-8 h-8 opacity-30" style={{ color: '#9090a8' }} />
+                  </div>
+                  <p className="text-sm font-medium mb-1" style={{ color: '#ededf5' }}>
+                    {filter === 'unread' ? 'All caught up' : 'No notifications yet'}
+                  </p>
+                  <p className="text-xs" style={{ color: '#9090a8' }}>
+                    {filter === 'unread' ? 'No unread notifications.' : "You'll see system alerts and updates here."}
+                  </p>
                 </div>
               ) : (
                 <div style={{ borderTop: 'none' }}>
@@ -198,12 +226,12 @@ export default function NotificationsPage() {
                           markAsRead(notification.id);
                         }
                       }}
-                      className="p-4 border-l-4 cursor-pointer transition-all"
+                      className="p-4 border-l-4 cursor-pointer transition-all hover:brightness-125"
                       style={{
                         borderBottom: '1px solid #1e1e30',
                         ...getPriorityStyle(notification.priority),
                         ...(selectedNotification?.id === notification.id
-                          ? { background: 'rgba(79,110,247,0.1)' }
+                          ? { background: 'rgba(79,110,247,0.12)', boxShadow: 'inset 0 0 0 1px rgba(79,110,247,0.18)' }
                           : {}),
                         fontWeight: notification.is_read ? 'normal' : 600,
                       }}
@@ -307,7 +335,7 @@ export default function NotificationsPage() {
                             <span className="block text-sm font-semibold" style={{ color: '#ededf5' }}>{btn.label}</span>
                             {btn.description && <span className="block text-xs mt-0.5" style={{ color: '#9090a8' }}>{btn.description}</span>}
                           </div>
-                          <ChevronRight className="w-4 h-4 text-amber-500 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform flex-shrink-0" style={{ color: '#fcc824' }} />
                         </button>
                       ))}
                     </div>

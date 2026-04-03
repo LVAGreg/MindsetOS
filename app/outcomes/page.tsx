@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter } from 'lucide-react';
+import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, AlertCircle } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 
@@ -25,20 +25,29 @@ export default function OutcomesPage() {
   const [dbUserId, setDbUserId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'recent' | 'importance' | 'agent'>('recent');
   const [agentFilter, setAgentFilter] = useState<string>('all');
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch database user ID
   useEffect(() => {
-    const fetchDbUserId = async () => {
-      if (!user?.email) return;
+    if (!user?.email) {
+      setIsLoading(false);
+      return;
+    }
 
+    const fetchDbUserId = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/user/by-email/${encodeURIComponent(user.email)}`);
         if (res.ok) {
           const data = await res.json();
           setDbUserId(data.id);
+        } else {
+          setError('Failed to load user data. Please try again.');
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Failed to fetch database user ID:', error);
+      } catch (err) {
+        console.error('Failed to fetch database user ID:', err);
+        setError('Failed to load user data. Please try again.');
+        setIsLoading(false);
       }
     };
 
@@ -47,18 +56,22 @@ export default function OutcomesPage() {
 
   // Fetch outcomes
   useEffect(() => {
-    const fetchOutcomes = async () => {
-      if (!dbUserId) return;
+    if (!dbUserId) return;
 
+    const fetchOutcomes = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/memories/outcomes/${dbUserId}`);
         if (res.ok) {
           const data = await res.json();
           setOutcomes(data);
+        } else {
+          setError('Failed to load outcomes. Please try again.');
         }
-      } catch (error) {
-        console.error('Failed to fetch outcomes:', error);
+      } catch (err) {
+        console.error('Failed to fetch outcomes:', err);
+        setError('Failed to load outcomes. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -67,9 +80,10 @@ export default function OutcomesPage() {
     fetchOutcomes();
   }, [dbUserId]);
 
-  // Check auth
+  // Check auth — use token check to avoid premature redirect on store rehydration
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
@@ -164,9 +178,9 @@ export default function OutcomesPage() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3">
-                <Trophy className="w-8 h-8 text-[#ffc82c]" />
+                <Trophy className="w-8 h-8" style={{ color: '#fcc824' }} />
                 <div>
-                  <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Outcomes & Deliverables</h1>
+                  <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Outcomes &amp; Deliverables</h1>
                   <p className="text-sm" style={{ color: '#9090a8' }}>Track your achievements and deliverables</p>
                 </div>
               </div>
@@ -176,7 +190,7 @@ export default function OutcomesPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleExportJSON}
-                className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                className="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium hover:bg-[rgba(79,110,247,0.25)]"
                 style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.3)', color: '#818cf8' }}
               >
                 <Download className="w-4 h-4" />
@@ -184,7 +198,7 @@ export default function OutcomesPage() {
               </button>
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                className="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium hover:bg-[rgba(34,197,94,0.2)]"
                 style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' }}
               >
                 <Download className="w-4 h-4" />
@@ -192,6 +206,21 @@ export default function OutcomesPage() {
               </button>
             </div>
           </div>
+
+          {/* Error Banner */}
+          {error && (
+            <div className="mt-4 flex items-center gap-3 p-4 rounded-xl" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-xs underline"
+                style={{ color: '#f87171' }}
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
 
           {/* Stats Bar */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -216,7 +245,7 @@ export default function OutcomesPage() {
               <TrendingUp className="w-4 h-4" style={{ color: '#9090a8' }} />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'recent' | 'importance' | 'agent')}
                 className="px-3 py-2 rounded-lg text-sm"
                 style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#ededf5' }}
               >
@@ -255,13 +284,17 @@ export default function OutcomesPage() {
       {/* Outcomes Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {filteredOutcomes.length === 0 ? (
-          <div className="text-center py-12">
-            <Trophy className="w-16 h-16 mx-auto mb-4 opacity-30" style={{ color: '#9090a8' }} />
-            <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>No Outcomes Yet</h3>
-            <p style={{ color: '#9090a8' }}>
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.15)' }}>
+              <Trophy className="w-10 h-10 opacity-40" style={{ color: '#fcc824' }} />
+            </div>
+            <h3 className="text-xl font-semibold mb-2" style={{ color: '#ededf5' }}>
+              {outcomes.length === 0 ? 'No outcomes yet' : 'No matches'}
+            </h3>
+            <p className="text-sm max-w-sm" style={{ color: '#9090a8' }}>
               {outcomes.length === 0
-                ? 'Start conversations to capture outcomes and deliverables.'
-                : 'No outcomes match the selected filters.'}
+                ? 'Start conversations with your agents — outcomes and deliverables will be captured and tracked here automatically.'
+                : 'Try adjusting your filters to see more outcomes.'}
             </p>
           </div>
         ) : (
@@ -272,7 +305,7 @@ export default function OutcomesPage() {
               return (
                 <div
                   key={outcome.id}
-                  className="p-6 transition-shadow"
+                  className="p-6 transition-all hover:border-[#2a2a45] hover:shadow-lg"
                   style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}
                 >
                   {/* Header */}
@@ -300,7 +333,7 @@ export default function OutcomesPage() {
                           className="w-3 h-3"
                           style={
                             i < Math.round(outcome.importance_score * 5)
-                              ? { color: '#ffc82c', fill: '#ffc82c' }
+                              ? { color: '#fcc824', fill: '#fcc824' }
                               : { color: '#1e1e30' }
                           }
                         />
@@ -319,7 +352,7 @@ export default function OutcomesPage() {
                       <Calendar className="w-3 h-3" />
                       {formatDate(outcome.created_at)}
                     </div>
-                    <div className="font-medium text-[#ffc82c]">
+                    <div className="font-medium" style={{ color: '#fcc824' }}>
                       {(outcome.importance_score * 100).toFixed(0)}% important
                     </div>
                   </div>
