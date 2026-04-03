@@ -38,6 +38,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserStats[]>([]);
   const [systemStats, setSystemStats] = useState<SystemStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -73,9 +74,11 @@ export default function AdminDashboard() {
         router.push('/login');
       } else {
         console.error('Admin stats error:', response.status, response.statusText);
+        setFetchError(`Failed to load admin data (${response.status}). Please refresh the page.`);
       }
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
+      setFetchError('Failed to load admin data. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -91,6 +94,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Fetch error banner */}
+      {fetchError && (
+        <div
+          className="px-4 py-3 rounded-lg text-sm"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}
+        >
+          {fetchError}
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="mb-2">
         <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: '#9090a8' }}>
@@ -104,7 +117,7 @@ export default function AdminDashboard() {
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {/* Total Users */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
                   <Users className="w-6 h-6" style={{ color: '#4f6ef7' }} />
@@ -117,7 +130,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Total Messages */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
                   <MessageSquare className="w-6 h-6" style={{ color: '#22c55e' }} />
@@ -130,10 +143,10 @@ export default function AdminDashboard() {
             </div>
 
             {/* Total Conversations */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg" style={{ background: 'rgba(168,85,247,0.15)' }}>
-                  <BarChart3 className="w-6 h-6" style={{ color: '#a855f7' }} />
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(124,91,246,0.15)' }}>
+                  <BarChart3 className="w-6 h-6" style={{ color: '#7c5bf6' }} />
                 </div>
                 <div>
                   <p className="text-sm" style={{ color: '#9090a8' }}>Total Conversations</p>
@@ -143,7 +156,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Active Today */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(249,115,22,0.15)' }}>
                   <Activity className="w-6 h-6" style={{ color: '#f97316' }} />
@@ -156,7 +169,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Avg Messages/User */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(20,184,166,0.15)' }}>
                   <TrendingUp className="w-6 h-6" style={{ color: '#14b8a6' }} />
@@ -169,7 +182,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Most Popular Agent */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(236,72,153,0.15)' }}>
                   <Clock className="w-6 h-6" style={{ color: '#ec4899' }} />
@@ -185,9 +198,9 @@ export default function AdminDashboard() {
           {/* Usage & Cost Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Total Tokens */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg" style={{ background: 'rgba(234,179,8,0.15)' }}>
+                <div className="p-3 rounded-lg" style={{ background: 'rgba(252,200,36,0.15)' }}>
                   <Zap className="w-6 h-6" style={{ color: '#fcc824' }} />
                 </div>
                 <div>
@@ -203,7 +216,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Total API Cost */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(34,197,94,0.15)' }}>
                   <DollarSign className="w-6 h-6" style={{ color: '#22c55e' }} />
@@ -221,7 +234,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Avg Cost Per User */}
-            <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg" style={{ background: 'rgba(79,110,247,0.15)' }}>
                   <Users className="w-6 h-6" style={{ color: '#4f6ef7' }} />
@@ -242,7 +255,7 @@ export default function AdminDashboard() {
       )}
 
       {/* User List */}
-      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="overflow-hidden">
+      <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }} className="overflow-hidden">
         <div className="p-6 border-b border-[#1e1e30]">
           <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>User Activity</h2>
           <p className="text-sm mt-1" style={{ color: '#9090a8' }}>Detailed usage statistics per user</p>
@@ -284,7 +297,12 @@ export default function AdminDashboard() {
                 </tr>
               ) : (
                 users.map((user) => (
-                  <tr key={user.id} style={{ borderBottom: '1px solid #1e1e30' }} className="hover:bg-white/[0.02] transition-colors">
+                  <tr
+                    key={user.id}
+                    style={{ borderBottom: '1px solid #1e1e30' }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.5)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ''; }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium" style={{ color: '#ededf5' }}>
@@ -307,7 +325,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-[#fcc824]" />
+                        <Zap className="w-4 h-4" style={{ color: '#fcc824' }} />
                         <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           {((user.totalTokens || 0) / 1000).toFixed(1)}K
                         </span>
@@ -315,7 +333,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-[#4ade80]" />
+                        <DollarSign className="w-4 h-4" style={{ color: '#22c55e' }} />
                         <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                           ${(user.estimatedCost || 0).toFixed(4)}
                         </span>

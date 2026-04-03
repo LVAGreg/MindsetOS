@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, ChevronDown, ChevronRight, RefreshCw } from 'lucide-react';
 
 interface SecurityEvent {
@@ -24,7 +24,7 @@ interface SecurityStats {
 }
 
 const cardStyle = {
-  background: 'rgba(18,18,31,0.7)',
+  background: 'rgba(18,18,31,0.8)',
   border: '1px solid #1e1e30',
   borderRadius: 16,
 };
@@ -43,9 +43,9 @@ const severityStyle = (s: string): React.CSSProperties => {
       };
     case 'medium':
       return {
-        background: 'rgba(245,158,11,0.1)',
-        border: '1px solid rgba(245,158,11,0.3)',
-        color: '#fbbf24',
+        background: 'rgba(252,200,36,0.1)',
+        border: '1px solid rgba(252,200,36,0.3)',
+        color: '#fcc824',
         borderRadius: 8,
         padding: '1px 8px',
         fontSize: 11,
@@ -100,7 +100,7 @@ const typeStyle = (t: string): React.CSSProperties => {
       return {
         background: 'rgba(124,91,246,0.1)',
         border: '1px solid rgba(124,91,246,0.3)',
-        color: '#a78bfa',
+        color: '#7c5bf6',
         borderRadius: 8,
         padding: '1px 8px',
         fontSize: 11,
@@ -108,9 +108,9 @@ const typeStyle = (t: string): React.CSSProperties => {
       };
     case 'suspicious_pattern':
       return {
-        background: 'rgba(245,158,11,0.1)',
-        border: '1px solid rgba(245,158,11,0.3)',
-        color: '#fbbf24',
+        background: 'rgba(252,200,36,0.1)',
+        border: '1px solid rgba(252,200,36,0.3)',
+        color: '#fcc824',
         borderRadius: 8,
         padding: '1px 8px',
         fontSize: 11,
@@ -197,7 +197,7 @@ export default function SecurityPage() {
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity disabled:opacity-50"
           style={{
-            background: 'rgba(18,18,31,0.7)',
+            background: 'rgba(18,18,31,0.8)',
             border: '1px solid #1e1e30',
             color: '#ededf5',
           }}
@@ -223,7 +223,7 @@ export default function SecurityPage() {
         </div>
         <div className="p-4" style={cardStyle}>
           <p style={{ color: '#9090a8', fontSize: 13 }}>Config Access Attempts</p>
-          <p style={{ color: '#a78bfa', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
+          <p style={{ color: '#7c5bf6', fontSize: 28, fontWeight: 700, marginTop: 4 }}>
             {filteredEvents.filter(e => e.event_type === 'config_access').length || '—'}
           </p>
         </div>
@@ -264,7 +264,7 @@ export default function SecurityPage() {
       </div>
 
       {/* Events Table */}
-      <div style={{ ...cardStyle, overflow: 'hidden' }}>
+      <div style={{ ...cardStyle, overflowX: 'auto' }}>
         {loading ? (
           <div className="p-12 text-center" style={{ color: '#9090a8' }}>
             <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
@@ -293,13 +293,12 @@ export default function SecurityPage() {
             </thead>
             <tbody>
               {filteredEvents.map((event) => (
-                <>
+                <React.Fragment key={event.id}>
                   <tr
-                    key={event.id}
                     className="cursor-pointer transition-colors"
                     style={{ borderBottom: '1px solid rgba(30,30,48,0.5)', color: '#ededf5' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.4)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                     onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
                   >
                     <td className="px-4 py-3 whitespace-nowrap" style={{ color: '#9090a8', fontSize: 13 }}>
@@ -332,7 +331,7 @@ export default function SecurityPage() {
                     </td>
                   </tr>
                   {expandedId === event.id && (
-                    <tr key={`${event.id}-detail`} style={{ background: 'rgba(9,9,15,0.6)' }}>
+                    <tr style={{ background: 'rgba(9,9,15,0.6)' }}>
                       <td colSpan={6} className="px-6 py-4">
                         <div className="space-y-2">
                           <p style={{ color: '#9090a8', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -341,7 +340,7 @@ export default function SecurityPage() {
                           <pre
                             className="font-mono text-sm whitespace-pre-wrap break-words max-h-48 overflow-y-auto p-3 rounded-lg"
                             style={{
-                              background: 'rgba(18,18,31,0.7)',
+                              background: 'rgba(18,18,31,0.8)',
                               border: '1px solid #1e1e30',
                               borderRadius: 12,
                               color: '#ededf5',
@@ -359,7 +358,7 @@ export default function SecurityPage() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>

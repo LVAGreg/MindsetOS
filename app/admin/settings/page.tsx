@@ -432,12 +432,8 @@ export default function SystemSettingsPage() {
                 <button
                   onClick={handleToggleDebug}
                   disabled={togglingDebug}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    debugMode
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'hover:opacity-80'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  style={!debugMode ? { background: '#1e1e30' } : undefined}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+                  style={debugMode ? { background: '#c0392b' } : { background: '#1e1e30' }}
                 >
                   <span
                     className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
@@ -494,7 +490,7 @@ export default function SystemSettingsPage() {
             >
               <div className="p-6 border-b border-[#1e1e30]">
                 <div className="flex items-center gap-3 mb-2">
-                  <Cpu className="w-6 h-6" style={{ color: '#a855f7' }} />
+                  <Cpu className="w-6 h-6" style={{ color: '#7c5bf6' }} />
                   <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>
                     {config.config_key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </h2>
@@ -608,7 +604,7 @@ export default function SystemSettingsPage() {
                     config.config_key.startsWith('trial:') ? 'Trial' : 'Config';
 
                   return (
-                    <div key={config.id} className="p-4 flex items-center gap-4">
+                    <div key={config.id} className="p-4 flex flex-wrap items-center gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span
@@ -640,10 +636,8 @@ export default function SystemSettingsPage() {
                                 [config.config_key]: val === 'true' ? 'false' : 'true',
                               }))
                             }
-                            className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                              val === 'true' ? 'bg-green-600 hover:bg-green-700' : 'hover:opacity-80'
-                            }`}
-                            style={val !== 'true' ? { background: '#1e1e30' } : undefined}
+                            className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors`}
+                            style={val === 'true' ? { background: '#4f6ef7' } : { background: '#1e1e30' }}
                           >
                             <span
                               className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
@@ -661,7 +655,7 @@ export default function SystemSettingsPage() {
                                 [config.config_key]: e.target.value,
                               }))
                             }
-                            className="w-48 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 text-sm"
+                            className="w-full sm:w-48 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 text-sm"
                           />
                         )}
 

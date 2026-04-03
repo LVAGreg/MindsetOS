@@ -243,7 +243,7 @@ export default function PipelinePage() {
                 onClick={() => { setStageFilter(stageFilter === stage.key ? '' : stage.key); }}
                 className="p-4 text-left transition-all rounded-xl"
                 style={{
-                  background: 'rgba(18,18,31,0.7)',
+                  background: 'rgba(18,18,31,0.8)',
                   border: isActive ? `1px solid ${stage.accent}` : '1px solid #1e1e30',
                   borderRadius: 16,
                   boxShadow: isActive ? `0 0 0 2px ${stage.accent}30` : undefined,
@@ -316,7 +316,7 @@ export default function PipelinePage() {
       </div>
 
       {/* Contacts Table */}
-      <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
+      <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
         {loading ? (
           <div className="flex items-center justify-center h-48">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#4f6ef7' }} />
@@ -346,8 +346,8 @@ export default function PipelinePage() {
                     key={c.id}
                     className="transition-colors"
                     style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.4)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                   >
                     <td className="px-4 py-3">
                       <div className="font-medium" style={{ color: '#ededf5' }}>
@@ -371,7 +371,6 @@ export default function PipelinePage() {
                         <select
                           autoFocus
                           defaultValue={c.funnel_stage}
-                          onBlur={e => handleStageChange(c.id, e.target.value, c.funnel_stage)}
                           onChange={e => handleStageChange(c.id, e.target.value, c.funnel_stage)}
                           className="bg-[#09090f] border border-[#4f6ef7] text-[#ededf5] rounded-xl px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                         >
