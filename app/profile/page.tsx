@@ -73,7 +73,8 @@ export default function ProfilePage() {
   const [coreMemories, setCoreMemories] = useState<CoreMemories | null>(null);
   const [brandVoice, setBrandVoice] = useState<BrandVoice | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingCoreMemories, setSavingCoreMemories] = useState(false);
+  const [savingBrandVoice, setSavingBrandVoice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coreMemoriesSuccess, setCoreMemoriesSuccess] = useState(false);
   const [brandVoiceSuccess, setBrandVoiceSuccess] = useState(false);
@@ -232,7 +233,7 @@ export default function ProfilePage() {
 
   const handleSaveCoreMemories = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    setSavingCoreMemories(true);
     setError(null);
     setCoreMemoriesSuccess(false);
 
@@ -248,7 +249,7 @@ export default function ProfilePage() {
       console.error('Error updating core memories:', err);
       setError(err.message || 'Failed to update business profile');
     } finally {
-      setSaving(false);
+      setSavingCoreMemories(false);
     }
   };
 
@@ -258,7 +259,7 @@ export default function ProfilePage() {
 
   const handleSaveBrandVoice = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    setSavingBrandVoice(true);
     setError(null);
     setBrandVoiceSuccess(false);
 
@@ -273,7 +274,7 @@ export default function ProfilePage() {
       console.error('Error updating brand voice:', err);
       setError(err.message || 'Failed to update brand voice profile');
     } finally {
-      setSaving(false);
+      setSavingBrandVoice(false);
     }
   };
 
@@ -552,9 +553,9 @@ export default function ProfilePage() {
               <button
                 onClick={() => router.push('/profile/webhooks')}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
-                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
+                style={{ background: 'rgba(124,91,246,0.08)', border: '1px solid rgba(124,91,246,0.2)' }}
               >
-                <Webhook className="h-5 w-5" style={{ color: '#8b5cf6' }} />
+                <Webhook className="h-5 w-5" style={{ color: '#7c5bf6' }} />
                 <div className="text-left">
                   <div className="font-medium" style={{ color: '#ededf5' }}>Webhooks</div>
                   <div className="text-sm" style={{ color: '#9090a8' }}>Connect MindsetOS to Zapier, Make, or any tool</div>
@@ -768,7 +769,7 @@ export default function ProfilePage() {
                 style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <Briefcase className="h-6 w-6" style={{ color: '#8b5cf6' }} />
+                  <Briefcase className="h-6 w-6" style={{ color: '#7c5bf6' }} />
                   <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Your Business</h3>
                 </div>
                 <div className="space-y-4">
@@ -811,7 +812,7 @@ export default function ProfilePage() {
                 style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <TrendingUp className="h-6 w-6" style={{ color: '#f59e0b' }} />
+                  <TrendingUp className="h-6 w-6" style={{ color: '#fcc824' }} />
                   <h3 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Business Goals</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -840,8 +841,8 @@ export default function ProfilePage() {
                     {coreMemoriesData.biggestChallenges.length > 0 ? (
                       <ul className="space-y-1 mb-2">
                         {coreMemoriesData.biggestChallenges.map((challenge, idx) => (
-                          <li key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#ededf5' }}>
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#f59e0b' }} />
+                          <li key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.2)', color: '#ededf5' }}>
+                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#fcc824' }} />
                             {challenge}
                           </li>
                         ))}
@@ -863,10 +864,10 @@ export default function ProfilePage() {
             <div className="flex justify-end mb-8">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={savingCoreMemories}
                 className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-6 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                {saving ? (
+                {savingCoreMemories ? (
                   <>
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                     <span>Saving...</span>
@@ -1083,10 +1084,10 @@ export default function ProfilePage() {
             <div className="mt-6 flex justify-end">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={savingBrandVoice}
                 className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-6 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
               >
-                {saving ? (
+                {savingBrandVoice ? (
                   <>
                     <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                     <span>Saving...</span>
@@ -1124,7 +1125,7 @@ export default function ProfilePage() {
                     className="h-2 rounded-full transition-all"
                     style={{
                       width: `${Math.min(tokenUsage.pct_used, 100)}%`,
-                      background: tokenUsage.pct_used >= 90 ? '#ef4444' : tokenUsage.pct_used >= 70 ? '#f59e0b' : '#4f6ef7'
+                      background: tokenUsage.pct_used >= 90 ? '#ef4444' : tokenUsage.pct_used >= 70 ? '#fcc824' : '#4f6ef7'
                     }}
                   />
                 </div>
