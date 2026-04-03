@@ -257,7 +257,7 @@ export default function AnalyticsPage() {
           {/* Avg Latency */}
           <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg" style={{ background: 'rgba(168,85,247,0.12)' }}>
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(124,91,246,0.12)' }}>
                 <Clock className="w-6 h-6" style={{ color: '#a855f7' }} />
               </div>
               <div>
