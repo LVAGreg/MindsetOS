@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { FileText, Star, Trash2, Pencil, Copy, Check, Search, X, Tag, BookOpen, Lightbulb } from 'lucide-react';
+import { FileText, Star, Trash2, Pencil, Copy, Check, Search, X, Tag, BookOpen } from 'lucide-react';
 import { fetchArtifacts, deleteArtifact, updateArtifact } from '@/lib/api-client';
 import { useAppStore } from '@/lib/store';
 
@@ -18,6 +18,7 @@ interface PlaybookArtifact {
 export function PlaybookList() {
   const [plays, setPlays] = useState<PlaybookArtifact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -60,6 +61,7 @@ export function PlaybookList() {
   const loadPlays = async (search?: string, tag?: string | null) => {
     try {
       setLoading(true);
+      setError(null);
       const data = await fetchArtifacts({
         limit: 50,
         client_profile_id: activeClientProfileId || undefined,
@@ -73,8 +75,9 @@ export function PlaybookList() {
       if (!search && !tag) {
         extractTags(list);
       }
-    } catch {
-      // Silently fail
+    } catch (err: unknown) {
+      console.error('[PlaybookList] Failed to load plays:', err);
+      setError('Failed to load plays. Tap to retry.');
     } finally {
       setLoading(false);
     }
@@ -140,7 +143,10 @@ export function PlaybookList() {
       try {
         await updateArtifact(editingId, { title: editTitle.trim() });
         setPlays(prev => prev.map(p => p.id === editingId ? { ...p, title: editTitle.trim() } : p));
-      } catch { /* revert on failure */ }
+      } catch (err: unknown) {
+        console.error('[PlaybookList] Rename failed:', err);
+        // Revert to original title — optimistic update was never applied so nothing to undo
+      }
     }
     setEditingId(null);
   };
@@ -150,7 +156,10 @@ export function PlaybookList() {
     try {
       await deleteArtifact(id);
       setPlays(prev => prev.filter(p => p.id !== id));
-    } catch { /* silently fail */ }
+    } catch (err: unknown) {
+      console.error('[PlaybookList] Delete failed:', err);
+      setError('Could not delete play. Please try again.');
+    }
   };
 
   // Sort: starred first, then by date
@@ -167,18 +176,27 @@ export function PlaybookList() {
       {/* Search input */}
       <div className="px-2 pt-1.5 pb-1">
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3" style={{ color: '#9090a8' }} />
           <input
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search plays..."
-            className="w-full text-xs pl-6 pr-6 py-1.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-[#fcc824] focus:ring-1 focus:ring-[#fcc824]/30 transition-colors"
+            style={{
+              background: 'rgba(18,18,31,0.8)',
+              border: '1px solid #1e1e30',
+              color: '#ededf5',
+            }}
+            className="w-full text-xs pl-6 pr-6 py-1.5 rounded-md outline-none focus:border-[#fcc824] focus:ring-1 focus:ring-[#fcc824]/30 transition-colors placeholder:text-[#5a5a72]"
           />
           {searchTerm && (
             <button
+              aria-label="Clear search"
               onClick={() => setSearchTerm('')}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 transition-colors"
+              style={{ color: '#9090a8' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
             >
               <X className="w-3 h-3" />
             </button>
@@ -186,18 +204,43 @@ export function PlaybookList() {
         </div>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <button
+          onClick={() => { setError(null); loadPlays(debouncedSearch, activeTag); }}
+          className="w-full px-3 py-1.5 text-left text-xs transition-colors"
+          style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', borderTop: '1px solid rgba(239,68,68,0.25)', borderBottom: '1px solid rgba(239,68,68,0.25)' }}
+        >
+          {error}
+        </button>
+      )}
+
       {/* Tag filter chips */}
       {allTags.length > 0 && (
         <div className="px-2 pb-1.5 flex flex-wrap gap-1">
           {allTags.map(tag => (
             <button
               key={tag}
+              aria-label={activeTag === tag ? `Remove filter: ${tag}` : `Filter by tag: ${tag}`}
               onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-              className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded-full border transition-colors ${
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded-full transition-colors"
+              style={
                 activeTag === tag
-                  ? 'bg-[#fcc824] border-[#fcc824] text-black font-medium'
-                  : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-[#fcc824]/50 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
+                  ? { background: '#fcc824', border: '1px solid #fcc824', color: '#09090f', fontWeight: 500 }
+                  : { background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#9090a8' }
+              }
+              onMouseEnter={e => {
+                if (activeTag !== tag) {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(252,200,36,0.5)';
+                  (e.currentTarget as HTMLElement).style.color = '#ededf5';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeTag !== tag) {
+                  (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+                  (e.currentTarget as HTMLElement).style.color = '#9090a8';
+                }
+              }}
             >
               <Tag className="w-2.5 h-2.5" />
               {tag}
@@ -208,31 +251,31 @@ export function PlaybookList() {
       )}
 
       {loading ? (
-        <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
+        <div className="px-3 py-2 text-xs" style={{ color: '#9090a8' }}>
           Loading plays...
         </div>
       ) : plays.length === 0 ? (
         hasFilters ? (
-          <div className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
+          <div className="px-3 py-2 text-xs" style={{ color: '#9090a8' }}>
             No plays match your filters.
           </div>
         ) : (
           /* On-brand empty state for no saved plays */
           <div className="px-3 py-4">
             <div
-              className="rounded-xl border border-dashed p-3.5 text-center"
-              style={{ borderColor: '#8b5cf650', background: '#8b5cf606' }}
+              className="rounded-xl border-dashed p-3.5 text-center"
+              style={{ border: '1px dashed rgba(124,91,246,0.3)', background: 'rgba(124,91,246,0.04)' }}
             >
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
-                style={{ background: '#8b5cf614', border: '1.5px solid #8b5cf630' }}
+                style={{ background: 'rgba(124,91,246,0.08)', border: '1.5px solid rgba(124,91,246,0.18)' }}
               >
-                <BookOpen className="w-4 h-4" style={{ color: '#8b5cf6' }} />
+                <BookOpen className="w-4 h-4" style={{ color: '#7c5bf6' }} />
               </div>
-              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+              <p className="text-xs font-semibold mb-1" style={{ color: '#ededf5' }}>
                 Your playbook is empty
               </p>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-[11px] leading-relaxed" style={{ color: '#9090a8' }}>
                 Your insights will appear here as you work with your coaches. Hit &ldquo;Save as Play&rdquo; on any response.
               </p>
             </div>
@@ -245,9 +288,11 @@ export function PlaybookList() {
               key={play.id}
               onClick={() => openPlay(play)}
               onDoubleClick={(e) => startRename(e, play)}
-              className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors group"
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-left rounded-md transition-colors group"
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
-              <FileText className="w-3.5 h-3.5 text-[#fcc824] shrink-0" />
+              <FileText className="w-3.5 h-3.5 shrink-0" style={{ color: '#fcc824' }} />
               <div className="flex-1 min-w-0">
                 {editingId === play.id ? (
                   <input
@@ -261,50 +306,68 @@ export function PlaybookList() {
                       if (e.key === 'Escape') setEditingId(null);
                     }}
                     onClick={e => e.stopPropagation()}
-                    className="w-full text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-[#fcc824] rounded px-1 py-0.5 outline-none"
+                    className="w-full text-xs rounded px-1 py-0.5 outline-none"
+                    style={{
+                      color: '#ededf5',
+                      background: 'rgba(18,18,31,0.8)',
+                      border: '1px solid #fcc824',
+                    }}
                   />
                 ) : (
-                  <div className="text-xs text-gray-700 dark:text-gray-300 truncate">
+                  <div className="text-xs truncate" style={{ color: '#ededf5' }}>
                     {play.title || 'Untitled Play'}
                   </div>
                 )}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 capitalize">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] capitalize" style={{ color: '#9090a8' }}>
                     {play.type}
                   </span>
                   {/* Inline tag chips */}
                   {play.metadata?.tags?.length > 0 && play.metadata.tags.slice(0, 2).map((t: string) => (
-                    <span key={t} className="text-[9px] px-1 py-px bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded">
+                    <span
+                      key={t}
+                      className="text-[9px] px-1 py-px rounded"
+                      style={{ background: 'rgba(18,18,31,0.8)', color: '#5a5a72', border: '1px solid #1e1e30' }}
+                    >
                       {t}
                     </span>
                   ))}
                 </div>
               </div>
               {play.is_starred && (
-                <Star className="w-3 h-3 text-yellow-500 shrink-0" fill="currentColor" />
+                <Star className="w-3 h-3 shrink-0" fill="currentColor" style={{ color: '#fcc824' }} />
               )}
               {/* Quick copy */}
               <button
+                aria-label="Copy play content"
                 onClick={(e) => copyPlay(e, play)}
-                className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-[#fcc824] transition-all shrink-0"
-                title="Copy content"
+                className="opacity-0 group-hover:opacity-100 p-0.5 transition-all shrink-0"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fcc824'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 {copiedId === play.id
-                  ? <Check className="w-3 h-3 text-green-500" />
+                  ? <Check className="w-3 h-3" style={{ color: '#22c55e' }} />
                   : <Copy className="w-3 h-3" />
                 }
               </button>
               <button
+                aria-label="Rename play"
                 onClick={(e) => startRename(e, play)}
-                className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-[#fcc824] transition-all shrink-0"
-                title="Rename play"
+                className="opacity-0 group-hover:opacity-100 p-0.5 transition-all shrink-0"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fcc824'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 <Pencil className="w-3 h-3" />
               </button>
               <button
+                aria-label="Delete play"
                 onClick={(e) => removePlay(e, play.id)}
-                className="opacity-0 group-hover:opacity-100 p-0.5 hover:text-red-500 transition-all shrink-0"
-                title="Delete play"
+                className="opacity-0 group-hover:opacity-100 p-0.5 transition-all shrink-0"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 <Trash2 className="w-3 h-3" />
               </button>
