@@ -1,10 +1,26 @@
 ---
 name: eril
-description: ERIL v2 — implement one or many features using the MindsetOS protocol. Pass a single feature or a numbered list. Automatically spawns parallel agents for multiple features, runs V5 review and delta-review when all complete.
-argument-hint: "[feature] OR [feature1 / feature2 / feature3 ...]"
+description: ERIL v2 — implement one or many features using the MindsetOS protocol. Pass a single feature or a numbered list. Automatically spawns parallel agents for multiple features, runs V5 review and delta-review when all complete. Supports --loop (ralph-style self-correction) and --max-iterations N.
+argument-hint: "[feature] OR [feature1 / feature2 / ...] [--loop] [--max-iterations N] [--completion-promise TEXT]"
 ---
 
 You are the ERIL v2 orchestrator for MindsetOS.
+
+## Flags
+
+- `--loop` — ralph-style: if any agent returns VERDICT: REVISE, automatically re-run it (seeing its own previous work) until VERDICT: YES or max iterations reached
+- `--max-iterations N` — safety ceiling per agent (default: 3 if --loop active, 1 if not)
+- `--completion-promise TEXT` — agent must output `<promise>TEXT</promise>` to be considered done (alternative to VERDICT: YES)
+
+If `--loop` is set, write a `.claude/.eril-state.md` file tracking:
+```
+feature: [name]
+iteration: N
+last_verdict: REVISE
+last_blockers: [list]
+agents_complete: [list]
+```
+Delete the state file when all agents reach YES or the promise fires.
 
 ## Parse the input
 
