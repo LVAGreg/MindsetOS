@@ -84,11 +84,11 @@ const DOMAINS = [
   },
 ];
 
-const COLOR_MAP: Record<string, { bg: string; border: string; text: string; badge: string; selected: string; bar: string }> = {
-  blue:   { bg: 'bg-blue-50 dark:bg-blue-950/20',   border: 'border-blue-200 dark:border-blue-800',   text: 'text-blue-700 dark:text-blue-300',   badge: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',   selected: 'bg-blue-600 text-white border-blue-600',   bar: 'bg-blue-400' },
-  purple: { bg: 'bg-purple-50 dark:bg-purple-950/20', border: 'border-purple-200 dark:border-purple-800', text: 'text-purple-700 dark:text-purple-300', badge: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300', selected: 'bg-purple-600 text-white border-purple-600', bar: 'bg-purple-400' },
-  orange: { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300', badge: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300', selected: 'bg-orange-500 text-white border-orange-500', bar: 'bg-orange-400' },
-  green:  { bg: 'bg-green-50 dark:bg-green-950/20',  border: 'border-green-200 dark:border-green-800',  text: 'text-green-700 dark:text-green-300',  badge: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',  selected: 'bg-green-600 text-white border-green-600',  bar: 'bg-green-500' },
+const COLOR_MAP: Record<string, { hex: string; hexBg: string; hexBorder: string; hexText: string; barHex: string }> = {
+  blue:   { hex: '#4f6ef7', hexBg: 'rgba(79,110,247,0.08)',  hexBorder: 'rgba(79,110,247,0.25)',  hexText: '#818cf8', barHex: '#4f6ef7' },
+  purple: { hex: '#7c5bf6', hexBg: 'rgba(124,91,246,0.08)', hexBorder: 'rgba(124,91,246,0.25)', hexText: '#a78bfa', barHex: '#7c5bf6' },
+  orange: { hex: '#f97316', hexBg: 'rgba(249,115,22,0.08)', hexBorder: 'rgba(249,115,22,0.25)', hexText: '#fb923c', barHex: '#f97316' },
+  green:  { hex: '#10b981', hexBg: 'rgba(16,185,129,0.08)', hexBorder: 'rgba(16,185,129,0.25)', hexText: '#34d399', barHex: '#10b981' },
 };
 
 function getInterpretation(total: number) {
@@ -130,23 +130,27 @@ export default function ScorecardViewPage() {
 
   if (submitted) {
     const interp = getInterpretation(totalScore);
+    const lowestC = COLOR_MAP[lowestDomain.color];
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4">
+      <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Score header */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 text-center">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Your Thinking Score</p>
-            <div className="text-7xl font-black text-gray-900 dark:text-white mb-1">{totalScore}</div>
-            <div className="text-lg text-gray-400 mb-4">out of 100</div>
-            <div className="inline-block px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold mb-4">
+          <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
+            <p className="text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Your Thinking Score</p>
+            <div className="text-7xl font-black mb-1" style={{ color: '#fcc824' }}>{totalScore}</div>
+            <div className="text-lg mb-4" style={{ color: '#9090a8' }}>out of 100</div>
+            <div
+              className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4"
+              style={{ background: 'rgba(79,110,247,0.15)', color: '#818cf8', border: '1px solid rgba(79,110,247,0.3)' }}
+            >
               {interp.label}
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{interp.body}</p>
+            <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{interp.body}</p>
           </div>
 
           {/* Domain breakdown */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">Domain Breakdown</h2>
+          <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
+            <h2 className="text-base font-bold mb-4" style={{ color: '#ededf5' }}>Domain Breakdown</h2>
             <div className="space-y-4">
               {domainScores.map(d => {
                 const c = COLOR_MAP[d.color];
@@ -154,13 +158,13 @@ export default function ScorecardViewPage() {
                 return (
                   <div key={d.key}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{d.name}</span>
-                      <span className={`text-sm font-bold ${d.key === lowestDomain.key ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                      <span className="text-sm font-medium" style={{ color: '#ededf5' }}>{d.name}</span>
+                      <span className="text-sm font-bold" style={{ color: d.key === lowestDomain.key ? '#f87171' : '#9090a8' }}>
                         {d.score}/25{d.key === lowestDomain.key ? ' ← lowest' : ''}
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all ${c.bar}`} style={{ width: `${pct}%` }} />
+                    <div style={{ height: 3, background: '#1e1e30', borderRadius: 99, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 99, background: c.barHex, width: `${pct}%`, transition: 'all 0.4s ease' }} />
                     </div>
                   </div>
                 );
@@ -169,16 +173,16 @@ export default function ScorecardViewPage() {
           </div>
 
           {/* Your leverage point */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-1">Your Leverage Point</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          <div className="rounded-2xl p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
+            <h2 className="text-base font-bold mb-1" style={{ color: '#ededf5' }}>Your Leverage Point</h2>
+            <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
               Your lowest domain is the bottleneck. It affects everything else.
             </p>
-            <div className={`rounded-xl border p-4 ${COLOR_MAP[lowestDomain.color].bg} ${COLOR_MAP[lowestDomain.color].border}`}>
-              <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${COLOR_MAP[lowestDomain.color].text}`}>
+            <div style={{ background: lowestC.hexBg, border: `1px solid ${lowestC.hexBorder}`, borderRadius: 12, padding: 16 }}>
+              <div style={{ color: lowestC.hexText, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                 {lowestDomain.name} — {lowestDomain.score}/25
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+              <p className="text-sm mb-4 leading-relaxed" style={{ color: '#ededf5' }}>
                 {lowestDomain.lowBody}
               </p>
               <a
@@ -192,7 +196,8 @@ export default function ScorecardViewPage() {
                     }
                   } catch (_) {}
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90"
+                style={{ background: '#fcc824', color: '#09090f' }}
               >
                 {lowestDomain.cta.label}
                 <ChevronRight className="w-4 h-4" />
@@ -202,13 +207,17 @@ export default function ScorecardViewPage() {
 
           {/* Retake */}
           <div className="text-center">
-            <button onClick={reset} className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+            <button
+              onClick={reset}
+              className="inline-flex items-center gap-2 text-sm transition-colors hover:text-[#ededf5]"
+              style={{ color: '#9090a8' }}
+            >
               <RotateCcw className="w-4 h-4" />
               Retake the scorecard
             </button>
           </div>
 
-          <p className="text-center text-xs text-gray-400 dark:text-gray-600">
+          <p className="text-center text-xs" style={{ color: '#5a5a72' }}>
             <Link href="https://mindset.show" target="_blank" className="hover:underline">mindset.show</Link>
           </p>
         </div>
@@ -217,29 +226,29 @@ export default function ScorecardViewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-black mb-2" style={{ color: '#ededf5' }}>
             The Entrepreneur&apos;s Thinking Scorecard
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+          <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
             20 questions · 4 domains · 5 minutes
           </p>
-          <p className="text-gray-600 dark:text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="text-sm max-w-md mx-auto leading-relaxed" style={{ color: '#9090a8' }}>
             Rate each statement honestly based on the last 90 days, not your best week.
             Go with your gut — don&apos;t debate yourself.
           </p>
         </div>
 
         {/* Scale reference */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+        <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
           <div className="grid grid-cols-5 gap-1 text-center">
             {SCALE.map(s => (
               <div key={s.value}>
-                <div className="text-lg font-bold text-gray-900 dark:text-white">{s.value}</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight">{s.label}</div>
+                <div className="text-lg font-bold" style={{ color: '#ededf5' }}>{s.value}</div>
+                <div className="text-xs leading-tight" style={{ color: '#9090a8' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -252,14 +261,14 @@ export default function ScorecardViewPage() {
           const answeredInDomain = domain.questions.filter((_, qi) => answers[`${domain.key}-${qi}`]).length;
 
           return (
-            <div key={domain.key} className={`rounded-2xl border p-6 ${c.bg} ${c.border}`}>
+            <div key={domain.key} className="rounded-2xl p-6" style={{ background: c.hexBg, border: `1px solid ${c.hexBorder}` }}>
               <div className="flex items-start justify-between mb-1">
-                <h2 className={`text-lg font-bold ${c.text}`}>{domain.name}</h2>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${c.badge}`}>
+                <h2 className="text-lg font-bold" style={{ color: c.hexText }}>{domain.name}</h2>
+                <span style={{ background: c.hexBg, color: c.hexText, border: `1px solid ${c.hexBorder}`, fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 999 }}>
                   {answeredInDomain}/{domain.questions.length}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 italic">{domain.subtitle}</p>
+              <p className="text-xs mb-6 italic" style={{ color: '#9090a8' }}>{domain.subtitle}</p>
 
               <div className="space-y-6">
                 {domain.questions.map((q, qi) => {
@@ -267,8 +276,8 @@ export default function ScorecardViewPage() {
                   const val = answers[key];
                   return (
                     <div key={qi}>
-                      <p className="text-sm text-gray-800 dark:text-gray-200 mb-3 leading-relaxed">
-                        <span className="font-semibold text-gray-400 dark:text-gray-500 mr-2 text-xs">
+                      <p className="text-sm mb-3 leading-relaxed" style={{ color: '#ededf5' }}>
+                        <span className="font-semibold mr-2 text-xs" style={{ color: '#5a5a72' }}>
                           {DOMAINS.indexOf(domain) * 5 + qi + 1}.
                         </span>
                         {q}
@@ -278,11 +287,12 @@ export default function ScorecardViewPage() {
                           <button
                             key={s.value}
                             onClick={() => setAnswer(domain.key, qi, s.value)}
-                            className={`flex-1 py-2 rounded-lg text-sm font-bold border-2 transition-all ${
+                            className="flex-1 py-3 rounded-lg text-sm font-bold border-2 transition-all"
+                            style={
                               val === s.value
-                                ? c.selected
-                                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500'
-                            }`}
+                                ? { background: c.hex, color: '#fff', border: `1px solid ${c.hex}` }
+                                : { background: '#12121f', border: '1px solid #1e1e30', color: '#9090a8' }
+                            }
                           >
                             {s.value}
                           </button>
@@ -294,9 +304,9 @@ export default function ScorecardViewPage() {
               </div>
 
               {answeredInDomain === domain.questions.length && (
-                <div className={`mt-5 pt-4 border-t ${c.border} flex items-center justify-between`}>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{domain.name} total</span>
-                  <span className={`text-lg font-bold ${c.text}`}>{domainScore} / 25</span>
+                <div className="mt-5 pt-4 flex items-center justify-between" style={{ borderTop: `1px solid ${c.hexBorder}` }}>
+                  <span className="text-xs" style={{ color: '#9090a8' }}>{domain.name} total</span>
+                  <span style={{ color: c.hexText, fontSize: 18, fontWeight: 700 }}>{domainScore} / 25</span>
                 </div>
               )}
             </div>
@@ -304,19 +314,18 @@ export default function ScorecardViewPage() {
         })}
 
         {/* Progress / Submit */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <div className="rounded-xl p-5" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">{answeredCount} of {totalQuestions} answered</span>
+            <span className="text-sm" style={{ color: '#9090a8' }}>{answeredCount} of {totalQuestions} answered</span>
             {isComplete && (
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                 Total: {Object.values(answers).reduce((s, v) => s + v, 0)} / 100
               </span>
             )}
           </div>
-          <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mb-4 overflow-hidden">
+          <div style={{ height: 3, background: '#1e1e30', borderRadius: 99, marginBottom: 16, overflow: 'hidden' }}>
             <div
-              className="h-full bg-indigo-500 rounded-full transition-all duration-300"
-              style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
+              style={{ height: '100%', background: '#4f6ef7', borderRadius: 99, width: `${(answeredCount / totalQuestions) * 100}%`, transition: 'width 0.3s ease' }}
             />
           </div>
           <button
@@ -329,13 +338,14 @@ export default function ScorecardViewPage() {
               setSubmitted(true);
             }}
             disabled={!isComplete}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3.5 font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all text-black"
+            style={{ background: '#fcc824' }}
           >
             {isComplete ? 'See My Score →' : `Answer all ${totalQuestions - answeredCount} remaining questions`}
           </button>
         </div>
 
-        <p className="text-center text-xs text-gray-400 dark:text-gray-600">
+        <p className="text-center text-xs" style={{ color: '#5a5a72' }}>
           <Link href="https://mindset.show" target="_blank" className="hover:underline">mindset.show</Link>
           {' · '}Stop reacting. Start designing.
         </p>

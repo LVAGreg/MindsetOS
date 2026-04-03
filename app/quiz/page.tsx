@@ -96,7 +96,7 @@ const RESULTS = {
   },
   sprinter: {
     label: 'Sprinter',
-    color: '#f59e0b',
+    color: '#fcc824',
     headline: "You're a Sprinter.",
     description:
       "You move fast and you trust yourself. Your blind spot: motion can be a form of avoidance. Sometimes the sprint is running away from a conversation you haven't had with yourself yet.",
@@ -133,7 +133,8 @@ type ThinkingType = 'analyst' | 'sprinter' | 'protector' | 'performer';
 function getDominantType(answers: string[]): ThinkingType {
   const counts: Record<string, number> = { analyst: 0, sprinter: 0, protector: 0, performer: 0 };
   answers.forEach(a => { counts[a] = (counts[a] || 0) + 1; });
-  return Object.entries(counts).sort(([, a], [, b]) => b - a)[0][0] as ThinkingType;
+  const order: ThinkingType[] = ['analyst', 'sprinter', 'protector', 'performer'];
+  return order.reduce((best, t) => counts[t] > counts[best] ? t : best, order[0]);
 }
 
 // ─────────────────────────────────────────────
@@ -268,7 +269,7 @@ export default function QuizPage() {
         {/* Progress bar */}
         {step >= 0 && step < 7 && (
           <div className="px-6 mb-8">
-            <div className="h-1 bg-[#12121f] rounded-full overflow-hidden">
+            <div className="h-[3px] bg-[#12121f] rounded-full overflow-hidden">
               <div
                 className="h-full bg-[#4f6ef7] rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${(step / 7) * 100}%` }}
@@ -335,7 +336,13 @@ export default function QuizPage() {
                           : 'border-[#1e1e30] bg-[#12121f] text-[#9090a8] hover:text-[#ededf5]'
                         }`}
                     >
-                      {opt.label}
+                      <span className="flex items-start gap-3">
+                        <span className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+                          style={{ background: isSelected ? 'rgba(255,255,255,0.2)' : 'rgba(144,144,168,0.12)', color: isSelected ? '#fff' : '#9090a8' }}>
+                          {opt.id.toUpperCase()}
+                        </span>
+                        <span>{opt.label}</span>
+                      </span>
                     </button>
                   );
                 })}
@@ -440,14 +447,18 @@ export default function QuizPage() {
                   </p>
 
                   {/* Skip to trial CTA */}
-                  <div className="anim-r6 text-center mt-4">
+                  <div className="anim-r6 mt-6">
                     <Link
                       href="/trial-v3b"
-                      className="inline-flex items-center gap-1.5 text-[#9090a8] hover:text-[#ededf5] text-xs transition-colors underline underline-offset-2"
+                      className="flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-sm text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                      style={{ background: '#fcc824' }}
                     >
-                      Skip the email — try MindsetOS free now
-                      <ArrowRight size={12} />
+                      Try MindsetOS free — no credit card needed
+                      <ArrowRight size={16} />
                     </Link>
+                    <p className="text-center text-xs mt-2" style={{ color: 'rgba(144,144,168,0.5)' }}>
+                      Free account. Takes 30 seconds.
+                    </p>
                   </div>
                 </>
               ) : (
