@@ -91,22 +91,28 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
   return (
     <div
-      className="group border border-gray-200 dark:border-gray-700/60 rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#fcc824]/40 dark:hover:border-[#fcc824]/30"
-      style={{ animationDelay: `${index * 0.08}s` }}
+      className="rounded-2xl overflow-hidden transition-all duration-300"
+      style={{
+        background: 'rgba(18,18,31,0.8)',
+        border: `1px solid ${open ? 'rgba(252,200,36,0.3)' : 'rgba(255,255,255,0.07)'}`,
+        animationDelay: `${index * 0.08}s`,
+      }}
     >
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-5 sm:p-6 text-left bg-white dark:bg-gray-800/60 hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors"
+        className="w-full flex items-center justify-between p-5 sm:p-6 text-left transition-colors duration-200"
+        style={{ background: open ? 'rgba(252,200,36,0.04)' : 'transparent' }}
       >
-        <h3 className="font-bold text-gray-900 dark:text-white pr-4 text-base sm:text-lg">{q}</h3>
+        <h3 className="font-bold pr-4 text-base sm:text-lg" style={{ color: '#ededf5' }}>{q}</h3>
         <ChevronDown
-          className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180 text-[#fcc824]' : ''}`}
+          className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+          style={{ color: open ? '#fcc824' : '#5a5a72' }}
         />
       </button>
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+        <p className="px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base leading-relaxed" style={{ color: '#9090a8' }}>
           {a}
         </p>
       </div>
@@ -116,7 +122,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
 
 export default function JoinPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a1a] overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#09090f' }}>
       {/* ============ INLINE KEYFRAMES ============ */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes join-float-up {
@@ -198,24 +204,26 @@ export default function JoinPage() {
       ` }} />
 
       {/* ============ NAVIGATION ============ */}
-      <nav className="border-b border-gray-100 dark:border-gray-800/50 sticky top-0 bg-white/90 dark:bg-[#0a0a1a]/90 backdrop-blur-md z-50">
+      <nav className="sticky top-0 backdrop-blur-md z-50" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(9,9,15,0.92)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <MindsetOSLogo size="md" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Mindset Architecture</span>
+            <MindsetOSLogo size="md" variant="light" />
+            <span className="text-xl font-bold tracking-tight" style={{ color: '#ededf5' }}>Mindset Architecture</span>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm transition-colors duration-200 rounded-lg px-3 py-1.5 hover:bg-white/[0.04]"
+              style={{ color: '#9090a8' }}
             >
               Sign In
             </Link>
             <a
               href={CHECKOUT_URL}
-              className="join-cta-btn px-5 py-2.5 bg-[#fcc824] hover:bg-[#f0be1e] text-black font-semibold rounded-lg text-sm"
+              className="join-cta-btn px-5 py-2.5 text-black font-bold rounded-xl text-sm"
+              style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
             >
-              Get Started &mdash; $47/wk
+              Get Started — $47/wk
             </a>
           </div>
         </div>
@@ -225,44 +233,42 @@ export default function JoinPage() {
       <section className="relative overflow-hidden">
         {/* Background atmosphere */}
         <div className="absolute inset-0 -z-10">
-          {/* Primary gradient orb */}
           <div
-            className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[700px] rounded-full blur-[120px] opacity-30 dark:opacity-15"
-            style={{ background: 'radial-gradient(circle, #fcc824 0%, transparent 70%)' }}
-          />
-          {/* Secondary accent orbs */}
-          <div
-            className="absolute top-[30%] right-[-5%] w-[400px] h-[400px] rounded-full blur-[100px] opacity-15 dark:opacity-8"
-            style={{ background: 'radial-gradient(circle, #f59e0b 0%, transparent 70%)', animation: 'join-drift 20s ease-in-out infinite' }}
+            className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[700px] rounded-full blur-[120px]"
+            style={{ background: 'radial-gradient(circle, rgba(252,200,36,0.08) 0%, transparent 70%)' }}
           />
           <div
-            className="absolute top-[50%] left-[-8%] w-[350px] h-[350px] rounded-full blur-[100px] opacity-10 dark:opacity-5"
-            style={{ background: 'radial-gradient(circle, #06b6d4 0%, transparent 70%)', animation: 'join-drift 25s ease-in-out infinite reverse' }}
+            className="absolute top-[30%] right-[-5%] w-[400px] h-[400px] rounded-full blur-[100px]"
+            style={{ background: 'radial-gradient(circle, rgba(124,91,246,0.06) 0%, transparent 70%)', animation: 'join-drift 20s ease-in-out infinite' }}
           />
-          {/* Subtle dot grid */}
+          <div
+            className="absolute top-[50%] left-[-8%] w-[350px] h-[350px] rounded-full blur-[100px]"
+            style={{ background: 'radial-gradient(circle, rgba(79,110,247,0.05) 0%, transparent 70%)', animation: 'join-drift 25s ease-in-out infinite reverse' }}
+          />
           <div className="absolute inset-0 join-section-dot-grid" />
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 pb-24 sm:pb-32">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="join-anim-1 inline-flex items-center gap-2 px-4 py-2 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-full text-sm text-amber-700 dark:text-amber-400 font-medium mb-8 backdrop-blur-sm">
+            <div className="join-anim-1 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-8 backdrop-blur-sm"
+              style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.25)', color: '#fcc824' }}>
               <Sparkles className="w-4 h-4" />
-              AI-Powered &middot; Coach-Supported &middot; Built for Entrepreneurs
+              AI-Powered · Coach-Supported · Built for Entrepreneurs
             </div>
 
-            <h1 className="join-anim-2 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-[1.08] tracking-tight mb-8">
+            <h1 className="join-anim-2 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight mb-8" style={{ color: '#ededf5' }}>
               Stop Reacting. Start{' '}
               <span
                 className="relative inline-block"
                 style={{ color: '#fcc824' }}
               >
                 Designing
-                <span className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-[#fcc824]/30" />
+                <span className="absolute -bottom-1 left-0 right-0 h-1 rounded-full" style={{ background: 'rgba(252,200,36,0.3)' }} />
               </span>{' '}
               <span className="block sm:inline">— Your Mind Is The Operating System</span>
             </h1>
 
-            <p className="join-anim-3 text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed max-w-3xl mx-auto">
+            <p className="join-anim-3 text-lg sm:text-xl md:text-2xl mb-10 leading-relaxed max-w-3xl mx-auto" style={{ color: '#9090a8' }}>
               The Mindset Architecture gives you 10 AI mindset coaches, proven frameworks that
               remove the guesswork, and live coaching that keeps you on track. Everything you need
               to rewire reactive patterns and design a mind that works for you.
@@ -271,18 +277,19 @@ export default function JoinPage() {
             <div className="join-anim-4 flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
               <a
                 href={CHECKOUT_URL}
-                className="join-cta-btn px-10 py-4 bg-[#fcc824] text-black font-bold rounded-xl shadow-lg flex items-center gap-3 text-lg"
+                className="join-cta-btn flex items-center gap-3 px-10 py-4 font-bold rounded-xl text-lg text-black"
+                style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
               >
-                Join Mindset Architecture &mdash; $47/wk
+                Join Mindset Architecture — $47/wk
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </a>
             </div>
-            <span className="join-anim-5 text-sm text-gray-500 dark:text-gray-400">
+            <span className="join-anim-5 text-sm" style={{ color: '#5a5a72' }}>
               or save with the $397 upfront option
             </span>
 
             {/* Trust indicators */}
-            <div className="join-anim-5 mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs text-gray-400 dark:text-gray-500">
+            <div className="join-anim-5 mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs" style={{ color: '#5a5a72' }}>
               <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Secure checkout</span>
               <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Instant access</span>
               <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Cancel anytime</span>
@@ -290,31 +297,30 @@ export default function JoinPage() {
           </div>
         </div>
 
-        {/* Section transition gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-amber-50/50 dark:to-[#0a0a1a] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent, #09090f)' }} />
       </section>
 
       {/* ============ HERO BRIDGE ============ */}
-      <section className="relative border-y border-amber-200/30 dark:border-amber-800/20 bg-gradient-to-r from-amber-50/80 via-orange-50/60 to-amber-50/80 dark:from-amber-900/10 dark:via-orange-900/8 dark:to-amber-900/10">
+      <section className="relative" style={{ borderTop: '1px solid rgba(252,200,36,0.12)', borderBottom: '1px solid rgba(252,200,36,0.12)', background: 'rgba(252,200,36,0.04)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-          <p className="text-lg sm:text-xl md:text-2xl font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
-            You've already seen what the AI agents can do.{' '}
-            <span className="font-bold" style={{ color: '#b8860b' }}>Now imagine them backed by live coaching, proven modules, and a community pushing you forward.</span>
+          <p className="text-lg sm:text-xl md:text-2xl font-medium leading-relaxed" style={{ color: '#ededf5' }}>
+            You&apos;ve already seen what the AI agents can do.{' '}
+            <span className="font-bold" style={{ color: '#fcc824' }}>Now imagine them backed by live coaching, proven modules, and a community pushing you forward.</span>
           </p>
         </div>
       </section>
 
       {/* ============ WHAT YOU GET ============ */}
-      <section className="relative py-20 sm:py-28">
-        {/* Background texture */}
-        <div className="absolute inset-0 -z-10 join-section-dot-grid opacity-50" />
+      <section className="relative py-20 sm:py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
+        <div className="absolute inset-0 -z-10 join-section-dot-grid opacity-30" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 tracking-tight">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>What&apos;s included</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 tracking-tight" style={{ color: '#ededf5' }}>
               Exactly What You Get
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#9090a8' }}>
               AI does the heavy lifting. Coaching fills the gaps. Frameworks keep you on track.
             </p>
           </div>
@@ -323,19 +329,24 @@ export default function JoinPage() {
             {WHAT_YOU_GET.map((item, i) => (
               <div
                 key={i}
-                className="join-card-hover relative p-7 rounded-2xl border border-gray-200/80 dark:border-gray-700/40 bg-white dark:bg-gray-800/40 group backdrop-blur-sm"
+                className="join-card-hover relative p-7 rounded-2xl group backdrop-blur-sm"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
-                {/* Hover glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#fcc824]/0 to-[#fcc824]/0 group-hover:from-[#fcc824]/5 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at top left, rgba(252,200,36,0.06) 0%, transparent 60%)' }} />
 
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/30 dark:to-amber-800/10 rounded-xl flex items-center justify-center mb-5 ring-1 ring-amber-200/40 dark:ring-amber-700/20 group-hover:ring-[#fcc824]/50 transition-all duration-300 group-hover:scale-110">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110"
+                    style={{ background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.2)' }}>
                     <item.icon className="w-5 h-5" style={{ color: '#fcc824' }} />
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2.5 group-hover:text-[#b8860b] dark:group-hover:text-[#fcc824] transition-colors duration-300">
+                  <h3 className="text-base sm:text-lg font-bold mb-2.5 transition-colors duration-300"
+                    style={{ color: '#ededf5' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#fcc824')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#ededf5')}>
                     {item.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed" style={{ color: '#9090a8' }}>
                     {item.desc}
                   </p>
                 </div>
@@ -343,29 +354,27 @@ export default function JoinPage() {
             ))}
           </div>
         </div>
-
-        {/* Section transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900/50 pointer-events-none" />
       </section>
 
       {/* ============ AI AGENTS SECTION ============ */}
-      <section className="relative py-20 sm:py-28 bg-gray-50 dark:bg-gray-900/50">
-        {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] opacity-10 dark:opacity-5 pointer-events-none" style={{ background: '#fcc824' }} />
+      <section className="relative py-20 sm:py-28" style={{ background: '#09090f' }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(124,91,246,0.06) 0%, transparent 70%)' }} />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100/80 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-800/40 rounded-full text-xs text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider mb-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5"
+                style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.22)', color: '#fcc824' }}>
                 <Sparkles className="w-3.5 h-3.5" />
                 Included: Full AI Agent Access
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 tracking-tight leading-[1.1]">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 tracking-tight leading-[1.1]" style={{ color: '#ededf5' }}>
                 10 AI Coaches That{' '}
                 <span style={{ color: '#fcc824' }}>Build It For You</span>
               </h2>
-              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                These aren't generic chatbots. Each coach is trained on proven mindset frameworks
+              <p className="text-base sm:text-lg mb-8 leading-relaxed" style={{ color: '#9090a8' }}>
+                These aren&apos;t generic chatbots. Each coach is trained on proven mindset frameworks
                 — so they assess your patterns, build daily practices, map your inner world, and design
                 your operating system while you focus on showing up.
               </p>
@@ -380,20 +389,21 @@ export default function JoinPage() {
                   '+ 4 more specialist coaches',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3 group">
-                    <CheckCircle className="w-4.5 h-4.5 flex-shrink-0 mt-0.5 transition-transform duration-300 group-hover:scale-110" style={{ color: '#fcc824' }} />
-                    <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300">{item}</span>
+                    <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5 transition-transform duration-300 group-hover:scale-110" style={{ color: '#fcc824' }} />
+                    <span className="text-sm sm:text-base" style={{ color: '#9090a8' }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* How AI + Coaching card with step connectors */}
-            <div className="join-card-hover bg-white dark:bg-gray-800/60 rounded-2xl p-8 sm:p-10 border border-gray-200/80 dark:border-gray-700/40 shadow-xl dark:shadow-2xl relative">
-              {/* Card glow */}
-              <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#fcc824]/10 via-transparent to-transparent pointer-events-none" />
+            {/* How AI + Coaching card */}
+            <div className="join-card-hover rounded-2xl p-8 sm:p-10 relative"
+              style={{ background: 'rgba(18,18,31,0.9)', border: '1px solid rgba(252,200,36,0.15)', boxShadow: '0 8px 48px rgba(0,0,0,0.5)' }}>
+              <div className="absolute -inset-px rounded-2xl pointer-events-none"
+                style={{ background: 'linear-gradient(135deg, rgba(252,200,36,0.07) 0%, transparent 50%)' }} />
 
               <div className="relative">
-                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight">
+                <h3 className="text-xl font-extrabold mb-6 tracking-tight" style={{ color: '#ededf5' }}>
                   How AI + Coaching Works Together
                 </h3>
                 <div className="space-y-0">
@@ -404,14 +414,15 @@ export default function JoinPage() {
                     { step: '4', text: 'The 90-Day Architecture designs your complete operating system' },
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-4 relative">
-                      {/* Connector line */}
                       {i < 3 && (
-                        <div className="absolute left-[14px] top-[36px] w-px h-[calc(100%-8px)] bg-gradient-to-b from-[#fcc824]/40 to-[#fcc824]/10" />
+                        <div className="absolute left-[14px] top-[36px] w-px h-[calc(100%-8px)]"
+                          style={{ background: 'linear-gradient(to bottom, rgba(252,200,36,0.4), rgba(252,200,36,0.08))' }} />
                       )}
-                      <div className="w-7 h-7 bg-[#fcc824] rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-black shadow-sm relative z-10">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-black relative z-10"
+                        style={{ background: '#fcc824' }}>
                         {item.step}
                       </div>
-                      <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300 pt-0.5 pb-6">
+                      <span className="text-sm sm:text-base pt-0.5 pb-6" style={{ color: '#9090a8' }}>
                         {item.text}
                       </span>
                     </div>
@@ -421,20 +432,18 @@ export default function JoinPage() {
             </div>
           </div>
         </div>
-
-        {/* Section transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-white dark:to-[#0a0a1a] pointer-events-none" />
       </section>
 
       {/* ============ BONUSES ============ */}
-      <section className="relative py-20 sm:py-28">
+      <section className="relative py-20 sm:py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50/80 dark:bg-purple-900/20 border border-purple-200/60 dark:border-purple-800/40 rounded-full text-sm text-purple-700 dark:text-purple-400 font-medium mb-5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-5"
+              style={{ background: 'rgba(124,91,246,0.1)', border: '1px solid rgba(124,91,246,0.25)', color: '#a07ef9' }}>
               <Gift className="w-4 h-4" />
-              Plus Bonuses &mdash; Total Value: $7,250
+              Plus Bonuses — Total Value: $7,250
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>
               You Also Get Access To
             </h2>
           </div>
@@ -443,61 +452,56 @@ export default function JoinPage() {
             {BONUSES.map((bonus, i) => (
               <div
                 key={i}
-                className="join-card-hover flex items-center justify-between p-5 rounded-xl border border-gray-200/80 dark:border-gray-700/40 bg-white dark:bg-gray-800/40 group"
+                className="join-card-hover flex items-center justify-between p-5 rounded-xl group"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#fcc824]/20 transition-colors duration-300">
-                    <CheckCircle className="w-4.5 h-4.5 flex-shrink-0" style={{ color: '#fcc824' }} />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300"
+                    style={{ background: 'rgba(252,200,36,0.1)', border: '1px solid rgba(252,200,36,0.18)' }}>
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#fcc824' }} />
                   </div>
-                  <span className="text-gray-900 dark:text-white font-medium text-sm sm:text-base">{bonus.name}</span>
+                  <span className="font-medium text-sm sm:text-base" style={{ color: '#ededf5' }}>{bonus.name}</span>
                 </div>
-                <span className="text-sm font-bold text-gray-400 dark:text-gray-500 flex-shrink-0 ml-4">
+                <span className="text-sm font-bold flex-shrink-0 ml-4" style={{ color: '#5a5a72' }}>
                   Valued at {bonus.value}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Total value summary */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Total bonus value: <span className="font-bold text-gray-700 dark:text-gray-300">$7,250</span> — included when you join
+            <p className="text-sm" style={{ color: '#5a5a72' }}>
+              Total bonus value: <span className="font-bold" style={{ color: '#9090a8' }}>$7,250</span> — included when you join
             </p>
           </div>
         </div>
-
-        {/* Section transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900/50 pointer-events-none" />
       </section>
 
       {/* ============ TESTIMONIALS ============ */}
-      <section className="relative py-20 sm:py-28 bg-gray-50 dark:bg-gray-900/50">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#fcc824]/20 to-transparent" />
+      <section className="relative py-20 sm:py-28" style={{ background: '#09090f' }}>
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(252,200,36,0.2), transparent)' }} />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>
               What MindsetOS Clients Have to Say
             </h2>
           </div>
           <SenjaTestimonials />
         </div>
-
-        {/* Section transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-white dark:to-[#0a0a1a] pointer-events-none" />
       </section>
 
       {/* ============ PRICING CTA ============ */}
-      <section className="relative py-20 sm:py-28">
-        {/* Ambient background */}
+      <section className="relative py-20 sm:py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full blur-[160px] opacity-8 dark:opacity-5" style={{ background: '#fcc824' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full blur-[160px]"
+            style={{ background: 'radial-gradient(circle, rgba(252,200,36,0.04) 0%, transparent 70%)' }} />
         </div>
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-3xl overflow-hidden">
             {/* Card background with gradient mesh */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-black dark:via-gray-900 dark:to-black" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d0d18 0%, #12121f 50%, #0d0d18 100%)' }} />
             <div className="absolute top-0 right-0 w-80 h-80 bg-[#fcc824]/8 rounded-full blur-[100px]" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#fcc824]/5 rounded-full blur-[80px]" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#fcc824]/3 rounded-full blur-[120px]" />
@@ -598,11 +602,11 @@ export default function JoinPage() {
       </section>
 
       {/* ============ FAQ ============ */}
-      <section className="relative py-20 sm:py-28 bg-gray-50 dark:bg-gray-900/50">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+      <section className="relative py-20 sm:py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent)' }} />
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-10 text-center tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-10 text-center tracking-tight" style={{ color: '#ededf5' }}>
             Common Questions
           </h2>
           <div className="space-y-3">
@@ -613,7 +617,7 @@ export default function JoinPage() {
               },
               {
                 q: 'I already tried the AI agents — why do I need the full program?',
-                a: 'The agents are powerful on their own, but they\'re built on the frameworks inside the course. With the modules, coaching, and community, you\'ll know exactly how to deploy what the AI builds for you — and get feedback on it.',
+                a: "The agents are powerful on their own, but they're built on the frameworks inside the course. With the modules, coaching, and community, you'll know exactly how to deploy what the AI builds for you — and get feedback on it.",
               },
               {
                 q: 'Is the coaching live or pre-recorded?',
@@ -621,61 +625,60 @@ export default function JoinPage() {
               },
               {
                 q: 'Can I cancel?',
-                a: 'Yes. Cancel anytime if you\'re on the weekly plan. Or lock in the best price with the $397 upfront option.',
+                a: "Yes. Cancel anytime if you're on the weekly plan. Or lock in the best price with the $397 upfront option.",
               },
               {
                 q: 'How is this different from other coaching programs?',
-                a: 'Most programs give you theory and leave you to figure it out. Mindset Architecture gives you AI coaches that build your daily practice, map your patterns, and design your system — plus real coaching and a community that keeps you accountable.',
+                a: "Most programs give you theory and leave you to figure it out. Mindset Architecture gives you AI coaches that build your daily practice, map your patterns, and design your system — plus real coaching and a community that keeps you accountable.",
               },
             ].map((faq, i) => (
               <FAQItem key={i} q={faq.q} a={faq.a} index={i} />
             ))}
           </div>
         </div>
-
-        {/* Section transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-b from-transparent to-gray-900 dark:to-black pointer-events-none" />
       </section>
 
       {/* ============ FINAL CTA ============ */}
-      <section className="relative py-24 sm:py-32 bg-gray-900 dark:bg-black overflow-hidden">
-        {/* Background atmosphere */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-[140px] opacity-10" style={{ background: '#fcc824' }} />
-          <div className="absolute inset-0 opacity-[0.02]" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, #fcc824 1px, transparent 0)',
-            backgroundSize: '24px 24px',
-          }} />
+      <section className="relative py-24 sm:py-32 overflow-hidden" style={{ background: '#09090f' }}>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="w-[900px] h-[400px] rounded-full"
+            style={{ background: 'radial-gradient(ellipse, rgba(124,91,246,0.07) 0%, transparent 65%)' }} />
         </div>
+        <div className="absolute inset-0 opacity-[0.025]" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(252,200,36,0.8) 1px, transparent 0)',
+          backgroundSize: '24px 24px',
+        }} />
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-5 tracking-tight">
+          <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: '#5a5a72' }}>Get started today</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-5 tracking-tight" style={{ color: '#ededf5' }}>
             Stop Figuring It Out Alone.
           </h2>
-          <p className="text-lg sm:text-xl text-gray-300 mb-10 leading-relaxed max-w-xl mx-auto">
-            AI maps it. Coaches sharpen it. You design it. That's the Mindset Architecture.
+          <p className="text-lg sm:text-xl mb-10 leading-relaxed max-w-xl mx-auto" style={{ color: '#9090a8' }}>
+            AI maps it. Coaches sharpen it. You design it. That&apos;s the Mindset Architecture.
           </p>
           <a
             href={CHECKOUT_URL}
-            className="join-cta-btn inline-flex items-center gap-3 px-10 py-4 bg-[#fcc824] text-black font-bold rounded-xl shadow-lg text-lg"
+            className="join-cta-btn inline-flex items-center gap-3 px-10 py-5 font-bold rounded-xl text-lg text-black"
+            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
           >
-            Join Now &mdash; $47/wk
+            Join Now — $47/wk
             <ArrowRight className="w-5 h-5" />
           </a>
-          <p className="text-sm text-gray-500 mt-5">
-            Cancel anytime &middot; Or save with $397 upfront
+          <p className="text-sm mt-5" style={{ color: '#5a5a72' }}>
+            Cancel anytime · Or save with $397 upfront
           </p>
         </div>
       </section>
 
       {/* ============ FOOTER ============ */}
-      <footer className="border-t border-gray-100 dark:border-gray-800/50 py-10 bg-white dark:bg-[#0a0a1a]">
+      <footer className="py-10" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: '#09090f' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <MindsetOSLogo size="xs" />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Mindset Architecture &mdash; powered by{' '}
+              <MindsetOSLogo size="xs" variant="light" />
+              <span className="text-sm" style={{ color: '#5a5a72' }}>
+                Mindset Architecture — powered by{' '}
                 <a
                   href="https://mindset.show"
                   target="_blank"
@@ -687,29 +690,33 @@ export default function JoinPage() {
                 </a>
               </span>
             </div>
-            <div className="flex items-center flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
-              <Link href="/agency" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                Coaching Practice
-              </Link>
-              <Link href="/trial-v3b" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                Free Trial
-              </Link>
-              <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition-colors">
-                Privacy
-              </Link>
+            <div className="flex items-center flex-wrap justify-center gap-x-6 gap-y-2 text-sm" style={{ color: '#5a5a72' }}>
+              {[
+                { label: 'Coaching Practice', href: '/agency' },
+                { label: 'Free Trial', href: '/trial-v3b' },
+                { label: 'Terms', href: '/terms' },
+                { label: 'Privacy', href: '/privacy' },
+              ].map((l, i) => (
+                <Link key={i} href={l.href}
+                  className="transition-colors duration-200"
+                  style={{ color: '#5a5a72' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#fcc824')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#5a5a72')}>
+                  {l.label}
+                </Link>
+              ))}
               <a
                 href="mailto:hello@mindset.show"
-                className="hover:text-gray-900 dark:hover:text-white transition-colors"
-              >
+                className="transition-colors duration-200"
+                style={{ color: '#5a5a72' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#fcc824')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#5a5a72')}>
                 Support
               </a>
             </div>
           </div>
           <div className="text-center mt-6">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
+            <p className="text-xs" style={{ color: '#3a3a52' }}>
               Copyright &copy; 2026 MindsetOS | All rights reserved.
             </p>
           </div>

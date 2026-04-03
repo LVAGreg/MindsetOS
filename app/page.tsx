@@ -33,9 +33,8 @@ export default function LandingPage() {
     const accessToken = localStorage.getItem('accessToken');
     if (user && isAuthenticated && accessToken) {
       router.push('/dashboard');
-      return;
     }
-    router.push('/login');
+    // Unauthenticated visitors see the landing page — no redirect
   }, [hasHydrated, user, isAuthenticated, router]);
 
   useEffect(() => { setVis(true); }, []);
