@@ -52,38 +52,29 @@ const COHORT_TYPE_LABELS: Record<CohortType, string> = {
   intensive_1997: '$1,997 Intensive',
 };
 
-const COHORT_TYPE_COLORS: Record<CohortType, string> = {
-  architecture_997: '',
-  intensive_1997: '',
-};
-
 const COHORT_TYPE_STYLES: Record<CohortType, React.CSSProperties> = {
-  architecture_997: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8', borderRadius: 9999 },
+  architecture_997: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#4f6ef7', borderRadius: 9999 },
   intensive_1997: { background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.3)', color: '#fb923c', borderRadius: 9999 },
 };
 
-const STATUS_CONFIG: Record<CohortStatus, { label: string; color: string; style: React.CSSProperties; icon: React.ReactNode }> = {
+const STATUS_CONFIG: Record<CohortStatus, { label: string; style: React.CSSProperties; icon: React.ReactNode }> = {
   upcoming: {
     label: 'Upcoming',
-    color: '',
-    style: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#7b8ff8', borderRadius: 9999 },
+    style: { background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.3)', color: '#4f6ef7', borderRadius: 9999 },
     icon: <Clock className="w-3 h-3" />,
   },
   active: {
     label: 'Active',
-    color: '',
     style: { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#4ade80', borderRadius: 9999 },
     icon: <CheckCircle className="w-3 h-3" />,
   },
   completed: {
     label: 'Completed',
-    color: '',
     style: { background: 'rgba(144,144,168,0.12)', border: '1px solid rgba(144,144,168,0.25)', color: '#9090a8', borderRadius: 9999 },
     icon: <CheckCircle className="w-3 h-3" />,
   },
   cancelled: {
     label: 'Cancelled',
-    color: '',
     style: { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171', borderRadius: 9999 },
     icon: <XCircle className="w-3 h-3" />,
   },
@@ -271,7 +262,7 @@ export default function AdminCohortsPage() {
         <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
-              <Calendar className="w-5 h-5" style={{ color: '#7b8ff8' }} />
+              <Calendar className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             </div>
             <div>
               <p className="text-sm" style={{ color: '#9090a8' }}>Total Cohorts</p>
@@ -295,7 +286,7 @@ export default function AdminCohortsPage() {
         <div className="rounded-xl p-4" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)' }}>
-              <Users className="w-5 h-5" style={{ color: '#7b8ff8' }} />
+              <Users className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             </div>
             <div>
               <p className="text-sm" style={{ color: '#9090a8' }}>Total Enrolled</p>
@@ -322,7 +313,7 @@ export default function AdminCohortsPage() {
       {/* Create Cohort Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="rounded-xl p-6 max-w-lg w-full shadow-2xl" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="rounded-xl p-6 max-w-lg w-full shadow-2xl" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xl font-bold" style={{ color: '#ededf5' }}>New Cohort</h2>
               <button
@@ -413,7 +404,7 @@ export default function AdminCohortsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
-                    Price (cents)
+                    Price in cents (e.g. 99700 = $997)
                   </label>
                   <input
                     type="number"
@@ -461,7 +452,7 @@ export default function AdminCohortsPage() {
       )}
 
       {/* Cohorts List */}
-      <div className="rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+      <div className="rounded-xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}>
         <div className="p-4" style={{ borderBottom: '1px solid #1e1e30' }}>
           <h2 className="font-semibold" style={{ color: '#ededf5' }}>All Cohorts</h2>
         </div>
@@ -472,16 +463,18 @@ export default function AdminCohortsPage() {
             <p className="text-sm" style={{ color: '#9090a8' }}>Loading cohorts...</p>
           </div>
         ) : cohorts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16" style={{ color: '#9090a8' }}>
-            <Calendar className="w-12 h-12 mb-3 opacity-30" />
-            <p className="font-medium">No cohorts yet</p>
-            <p className="text-sm mt-1">Create your first cohort to get started.</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+            <Calendar className="w-12 h-12 mb-3 opacity-30" style={{ color: '#fcc824' }} />
+            <p className="font-semibold" style={{ color: '#ededf5' }}>No cohorts scheduled yet</p>
+            <p className="text-sm mt-1 max-w-xs" style={{ color: '#9090a8' }}>
+              Create the first cohort and start enrolling your Architecture students.
+            </p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="mt-4 text-sm hover:underline"
-              style={{ color: '#7b8ff8' }}
+              className="mt-4 text-sm font-medium hover:underline"
+              style={{ color: '#fcc824' }}
             >
-              Create a cohort
+              Create a cohort →
             </button>
           </div>
         ) : (
@@ -497,7 +490,10 @@ export default function AdminCohortsPage() {
                 <div
                   key={cohort.id}
                   className="p-4 sm:p-5 transition-colors"
-                  style={idx < cohorts.length - 1 ? { borderBottom: '1px solid #1e1e30' } : undefined}
+                  style={{
+                    ...(idx < cohorts.length - 1 ? { borderBottom: '1px solid #1e1e30' } : {}),
+                    ...(cohort.status === 'cancelled' ? { opacity: 0.55 } : {}),
+                  }}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                     {/* Left: info */}
@@ -517,7 +513,7 @@ export default function AdminCohortsPage() {
                       </div>
 
                       {/* Dates */}
-                      <div className="flex items-center gap-1.5 text-sm" style={{ color: '#7b8ff8' }}>
+                      <div className="flex items-center gap-1.5 text-sm" style={{ color: '#4f6ef7' }}>
                         <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{formatDate(cohort.start_date)} – {formatDate(cohort.end_date)}</span>
                       </div>
@@ -540,8 +536,8 @@ export default function AdminCohortsPage() {
                       </div>
 
                       {/* Revenue */}
-                      <div className="flex items-center gap-1.5 text-sm font-medium" style={{ color: '#ededf5' }}>
-                        <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#4ade80' }} />
+                      <div className="flex items-center gap-1.5 text-sm font-medium" style={{ color: '#fcc824' }}>
+                        <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#fcc824' }} />
                         <span>
                           {formatRevenue(cohort.price_cents, cohort.current_participants)} revenue
                         </span>
@@ -556,7 +552,7 @@ export default function AdminCohortsPage() {
                       <Link
                         href={`/admin/cohorts/${cohort.id}/enrollments`}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
-                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }}
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#4f6ef7' }}
                       >
                         <Users className="w-3.5 h-3.5" />
                         View Enrollments
@@ -591,6 +587,22 @@ export default function AdminCohortsPage() {
                             <CheckCircle className="w-3.5 h-3.5" />
                           )}
                           Mark Completed
+                        </button>
+                      )}
+
+                      {(cohort.status === 'upcoming' || cohort.status === 'active') && (
+                        <button
+                          onClick={() => patchStatus(cohort, 'cancelled')}
+                          disabled={isPatching}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
+                        >
+                          {isPatching ? (
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <X className="w-3.5 h-3.5" />
+                          )}
+                          Cancel
                         </button>
                       )}
                     </div>
