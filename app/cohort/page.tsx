@@ -68,7 +68,7 @@ const WHAT_YOU_GET = [
     icon: MessageSquare,
     title: 'Private Cohort Community',
     desc: "A focused group of 8\u201312 entrepreneurs moving through the same architecture at the same time. No noise. High signal.",
-    accent: '#8b5cf6',
+    accent: '#7c5bf6',
   },
   {
     icon: TrendingUp,
@@ -149,7 +149,7 @@ const TESTIMONIALS = [
     name: 'Priya L.',
     role: 'Entrepreneur & consultant',
     initial: 'P',
-    accent: '#8b5cf6',
+    accent: '#7c5bf6',
   },
 ] as const;
 
@@ -212,7 +212,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
           open ? 'max-h-96 pb-5' : 'max-h-0'
         }`}
       >
-        <p className="text-[#9898b3] leading-relaxed text-sm">{a}</p>
+        <p className="text-[#9090a8] leading-relaxed text-sm">{a}</p>
       </div>
     </div>
   );
@@ -244,17 +244,17 @@ function CohortCard({
         <div className="flex-1">
           <h3 className="text-lg font-bold text-[#ededf5] mb-1">{cohort.name}</h3>
           {cohort.description && (
-            <p className="text-sm text-[#9898b3] mb-4 leading-relaxed">
+            <p className="text-sm text-[#9090a8] mb-4 leading-relaxed">
               {cohort.description}
             </p>
           )}
           <div className="flex flex-wrap gap-4 text-sm">
-            <span className="flex items-center gap-1.5 text-[#6b6b8a]">
+            <span className="flex items-center gap-1.5 text-[#5a5a72]">
               <Calendar className="w-4 h-4 text-[#fcc824]" />
               Starts {formatDate(cohort.start_date)}
             </span>
             {cohort.max_participants && (
-              <span className="flex items-center gap-1.5 text-[#6b6b8a]">
+              <span className="flex items-center gap-1.5 text-[#5a5a72]">
                 <Users className="w-4 h-4 text-[#10b981]" />
                 {cohort.current_participants}/{cohort.max_participants} enrolled
               </span>
@@ -266,10 +266,10 @@ function CohortCard({
             <span className="text-2xl font-black text-[#ededf5]">
               ${(cohort.price_cents / 100).toLocaleString()}
             </span>
-            <span className="text-[#6b6b8a] text-sm ml-1">one-time</span>
+            <span className="text-[#5a5a72] text-sm ml-1">one-time</span>
           </div>
           {isFull ? (
-            <span className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#1e1e30] text-[#6b6b8a] rounded-xl text-sm font-semibold cursor-not-allowed">
+            <span className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#1e1e30] text-[#5a5a72] rounded-xl text-sm font-semibold cursor-not-allowed">
               Cohort Full
             </span>
           ) : (
@@ -327,7 +327,7 @@ function WaitlistForm() {
         </div>
         <div>
           <p className="text-lg font-bold text-[#ededf5] mb-1">You're on the list.</p>
-          <p className="text-[#9898b3] text-sm">
+          <p className="text-[#9090a8] text-sm">
             We'll reach out as soon as the next cohort opens. Keep an eye on your inbox.
           </p>
         </div>
@@ -343,7 +343,7 @@ function WaitlistForm() {
           placeholder="First name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#1e1e30] focus:border-[#fcc824]/60 rounded-xl text-[#ededf5] placeholder-[#4a4a6a] text-sm outline-none transition-colors"
+          className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#1e1e30] focus:border-[#fcc824]/60 rounded-xl text-[#ededf5] placeholder-[#5a5a72] text-sm outline-none transition-colors"
         />
         <input
           type="email"
@@ -351,7 +351,7 @@ function WaitlistForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#1e1e30] focus:border-[#fcc824]/60 rounded-xl text-[#ededf5] placeholder-[#4a4a6a] text-sm outline-none transition-colors"
+          className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#1e1e30] focus:border-[#fcc824]/60 rounded-xl text-[#ededf5] placeholder-[#5a5a72] text-sm outline-none transition-colors"
         />
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
@@ -372,7 +372,7 @@ function WaitlistForm() {
           </>
         )}
       </button>
-      <p className="text-center text-xs text-[#4a4a6a]">
+      <p className="text-center text-xs text-[#5a5a72]">
         No spam. You'll only hear from us when a cohort opens.
       </p>
     </form>
@@ -384,6 +384,7 @@ function WaitlistForm() {
 export default function CohortLandingPage() {
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const enrollRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -397,7 +398,7 @@ export default function CohortLandingPage() {
           setCohorts(Array.isArray(data) ? data : []);
         }
       } catch {
-        // Network error — fall through to waitlist state
+        setFetchError(true);
       } finally {
         setLoading(false);
       }
@@ -462,20 +463,20 @@ export default function CohortLandingPage() {
         {/* ─── Atmospheric background ─── */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
           <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#fcc824]/[0.04] rounded-full blur-[160px]" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-violet-500/[0.04] rounded-full blur-[160px]" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[160px]" style={{ background: 'rgba(124,91,246,0.04)' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-[#10b981]/[0.02] rounded-full blur-[200px]" />
         </div>
 
         {/* ─── Nav ─── */}
-        <header className="relative z-10 border-b border-white/[0.05] bg-[#09090f]/80 backdrop-blur-xl sticky top-0">
+        <header className="relative z-10 border-b border-[#1e1e30] bg-[#09090f]/80 backdrop-blur-xl sticky top-0">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
             <Link href="/" aria-label="MindsetOS home">
               <MindsetOSLogo size="sm" variant="light" />
             </Link>
             <nav className="hidden sm:flex items-center gap-6 text-sm">
-              <a href="#program" className="text-[#9898b3] hover:text-[#ededf5] transition-colors">Program</a>
-              <a href="#phases" className="text-[#9898b3] hover:text-[#ededf5] transition-colors">Curriculum</a>
-              <a href="#faq" className="text-[#9898b3] hover:text-[#ededf5] transition-colors">FAQ</a>
+              <a href="#program" className="text-[#9090a8] hover:text-[#ededf5] transition-colors">Program</a>
+              <a href="#phases" className="text-[#9090a8] hover:text-[#ededf5] transition-colors">Curriculum</a>
+              <a href="#faq" className="text-[#9090a8] hover:text-[#ededf5] transition-colors">FAQ</a>
               <button
                 onClick={scrollToEnroll}
                 className="px-4 py-2 bg-[#fcc824] hover:bg-[#ffd84d] text-black text-xs font-bold rounded-lg transition-all duration-200"
@@ -505,7 +506,7 @@ export default function CohortLandingPage() {
           </h1>
 
           {/* Subhead */}
-          <p className="anim-f3 max-w-2xl mx-auto text-lg sm:text-xl text-[#9898b3] leading-relaxed mb-10">
+          <p className="anim-f3 max-w-2xl mx-auto text-lg sm:text-xl text-[#9090a8] leading-relaxed mb-10">
             A structured group program for entrepreneurs ready to permanently
             redesign how they think, decide, and lead.
           </p>
@@ -528,7 +529,7 @@ export default function CohortLandingPage() {
           </div>
 
           {/* Social proof strip */}
-          <div className="anim-f5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-[#6b6b8a]">
+          <div className="anim-f5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-[#5a5a72]">
             <span className="flex items-center gap-2">
               <Users className="w-4 h-4 text-[#fcc824]" />
               8–12 entrepreneurs per cohort
@@ -573,7 +574,7 @@ export default function CohortLandingPage() {
                     <Icon className="w-5 h-5" style={{ color: item.accent }} />
                   </div>
                   <h3 className="text-base font-bold text-[#ededf5] mb-2">{item.title}</h3>
-                  <p className="text-sm text-[#9898b3] leading-relaxed">{item.desc}</p>
+                  <p className="text-sm text-[#9090a8] leading-relaxed">{item.desc}</p>
                 </div>
               );
             })}
@@ -589,7 +590,7 @@ export default function CohortLandingPage() {
             <h2 className="text-3xl sm:text-4xl font-black text-[#ededf5]">
               Three phases. One permanent shift.
             </h2>
-            <p className="mt-4 text-[#9898b3] max-w-xl mx-auto text-base">
+            <p className="mt-4 text-[#9090a8] max-w-xl mx-auto text-base">
               Each phase builds on the last. You're not collecting insights —
               you're installing a new operating system, one layer at a time.
             </p>
@@ -633,19 +634,19 @@ export default function CohortLandingPage() {
                         >
                           {phase.label}
                         </span>
-                        <span className="flex items-center gap-1.5 text-xs text-[#6b6b8a]">
+                        <span className="flex items-center gap-1.5 text-xs text-[#5a5a72]">
                           <Clock className="w-3.5 h-3.5" />
                           {phase.weeks}
                         </span>
                       </div>
 
                       <h3 className="text-xl font-bold text-[#ededf5] mb-3">{phase.title}</h3>
-                      <p className="text-sm text-[#9898b3] leading-relaxed mb-5">{phase.desc}</p>
+                      <p className="text-sm text-[#9090a8] leading-relaxed mb-5">{phase.desc}</p>
 
                       {/* Milestones */}
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {phase.milestones.map((m) => (
-                          <li key={m} className="flex items-start gap-2.5 text-sm text-[#9898b3]">
+                          <li key={m} className="flex items-start gap-2.5 text-sm text-[#9090a8]">
                             <CheckCircle2
                               className="w-4 h-4 mt-0.5 shrink-0"
                               style={{ color: phase.accent }}
@@ -688,7 +689,7 @@ export default function CohortLandingPage() {
                     />
                   ))}
                 </div>
-                <p className="text-sm text-[#c8c8e0] leading-relaxed flex-1">
+                <p className="text-sm text-[#9090a8] leading-relaxed flex-1">
                   "{t.quote}"
                 </p>
                 <div className="flex items-center gap-3 pt-2 border-t border-[#1e1e30]">
@@ -700,7 +701,7 @@ export default function CohortLandingPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[#ededf5]">{t.name}</p>
-                    <p className="text-xs text-[#6b6b8a]">{t.role}</p>
+                    <p className="text-xs text-[#5a5a72]">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -727,13 +728,20 @@ export default function CohortLandingPage() {
               {hasCohorts ? 'Secure your spot' : 'Join the waitlist'}
             </h2>
             {!hasCohorts && (
-              <p className="mt-4 text-[#9898b3] max-w-lg mx-auto text-base">
+              <p className="mt-4 text-[#9090a8] max-w-lg mx-auto text-base">
                 The next cohort is being scheduled. Drop your email and you'll
                 be the first to know — with priority access before public
                 enrollment opens.
               </p>
             )}
           </div>
+
+          {fetchError && (
+            <div className="mb-6 flex items-center gap-2 px-4 py-3 rounded-lg text-sm" style={{ background: 'rgba(252,200,36,0.06)', border: '1px solid rgba(252,200,36,0.2)', color: '#9090a8' }}>
+              <span style={{ color: '#fcc824' }}>⚠</span>
+              Could not load cohort schedule — showing waitlist. Refresh to try again.
+            </div>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-12">
@@ -752,7 +760,7 @@ export default function CohortLandingPage() {
                     <p className="text-sm font-bold text-[#ededf5] mb-1">
                       Ready to commit?
                     </p>
-                    <p className="text-xs text-[#9898b3]">
+                    <p className="text-xs text-[#9090a8]">
                       $997 · 90-day group cohort · Completion guarantee
                     </p>
                   </div>
@@ -773,7 +781,7 @@ export default function CohortLandingPage() {
           )}
 
           {/* Trust signals */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-[#6b6b8a]">
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-[#5a5a72]">
             <span className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#10b981]" />
               Completion guarantee
@@ -831,7 +839,7 @@ export default function CohortLandingPage() {
               <span className="gold-shimmer">designing your thinking</span>
               {' '}or reacting to it.
             </h2>
-            <p className="relative text-[#9898b3] mb-10 max-w-lg mx-auto leading-relaxed">
+            <p className="relative text-[#9090a8] mb-10 max-w-lg mx-auto leading-relaxed">
               $997 · 90-day group cohort · 8–12 entrepreneurs · AI coaching between calls ·
               Bi-weekly live sessions with Greg · Completion guarantee
             </p>
@@ -847,7 +855,7 @@ export default function CohortLandingPage() {
 
         {/* ─── Footer ─── */}
         <footer className="relative z-10 border-t border-[#1e1e30] py-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6b6b8a]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#5a5a72]">
             <MindsetOSLogo size="xs" variant="light" />
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="hover:text-[#ededf5] transition-colors">
