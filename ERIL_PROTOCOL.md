@@ -49,7 +49,31 @@ Never edit a file you haven't read.
 
 ---
 
-## Step 3 — Score your implementation against the actual rubric
+## Step 3 — Score your implementation against BOTH rubrics
+
+ERIL uses a **dual rubric**. Both must independently pass. Either failing → VERDICT: REVISE.
+
+---
+
+### Rubric A — Self-created rubric (write this BEFORE touching any code)
+
+In Step 2, before modifying any file, write 5 task-specific criteria for this feature:
+
+```
+Self-Rubric for: [feature name]
+1. Does [specific behavior] work correctly?
+2. Does it handle [edge case] gracefully?
+3. Is [element] visible/functional on mobile?
+4. Does [integration point] connect to the real backend endpoint?
+5. Is [user action] intuitive without instruction?
+```
+
+These criteria must be specific to YOUR task — things the universal rubric can't anticipate.
+Score each criterion after implementing: each must be ≥7 for VERDICT: YES.
+
+---
+
+### Rubric B — EVALUATION_CRITERIA.md universal floor
 
 Use the scoring template from EVALUATION_CRITERIA.md. Score all 10 criteria:
 
@@ -74,11 +98,15 @@ UX
 
 For backend-only work (no UI), score only: Functionality, Simplicity, Correctness.
 
-**Scoring rules:**
-- If ANY `blocker:yes` anti-pattern applies to your code → VERDICT: REVISE regardless of score
-- If ANY starred criterion (★) scores < 8 → VERDICT: REVISE
-- If ANY criterion scores < 7 → VERDICT: REVISE
-- Otherwise → VERDICT: YES
+---
+
+### VERDICT rules (both rubrics must pass)
+
+- If ANY `blocker:yes` anti-pattern applies → VERDICT: REVISE (immediate, no other scoring needed)
+- If ANY self-rubric criterion < 7 → VERDICT: REVISE
+- If ANY starred criterion (★) in Rubric B < 8 → VERDICT: REVISE
+- If ANY Rubric B criterion < 7 → VERDICT: REVISE
+- All of the above pass → VERDICT: YES
 
 ---
 

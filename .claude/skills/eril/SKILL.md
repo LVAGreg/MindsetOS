@@ -44,9 +44,10 @@ Follow ERIL_PROTOCOL.md exactly as a single agent. Steps:
 3. Step 0: mandatory cross-file verification (API URLs vs real-backend.cjs, field names, color tokens)
 4. Playwright screenshot of https://mindset-os-frontend-production.up.railway.app (UI work only)
 5. Read files you will modify
-6. Implement
-7. Score against EVALUATION_CRITERIA.md rubric
-8. Return VERDICT + near-misses
+6. **Write your self-created rubric BEFORE touching code** — 5 task-specific criteria
+7. Implement
+8. Score against BOTH rubrics: self-created (Rubric A) + EVALUATION_CRITERIA.md (Rubric B)
+9. Return VERDICT + both rubric scores + near-misses
 
 ---
 
@@ -74,13 +75,21 @@ STEP 0 — Mandatory cross-file verification:
   - Every res.data.field: confirm field exists in backend handler
   - Every color value: verify against 9-token palette
 
+STEP 1 — Write your self-created rubric BEFORE touching any code:
+  5 task-specific criteria for this feature (things the universal rubric can't anticipate)
+
 YOUR TASK: [feature description]
 
 Files this agent may touch: [list — must not overlap with other running agents]
 
-Score against EVALUATION_CRITERIA.md. End with:
+Score against BOTH rubrics (dual rubric — both must pass):
+  Rubric A: your self-created 5 criteria (each ≥7)
+  Rubric B: EVALUATION_CRITERIA.md universal floor (all criteria ≥7, starred ≥8, no blockers)
+
+End with:
 VERDICT: YES | REVISE
-Score: X.X/10
+Rubric A scores: (5 criteria + scores)
+Rubric B score: X.X/10
 Blockers: ...
 Near-misses: ...
 Files created/modified: ...
