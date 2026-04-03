@@ -196,24 +196,32 @@ Use Railway MCP `get-logs` with `logType: "deploy"` — filter with `filter: "er
 
 ---
 
-## 🎯 Evaluation
+## 🎯 Evaluation System
 
-After any significant UI build or feature implementation, score it against `EVALUATION_CRITERIA.md`.
-Target ≥7 on all criteria, ≥8 on starred (Originality, Quality of Design, Conversation Feel, User Intent).
-If anything scores below 7, fix it before marking done.
-Spawn `feature-dev:code-reviewer` as the separate evaluator — don't self-certify.
+Three documents work together. Read all three before starting any ERIL loop:
 
-feature-dev:code-reviewer is a built-in Claude Code agent type — no setup needed.
-Invoke it via the Agent tool with subagent_type: "feature-dev:code-reviewer".
+| File | Purpose |
+|------|---------|
+| `ERIL_PROTOCOL.md` | Step-by-step protocol every implementation agent follows |
+| `EVALUATION_CRITERIA.md` | The live rubric — 10 scored criteria + 35+ anti-patterns with hit counts |
+| `DELTA_REVIEWER.md` | Post-commit reviewer protocol — keeps the criteria current |
 
-Pass it the modified files and this instruction:
-"Score this implementation using the rubric at /data/workspace/ECOS/apps/mindset-os/EVALUATION_CRITERIA.md.
-Approach it assuming bugs exist — do not praise.
-Report the score per criterion, list everything below 7, flag any starred criteria below 8,
-and return a ship decision: YES / NO / REVISE.
-After scoring, update EVALUATION_CRITERIA.md — add any new criteria that emerged from this review,
-raise the bar on any criterion where the current description proved too lenient, and note any
-project-specific patterns to watch for in future builds."
+### For ERIL implementation agents
+Follow `ERIL_PROTOCOL.md` exactly. Score against `EVALUATION_CRITERIA.md` (not ad-hoc criteria).
+Mandatory Step 0: verify every API URL and response field name against `real-backend.cjs` before writing.
+
+### For V5 final reviewer
+Use `feature-dev:code-reviewer` subagent type. Pass it this instruction:
+
+> "Score using `/data/workspace/ECOS/apps/mindset-os/EVALUATION_CRITERIA.md`.
+> Assume bugs exist — do not praise. Report score per criterion, list everything below 7,
+> flag starred criteria below 8. Return ship decision: YES / NO / REVISE.
+> After scoring: increment `hits` and update `last_caught` on every anti-pattern you caught.
+> Append new patterns for anything not already covered. Update the Class Index counts."
+
+### For delta review (after every commit)
+Run a background agent using `DELTA_REVIEWER.md` protocol on the git diff.
+Keeps criteria accurate without re-reviewing the full implementation.
 
 ---
 
