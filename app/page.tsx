@@ -379,7 +379,7 @@ export default function LandingPage() {
                   borderRadius: 24,
                 }}
               >
-                <BrainVariantB onAgentSelect={() => {}} />
+                <BrainVariantB onAgentSelect={() => router.push('/trial-v3b')} />
               </div>
 
               {/* LIVE SYSTEM badge */}
@@ -459,7 +459,7 @@ export default function LandingPage() {
                       background: 'rgba(18,18,31,0.8)',
                       border: isDestination ? undefined : '1px solid rgba(255,255,255,0.07)',
                       backdropFilter: 'blur(14px)',
-                      borderLeft: '2px solid rgba(79,110,247,0.3)',
+                      borderLeft: isDestination ? undefined : '2px solid rgba(79,110,247,0.3)',
                       borderRadius: isDestination ? 15 : undefined,
                     }}
                   >

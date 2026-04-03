@@ -154,7 +154,7 @@ Ship? YES / NO / REVISE
 
 ---
 
-## Project-Specific Anti-Patterns (updated 2026-04-02, extended 2026-04-02 Three.js review, extended 2026-04-02 token sweep)
+## Project-Specific Anti-Patterns (updated 2026-04-02, extended 2026-04-02 Three.js review, extended 2026-04-02 token sweep, extended 2026-04-03 Loop-74)
 
 <!-- hits:6 | last_caught:Loop-72 | class:silent-failure | severity:correctness | blocker:no -->
 ### Silent async failure
@@ -328,6 +328,14 @@ When selecting an item from a list causes a detail pane to appear below the list
 ### Mobile detail pane lacks orientation label
 When a mobile breakpoint reveals a detail card below a list in response to a tap, the card must include a clear contextual label (e.g., a small "Selected" badge, "Notification Details" heading, or visible close button with label) so users understand what they're looking at. A detail card that appears without any heading or label is visually ambiguous — on a first visit, users may not realize it is connected to the tapped list item. Acceptable implementations: (1) a small `text-xs` label above the card reading the item title or "Details"; (2) a close button with explicit label; (3) a heading inside the card at a visually distinct level. Caps Quality of Design at 7 if the mobile pane has no orientation label.
 
+<!-- hits:1 | last_caught:Loop-74 | class:design-duplication | severity:craft | blocker:no -->
+### Gradient border wrapper + unconditional inner border-side produces double-border
+When a card uses a gradient-border wrapper technique (a `padding: 1px` div with gradient background acting as the border), the inner card div must NOT also set an individual border-side (e.g., `borderLeft`) unconditionally. The wrapper already provides the visible border on that edge; the inner override produces a double left-edge artefact. Make the inner border-side conditional on the card NOT being the wrapped variant. Reviewers: when a conditional wrapper such as `gradient-border-blue` is applied to one variant in a mapped array, check whether any unconditional border-side styles on the inner element conflict with the wrapper's border on that variant. Caps Craft at 7.
+
+<!-- hits:1 | last_caught:Loop-74 | class:webgl | severity:functionality | blocker:no -->
+### Interactive WebGL canvas with no-op onAgentSelect on marketing page
+When `BrainVariantB` (or equivalent Three.js canvas with hover-highlight and lobe-click handlers) is embedded on a landing/marketing page, hover affordance (lobe highlighting, label appearance, implied cursor-pointer) signals interactivity. Passing `onAgentSelect={() => {}}` silently no-ops every click — a user receives no feedback after clicking a highlighted lobe. Acceptable resolutions: (1) wire `onAgentSelect` to a meaningful CTA route (e.g., `router.push('/trial-v3b')`), or (2) apply `pointerEvents: 'none'` to the container div to remove the interactive affordance entirely. Scores Functionality ≤7 and User Intent ≤7 if unresolved.
+
 ---
 
 ## Anti-Pattern Class Index
@@ -343,8 +351,8 @@ When a mobile breakpoint reveals a detail card below a list in response to a tap
 | accessibility | 2 | Redundant keyboard handler on native button elements (hits:1) |
 | mobile | 5 | hover-only delete affordance on touch devices (hits:3) |
 | state-management | 5 | `setTimeout`-based state re-trigger / `fetchContacts` stale-closure (hits:3 each) |
-| design-duplication | 3 | Duplicated detail/pane rendering across breakpoints (hits:2) |
+| design-duplication | 4 | Duplicated detail/pane rendering across breakpoints (hits:2) |
 | analytics | 2 | Analytics semantic mismatch (funnel attribution corruption) (hits:1) |
-| webgl | 4 | Shared WebGL geometry disposed while meshes live (hits:1) |
+| webgl | 5 | Shared WebGL geometry disposed while meshes live (hits:1) |
 
 *Updated automatically by V5 reviewer after each loop.*
