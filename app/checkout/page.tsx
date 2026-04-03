@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import Link from 'next/link';
 import {
+  AlertCircle,
   CheckCircle,
   Shield,
   Lock,
@@ -167,31 +168,44 @@ function CheckoutPageInner() {
         }),
       });
 
-      const data = await res.json();
+      let data: { error?: string; url?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Response body is not JSON — surface status
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
+        const statusContext = (() => {
+          if (res.status === 402) return 'Payment declined — please check your card details.';
+          if (res.status === 409) return 'An account with this email already exists. Try logging in.';
+          if (res.status === 422) return 'Invalid details — please review your information and try again.';
+          if (res.status >= 500) return `Server error (${res.status}) — please try again in a moment.`;
+          return `Something went wrong (${res.status}).`;
+        })();
+        throw new Error(data.error || statusContext);
       }
 
       if (data.url) {
         window.location.href = data.url;
       }
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setError(message);
     } finally {
       setIsProcessing(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a] text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#09090f] text-white relative overflow-hidden">
 
       {/* ===== Atmospheric background ===== */}
       <div className="pointer-events-none fixed inset-0 z-0">
         {/* Primary warm orb top-left */}
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#fcc824]/[0.06] rounded-full blur-[160px]" />
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full blur-[160px]" style={{ background: 'rgba(252,200,36,0.06)' }} />
         {/* Secondary cool orb bottom-right */}
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/[0.04] rounded-full blur-[180px]" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[180px]" style={{ background: 'rgba(79,110,247,0.04)' }} />
         {/* Center subtle glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full blur-[200px]" style={{ background: 'rgba(124,91,246,0.02)' }} />
         {/* Dot grid */}
@@ -205,7 +219,7 @@ function CheckoutPageInner() {
       </div>
 
       {/* ===== Top bar ===== */}
-      <header className="relative z-10 border-b border-white/[0.06] bg-[#0a0a1a]/80 backdrop-blur-xl">
+      <header className="relative z-10 border-b border-white/[0.06] bg-[#09090f]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MindsetOSLogo size="md" variant="light" />
@@ -241,41 +255,57 @@ function CheckoutPageInner() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="relative group">
+                      <label htmlFor="firstName" className="sr-only">First name</label>
                       <input
+                        id="firstName"
                         type="text"
                         placeholder="First name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
                         required
+                        autoComplete="given-name"
                       />
                     </div>
                     <div className="relative group">
+                      <label htmlFor="lastName" className="sr-only">Last name</label>
                       <input
+                        id="lastName"
                         type="text"
                         placeholder="Last name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
                         required
+                        autoComplete="family-name"
                       />
                     </div>
                   </div>
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
-                    required
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Phone (optional)"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
-                  />
+                  <div>
+                    <label htmlFor="email" className="sr-only">Email address</label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
+                      required
+                      autoComplete="email"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="sr-only">Phone number (optional)</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="Phone (optional)"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-[#fcc824]/50 focus:border-[#fcc824]/40 focus:bg-white/[0.06] transition-all duration-300"
+                      autoComplete="tel"
+                    />
+                  </div>
                 </div>
               </section>
 
@@ -341,7 +371,10 @@ function CheckoutPageInner() {
                       <div className="flex items-baseline gap-2 flex-wrap">
                         <span className="text-xl font-extrabold text-white tracking-tight">$397</span>
                         <span className="text-sm text-white/40 font-medium">one-time</span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/20">
+                        <span
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full"
+                          style={{ background: 'rgba(79,110,247,0.12)', color: '#7c9fff', border: '1px solid rgba(79,110,247,0.25)' }}
+                        >
                           <Zap className="w-3 h-3" />
                           SAVE $167
                         </span>
@@ -411,10 +444,12 @@ function CheckoutPageInner() {
                         onMouseLeave={e => { if (!addons.has('1on1_intensive')) { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.01)'; } }}
                       >
                         <input
+                          id="addon-1on1-intensive"
                           type="checkbox"
                           checked={addons.has('1on1_intensive')}
                           onChange={() => toggleAddon('1on1_intensive')}
                           className="sr-only"
+                          aria-label="Add 1:1 Architecture Intensive for $1,000"
                         />
                         <div className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all duration-200"
                           style={addons.has('1on1_intensive')
@@ -450,11 +485,12 @@ function CheckoutPageInner() {
 
                   {/* MindsetOS Annual — $1,997/year */}
                   <label
-                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                      plan === 'individual_annual'
-                        ? 'border-emerald-500/60 bg-emerald-500/[0.06]'
-                        : 'border-white/[0.06] bg-white/[0.02] hover:border-emerald-500/20 hover:bg-emerald-500/[0.03]'
-                    }`}
+                    className="group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300"
+                    style={plan === 'individual_annual'
+                      ? { borderColor: 'rgba(79,110,247,0.6)', background: 'rgba(79,110,247,0.06)' }
+                      : { borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+                    onMouseEnter={e => { if (plan !== 'individual_annual') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.2)'; (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.03)'; } }}
+                    onMouseLeave={e => { if (plan !== 'individual_annual') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; } }}
                   >
                     <input
                       type="radio"
@@ -464,17 +500,24 @@ function CheckoutPageInner() {
                       onChange={() => handlePlanChange('individual_annual')}
                       className="sr-only"
                     />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
-                      plan === 'individual_annual' ? 'border-emerald-400' : 'border-white/20'
-                    }`}>
-                      {plan === 'individual_annual' && <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />}
+                    <div
+                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300"
+                      style={{ borderColor: plan === 'individual_annual' ? '#4f6ef7' : 'rgba(255,255,255,0.2)' }}
+                    >
+                      {plan === 'individual_annual' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#4f6ef7' }} />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2 flex-wrap mb-1">
                         <span className="text-xl font-extrabold text-white tracking-tight">$1,997</span>
                         <span className="text-sm text-white/40 font-medium">/year</span>
-                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 tracking-wide">ANNUAL SUBSCRIPTION</span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/20">
+                        <span
+                          className="px-2 py-0.5 text-[10px] font-bold rounded tracking-wide"
+                          style={{ background: 'rgba(79,110,247,0.1)', color: '#7c9fff', border: '1px solid rgba(79,110,247,0.2)' }}
+                        >ANNUAL SUBSCRIPTION</span>
+                        <span
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full"
+                          style={{ background: 'rgba(79,110,247,0.1)', color: '#7c9fff', border: '1px solid rgba(79,110,247,0.2)' }}
+                        >
                           <Zap className="w-3 h-3" />
                           SAVE $440
                         </span>
@@ -486,24 +529,25 @@ function CheckoutPageInner() {
                       <ul className="space-y-1">
                         {['365 days of full access', 'All 10 agents', 'Unlimited conversations', 'Save $440 vs weekly'].map((f) => (
                           <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
-                            <CheckCircle className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                            <CheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: '#4f6ef7' }} />
                             {f}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-emerald-600 text-white text-[10px] font-bold rounded-full tracking-wide">
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 text-white text-[10px] font-bold rounded-full tracking-wide" style={{ background: '#4f6ef7' }}>
                       BEST VALUE
                     </span>
                   </label>
 
                   {/* Architecture Intensive (1:1) — $1,997 one-time */}
                   <label
-                    className={`group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                      plan === 'intensive_1997'
-                        ? 'border-rose-500/60 bg-rose-500/[0.06]'
-                        : 'border-white/[0.06] bg-white/[0.02] hover:border-rose-500/20 hover:bg-rose-500/[0.03]'
-                    }`}
+                    className="group relative flex items-start gap-4 p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300"
+                    style={plan === 'intensive_1997'
+                      ? { borderColor: 'rgba(124,91,246,0.6)', background: 'rgba(124,91,246,0.06)' }
+                      : { borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+                    onMouseEnter={e => { if (plan !== 'intensive_1997') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.2)'; (e.currentTarget as HTMLElement).style.background = 'rgba(124,91,246,0.03)'; } }}
+                    onMouseLeave={e => { if (plan !== 'intensive_1997') { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; } }}
                   >
                     <input
                       type="radio"
@@ -513,10 +557,11 @@ function CheckoutPageInner() {
                       onChange={() => handlePlanChange('intensive_1997')}
                       className="sr-only"
                     />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300 ${
-                      plan === 'intensive_1997' ? 'border-rose-400' : 'border-white/20'
-                    }`}>
-                      {plan === 'intensive_1997' && <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />}
+                    <div
+                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors duration-300"
+                      style={{ borderColor: plan === 'intensive_1997' ? '#7c5bf6' : 'rgba(255,255,255,0.2)' }}
+                    >
+                      {plan === 'intensive_1997' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#7c5bf6' }} />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-2 flex-wrap mb-1">
@@ -525,7 +570,10 @@ function CheckoutPageInner() {
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-semibold text-white/80">Architecture Intensive (1:1)</span>
-                        <span className="px-2 py-0.5 bg-rose-500/10 text-rose-400 text-[10px] font-bold rounded border border-rose-500/20 tracking-wide">ONE-TIME PAYMENT</span>
+                        <span
+                          className="px-2 py-0.5 text-[10px] font-bold rounded tracking-wide"
+                          style={{ background: 'rgba(124,91,246,0.1)', color: '#b59fff', border: '1px solid rgba(124,91,246,0.2)' }}
+                        >ONE-TIME PAYMENT</span>
                       </div>
                       <div className="text-xs text-white/35 mb-2 leading-relaxed">
                         Greg&apos;s flagship 1:1 program. Full 90-Day Architecture access plus 3 private coaching sessions, a personalized mindset blueprint, and priority support.
@@ -533,13 +581,13 @@ function CheckoutPageInner() {
                       <ul className="space-y-1">
                         {['Full 90-Day Architecture program', '3 private 1:1 coaching sessions', 'Personalized mindset blueprint', 'Priority support & direct access'].map((f) => (
                           <li key={f} className="flex items-center gap-1.5 text-[11px] text-white/45">
-                            <CheckCircle className="w-3 h-3 text-rose-400 flex-shrink-0" />
+                            <CheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: '#7c5bf6' }} />
                             {f}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-rose-600 text-white text-[10px] font-bold rounded-full tracking-wide">
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 text-white text-[10px] font-bold rounded-full tracking-wide" style={{ background: '#7c5bf6' }}>
                       PREMIUM
                     </span>
                   </label>
@@ -596,9 +644,12 @@ function CheckoutPageInner() {
               </section>
 
               {/* --- Secure payment note --- */}
-              <div className="checkout-section-animate flex items-center gap-3 text-sm text-white/50 bg-emerald-500/[0.04] border border-emerald-500/10 rounded-xl p-4" style={{ animationDelay: '0.4s' }}>
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-                  <Lock className="w-4 h-4 text-emerald-400" />
+              <div
+                className="checkout-section-animate flex items-center gap-3 text-sm rounded-xl p-4"
+                style={{ animationDelay: '0.4s', background: 'rgba(79,110,247,0.04)', border: '1px solid rgba(79,110,247,0.12)' }}
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(79,110,247,0.1)' }}>
+                  <Lock className="w-4 h-4" style={{ color: '#4f6ef7' }} />
                 </div>
                 <span className="text-xs leading-relaxed text-white/50">
                   You&apos;ll enter your payment details securely on the next page via <strong className="text-white/70">Stripe</strong> &mdash; the world&apos;s most trusted payment processor.
@@ -607,8 +658,13 @@ function CheckoutPageInner() {
 
               {/* --- Error --- */}
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-start gap-2">
-                  <span className="text-red-400 text-lg leading-none">!</span>
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="border text-sm p-4 rounded-xl flex items-start gap-3"
+                  style={{ background: 'rgba(239,68,68,0.08)', borderColor: 'rgba(239,68,68,0.25)', color: '#f87171' }}
+                >
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{error}</span>
                 </div>
               )}
@@ -618,7 +674,9 @@ function CheckoutPageInner() {
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="checkout-cta-btn group w-full py-4 sm:py-5 bg-[#fcc824] hover:bg-[#ffe066] disabled:opacity-50 disabled:cursor-not-allowed text-black font-extrabold text-base sm:text-lg tracking-tight rounded-xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.15)] hover:shadow-[0_0_60px_rgba(252,200,36,0.3)] hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2.5 relative overflow-hidden"
+                  aria-disabled={isProcessing}
+                  aria-busy={isProcessing}
+                  className="checkout-cta-btn group w-full py-4 sm:py-5 bg-[#fcc824] hover:bg-[#ffe066] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none text-black font-extrabold text-base sm:text-lg tracking-tight rounded-xl transition-all duration-300 shadow-[0_0_40px_rgba(252,200,36,0.15)] hover:shadow-[0_0_60px_rgba(252,200,36,0.3)] hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2.5 relative overflow-hidden"
                 >
                   {/* Shimmer sweep on hover */}
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
@@ -739,7 +797,7 @@ function CheckoutPageInner() {
                       </div>
                       <span className="text-sm text-white/70 flex-1 min-w-0">{bonus.name}</span>
                       <span className="text-xs font-bold text-white/30 line-through flex-shrink-0">{bonus.value}</span>
-                      <span className="text-xs font-bold text-emerald-400 flex-shrink-0">FREE</span>
+                      <span className="text-xs font-bold flex-shrink-0" style={{ color: '#4f6ef7' }}>FREE</span>
                     </div>
                   ))}
                 </div>
@@ -785,7 +843,7 @@ function CheckoutPageInner() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a1a]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#09090f]" />}>
       <CheckoutPageInner />
     </Suspense>
   );
