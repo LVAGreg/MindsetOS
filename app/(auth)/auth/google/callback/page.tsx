@@ -102,24 +102,40 @@ function GoogleCallbackContent() {
   }, [searchParams, router, setUser, loadConversations]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 max-w-md w-full text-center" style={{ borderColor: '#fcc824' }}>
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: '#09090f' }}
+    >
+      <div
+        className="backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 max-w-md w-full text-center"
+        style={{
+          background: 'rgba(18,18,31,0.8)',
+          borderColor: '#fcc824',
+        }}
+      >
         {error ? (
           <>
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
+            <div
+              className="mb-4 p-3 rounded-lg"
+              style={{
+                background: 'rgba(239,68,68,0.12)',
+                border: '1px solid rgba(239,68,68,0.35)',
+                color: '#f87171',
+              }}
+            >
               {error}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm" style={{ color: '#9090a8' }}>
               Redirecting to login page...
             </p>
           </>
         ) : (
           <>
             <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#fcc824' }} />
-            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#ededf5' }}>
               Completing Google Sign-In
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p style={{ color: '#9090a8' }}>
               Please wait while we log you in...
             </p>
           </>
@@ -132,10 +148,19 @@ function GoogleCallbackContent() {
 export default function GoogleCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 max-w-md w-full text-center" style={{ borderColor: '#fcc824' }}>
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: '#09090f' }}
+      >
+        <div
+          className="backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 max-w-md w-full text-center"
+          style={{
+            background: 'rgba(18,18,31,0.8)',
+            borderColor: '#fcc824',
+          }}
+        >
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#fcc824' }} />
-          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          <h2 className="text-xl font-semibold mb-2" style={{ color: '#ededf5' }}>
             Loading...
           </h2>
         </div>
