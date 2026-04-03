@@ -74,7 +74,7 @@ function RoleBadge({ role }: { role: string }) {
 
   if (isAdmin) {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-purple-500/15 border border-purple-500/20 text-[10px] font-bold text-purple-400 tracking-wide uppercase">
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase" style={{ background: 'rgba(124,91,246,0.12)', border: '1px solid rgba(124,91,246,0.22)', color: '#7c5bf6' }}>
         <Shield className="w-2.5 h-2.5" />
         Admin
       </span>
@@ -115,6 +115,16 @@ function NavItem({
     <button
       onClick={onClick}
       disabled={locked}
+      onMouseEnter={e => {
+        if (!isActive && !locked) {
+          (e.currentTarget as HTMLElement).style.background = 'rgba(237,237,245,0.05)';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isActive && !locked) {
+          (e.currentTarget as HTMLElement).style.background = 'transparent';
+        }
+      }}
       className={`
         w-full flex items-center gap-3 px-3 py-3 rounded-xl
         transition-all duration-150 text-left group relative
@@ -122,8 +132,8 @@ function NavItem({
         ${isActive
           ? 'bg-[#fcc824]/[0.07] text-[#fcc824] border border-[#fcc824]/[0.14] border-l-[3px] border-l-[#fcc824]'
           : locked
-            ? 'opacity-40 cursor-not-allowed text-gray-500 border border-transparent'
-            : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.05] border border-transparent'
+            ? 'opacity-40 cursor-not-allowed border border-transparent'
+            : 'border border-transparent'
         }
         ${className}
       `}
@@ -133,24 +143,30 @@ function NavItem({
         <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#fcc824] shadow-[0_0_6px_#fcc82466]" />
       )}
 
-      <span className={`flex-shrink-0 transition-colors duration-200 ${isActive ? 'text-[#fcc824]' : 'text-gray-500 group-hover:text-gray-300'}`}>
+      <span
+        className="flex-shrink-0 transition-colors duration-200"
+        style={{ color: isActive ? '#fcc824' : '#5a5a72' }}
+      >
         {icon}
       </span>
 
-      <span className={`text-sm font-medium flex-1 truncate ${isActive ? 'text-[#fcc824]' : ''}`}>
+      <span
+        className="text-sm font-medium flex-1 truncate"
+        style={{ color: isActive ? '#fcc824' : '#9090a8' }}
+      >
         {label}
       </span>
 
-      {locked && <Lock className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />}
+      {locked && <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#5a5a72' }} />}
 
       {badge !== undefined && badge !== 0 && (
-        <span className={`
-          flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold
-          ${isActive
-            ? 'bg-[#fcc824] text-black'
-            : 'bg-white/[0.08] text-gray-400'
+        <span
+          className="flex-shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-bold"
+          style={isActive
+            ? { background: '#fcc824', color: '#000' }
+            : { background: 'rgba(237,237,245,0.08)', color: '#9090a8' }
           }
-        `}>
+        >
           {badge}
         </span>
       )}
@@ -162,7 +178,7 @@ function NavItem({
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-3 pt-5 pb-1">
-      <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-600">
+      <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: '#5a5a72' }}>
         {children}
       </p>
     </div>
@@ -279,8 +295,8 @@ function StatsStrip({ userId }: { userId?: string }) {
         <div className="flex items-center justify-between">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex flex-col items-center gap-1">
-              <div className="h-3 w-12 rounded bg-white/[0.07] animate-pulse" />
-              <div className="h-2 w-8 rounded bg-white/[0.04] animate-pulse" />
+              <div className="h-3 w-12 rounded animate-pulse" style={{ background: 'rgba(237,237,245,0.07)' }} />
+              <div className="h-2 w-8 rounded animate-pulse" style={{ background: 'rgba(237,237,245,0.04)' }} />
             </div>
           ))}
         </div>
@@ -343,23 +359,22 @@ export default function DashboardSidebar({
   const ExpandedSidebar = (
     <div className="w-[272px] flex flex-col h-full min-h-0
       sidebar-studio
-      border-r border-white/[0.05]
-      text-gray-100
       relative overflow-hidden
-    ">
+    " style={{ borderRight: '1px solid rgba(237,237,245,0.05)', color: '#ededf5' }}>
       {/* Ambient background orbs — depth without noise */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-[#fcc824]/[0.025] blur-[80px]" />
-        <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full bg-cyan-500/[0.015] blur-[80px]" />
+        <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full blur-[80px]" style={{ background: 'rgba(79,110,247,0.015)' }} />
       </div>
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="relative flex-shrink-0 px-4 py-4 border-b border-white/[0.05] flex items-center justify-between">
+      <div className="relative flex-shrink-0 px-4 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(237,237,245,0.05)' }}>
         <MindsetOSLogo size="md" variant="light" />
 
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-lg hover:bg-white/[0.06] transition-colors text-gray-500 hover:text-gray-300"
+          className="p-2 rounded-lg transition-colors"
+          style={{ color: '#5a5a72' }}
           title="Collapse sidebar"
           aria-label="Collapse sidebar"
         >
@@ -381,7 +396,7 @@ export default function DashboardSidebar({
           <div className="w-7 h-7 rounded-lg bg-[#fcc824]/10 flex items-center justify-center group-hover:bg-[#fcc824]/18 transition-colors">
             <Plus className="w-4 h-4 text-[#fcc824]" />
           </div>
-          <span className="text-sm font-semibold text-gray-200">New Chat</span>
+          <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>New Chat</span>
         </button>
       </div>
 
@@ -409,7 +424,7 @@ export default function DashboardSidebar({
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-[#fcc824] leading-tight">Take Your Mindset Score</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">5 questions · free · takes 2 min</p>
+                  <p className="text-[11px] mt-0.5 leading-snug" style={{ color: '#5a5a72' }}>5 questions · free · takes 2 min</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#fcc824]/50 flex-shrink-0 mt-1.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
@@ -466,7 +481,7 @@ export default function DashboardSidebar({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-[#fcc824] leading-tight">Go Premium</p>
-                  <p className="text-[11px] text-gray-500 leading-tight mt-0.5">Unlock all 10 agents</p>
+                  <p className="text-[11px] leading-tight mt-0.5" style={{ color: '#5a5a72' }}>Unlock all 10 agents</p>
                 </div>
               </button>
             </div>
@@ -561,7 +576,7 @@ export default function DashboardSidebar({
       </div>
 
       {/* ── Footer: user profile ──────────────────────────── */}
-      <div className="relative flex-shrink-0 border-t border-white/[0.05] p-3">
+      <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }}>
 
         {/* User menu popup */}
         {showUserMenu && (
@@ -570,24 +585,23 @@ export default function DashboardSidebar({
               className="fixed inset-0 z-40"
               onClick={() => setShowUserMenu(false)}
             />
-            <div className="absolute bottom-full left-0 right-0 mb-2 mx-1 z-50
-              bg-[#0f1520] border border-white/[0.08] rounded-2xl
-              shadow-2xl shadow-black/50
-              overflow-hidden
-            ">
+            <div
+              className="absolute bottom-full left-0 right-0 mb-2 mx-1 z-50 rounded-2xl overflow-hidden"
+              style={{ background: '#0f1520', border: '1px solid rgba(237,237,245,0.08)', boxShadow: '0 25px 50px rgba(0,0,0,0.5)' }}
+            >
               {/* Profile header */}
-              <div className="px-4 py-3 border-b border-white/[0.05]">
+              <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(237,237,245,0.05)' }}>
                 {viewAsUser ? (
                   <>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-blue-400">Viewing as</p>
-                    <p className="text-sm font-semibold text-white truncate mt-0.5">{effectiveUser?.name || effectiveUser?.email}</p>
-                    <p className="text-[11px] text-gray-500 capitalize">{effectiveUser?.role?.replace('_', ' ')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#4f6ef7' }}>Viewing as</p>
+                    <p className="text-sm font-semibold truncate mt-0.5" style={{ color: '#ededf5' }}>{effectiveUser?.name || effectiveUser?.email}</p>
+                    <p className="text-[11px] capitalize" style={{ color: '#5a5a72' }}>{effectiveUser?.role?.replace('_', ' ')}</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Signed in as</p>
-                    <p className="text-sm font-semibold text-white truncate mt-0.5">{user?.name || user?.email}</p>
-                    <p className="text-[11px] text-gray-500 capitalize">{effectiveUser?.role?.replace('_', ' ')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#5a5a72' }}>Signed in as</p>
+                    <p className="text-sm font-semibold truncate mt-0.5" style={{ color: '#ededf5' }}>{user?.name || user?.email}</p>
+                    <p className="text-[11px] capitalize" style={{ color: '#5a5a72' }}>{effectiveUser?.role?.replace('_', ' ')}</p>
                   </>
                 )}
               </div>
@@ -596,18 +610,20 @@ export default function DashboardSidebar({
                 {/* Profile */}
                 <button
                   onClick={() => { router.push('/profile'); setShowUserMenu(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] transition-colors min-h-[44px]"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors min-h-[44px]"
+                  style={{ color: '#9090a8' }}
                 >
-                  <Settings className="w-4 h-4 text-gray-500" />
+                  <Settings className="w-4 h-4" style={{ color: '#5a5a72' }} />
                   <span>Profile & Settings</span>
                 </button>
 
                 {/* Search */}
                 <button
                   onClick={() => { onSearch(); setShowUserMenu(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] transition-colors min-h-[44px]"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors min-h-[44px]"
+                  style={{ color: '#9090a8' }}
                 >
-                  <Search className="w-4 h-4 text-gray-500" />
+                  <Search className="w-4 h-4" style={{ color: '#5a5a72' }} />
                   <span>Search Conversations</span>
                 </button>
 
@@ -615,12 +631,13 @@ export default function DashboardSidebar({
                 {onFeedbackClick && (
                   <button
                     onClick={() => { onFeedbackClick(); setShowUserMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.05] transition-colors min-h-[44px]"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors min-h-[44px]"
+                    style={{ color: '#9090a8' }}
                   >
-                    <MessageCircle className="w-4 h-4 text-gray-500" />
+                    <MessageCircle className="w-4 h-4" style={{ color: '#5a5a72' }} />
                     <span>Send Feedback</span>
                     {unreadFeedbackCount > 0 && (
-                      <span className="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                      <span className="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: '#c0392b', color: '#ededf5' }}>
                         {unreadFeedbackCount > 99 ? '99+' : unreadFeedbackCount}
                       </span>
                     )}
@@ -628,44 +645,47 @@ export default function DashboardSidebar({
                 )}
 
                 {/* Preferences divider */}
-                <div className="mx-4 my-1 border-t border-white/[0.05]" />
+                <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }} />
 
                 {/* Dark Mode */}
                 <div className="px-4 py-2.5 flex items-center justify-between min-h-[44px]">
-                  <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                    {theme === 'dark' ? <Moon className="w-4 h-4 text-gray-500" /> : <Sun className="w-4 h-4 text-gray-500" />}
+                  <div className="flex items-center gap-2.5 text-sm" style={{ color: '#9090a8' }}>
+                    {theme === 'dark'
+                      ? <Moon className="w-4 h-4" style={{ color: '#5a5a72' }} />
+                      : <Sun className="w-4 h-4" style={{ color: '#5a5a72' }} />
+                    }
                     <span>Dark Mode</span>
                   </div>
                   <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium ${
-                      theme === 'dark' ? 'bg-[#fcc824]' : 'bg-white/10'
-                    }`}
+                    className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium"
+                    style={{ background: theme === 'dark' ? '#fcc824' : 'rgba(237,237,245,0.1)' }}
                     aria-label="Toggle dark mode"
                   >
-                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${
-                      theme === 'dark' ? 'translate-x-4' : 'translate-x-0.5'
-                    }`} />
+                    <span
+                      className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform shadow-sm ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0.5'}`}
+                      style={{ background: '#ededf5' }}
+                    />
                   </button>
                 </div>
 
                 {/* Widgets toggle */}
                 {user && (
                   <div className="px-4 py-2.5 flex items-center justify-between min-h-[44px]">
-                    <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                      <Sparkles className="w-4 h-4 text-gray-500" />
+                    <div className="flex items-center gap-2.5 text-sm" style={{ color: '#9090a8' }}>
+                      <Sparkles className="w-4 h-4" style={{ color: '#5a5a72' }} />
                       <span>Widgets</span>
                     </div>
                     <button
                       onClick={() => setWidgetFormattingEnabled(!widgetFormattingEnabled)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium ${
-                        widgetFormattingEnabled ? 'bg-purple-500' : 'bg-white/10'
-                      }`}
+                      className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium"
+                      style={{ background: widgetFormattingEnabled ? '#7c5bf6' : 'rgba(237,237,245,0.1)' }}
                       aria-label="Toggle widgets"
                     >
-                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${
-                        widgetFormattingEnabled ? 'translate-x-4' : 'translate-x-0.5'
-                      }`} />
+                      <span
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform shadow-sm ${widgetFormattingEnabled ? 'translate-x-4' : 'translate-x-0.5'}`}
+                        style={{ background: '#ededf5' }}
+                      />
                     </button>
                   </div>
                 )}
@@ -673,20 +693,20 @@ export default function DashboardSidebar({
                 {/* Memory toggle — admin/power_user only */}
                 {(isAdmin || isPowerUser) && (
                   <div className="px-4 py-2.5 flex items-center justify-between min-h-[44px]">
-                    <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                      <Brain className="w-4 h-4 text-gray-500" />
+                    <div className="flex items-center gap-2.5 text-sm" style={{ color: '#9090a8' }}>
+                      <Brain className="w-4 h-4" style={{ color: '#5a5a72' }} />
                       <span>Memory Context</span>
                     </div>
                     <button
                       onClick={() => setMemoryEnabled(!memoryEnabled)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium ${
-                        memoryEnabled ? 'bg-blue-500' : 'bg-white/10'
-                      }`}
+                      className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium"
+                      style={{ background: memoryEnabled ? '#4f6ef7' : 'rgba(237,237,245,0.1)' }}
                       aria-label="Toggle memory context"
                     >
-                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${
-                        memoryEnabled ? 'translate-x-4' : 'translate-x-0.5'
-                      }`} />
+                      <span
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform shadow-sm ${memoryEnabled ? 'translate-x-4' : 'translate-x-0.5'}`}
+                        style={{ background: '#ededf5' }}
+                      />
                     </button>
                   </div>
                 )}
@@ -694,8 +714,8 @@ export default function DashboardSidebar({
                 {/* Playbook toggle */}
                 {user && (
                   <div className="px-4 py-2.5 flex items-center justify-between min-h-[44px]">
-                    <div className="flex items-center gap-2.5 text-sm text-gray-300">
-                      <PanelRightOpen className="w-4 h-4 text-gray-500" />
+                    <div className="flex items-center gap-2.5 text-sm" style={{ color: '#9090a8' }}>
+                      <PanelRightOpen className="w-4 h-4" style={{ color: '#5a5a72' }} />
                       <span>Playbook Panel</span>
                     </div>
                     <button
@@ -703,14 +723,14 @@ export default function DashboardSidebar({
                         const store = useAppStore.getState();
                         store.setCanvasEnabled(!canvasEnabled);
                       }}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium ${
-                        canvasEnabled ? 'bg-[#fcc824]' : 'bg-white/10'
-                      }`}
+                      className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors toggle-premium"
+                      style={{ background: canvasEnabled ? '#fcc824' : 'rgba(237,237,245,0.1)' }}
                       aria-label="Toggle playbook panel"
                     >
-                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm ${
-                        canvasEnabled ? 'translate-x-4' : 'translate-x-0.5'
-                      }`} />
+                      <span
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full transition-transform shadow-sm ${canvasEnabled ? 'translate-x-4' : 'translate-x-0.5'}`}
+                        style={{ background: '#ededf5' }}
+                      />
                     </button>
                   </div>
                 )}
@@ -718,10 +738,11 @@ export default function DashboardSidebar({
                 {/* Upgrade — non-premium, non-agency */}
                 {!isPremium && !isAdmin && (
                   <>
-                    <div className="mx-4 my-1 border-t border-white/[0.05]" />
+                    <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }} />
                     <button
                       onClick={() => { router.push('/agency'); setShowUserMenu(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-amber-400 hover:text-amber-300 hover:bg-amber-500/[0.06] transition-colors min-h-[44px]"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors min-h-[44px]"
+                      style={{ color: '#fcc824' }}
                     >
                       <GraduationCap className="w-4 h-4" />
                       <span>Upgrade to Coaching Practice</span>
@@ -730,10 +751,11 @@ export default function DashboardSidebar({
                 )}
 
                 {/* Sign out */}
-                <div className="mx-4 my-1 border-t border-white/[0.05]" />
+                <div className="mx-4 my-1" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }} />
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.06] transition-colors min-h-[44px]"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors min-h-[44px]"
+                  style={{ color: '#e05252' }}
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign out</span>
@@ -746,7 +768,7 @@ export default function DashboardSidebar({
         {/* User profile button */}
         <button
           onClick={() => setShowUserMenu(!showUserMenu)}
-          className="w-full flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-150 group min-h-[44px]"
+          className="w-full flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-150 group min-h-[44px]"
         >
           {/* Avatar — initials from firstName + lastName, gold ring on hover */}
           {(() => {
@@ -755,19 +777,15 @@ export default function DashboardSidebar({
             const initials = parts.length >= 2
               ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
               : (name[0] || effectiveUser?.email?.[0] || 'U').toUpperCase();
+            const avatarStyle: React.CSSProperties = viewAsUser
+              ? { background: 'linear-gradient(135deg, #4f6ef7, #6c47d0)', color: '#ededf5' }
+              : isPremium
+                ? { background: 'linear-gradient(135deg, #fcc824, #d97706)', color: '#000' }
+                : { background: 'linear-gradient(135deg, #3a3a52, #2a2a3e)', color: '#9090a8' };
             return (
               <div
-                className={`
-                  w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
-                  text-sm font-bold shadow-sm
-                  ring-2 ring-[#fcc824]/0 group-hover:ring-[#fcc824]/60 transition-all duration-150
-                  ${viewAsUser
-                    ? 'bg-gradient-to-br from-blue-400 to-indigo-600 text-white'
-                    : isPremium
-                      ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
-                      : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
-                  }
-                `}
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-sm transition-all duration-150"
+                style={avatarStyle}
               >
                 {initials}
               </div>
@@ -777,7 +795,7 @@ export default function DashboardSidebar({
           {/* Name + role */}
           <div className="flex-1 text-left min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <p className="text-[13px] font-semibold text-gray-200 truncate leading-tight">
+              <p className="text-[13px] font-semibold truncate leading-tight" style={{ color: '#ededf5' }}>
                 {viewAsUser
                   ? (effectiveUser?.name || effectiveUser?.email)
                   : (user?.name || user?.email)
@@ -786,11 +804,11 @@ export default function DashboardSidebar({
               {effectiveUser?.role && <RoleBadge role={effectiveUser.role} />}
             </div>
             {viewAsUser && (
-              <p className="text-[11px] text-blue-400 font-medium leading-tight mt-0.5">viewing as</p>
+              <p className="text-[11px] font-medium leading-tight mt-0.5" style={{ color: '#4f6ef7' }}>viewing as</p>
             )}
           </div>
 
-          <ChevronDown className={`w-4 h-4 text-gray-600 flex-shrink-0 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} style={{ color: '#5a5a72' }} />
         </button>
       </div>
     </div>
@@ -798,12 +816,12 @@ export default function DashboardSidebar({
 
   /* ── Collapsed sidebar (desktop only) ──────────────────── */
   const CollapsedSidebar = (
-    <div className="hidden md:flex w-[60px] flex-col h-full sidebar-studio border-r border-white/[0.05]">
+    <div className="hidden md:flex w-[60px] flex-col h-full sidebar-studio" style={{ borderRight: '1px solid rgba(237,237,245,0.05)' }}>
       {/* Logo / expand */}
-      <div className="px-2 py-3 border-b border-white/[0.05]">
+      <div className="px-2 py-3" style={{ borderBottom: '1px solid rgba(237,237,245,0.05)' }}>
         <button
           onClick={toggleSidebar}
-          className="p-2 hover:bg-white/[0.06] rounded-xl transition-colors w-full flex items-center justify-center"
+          className="p-2 rounded-xl transition-colors w-full flex items-center justify-center"
           title="Expand sidebar"
           aria-label="Expand sidebar"
         >
@@ -815,61 +833,58 @@ export default function DashboardSidebar({
       <div className="flex-1 flex flex-col items-center gap-1 py-3 overflow-y-auto">
         <button
           onClick={onNewChat}
-          className="p-3 hover:bg-[#fcc824]/[0.08] rounded-xl transition-colors group min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="p-3 hover:bg-[#fcc824]/[0.08] rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           title="New Chat"
           aria-label="New Chat"
         >
-          <Plus className="w-5 h-5 text-gray-500 group-hover:text-[#fcc824] transition-colors" />
+          <Plus className="w-5 h-5 transition-colors" style={{ color: '#5a5a72' }} />
         </button>
 
         <button
           onClick={() => onSectionChange('agents')}
-          className={`p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center group ${
-            activeSection === 'agents' ? 'bg-[#fcc824]/[0.08] text-[#fcc824]' : 'hover:bg-white/[0.04]'
-          }`}
+          className="p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          style={activeSection === 'agents' ? { background: 'rgba(252,200,36,0.08)' } : undefined}
           title="Agents"
           aria-label="Agents"
         >
-          <Users className={`w-5 h-5 ${activeSection === 'agents' ? 'text-[#fcc824]' : 'text-gray-500 group-hover:text-gray-300'} transition-colors`} />
+          <Users className="w-5 h-5 transition-colors" style={{ color: activeSection === 'agents' ? '#fcc824' : '#5a5a72' }} />
         </button>
 
         <button
           onClick={() => onSectionChange('playbook')}
-          className={`p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center group ${
-            activeSection === 'playbook' ? 'bg-[#fcc824]/[0.08] text-[#fcc824]' : 'hover:bg-white/[0.04]'
-          }`}
+          className="p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          style={activeSection === 'playbook' ? { background: 'rgba(252,200,36,0.08)' } : undefined}
           title="Playbook"
           aria-label="Playbook"
         >
-          <BookOpen className={`w-5 h-5 ${activeSection === 'playbook' ? 'text-[#fcc824]' : 'text-gray-500 group-hover:text-gray-300'} transition-colors`} />
+          <BookOpen className="w-5 h-5 transition-colors" style={{ color: activeSection === 'playbook' ? '#fcc824' : '#5a5a72' }} />
         </button>
 
         <button
           onClick={() => onSectionChange('conversations')}
-          className={`p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center group ${
-            activeSection === 'conversations' ? 'bg-[#fcc824]/[0.08] text-[#fcc824]' : 'hover:bg-white/[0.04]'
-          }`}
+          className="p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          style={activeSection === 'conversations' ? { background: 'rgba(252,200,36,0.08)' } : undefined}
           title="Conversations"
           aria-label="Conversations"
         >
-          <MessageSquare className={`w-5 h-5 ${activeSection === 'conversations' ? 'text-[#fcc824]' : 'text-gray-500 group-hover:text-gray-300'} transition-colors`} />
+          <MessageSquare className="w-5 h-5 transition-colors" style={{ color: activeSection === 'conversations' ? '#fcc824' : '#5a5a72' }} />
         </button>
 
         <button
           onClick={onSearch}
-          className="p-3 hover:bg-white/[0.04] rounded-xl transition-colors group min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           title="Search"
           aria-label="Search"
         >
-          <Search className="w-5 h-5 text-gray-500 group-hover:text-gray-300 transition-colors" />
+          <Search className="w-5 h-5 transition-colors" style={{ color: '#5a5a72' }} />
         </button>
       </div>
 
       {/* User avatar */}
-      <div className="px-2 py-3 border-t border-white/[0.05]">
+      <div className="px-2 py-3" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }}>
         <button
           onClick={toggleSidebar}
-          className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-all duration-150 w-full flex items-center justify-center min-h-[44px] group"
+          className="p-1.5 rounded-xl transition-all duration-150 w-full flex items-center justify-center min-h-[44px]"
           title={user?.name || user?.email || 'Open sidebar'}
           aria-label="Open sidebar"
         >
@@ -879,16 +894,13 @@ export default function DashboardSidebar({
             const initials = parts.length >= 2
               ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
               : (name[0] || user?.email?.[0] || 'U').toUpperCase();
+            const collapsedAvatarStyle: React.CSSProperties = isPremium
+              ? { background: 'linear-gradient(135deg, #fcc824, #d97706)', color: '#000' }
+              : { background: 'linear-gradient(135deg, #3a3a52, #2a2a3e)', color: '#9090a8' };
             return (
               <div
-                className={`
-                  w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm
-                  ring-2 ring-[#fcc824]/0 group-hover:ring-[#fcc824]/60 transition-all duration-150
-                  ${isPremium
-                    ? 'bg-gradient-to-br from-[#fcc824] to-amber-600 text-black'
-                    : 'bg-gradient-to-br from-gray-600 to-gray-700 text-gray-200'
-                  }
-                `}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-sm transition-all duration-150"
+                style={collapsedAvatarStyle}
               >
                 {initials}
               </div>
@@ -905,7 +917,8 @@ export default function DashboardSidebar({
       {/* Mobile overlay backdrop */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm z-30 md:hidden"
+          style={{ background: 'rgba(9,9,15,0.75)' }}
           onClick={toggleSidebar}
           aria-label="Close sidebar"
         />
