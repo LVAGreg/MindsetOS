@@ -106,8 +106,8 @@ export default function LandingPage() {
       Icon: Brain,
       color: '#4f6ef7',
       name: 'Mindset Score',
-      tagline: 'Find Your Weakest Pillar',
-      description: 'A precise 5-question diagnostic that pinpoints exactly where your mindset is working against you — in under 3 minutes.',
+      tagline: 'Find your weakest pillar in 3 minutes.',
+      description: 'A precise 5-question diagnostic that pinpoints exactly where your mindset is working against you. You\'ll walk away with: A personalized diagnosis + the right agents activated for your patterns.',
       outcome: 'Personalized mindset profile',
       time: '3 min',
     },
@@ -115,8 +115,8 @@ export default function LandingPage() {
       Icon: Zap,
       color: '#4f6ef7',
       name: '48-Hour Reset',
-      tagline: 'Interrupt the Pattern Now',
-      description: 'Six targeted exercises that break your reactive cycle and install a new behavioral baseline. Fastest results in the system.',
+      tagline: 'Break the reactive cycle fast.',
+      description: 'Six targeted exercises that interrupt what\'s running on autopilot and install something better. You\'ll walk away with: A new behavioral baseline you can feel the moment it installs.',
       outcome: 'New behavioral baseline',
       time: '48 hrs',
     },
@@ -124,8 +124,8 @@ export default function LandingPage() {
       Icon: Layers,
       color: '#7c5bf6',
       name: 'Architecture Coach',
-      tagline: 'Build Your Mental OS',
-      description: 'The 90-day cohort that builds all three layers of mindset architecture. Awareness, interruption, and design — working together.',
+      tagline: 'Build the mental OS that compounds.',
+      description: 'The 90-day cohort that goes all the way through. Not one layer — all three, working together. You\'ll walk away with: Three layers installed — awareness, interruption, design — working together.',
       outcome: 'Complete mental architecture',
       time: '90 days',
     },
@@ -133,8 +133,8 @@ export default function LandingPage() {
       Icon: Eye,
       color: '#7c5bf6',
       name: 'Inner World Mapper',
-      tagline: "Surface What's Running You",
-      description: 'Map the beliefs, values, and emotional patterns driving your decisions. Clarity on what to keep, rewire, and release.',
+      tagline: "Surface what's running the show.",
+      description: 'Map the beliefs, values, and emotional patterns driving your decisions before you even notice them. You\'ll walk away with: Complete clarity on beliefs to keep, rewire, and release.',
       outcome: 'Personal belief audit',
       time: '20 min',
     },
@@ -142,8 +142,8 @@ export default function LandingPage() {
       Icon: Target,
       color: '#4f6ef7',
       name: 'Decision Framework',
-      tagline: 'Cut Through Overthinking',
-      description: 'The DESIGN process — Define, Examine, Separate, Identify, Generate, Name — for high-stakes decisions under pressure.',
+      tagline: 'Cut through overthinking under pressure.',
+      description: 'The DESIGN process — Define, Examine, Separate, Identify, Generate, Name — built for high-stakes moments. You\'ll walk away with: A 6-step process for high-stakes decisions with zero second-guessing.',
       outcome: 'Clear decision with conviction',
       time: '10 min',
     },
@@ -151,8 +151,8 @@ export default function LandingPage() {
       Icon: Activity,
       color: '#fcc824',
       name: 'Accountability Partner',
-      tagline: 'Daily Check-In That Compounds',
-      description: 'A 5-minute daily practice that tracks commitments, celebrates wins, and recalibrates when you drift — every day.',
+      tagline: 'Daily compound interest on your commitments.',
+      description: 'A 5-minute daily practice that tracks what you said you\'d do, celebrates what you did, and recalibrates when you drift. You\'ll walk away with: A 5-minute practice that tracks, celebrates, and recalibrates every day.',
       outcome: 'Consistent forward momentum',
       time: '5 min / day',
     },
@@ -511,7 +511,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {agents.map((a, i) => (
-              <AgentCard key={i} {...a} />
+              <AgentCard key={i} index={i} {...a} />
             ))}
           </div>
 
@@ -797,46 +797,139 @@ export default function LandingPage() {
 
 /* ── Agent Card — isolated to avoid inline handler performance issues ── */
 function AgentCard({
-  Icon, color, name, tagline, description, outcome, time,
+  Icon, color, name, tagline, description, outcome, time, index,
 }: {
   Icon: React.ElementType; color: string; name: string; tagline: string;
-  description: string; outcome: string; time: string;
+  description: string; outcome: string; time: string; index: number;
 }) {
   const [hovered, setHovered] = useState(false);
+
+  /* Ghost watermark label: 01 through 06 */
+  const cardLabel = `0${index + 1}`;
+
+  /* Sprite horizontal crop: each card clips a different 1/6 of the image */
+  const spriteXPct = `${index * 16.6}%`;
 
   return (
     <div
       className="relative p-7 rounded-2xl transition-all duration-300"
       style={{
+        position: 'relative',
         background: 'rgba(18,18,31,0.75)',
         border: `1px solid ${hovered ? color + '38' : 'rgba(255,255,255,0.07)'}`,
         backdropFilter: 'blur(14px)',
         transform: hovered ? 'translateY(-3px)' : 'none',
         boxShadow: hovered ? `0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px ${color}14 inset` : 'none',
+        overflow: 'hidden',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Icon */}
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-        style={{ background: `${color}18`, border: `1px solid ${color}28` }}>
-        <Icon className="w-5 h-5" style={{ color }} aria-hidden="true" />
+      {/* ── Top-edge gradient accent line ── */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '1px',
+        background: `linear-gradient(90deg, ${color}00, ${color}50, ${color}00)`,
+        zIndex: 2,
+      }} />
+
+      {/* ── Ghost watermark number (behind everything) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: -8,
+          right: 12,
+          fontSize: '4.5rem',
+          fontWeight: 800,
+          lineHeight: 1,
+          color: 'rgba(237,237,245,0.04)',
+          pointerEvents: 'none',
+          userSelect: 'none',
+          zIndex: 0,
+        }}
+      >
+        {cardLabel}
       </div>
 
-      <h3 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>{name}</h3>
-      <p className="text-xs font-semibold mb-3" style={{ color }}>{tagline}</p>
-      <p className="text-sm leading-relaxed mb-5" style={{ color: '#9090a8' }}>{description}</p>
+      {/* ── Visual signature sprite (desktop only) ── */}
+      <div
+        aria-hidden="true"
+        className="hidden md:block"
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          width: 80,
+          height: 80,
+          borderRadius: 8,
+          backgroundImage: 'url(/generated/agents-ambient.png)',
+          backgroundSize: '600px 400px',
+          backgroundPosition: `${spriteXPct} 0%`,
+          opacity: 0.7,
+          zIndex: 1,
+        }}
+      />
 
-      <div className="flex items-center justify-between pt-4"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div>
-          <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Outcome</div>
-          <div className="text-xs font-semibold" style={{ color: '#ededf5' }}>{outcome}</div>
+      {/* ── Card content (above decorative elements) ── */}
+      <div style={{ position: 'relative', zIndex: 2 }}>
+
+        {/* Header row: icon + mobile sprite inline */}
+        <div className="flex items-start gap-3 mb-5">
+          <div className="w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center"
+            style={{ background: `${color}18`, border: `1px solid ${color}28` }}>
+            <Icon className="w-5 h-5" style={{ color }} aria-hidden="true" />
+          </div>
+
+          {/* Mobile sprite — inline in header, smaller (40×40) */}
+          <div
+            aria-hidden="true"
+            className="block md:hidden ml-auto flex-shrink-0"
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 6,
+              backgroundImage: 'url(/generated/agents-ambient.png)',
+              backgroundSize: '300px 200px',
+              backgroundPosition: `${spriteXPct} 0%`,
+              opacity: 0.7,
+            }}
+          />
         </div>
-        <div className="text-right">
-          <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Time</div>
-          <div className="text-xs font-semibold" style={{ color }}>{time}</div>
+
+        <h3 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>{name}</h3>
+        <p className="text-xs font-semibold mb-3" style={{ color }}>{tagline}</p>
+        {/* Extra right padding on desktop so text doesn't run under the sprite */}
+        <p className="text-sm leading-relaxed mb-5 md:pr-20" style={{ color: '#9090a8' }}>{description}</p>
+
+        <div className="flex items-center justify-between pt-4"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div>
+            <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Outcome</div>
+            <div className="text-xs font-semibold" style={{ color: '#ededf5' }}>{outcome}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: '#5a5a72' }}>Time</div>
+            <div className="text-xs font-semibold" style={{ color }}>{time}</div>
+          </div>
         </div>
+      </div>
+
+      {/* ── Ready badge ── */}
+      <div style={{
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+        zIndex: 3,
+      }}>
+        <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+        <span style={{ fontSize: 11, color: '#9090a8', fontWeight: 500 }}>Ready</span>
       </div>
     </div>
   );
