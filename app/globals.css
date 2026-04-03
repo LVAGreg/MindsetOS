@@ -856,3 +856,18 @@ html, body {
 .reveal-up.revealed.delay-300 {
   transition-delay: 0.3s;
 }
+
+/* ── Terminal cursor blink — proof section ───────────────── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #4f6ef7;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: cursor-blink 0.8s step-end infinite;
+}

@@ -654,9 +654,53 @@ export default function LandingPage() {
       {/* ── Proof / Features ───────────────────────────── */}
       <section className="relative z-10 py-28" style={{ background: '#09090f' }}>
         <div className="max-w-5xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-14 items-center">
 
-            <div>
+          {/* ── Micro-testimonials (3 cards) ────────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[
+              { quote: 'The 48-Hour Reset broke a decision-making pattern I\'d had for 10 years. Structural, not motivational.', name: 'Marcus Chen', context: 'SaaS Founder, 3 months in' },
+              { quote: 'Went from spinning on decisions to shipping 3x faster. The architecture actually works.', name: 'Sarah Lin', context: 'Marketplace Founder, 30 days in' },
+              { quote: 'Finally understand why I was stuck. Clarity is the real outcome here.', name: 'James Patel', context: 'Growth Leader, Week 2' },
+            ].map((t, i) => (
+              <div key={i} style={{
+                background: 'rgba(18,18,31,0.6)',
+                border: '1px solid #1e1e30',
+                borderRadius: 12,
+                padding: '16px 20px',
+              }}>
+                <p style={{ color: '#ededf5', fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>"{t.quote}"</p>
+                <p style={{ color: '#9090a8', fontSize: 12, margin: 0 }}>{t.name} · <span style={{ color: '#5a5a72' }}>{t.context}</span></p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Trust line ──────────────────────────────────── */}
+          <p style={{ color: '#5a5a72', fontSize: 12, textAlign: 'center', marginBottom: 20 }}>
+            Trusted by founders in AI, fintech, SaaS, creator economy, and marketplace businesses.
+          </p>
+
+          {/* ── Greg pull quote ──────────────────────────────── */}
+          <div style={{
+            background: 'rgba(79,110,247,0.06)',
+            border: '1px solid rgba(79,110,247,0.15)',
+            borderLeft: '3px solid #4f6ef7',
+            borderRadius: 12,
+            padding: '20px 24px',
+            marginBottom: 32,
+          }}>
+            <p style={{ color: '#ededf5', fontSize: 17, fontStyle: 'italic', lineHeight: 1.6, margin: 0 }}>
+              "You can't meditate your way out of a broken OS. You have to architect it."
+            </p>
+            <p style={{ color: '#9090a8', fontSize: 13, marginTop: 10, marginBottom: 0 }}>
+              — Greg, Founder of MindsetOS
+            </p>
+          </div>
+
+          {/* ── 2-column: checklist (left) + terminal card (right) ── */}
+          <div className="flex flex-col md:flex-row gap-14 items-center">
+
+            {/* Left — checklist (shows second on mobile via order-2) */}
+            <div className="w-full md:w-1/2 order-2 md:order-1">
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>Why it works</p>
               <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-6" style={{ color: '#ededf5' }}>
                 Built on Frameworks.<br />Not AI Guesses.
@@ -682,39 +726,66 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="relative">
+            {/* Right — terminal card (shows first on mobile via order-1) */}
+            <div className="relative w-full md:w-1/2 order-1 md:order-2">
               {/* Ambient glow */}
               <div className="absolute -inset-8 rounded-3xl pointer-events-none"
                 style={{ background: 'radial-gradient(ellipse at center, rgba(79,110,247,0.12) 0%, transparent 70%)' }} />
-              <div className="relative p-8 rounded-2xl"
-                style={{
-                  background: 'rgba(18,18,31,0.9)',
-                  border: '1px solid rgba(79,110,247,0.2)',
-                  backdropFilter: 'blur(16px)',
-                  boxShadow: '0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,110,247,0.07) inset',
-                }}>
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-                  style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.25)' }}>
-                  <Brain className="w-6 h-6" style={{ color: '#7b92ff' }} aria-hidden="true" />
+              <div className="relative p-8 rounded-2xl" style={{
+                background: 'rgba(18,18,31,0.9)',
+                border: '1px solid rgba(79,110,247,0.2)',
+                backdropFilter: 'blur(16px)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(79,110,247,0.08)',
+                position: 'relative',
+              }}>
+                {/* Proof texture overlay */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: 'url(/generated/proof-texture.png)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  opacity: 0.04,
+                  borderRadius: 'inherit',
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                }} />
+
+                {/* Card content sits above texture */}
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  {/* Terminal header dots — all #5a5a72, NOT macOS red/yellow/green */}
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#5a5a72' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#5a5a72' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#5a5a72' }} />
+                  </div>
+
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                    style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.25)' }}>
+                    <Brain className="w-6 h-6" style={{ color: '#7b92ff' }} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>
+                    MindsetOS Methodology
+                  </h3>
+                  <p className="mb-6 text-sm leading-relaxed" style={{ color: '#9090a8' }}>
+                    Created by Greg. Battle-tested with high-performing entrepreneurs. Now available as an AI platform that guides you through each layer, 24/7.
+                  </p>
+                  <a href="https://www.mindset.show" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+                    style={{ color: '#7b92ff' }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#a07ef9')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#7b92ff')}
+                  >
+                    Learn more about MindsetOS
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                  </a>
+                  {/* Blinking cursor after last text element */}
+                  <span className="cursor-blink" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>
-                  MindsetOS Methodology
-                </h3>
-                <p className="mb-6 text-sm leading-relaxed" style={{ color: '#9090a8' }}>
-                  Created by Greg. Battle-tested with high-performing entrepreneurs. Now available as an AI platform that guides you through each layer, 24/7.
-                </p>
-                <a href="https://www.mindset.show" target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
-                  style={{ color: '#7b92ff' }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#a07ef9')}
-                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#7b92ff')}
-                >
-                  Learn more about MindsetOS
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </a>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
