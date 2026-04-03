@@ -208,7 +208,7 @@ export default function AdminCreditsPage() {
     return (
       <div className="flex items-center justify-center py-20 p-4" style={{ background: '#09090f' }}>
         <div className="text-center max-w-md">
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <p className="mb-4" style={{ color: '#ff6b6b' }}>{error}</p>
             <button
               onClick={() => router.push('/admin')}
@@ -229,16 +229,16 @@ export default function AdminCreditsPage() {
   return (
     <div className="space-y-6" style={{ background: '#09090f' }}>
       {/* Header */}
-      <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+      <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/admin')}
-                className="p-2 rounded-lg transition-colors"
+                className="p-2.5 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -252,13 +252,13 @@ export default function AdminCreditsPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={fetchOverview}
                 className="px-4 py-2 rounded-xl transition-colors flex items-center gap-2 text-sm font-medium"
                 style={{ color: '#9090a8', border: '1px solid #1e1e30' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
@@ -280,7 +280,7 @@ export default function AdminCreditsPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Users */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
               <Users className="w-5 h-5" style={{ color: '#4f6ef7' }} />
               <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Users</span>
@@ -291,7 +291,7 @@ export default function AdminCreditsPage() {
           </div>
 
           {/* Total Balance */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
               <Coins className="w-5 h-5" style={{ color: '#22c55e' }} />
               <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Balance</span>
@@ -305,9 +305,9 @@ export default function AdminCreditsPage() {
           </div>
 
           {/* Total Earned */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5" style={{ color: '#a855f7' }} />
+              <TrendingUp className="w-5 h-5" style={{ color: '#7c5bf6' }} />
               <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Earned</span>
             </div>
             <div className="text-3xl font-bold" style={{ color: '#fcc824', fontWeight: 700 }}>
@@ -319,7 +319,7 @@ export default function AdminCreditsPage() {
           </div>
 
           {/* Total Spent */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="flex items-center gap-3 mb-2">
               <TrendingDown className="w-5 h-5" style={{ color: '#ef4444' }} />
               <span className="text-sm font-medium" style={{ color: '#9090a8' }}>Total Spent</span>
@@ -335,14 +335,14 @@ export default function AdminCreditsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Top Users by Balance */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
               <TrendingUp className="w-5 h-5" style={{ color: '#22c55e' }} />
               Top Users by Balance
             </h3>
             <div className="space-y-3">
               {overview.topUsers.map((user, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(30,30,48,0.5)', borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(9,9,15,0.4)', border: '1px solid #1e1e30' }}>
                   <div>
                     <div className="font-medium" style={{ color: '#ededf5' }}>
                       {user.first_name} {user.last_name}
@@ -363,14 +363,14 @@ export default function AdminCreditsPage() {
           </div>
 
           {/* Top Spenders */}
-          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+          <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
               <TrendingDown className="w-5 h-5" style={{ color: '#ef4444' }} />
               Top Spenders
             </h3>
             <div className="space-y-3">
               {overview.topSpenders.map((user, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(30,30,48,0.5)', borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                <div key={index} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(9,9,15,0.4)', border: '1px solid #1e1e30' }}>
                   <div>
                     <div className="font-medium" style={{ color: '#ededf5' }}>
                       {user.first_name} {user.last_name}
@@ -392,7 +392,7 @@ export default function AdminCreditsPage() {
         </div>
 
         {/* Recent Transactions */}
-        <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-6 rounded-2xl" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: '#ededf5' }}>
             <DollarSign className="w-5 h-5" style={{ color: '#4f6ef7' }} />
             Recent Transactions
@@ -400,7 +400,7 @@ export default function AdminCreditsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                <tr style={{ borderBottom: '1px solid #1e1e30' }}>
                   <th className="text-left py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>User</th>
                   <th className="text-left py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Type</th>
                   <th className="text-right py-3 px-4 text-sm font-medium" style={{ color: '#9090a8' }}>Amount</th>
@@ -410,7 +410,7 @@ export default function AdminCreditsPage() {
               </thead>
               <tbody>
                 {overview.recentTransactions.map((tx) => (
-                  <tr key={tx.id} style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}>
+                  <tr key={tx.id} style={{ borderBottom: '1px solid #1e1e30' }}>
                     <td className="py-3 px-4 text-sm" style={{ color: '#ededf5' }}>{tx.email}</td>
                     <td className="py-3 px-4">
                       <span
@@ -509,8 +509,8 @@ export default function AdminCreditsPage() {
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
                   style={{ border: '1px solid #1e1e30', color: '#9090a8' }}
                   disabled={grantLoading}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.6)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.6)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                 >
                   Cancel
                 </button>
