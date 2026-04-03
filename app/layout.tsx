@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     template: '%s | MindsetOS',
   },
   description:
-    'AI-powered mindset coaching for entrepreneurs. Build daily practices, map your beliefs, sharpen decisions, and lead with presence. Your inner world runs your outer world.',
+    'The operating system for your mind. 10 AI agents, battle-tested frameworks, and the interruption layer most founders skip.',
   keywords: [
     'mindset coaching',
     'entrepreneur mindset',
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     siteName: 'MindsetOS',
     title: 'MindsetOS — Mindset Coaching for Entrepreneurs',
     description:
-      'AI-powered mindset coaching for entrepreneurs. Build daily practices, map your beliefs, sharpen decisions, and lead with presence. Your inner world runs your outer world.',
+      'The operating system for your mind. 10 AI agents, battle-tested frameworks, and the interruption layer most founders skip.',
     images: [
       {
         url: '/og-image.png',

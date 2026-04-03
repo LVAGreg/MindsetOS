@@ -790,34 +790,92 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ─────────────────────────────────── */}
-      <section className="relative z-10 py-32 overflow-hidden">
-        {/* Ambient glow behind text */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="w-[900px] h-[400px] rounded-full"
-            style={{ background: 'radial-gradient(ellipse, rgba(124,91,246,0.07) 0%, transparent 65%)' }} />
-        </div>
+      <section className="relative z-10 py-32 overflow-hidden" style={{ position: 'relative' }}>
 
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
+        {/* ── Background texture ── */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url(/generated/cta-atmosphere.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.12,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+
+        {/* ── Left glow ── */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '20%',
+          transform: 'translate(-50%, -50%)',
+          width: 600,
+          height: 400,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(79,110,247,0.09) 0%, transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+
+        {/* ── Right glow ── */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          right: '10%',
+          transform: 'translateY(-50%)',
+          width: 500,
+          height: 350,
+          borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(124,91,246,0.07) 0%, transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+
+        {/* ── Content layer ── */}
+        <div className="relative max-w-3xl mx-auto px-6 text-center" style={{ position: 'relative', zIndex: 1 }}>
           <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: '#5a5a72' }}>Get started</p>
           <h2 className="font-extrabold heading-tighter mb-6"
             style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', color: '#ededf5', lineHeight: 1.08 }}>
             The Next 90 Days<br />
             <span className="gradient-text-brand">Will Happen Anyway.</span>
           </h2>
-          <p className="text-xl mb-12 max-w-xl mx-auto" style={{ color: '#9090a8' }}>
+          <p className="text-xl max-w-xl mx-auto" style={{ color: '#9090a8', marginBottom: 0 }}>
             Every day you spend reacting is a day you&rsquo;re not designing. Start free. No credit card. Results in 48 hours.
           </p>
-          <button
-            onClick={() => router.push('/trial-v3b')}
-            className="group inline-flex items-center gap-3 px-12 py-6 font-bold text-black text-2xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
-            aria-label="Start MindsetOS free — no credit card required"
-          >
-            Start Free
-            <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-          </button>
-          <p className="text-xs mt-5" style={{ color: '#5a5a72' }}>
-            No credit card required · Get started in 60 seconds
+          <p style={{ margin: '8px 0 28px' }}>
+            <span className="gradient-text-amber" style={{ fontSize: '1.1em', fontWeight: 700 }}>Time to upgrade it.</span>
+          </p>
+
+          {/* ── Button with pulsing glow ring ── */}
+          <div className="inline-block sm:w-auto w-full" style={{ position: 'relative', display: 'inline-block' }}>
+            {/* Glow ring */}
+            <div
+              className="animate-glow-pulse"
+              style={{
+                position: 'absolute',
+                inset: -8,
+                borderRadius: 16,
+                background: 'linear-gradient(135deg, rgba(252,200,36,0.3) 0%, rgba(252,200,36,0.15) 100%)',
+                filter: 'blur(16px)',
+                zIndex: 0,
+                pointerEvents: 'none',
+              }}
+            />
+            <button
+              onClick={() => router.push('/trial-v3b')}
+              className="group inline-flex items-center gap-3 px-12 py-6 font-bold text-black text-2xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)', position: 'relative', zIndex: 1 }}
+              aria-label="Start MindsetOS free — no credit card required"
+            >
+              Start Free
+              <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+            </button>
+          </div>
+
+          {/* ── Trust line ── */}
+          <p style={{ color: '#9090a8', fontSize: 13, marginTop: 12, textAlign: 'center' }}>
+            ✓ Free to start&nbsp;&nbsp;·&nbsp;&nbsp;✓ Results in 48 hours&nbsp;&nbsp;·&nbsp;&nbsp;✓ Cancel any time
           </p>
         </div>
       </section>
