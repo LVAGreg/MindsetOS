@@ -37,9 +37,9 @@ export default function ResetPasswordPage() {
   };
 
   const getStrengthColor = (strength: number): string => {
-    if (strength < 40) return 'bg-red-500';
-    if (strength < 70) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (strength < 40) return '#ef4444';
+    if (strength < 70) return '#fcc824';
+    return '#22c55e';
   };
 
   const getStrengthLabel = (strength: number): string => {
@@ -229,16 +229,14 @@ export default function ResetPasswordPage() {
                 <div className="mt-2.5">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs" style={{ color: '#9090a8' }}>Password Strength:</span>
-                    <span className={`text-xs font-medium ${
-                      passwordStrength < 40 ? 'text-red-400' : passwordStrength < 70 ? 'text-yellow-400' : 'text-green-400'
-                    }`}>
+                    <span className="text-xs font-medium" style={{ color: getStrengthColor(passwordStrength) }}>
                       {getStrengthLabel(passwordStrength)}
                     </span>
                   </div>
                   <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: '#1e1e30' }}>
                     <div
-                      className={`h-full transition-all duration-300 ${getStrengthColor(passwordStrength)}`}
-                      style={{ width: `${passwordStrength}%` }}
+                      className="h-full transition-all duration-300"
+                      style={{ width: `${passwordStrength}%`, background: getStrengthColor(passwordStrength) }}
                     />
                   </div>
                 </div>
@@ -248,23 +246,23 @@ export default function ResetPasswordPage() {
               <div className="mt-3 space-y-1">
                 <p className="text-xs font-medium" style={{ color: '#9090a8' }}>Password must contain:</p>
                 <div className="grid grid-cols-2 gap-1">
-                  <div className={`text-xs flex items-center gap-1 ${formData.newPassword.length >= 8 ? 'text-green-400' : ''}`}
-                    style={formData.newPassword.length >= 8 ? {} : { color: '#9090a8' }}>
+                  <div className="text-xs flex items-center gap-1"
+                    style={{ color: formData.newPassword.length >= 8 ? '#22c55e' : '#9090a8' }}>
                     <span className="text-[10px]">{formData.newPassword.length >= 8 ? '✓' : '○'}</span>
                     At least 8 characters
                   </div>
-                  <div className={`text-xs flex items-center gap-1 ${/[A-Z]/.test(formData.newPassword) ? 'text-green-400' : ''}`}
-                    style={/[A-Z]/.test(formData.newPassword) ? {} : { color: '#9090a8' }}>
+                  <div className="text-xs flex items-center gap-1"
+                    style={{ color: /[A-Z]/.test(formData.newPassword) ? '#22c55e' : '#9090a8' }}>
                     <span className="text-[10px]">{/[A-Z]/.test(formData.newPassword) ? '✓' : '○'}</span>
                     One uppercase letter
                   </div>
-                  <div className={`text-xs flex items-center gap-1 ${/[0-9]/.test(formData.newPassword) ? 'text-green-400' : ''}`}
-                    style={/[0-9]/.test(formData.newPassword) ? {} : { color: '#9090a8' }}>
+                  <div className="text-xs flex items-center gap-1"
+                    style={{ color: /[0-9]/.test(formData.newPassword) ? '#22c55e' : '#9090a8' }}>
                     <span className="text-[10px]">{/[0-9]/.test(formData.newPassword) ? '✓' : '○'}</span>
                     One number
                   </div>
-                  <div className={`text-xs flex items-center gap-1 ${/[!@#$%^&*]/.test(formData.newPassword) ? 'text-green-400' : ''}`}
-                    style={/[!@#$%^&*]/.test(formData.newPassword) ? {} : { color: '#9090a8' }}>
+                  <div className="text-xs flex items-center gap-1"
+                    style={{ color: /[!@#$%^&*]/.test(formData.newPassword) ? '#22c55e' : '#9090a8' }}>
                     <span className="text-[10px]">{/[!@#$%^&*]/.test(formData.newPassword) ? '✓' : '○'}</span>
                     One special character
                   </div>
@@ -316,11 +314,12 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !formData.newPassword || !formData.confirmPassword || formData.newPassword !== formData.confirmPassword}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-6 py-3 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 hover:opacity-90 font-semibold rounded-xl px-6 py-3 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: '#4f6ef7', color: '#ededf5' }}
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    <div className="animate-spin h-4 w-4 border-2 border-t-transparent rounded-full" style={{ borderColor: '#ededf5', borderTopColor: 'transparent' }} />
                     <span>Updating...</span>
                   </>
                 ) : (
