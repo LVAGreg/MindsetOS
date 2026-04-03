@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Bell, Check, CheckCheck, Trash2, X, Search, ExternalLink, ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Bell, CheckCheck, Trash2, X, ExternalLink, ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
-import { useAppStore } from '@/lib/store';
 
 interface Notification {
   id: string;
@@ -30,8 +29,9 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { setImpersonationSession } = useAppStore();
 
   // Fetch unread count on mount and when tab becomes active (no polling)
   useEffect(() => {
@@ -107,8 +107,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       await apiClient.markAllNotificationsAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true, read_at: new Date().toISOString() })));
       setUnreadCount(0);
-    } catch (error) {
+      setListError(null);
+    } catch (error: any) {
       console.error('Failed to mark all as read:', error);
+      setListError(error?.message || 'Failed to mark notifications as read.');
     }
   };
 
@@ -120,18 +122,20 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       if (notification && !notification.is_read) {
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
-    } catch (error) {
+      setActionError(null);
+    } catch (error: any) {
       console.error('Failed to delete notification:', error);
+      setActionError(error?.message || 'Failed to delete notification.');
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityStyle = (priority: string): React.CSSProperties => {
     switch (priority) {
-      case 'urgent': return 'border-l-red-500 bg-red-50 dark:bg-red-900/20';
-      case 'high': return 'border-l-orange-500 bg-orange-50 dark:bg-orange-900/20';
-      case 'normal': return 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/20';
-      case 'low': return 'border-l-gray-400 bg-gray-50 dark:bg-gray-800';
-      default: return 'border-l-gray-400';
+      case 'urgent': return { borderLeftColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)' };
+      case 'high': return { borderLeftColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.08)' };
+      case 'normal': return { borderLeftColor: '#4f6ef7', backgroundColor: 'rgba(79,110,247,0.08)' };
+      case 'low': return { borderLeftColor: '#5a5a72', backgroundColor: 'rgba(90,90,114,0.06)' };
+      default: return { borderLeftColor: '#5a5a72' };
     }
   };
 
@@ -187,10 +191,12 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     setIsOpen(false);
   };
 
-  const hasActionableLink = (notification: Notification) => {
-    return notification.type === 'research_complete' && notification.data?.research_id ||
-           notification.data?.conversation_id ||
-           notification.data?.url;
+  const hasActionableLink = (notification: Notification): boolean => {
+    return !!(
+      (notification.type === 'research_complete' && notification.data?.research_id) ||
+      notification.data?.conversation_id ||
+      notification.data?.url
+    );
   };
 
   return (
@@ -198,14 +204,17 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       {/* Bell Button */}
       <button
         onClick={handleBellClick}
-        className="relative p-2 rounded-lg transition-all duration-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+        className="relative p-2.5 rounded-lg transition-all duration-200"
+        style={{ color: '#fcc824' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(252,200,36,0.12)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
         title="Notifications"
       >
-        <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        <Bell className="w-5 h-5" style={{ color: '#fcc824' }} />
 
         {/* Unread Badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full px-1 animate-pulse">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold rounded-full px-1 animate-pulse" style={{ color: '#ededf5', backgroundColor: '#ef4444' }}>
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -213,24 +222,29 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-96 max-h-[500px] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-96 max-w-[calc(100vw-16px)] max-h-[500px] rounded-xl shadow-2xl z-50 overflow-hidden" style={{ backgroundColor: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}>
           {selectedNotification ? (
             // Detail View
             <>
               {/* Detail Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+              <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #1e1e30', background: 'linear-gradient(to right, rgba(252,200,36,0.08), rgba(249,115,22,0.08))' }}>
                 <button
                   onClick={() => { setConfirmDelete(false); setSelectedNotification(null); }}
-                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  className="flex items-center gap-2 transition-colors"
+                  style={{ color: '#9090a8' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span className="text-sm font-medium">Back</span>
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-lg transition-colors"
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                 >
-                  <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <X className="w-4 h-4" style={{ color: '#9090a8' }} />
                 </button>
               </div>
 
@@ -239,18 +253,18 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                 <div className="flex items-start gap-3 mb-4">
                   <span className="text-2xl">{getTypeIcon(selectedNotification.type)}</span>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold" style={{ color: '#ededf5' }}>
                       {selectedNotification.title}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs mt-1" style={{ color: '#9090a8' }}>
                       {new Date(selectedNotification.created_at).toLocaleString()} • {selectedNotification.source}
                     </p>
                   </div>
                 </div>
 
                 {selectedNotification.message && (
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-4">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30' }}>
+                    <p className="text-sm whitespace-pre-wrap" style={{ color: '#ededf5' }}>
                       {selectedNotification.message}
                     </p>
                   </div>
@@ -259,6 +273,12 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                 {/* Impersonation Accept/Decline buttons */}
                 {selectedNotification.type === 'impersonation_request' && selectedNotification.data?.session_id && (
                   <div className="mb-4">
+                    {actionError && (
+                      <div className="mb-2 px-3 py-2 rounded-lg text-xs flex items-center justify-between gap-2" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
+                        <span>{actionError}</span>
+                        <button onClick={() => setActionError(null)} style={{ color: '#f87171' }}>✕</button>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         disabled={actionLoading !== null}
@@ -269,13 +289,17 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                             markAsRead(selectedNotification.id);
                             setSelectedNotification(null);
                             fetchNotifications();
-                          } catch (err) {
+                          } catch (err: any) {
                             console.error('Failed to accept:', err);
+                            setActionError(err?.message || 'Failed to accept the coaching session.');
                           } finally {
                             setActionLoading(null);
                           }
                         }}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all font-medium text-sm disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all font-medium text-sm disabled:opacity-50"
+                        style={{ backgroundColor: '#22c55e', color: '#09090f' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#16a34a'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#22c55e'; }}
                       >
                         {actionLoading === 'accept' ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>✅</span>}
                         Accept
@@ -289,13 +313,17 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                             markAsRead(selectedNotification.id);
                             setSelectedNotification(null);
                             fetchNotifications();
-                          } catch (err) {
+                          } catch (err: any) {
                             console.error('Failed to decline:', err);
+                            setActionError(err?.message || 'Failed to decline the coaching session.');
                           } finally {
                             setActionLoading(null);
                           }
                         }}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all font-medium text-sm disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all font-medium text-sm disabled:opacity-50"
+                        style={{ backgroundColor: '#ef4444', color: '#ededf5' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#dc2626'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#ef4444'; }}
                       >
                         {actionLoading === 'decline' ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>❌</span>}
                         Decline
@@ -315,11 +343,14 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                             window.location.href = btn.url;
                             setIsOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-xl hover:from-amber-100 hover:to-orange-100 dark:hover:from-amber-900/30 dark:hover:to-orange-900/30 transition-all group"
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group"
+                          style={{ backgroundColor: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.2)' }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(252,200,36,0.14)'; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(252,200,36,0.08)'; }}
                         >
                           {btn.icon && <span className="text-xl">{btn.icon}</span>}
-                          <span className="flex-1 text-left text-sm font-medium text-gray-900 dark:text-white">{btn.label}</span>
-                          <ChevronRight className="w-4 h-4 text-amber-500 group-hover:translate-x-1 transition-transform" />
+                          <span className="flex-1 text-left text-sm font-medium" style={{ color: '#ededf5' }}>{btn.label}</span>
+                          <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" style={{ color: '#fcc824' }} />
                         </button>
                       ))}
                     </div>
@@ -328,13 +359,13 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
                 {/* Additional Data (exclude internal fields from raw display) */}
                 {selectedNotification.data && Object.keys(selectedNotification.data).filter(k => !['action_buttons', 'session_id', 'admin_user_id', 'admin_name', 'admin_email', 'target_user_id', 'target_name', 'action', 'expires_at'].includes(k)).length > 0 && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  <div className="text-xs mb-4" style={{ color: '#9090a8' }}>
                     <p className="font-medium mb-1">Details:</p>
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded p-2 space-y-1">
+                    <div className="rounded p-2 space-y-1" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
                       {Object.entries(selectedNotification.data).filter(([key]) => !['action_buttons', 'session_id', 'admin_user_id', 'admin_name', 'admin_email', 'target_user_id', 'target_name', 'action', 'expires_at'].includes(key)).map(([key, value]) => (
                         <div key={key} className="flex justify-between">
-                          <span className="text-gray-500">{key}:</span>
-                          <span className="text-gray-700 dark:text-gray-300">{String(value)}</span>
+                          <span style={{ color: '#9090a8' }}>{key}:</span>
+                          <span style={{ color: '#ededf5' }}>{String(value)}</span>
                         </div>
                       ))}
                     </div>
@@ -347,7 +378,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                     {hasActionableLink(selectedNotification) && (
                       <button
                         onClick={() => handleNotificationAction(selectedNotification)}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-600 transition-colors font-medium text-sm"
+                        className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium text-sm"
+                        style={{ backgroundColor: '#fcc824', color: '#09090f' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#e6b420'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#fcc824'; }}
                       >
                         <ExternalLink className="w-4 h-4" />
                         View Details
@@ -357,20 +391,26 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                   {/* Delete - subtle with confirmation */}
                   {confirmDelete ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Delete?</span>
+                      <span className="text-xs" style={{ color: '#9090a8' }}>Delete?</span>
                       <button
                         onClick={() => {
                           deleteNotification(selectedNotification.id);
                           setSelectedNotification(null);
                           setConfirmDelete(false);
                         }}
-                        className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        className="px-2 py-1 text-xs rounded transition-colors"
+                        style={{ color: '#ef4444' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(239,68,68,0.12)'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                       >
                         Yes
                       </button>
                       <button
                         onClick={() => setConfirmDelete(false)}
-                        className="px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                        className="px-2 py-1 text-xs rounded transition-colors"
+                        style={{ color: '#9090a8' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                       >
                         No
                       </button>
@@ -378,7 +418,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                   ) : (
                     <button
                       onClick={() => setConfirmDelete(true)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                      className="p-1.5 rounded transition-colors"
+                      style={{ color: '#5a5a72' }}
+                      onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = '#ef4444'; el.style.backgroundColor = 'rgba(239,68,68,0.08)'; }}
+                      onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.color = '#5a5a72'; el.style.backgroundColor = 'transparent'; }}
                       title="Delete notification"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -391,12 +434,12 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
             // List View
             <>
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+              <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #1e1e30', background: 'linear-gradient(to right, rgba(252,200,36,0.08), rgba(249,115,22,0.08))' }}>
                 <div className="flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                  <Bell className="w-5 h-5" style={{ color: '#fcc824' }} />
+                  <h3 className="font-semibold" style={{ color: '#ededf5' }}>Notifications</h3>
                   {unreadCount > 0 && (
-                    <span className="px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-200 dark:bg-amber-800 rounded-full">
+                    <span className="px-2 py-0.5 text-xs font-medium rounded-full" style={{ color: '#fcc824', backgroundColor: 'rgba(252,200,36,0.15)' }}>
                       {unreadCount} new
                     </span>
                   )}
@@ -405,41 +448,58 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
-                      className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                       title="Mark all as read"
                     >
-                      <CheckCheck className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <CheckCheck className="w-4 h-4" style={{ color: '#9090a8' }} />
                     </button>
                   )}
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                    className="p-2 rounded-lg transition-colors"
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.06)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
                   >
-                    <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <X className="w-4 h-4" style={{ color: '#9090a8' }} />
                   </button>
                 </div>
               </div>
+
+              {/* List-level error (markAllAsRead failure) */}
+              {listError && (
+                <div className="px-4 py-2 flex items-center justify-between gap-2 text-xs" style={{ background: 'rgba(239,68,68,0.08)', borderBottom: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+                  <span>{listError}</span>
+                  <button onClick={() => setListError(null)} style={{ color: '#f87171' }}>✕</button>
+                </div>
+              )}
 
               {/* Notification List */}
               <div className="max-h-[400px] overflow-y-auto">
                 {loading ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2" style={{ borderColor: '#fcc824' }}></div>
                   </div>
                 ) : notifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-col items-center justify-center py-12" style={{ color: '#9090a8' }}>
                     <Bell className="w-12 h-12 mb-3 opacity-30" />
                     <p className="text-sm">No notifications yet</p>
-                    <p className="text-xs mt-1">You're all caught up!</p>
+                    <p className="text-xs mt-1" style={{ color: '#5a5a72' }}>You're all caught up!</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                  <div style={{ borderTop: '1px solid #1e1e30' }}>
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`relative p-4 border-l-4 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 group ${
-                          getPriorityColor(notification.priority)
-                        } ${!notification.is_read ? 'bg-opacity-100' : 'bg-opacity-50'}`}
+                        className="relative p-4 border-l-4 cursor-pointer transition-all duration-200 group"
+                        style={{
+                          ...getPriorityStyle(notification.priority),
+                          opacity: notification.is_read ? 0.7 : 1,
+                          borderBottom: '1px solid #1e1e30',
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = getPriorityStyle(notification.priority).backgroundColor as string ?? 'transparent'; }}
                         onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="flex items-start gap-3">
@@ -449,34 +509,30 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                           {/* Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className={`text-sm font-medium ${
-                                notification.is_read
-                                  ? 'text-gray-600 dark:text-gray-400'
-                                  : 'text-gray-900 dark:text-white'
-                              }`}>
+                              <h4 className="text-sm font-medium" style={{ color: notification.is_read ? '#9090a8' : '#ededf5' }}>
                                 {notification.title}
                               </h4>
-                              <span className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap">
+                              <span className="text-xs whitespace-nowrap" style={{ color: '#5a5a72' }}>
                                 {formatTime(notification.created_at)}
                               </span>
                             </div>
                             {notification.message && (
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                              <p className="text-xs mt-1 line-clamp-2" style={{ color: '#9090a8' }}>
                                 {notification.message}
                               </p>
                             )}
                             <div className="flex items-center gap-2 mt-2">
-                              <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase">
+                              <span className="text-[10px] uppercase" style={{ color: '#5a5a72' }}>
                                 {notification.source}
                               </span>
                               {!notification.is_read && (
-                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#fcc824' }}></span>
                               )}
                             </div>
                           </div>
 
                           {/* Chevron */}
-                          <ChevronRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#9090a8' }} />
                         </div>
                       </div>
                     ))}
@@ -486,13 +542,16 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
               {/* Footer */}
               {notifications.length > 0 && (
-                <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div className="px-4 py-2" style={{ borderTop: '1px solid #1e1e30', backgroundColor: 'rgba(255,255,255,0.02)' }}>
                   <button
                     onClick={() => {
                       setIsOpen(false);
                       window.location.href = '/notifications';
                     }}
-                    className="w-full text-center text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium"
+                    className="w-full text-center text-sm font-medium transition-colors"
+                    style={{ color: '#fcc824' }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#fcc824'; }}
                   >
                     View all notifications
                   </button>
