@@ -93,6 +93,7 @@ export default function AdminEmailsPage() {
       setTemplates(data.templates || []);
     } catch (error) {
       console.error('Failed to fetch email templates:', error);
+      setStatusMessage({ type: 'error', text: 'Failed to load email templates' });
     } finally {
       setLoading(false);
     }
@@ -214,7 +215,9 @@ export default function AdminEmailsPage() {
           </div>
           <button
             onClick={() => setStatusMessage(null)}
-            className="p-1 hover:bg-white/10 rounded"
+            className="p-1 rounded"
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(144,144,168,0.15)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -347,19 +350,19 @@ export default function AdminEmailsPage() {
                     <button
                       onClick={() => toggleEnabled(template)}
                       disabled={saving === template.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 ${
-                        template.enabled ? 'bg-green-500' : 'bg-[#1e1e30]'
-                      }`}
+                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
+                      style={{ background: template.enabled ? '#4ade80' : '#1e1e30' }}
                     >
                       {saving === template.id ? (
                         <span className="absolute inset-0 flex items-center justify-center">
-                          <RefreshCw className="w-3 h-3 animate-spin text-white" />
+                          <RefreshCw className="w-3 h-3 animate-spin" style={{ color: '#ededf5' }} />
                         </span>
                       ) : (
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                          className={`inline-block h-4 w-4 transform rounded-full shadow transition-transform ${
                             template.enabled ? 'translate-x-6' : 'translate-x-1'
                           }`}
+                          style={{ background: '#ededf5' }}
                         />
                       )}
                     </button>
@@ -398,7 +401,10 @@ export default function AdminEmailsPage() {
               <button
                 onClick={saveTemplate}
                 disabled={saving === editingTemplate.id}
-                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                style={{ background: '#4f6ef7', color: '#ededf5' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
               >
                 {saving === editingTemplate.id ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -409,8 +415,10 @@ export default function AdminEmailsPage() {
               </button>
               <button
                 onClick={closeEditModal}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(144,144,168,0.15)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <X className="w-5 h-5" />
               </button>
