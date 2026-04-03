@@ -289,11 +289,11 @@ export default function AgentsPage() {
               <div className="hidden md:flex items-center justify-center">
                 <div className="w-36 h-36 rounded-3xl flex items-center justify-center"
                   style={{
-                    background: `linear-gradient(135deg, ${freeAgent.accent_color || '#f59e0b'}1a, ${freeAgent.accent_color || '#f59e0b'}08)`,
-                    border: `1px solid ${freeAgent.accent_color || '#f59e0b'}2a`,
-                    boxShadow: `0 0 60px ${freeAgent.accent_color || '#f59e0b'}10`,
+                    background: `linear-gradient(135deg, ${freeAgent.accent_color || '#fcc824'}1a, ${freeAgent.accent_color || '#fcc824'}08)`,
+                    border: `1px solid ${freeAgent.accent_color || '#fcc824'}2a`,
+                    boxShadow: `0 0 60px ${freeAgent.accent_color || '#fcc824'}10`,
                   }}>
-                  <Brain className="w-16 h-16" style={{ color: freeAgent.accent_color || '#f59e0b' }} />
+                  <Brain className="w-16 h-16" style={{ color: freeAgent.accent_color || '#fcc824' }} />
                 </div>
               </div>
             </div>

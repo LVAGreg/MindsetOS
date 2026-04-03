@@ -36,6 +36,7 @@ export default function ReferralsPage() {
   const [history, setHistory] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -47,7 +48,9 @@ export default function ReferralsPage() {
         ]);
         if (statsRes.ok) setStats(await statsRes.json());
         if (histRes.ok) setHistory(await histRes.json());
-      } catch {}
+      } catch {
+        setLoadError('Failed to load referral data.');
+      }
       setLoading(false);
     }
     load();
@@ -84,6 +87,11 @@ export default function ReferralsPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {loadError && (
+          <p className="text-xs text-red-400 px-4 py-3 rounded-xl" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            {loadError}
+          </p>
+        )}
         {/* Referral link — always visible, even while loading */}
         <div className="bg-[#12121f] rounded-xl border border-[#1e1e30] p-6">
           <div className="flex items-start justify-between gap-4 mb-3">

@@ -28,7 +28,7 @@ const ICON_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
+  '#7c5bf6', '#3b82f6', '#10b981', '#fcc824', '#ef4444',
   '#ec4899', '#06b6d4', '#f97316', '#6366f1',
 ];
 
@@ -51,7 +51,7 @@ const emptyForm: AgentForm = {
   category: 'custom',
   systemPrompt: '',
   icon: 'Wand2',
-  color: '#8b5cf6',
+  color: '#7c5bf6',
   conversationStarters: [''],
   visibility: 'private',
 };
@@ -204,7 +204,7 @@ export default function MyAgentsPage() {
               </button>
               <div>
                 <h1 className="text-xl font-bold flex items-center gap-2" style={{ color: '#ededf5' }}>
-                  <Wand2 className="w-5 h-5 text-[#8b5cf6]" />
+                  <Wand2 className="w-5 h-5" style={{ color: '#7c5bf6' }} />
                   My Agents
                 </h1>
                 <p className="text-sm" style={{ color: '#9090a8' }}>
@@ -271,11 +271,11 @@ export default function MyAgentsPage() {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{
-                        background: (agent.color || '#8b5cf6') + '15',
-                        border: '1px solid ' + (agent.color || '#8b5cf6') + '30',
+                        background: (agent.color || '#7c5bf6') + '15',
+                        border: '1px solid ' + (agent.color || '#7c5bf6') + '30',
                       }}
                     >
-                      <Wand2 className="w-5 h-5" style={{ color: agent.color || '#8b5cf6' }} />
+                      <Wand2 className="w-5 h-5" style={{ color: agent.color || '#7c5bf6' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">

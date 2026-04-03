@@ -56,6 +56,8 @@ export default function UserClapsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -78,7 +80,9 @@ export default function UserClapsPage() {
         });
       }
       if (histR.ok) setHistory(await histR.json());
-    } catch {}
+    } catch {
+      setError('Failed to load data. Please refresh.');
+    }
     setLoading(false);
   }, []);
 
@@ -86,6 +90,7 @@ export default function UserClapsPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       const r = await fetch(`${API}/api/claps`, {
         method: 'POST', headers: authHeaders(),
@@ -95,8 +100,12 @@ export default function UserClapsPage() {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
         fetchData();
+      } else {
+        setSaveError('Failed to save. Try again.');
       }
-    } catch {}
+    } catch {
+      setSaveError('Network error. Try again.');
+    }
     setSaving(false);
   };
 
@@ -119,6 +128,11 @@ export default function UserClapsPage() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <p className="text-xs text-red-400 px-4 py-3 rounded-xl" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+          {error}
+        </p>
+      )}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <TrendingUp className="w-7 h-7 text-indigo-500" />
@@ -185,13 +199,18 @@ export default function UserClapsPage() {
           </div>
         </div>
 
-        <button
-          onClick={handleSave} disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
-        >
-          {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-          {saving ? 'Saving...' : saved ? 'Saved!' : 'Save this week'}
-        </button>
+        <div>
+          <button
+            onClick={handleSave} disabled={saving}
+            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 transition-colors"
+          >
+            {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save this week'}
+          </button>
+          {saveError && (
+            <p className="text-xs mt-1" style={{ color: '#ef4444' }}>{saveError}</p>
+          )}
+        </div>
       </div>
 
       {/* Trend Chart */}
