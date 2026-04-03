@@ -127,7 +127,7 @@ Ship? YES / NO / REVISE
 
 ---
 
-## Project-Specific Anti-Patterns (updated 2026-04-02)
+## Project-Specific Anti-Patterns (updated 2026-04-02, extended 2026-04-02 Three.js review, extended 2026-04-02 token sweep)
 
 ### Silent async failure
 Any `catch` block in a user-initiated save/submit action that does not set an error state or show a toast scores Functionality ≤6 and Correctness ≤6. The user must always know whether their data was saved.
@@ -180,5 +180,35 @@ The `validPlans` array and `priceMap` in the checkout page must only contain key
 ### Cross-product metadata leak into Stripe
 MindsetOS is a white-label product. Any Stripe API call (customer creation, session metadata, webhook logging) that embeds ECOS-specific identifiers (e.g., `source: 'ecos_checkout'`) violates the CLAUDE.md cross-contamination rule. These strings appear in Stripe dashboards, customer exports, and support tickets visible to users. Audit all `metadata` objects in `checkout.cjs` after every backend change.
 
+### Pointer/click double-fire on mobile tap in Three.js canvas
+When a canvas registers both `pointerup` and `click` event handlers for the same action (e.g., `onAgentSelect`), a single finger tap on touch devices fires both events — triggering the action twice. This causes double-navigation and potentially double-API calls. Fix: use `pointer` events exclusively for tap/click on canvas elements — remove `click` and rely on `pointerup` alone, or add a guard flag (`let pointerUpHandled = false`) that the `click` handler checks and resets. Scores Mobile Readiness ≤7 and Correctness ≤7 if both handlers fire the same action without deduplication.
+
+### Label/tooltip clipping at narrow viewports in Three.js overlays
+Absolute-positioned labels computed from `getBoundingClientRect()` projections will clip at container edges on narrow viewports (≤420px) when `overflow: hidden` is set on the parent. The label x/y must be clamped to `[margin, containerWidth - margin]` and `[margin, containerHeight - margin]` before setting React state. Scores Mobile Readiness ≤7 if labels are visibly cut off at 420px viewport width.
+
+### Uninitialised RAF ID in Three.js cleanup
+`let rafId: number` declared without an initial value means `cancelAnimationFrame(undefined)` is called if the component unmounts before the first animation frame executes (e.g., during fast remount in React Strict Mode). Initialise as `let rafId = 0` — `cancelAnimationFrame(0)` is a no-op and avoids the undefined call. Flag for Correctness.
+
 ### Payload-type mismatch after field removal
 When a backend response object drops a field (e.g., removing `id` from a handoff agent payload), every downstream consumer must be audited: (1) inline TypeScript type annotations, (2) `key` props on mapped list elements, (3) any logic that reads the removed field. Leaving a TypeScript type that still declares the removed field as `string` suppresses the type error and allows `undefined` to propagate silently at runtime — causing `key={undefined}` on React list items and defeating reconciliation. Fix order: update the type → grep all usages of the removed field name in the consumer → replace with the canonical field still present. Scores Correctness ≤6 if removed-field references remain in the consumer after the contract change.
+
+### Inline hover handler fragility (borderLeft sub-property)
+When applying `borderLeft` shorthand as an inline style on initial render (which sets top/right/bottom/left borders simultaneously), restoring `borderColor` in `onMouseLeave` overwrites the left-border accent. The correct restore sequence is: set `borderColor` back to default, then immediately override `borderLeftColor` with the accent. The explicit sub-property wins over the shorthand because it fires last. Reviewers should verify multi-border restore handlers explicitly set `borderLeftColor` after any `borderColor` reset. Recommended fix: use a CSS class + CSS custom property for the accent border rather than inline hover handlers. Scores Simplicity ≤7 if repeated across two or more elements.
+
+### Modified-section grey token leak
+When a PR touches a JSX block (adds/removes elements, modifies styles), all `text-gray-*` and `dark:*-gray-*` classes in that same JSX block must be migrated to MindsetOS design tokens. Leaving `text-gray-500` in a label that sits inside a modified section counts as a partial migration and caps Craft at 7. Reviewers should grep the surrounding JSX element from opening tag to closing tag for grey tokens, not just the diff lines.
+
+### Tailwind `violet-*` vs design-token purple in changed files
+MindsetOS's purple token is `#7c5bf6`. Tailwind's `violet-500` is `#8b5cf6` — a different value. When a token sweep PR touches a file that contains `violet-*` classes, those classes must be migrated to inline `style={{ color: '#7c5bf6' }}` (or the appropriate opacity variant) to be on-token. Leaving `violet-*` in a changed file caps Craft at 7 even if all `gray-*`/`indigo-*` classes are removed. Reviewers should add `violet-` to the grep pattern for every token sweep.
+
+### onMouseEnter/onMouseLeave hover handlers require `as HTMLElement` cast
+When applying inline hover state to a button/anchor via `onMouseEnter`, the event's `currentTarget` must be cast to `HTMLElement` before accessing `.style`. Omitting the cast produces a TypeScript error that gets hidden at runtime but fails in strict mode builds. Pattern: `(e.currentTarget as HTMLElement).style.background = ...`. All new inline hover handlers introduced in a PR must include the cast or the PR scores Correctness ≤8 for the changed file.
+
+### Analytics semantic mismatch (funnel attribution corruption)
+When calling a named tracking helper (e.g., `trackLeadMagnet`, `trackTrialStarted`), the call site must match the actual user action, not the nearest available event type. `trackLeadMagnet('scorecard')` must only fire when a user submits a scorecard form — not on a trial registration page that may be reached from any entry point. Using the wrong event corrupts funnel attribution in PostHog and makes it impossible to distinguish sources. Always match the helper name to the actual action at the call site. Scores Correctness ≤6 and User Intent ≤7 if the event name does not match the action.
+
+### useEffect with object dependency where primitive would suffice
+When a `useEffect` depends on an object returned by a hook (e.g., `useSearchParams()`, `useRouter()`), and the effect only reads a single value from that object, depend on the extracted primitive value, not the object. `[searchParams]` will re-fire whenever the reference changes, even if the value is the same. Use `const planParam = searchParams.get('plan')` outside the effect and depend on `[planParam]`. Applies to any object-type hook return value where the effect only reads a single property. Scores Correctness ≤8 if the latent double-fire is not addressed.
+
+### Analytics wrapper — exported low-level `trackEvent` invites bypass
+When a `lib/analytics.ts` module defines typed named helpers (`trackLeadMagnet`, `trackTrialStarted`, etc.), exporting the underlying `trackEvent` primitive as public API invites callers to bypass the typed surface and fire ad-hoc event strings. Prefer keeping `trackEvent` unexported (or marking it `/** @internal */`) unless callers genuinely need one-off events. Any new ad-hoc `trackEvent('...')` call introduced by a PR should be reviewed: if the event belongs to the funnel, add a named helper instead.
