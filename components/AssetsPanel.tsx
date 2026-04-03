@@ -11,10 +11,10 @@ import {
   Plus,
   X,
   Download,
-  Tag,
   ChevronRight,
   ChevronDown,
-  File
+  File,
+  Loader2
 } from 'lucide-react';
 
 interface Asset {
@@ -42,6 +42,21 @@ interface AssetsPanelProps {
   onClose: () => void;
 }
 
+// ── design tokens ──────────────────────────────────────────────
+const T = {
+  pageBg:   '#09090f',
+  cardBg:   'rgba(18,18,31,0.8)',
+  border:   '#1e1e30',
+  textPrimary: '#ededf5',
+  textMuted:   '#9090a8',
+  textDim:     '#5a5a72',
+  blue:     '#4f6ef7',
+  amber:    '#fcc824',
+  purple:   '#7c5bf6',
+  red:      '#ef4444',
+  inputBg:  'rgba(18,18,31,0.9)',
+};
+
 export default function AssetsPanel({
   conversationId,
   agentId,
@@ -51,6 +66,7 @@ export default function AssetsPanel({
   const [assets, setAssets] = useState<Asset[]>([]);
   const [filteredAssets, setFilteredAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [showArchived, setShowArchived] = useState(false);
@@ -62,6 +78,8 @@ export default function AssetsPanel({
   const [noteContent, setNoteContent] = useState('');
   const [noteTags, setNoteTags] = useState<string[]>([]);
   const [showNoteEditor, setShowNoteEditor] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   // Load assets
   useEffect(() => {
@@ -74,12 +92,10 @@ export default function AssetsPanel({
   useEffect(() => {
     let filtered = assets;
 
-    // Filter by type
     if (selectedType !== 'all') {
       filtered = filtered.filter(a => a.asset_type === selectedType);
     }
 
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(a =>
@@ -94,6 +110,7 @@ export default function AssetsPanel({
 
   const loadAssets = async () => {
     setLoading(true);
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
@@ -112,9 +129,12 @@ export default function AssetsPanel({
       if (response.ok) {
         const data = await response.json();
         setAssets(data.assets || []);
+      } else {
+        setError('Failed to load assets.');
       }
-    } catch (error) {
-      console.error('Failed to load assets:', error);
+    } catch (err) {
+      console.error('Failed to load assets:', err);
+      setError('Failed to load assets. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +142,8 @@ export default function AssetsPanel({
 
   const createNote = async () => {
     if (!noteTitle.trim()) return;
-
+    setSavingNote(true);
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets`, {
@@ -144,15 +165,21 @@ export default function AssetsPanel({
       if (response.ok) {
         resetNoteEditor();
         loadAssets();
+      } else {
+        setError('Failed to create note.');
       }
-    } catch (error) {
-      console.error('Failed to create note:', error);
+    } catch (err) {
+      console.error('Failed to create note:', err);
+      setError('Failed to create note. Please try again.');
+    } finally {
+      setSavingNote(false);
     }
   };
 
   const updateNote = async () => {
     if (!editingNote) return;
-
+    setSavingNote(true);
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${editingNote.id}`, {
@@ -171,15 +198,20 @@ export default function AssetsPanel({
       if (response.ok) {
         resetNoteEditor();
         loadAssets();
+      } else {
+        setError('Failed to update note.');
       }
-    } catch (error) {
-      console.error('Failed to update note:', error);
+    } catch (err) {
+      console.error('Failed to update note:', err);
+      setError('Failed to update note. Please try again.');
+    } finally {
+      setSavingNote(false);
     }
   };
 
   const deleteAsset = async (assetId: string) => {
     if (!confirm('Are you sure you want to delete this asset?')) return;
-
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${assetId}`, {
@@ -189,16 +221,20 @@ export default function AssetsPanel({
 
       if (response.ok) {
         loadAssets();
+      } else {
+        setError('Failed to delete asset.');
       }
-    } catch (error) {
-      console.error('Failed to delete asset:', error);
+    } catch (err) {
+      console.error('Failed to delete asset:', err);
+      setError('Failed to delete asset. Please try again.');
     }
   };
 
   const togglePin = async (asset: Asset) => {
+    setError(null);
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${asset.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${asset.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -206,16 +242,22 @@ export default function AssetsPanel({
         },
         body: JSON.stringify({ is_pinned: !asset.is_pinned })
       });
-      loadAssets();
-    } catch (error) {
-      console.error('Failed to toggle pin:', error);
+      if (response.ok) {
+        loadAssets();
+      } else {
+        setError('Failed to update pin.');
+      }
+    } catch (err) {
+      console.error('Failed to toggle pin:', err);
+      setError('Failed to update pin. Please try again.');
     }
   };
 
   const toggleArchive = async (asset: Asset) => {
+    setError(null);
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${asset.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${asset.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -223,13 +265,19 @@ export default function AssetsPanel({
         },
         body: JSON.stringify({ is_archived: !asset.is_archived })
       });
-      loadAssets();
-    } catch (error) {
-      console.error('Failed to toggle archive:', error);
+      if (response.ok) {
+        loadAssets();
+      } else {
+        setError('Failed to update archive status.');
+      }
+    } catch (err) {
+      console.error('Failed to toggle archive:', err);
+      setError('Failed to update archive status. Please try again.');
     }
   };
 
   const downloadFile = async (asset: Asset) => {
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/${asset.id}/download`, {
@@ -246,9 +294,12 @@ export default function AssetsPanel({
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+      } else {
+        setError('Failed to download file.');
       }
-    } catch (error) {
-      console.error('Failed to download file:', error);
+    } catch (err) {
+      console.error('Failed to download file:', err);
+      setError('Failed to download file. Please try again.');
     }
   };
 
@@ -261,6 +312,8 @@ export default function AssetsPanel({
     if (conversationId) formData.append('conversation_id', conversationId);
     if (agentId) formData.append('agent_id', agentId);
 
+    setUploadingFile(true);
+    setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/assets/upload`, {
@@ -271,9 +324,16 @@ export default function AssetsPanel({
 
       if (response.ok) {
         loadAssets();
+      } else {
+        setError('Failed to upload file.');
       }
-    } catch (error) {
-      console.error('Failed to upload file:', error);
+    } catch (err) {
+      console.error('Failed to upload file:', err);
+      setError('Failed to upload file. Please try again.');
+    } finally {
+      setUploadingFile(false);
+      // reset input so same file can be re-uploaded
+      event.target.value = '';
     }
   };
 
@@ -325,55 +385,147 @@ export default function AssetsPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-white dark:bg-gray-900 shadow-2xl border-l border-gray-200 dark:border-gray-700 z-50 flex flex-col">
+    <div
+      style={{
+        position: 'fixed', right: 0, top: 0, height: '100%', width: '24rem',
+        background: T.cardBg, borderLeft: `1px solid ${T.border}`,
+        zIndex: 50, display: 'flex', flexDirection: 'column',
+        boxShadow: '0 25px 50px rgba(0,0,0,0.6)',
+      }}
+    >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notes & Files</h2>
+      <div
+        style={{
+          padding: '1rem', borderBottom: `1px solid ${T.border}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}
+      >
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: T.textPrimary, margin: 0 }}>
+          Notes &amp; Files
+        </h2>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          aria-label="Close assets panel"
+          style={{
+            padding: '0.5rem', borderRadius: '0.5rem', background: 'transparent',
+            border: 'none', cursor: 'pointer', color: T.textMuted,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
+      {/* Error banner */}
+      {error && (
+        <div
+          style={{
+            margin: '0.75rem 1rem 0',
+            padding: '0.5rem 0.75rem',
+            background: 'rgba(239,68,68,0.15)',
+            border: '1px solid rgba(239,68,68,0.35)',
+            borderRadius: '0.5rem',
+            color: '#fca5a5',
+            fontSize: '0.8125rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem',
+          }}
+        >
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            aria-label="Dismiss error"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fca5a5', flexShrink: 0 }}
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Search and Filters */}
-      <div className="p-4 space-y-3 border-b border-gray-200 dark:border-gray-700">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div
+        style={{
+          padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem',
+          borderBottom: `1px solid ${T.border}`,
+        }}
+      >
+        {/* Search */}
+        <div style={{ position: 'relative' }}>
+          <Search
+            className="w-4 h-4"
+            style={{
+              position: 'absolute', left: '0.75rem', top: '50%',
+              transform: 'translateY(-50%)', color: T.textDim,
+            }}
+          />
           <input
             type="text"
             placeholder="Search notes and files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+            style={{
+              width: '100%', paddingLeft: '2.25rem', paddingRight: '1rem',
+              paddingTop: '0.5rem', paddingBottom: '0.5rem',
+              border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+              background: T.inputBg, color: T.textPrimary, fontSize: '0.875rem',
+              outline: 'none', boxSizing: 'border-box',
+            }}
           />
         </div>
 
-        <div className="flex gap-2">
+        {/* Action buttons — flex-wrap for mobile */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => openNoteEditor()}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            style={{
+              flex: '1 1 auto', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', gap: '0.5rem',
+              padding: '0.5rem 0.75rem',
+              background: T.blue, color: '#fff',
+              border: 'none', borderRadius: '0.5rem',
+              cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500,
+            }}
           >
             <Plus className="w-4 h-4" />
             New Note
           </button>
-          <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer text-sm">
-            <Upload className="w-4 h-4" />
-            Upload
+          <label
+            style={{
+              flex: '1 1 auto', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', gap: '0.5rem',
+              padding: '0.5rem 0.75rem',
+              background: uploadingFile ? T.textDim : T.purple, color: '#fff',
+              border: 'none', borderRadius: '0.5rem',
+              cursor: uploadingFile ? 'not-allowed' : 'pointer',
+              fontSize: '0.875rem', fontWeight: 500,
+              opacity: uploadingFile ? 0.7 : 1,
+            }}
+          >
+            {uploadingFile ? (
+              <Loader2 className="w-4 h-4" style={{ animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            {uploadingFile ? 'Uploading…' : 'Upload'}
             <input
               type="file"
               onChange={handleFileUpload}
-              className="hidden"
+              disabled={uploadingFile}
+              style={{ display: 'none' }}
             />
           </label>
         </div>
 
-        <div className="flex gap-2">
+        {/* Type filter + archive toggle */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+            style={{
+              flex: '1 1 auto', padding: '0.5rem 0.75rem',
+              border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+              background: T.inputBg, color: T.textPrimary, fontSize: '0.875rem',
+              outline: 'none',
+            }}
           >
             <option value="all">All Types</option>
             <option value="note">Notes</option>
@@ -383,11 +535,14 @@ export default function AssetsPanel({
           </select>
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`px-3 py-2 border rounded-lg text-sm ${
-              showArchived
-                ? 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600'
-                : 'border-gray-300 dark:border-gray-600'
-            }`}
+            aria-label={showArchived ? 'Hide archived' : 'Show archived'}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+              background: showArchived ? 'rgba(124,91,246,0.2)' : 'transparent',
+              color: showArchived ? T.purple : T.textMuted,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
           >
             <Archive className="w-4 h-4" />
           </button>
@@ -395,20 +550,28 @@ export default function AssetsPanel({
       </div>
 
       {/* Assets List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {loading ? (
-          <div className="text-center text-gray-500 py-8">Loading...</div>
+          <div style={{ textAlign: 'center', color: T.textMuted, paddingTop: '2rem', paddingBottom: '2rem' }}>
+            Loading...
+          </div>
         ) : filteredAssets.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>No assets found</p>
+          <div style={{ textAlign: 'center', color: T.textMuted, paddingTop: '2rem', paddingBottom: '2rem' }}>
+            <FileText className="w-12 h-12 mx-auto mb-2" style={{ opacity: 0.4, color: T.textDim }} />
+            <p style={{ margin: 0 }}>No assets found</p>
           </div>
         ) : (
           Object.entries(groupedAssets).map(([type, typeAssets]) => (
-            <div key={type} className="space-y-2">
+            <div key={type} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <button
                 onClick={() => toggleCategory(type)}
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 w-full hover:text-gray-900 dark:hover:text-white"
+                aria-label={`Toggle ${type} category`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  fontSize: '0.875rem', fontWeight: 500, color: T.textMuted,
+                  width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                  padding: 0, textAlign: 'left',
+                }}
               >
                 {expandedCategories.has(type) ? (
                   <ChevronDown className="w-4 h-4" />
@@ -419,38 +582,59 @@ export default function AssetsPanel({
               </button>
 
               {expandedCategories.has(type) && (
-                <div className="space-y-2 ml-6">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginLeft: '1.5rem' }}>
                   {typeAssets.map(asset => (
                     <div
                       key={asset.id}
-                      className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      style={{
+                        padding: '0.75rem',
+                        border: `1px solid ${T.border}`,
+                        borderRadius: '0.5rem',
+                        background: T.cardBg,
+                      }}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             {asset.asset_type === 'file' ? (
-                              <File className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <File className="w-4 h-4" style={{ color: T.textDim, flexShrink: 0 }} />
                             ) : (
-                              <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <FileText className="w-4 h-4" style={{ color: T.textDim, flexShrink: 0 }} />
                             )}
-                            <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            <h3
+                              style={{
+                                fontSize: '0.875rem', fontWeight: 500, color: T.textPrimary,
+                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0,
+                              }}
+                            >
                               {asset.title || asset.file_name || 'Untitled'}
                             </h3>
                             {asset.is_pinned && (
-                              <Pin className="w-3 h-3 text-yellow-500 flex-shrink-0" />
+                              <Pin className="w-3 h-3" style={{ color: T.amber, flexShrink: 0 }} />
                             )}
                           </div>
                           {asset.content && (
-                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                            <p
+                              style={{
+                                fontSize: '0.75rem', color: T.textMuted, marginTop: '0.25rem',
+                                overflow: 'hidden', display: '-webkit-box',
+                                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                              }}
+                            >
                               {asset.content}
                             </p>
                           )}
                           {asset.tags.length > 0 && (
-                            <div className="flex gap-1 mt-2 flex-wrap">
+                            <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                               {asset.tags.map(tag => (
                                 <span
                                   key={tag}
-                                  className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
+                                  style={{
+                                    fontSize: '0.75rem', padding: '0.125rem 0.5rem',
+                                    background: 'rgba(124,91,246,0.15)',
+                                    color: T.purple, borderRadius: '0.25rem',
+                                    border: `1px solid rgba(124,91,246,0.25)`,
+                                  }}
                                 >
                                   {tag}
                                 </span>
@@ -460,20 +644,29 @@ export default function AssetsPanel({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 mt-2">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                         <button
                           onClick={() => togglePin(asset)}
-                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                          title="Pin/Unpin"
+                          aria-label={asset.is_pinned ? 'Unpin asset' : 'Pin asset'}
+                          style={{
+                            padding: '0.375rem', borderRadius: '0.25rem',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            color: asset.is_pinned ? T.amber : T.textDim,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
                         >
-                          <Pin className={`w-3.5 h-3.5 ${asset.is_pinned ? 'text-yellow-500' : 'text-gray-400'}`} />
+                          <Pin className="w-3.5 h-3.5" />
                         </button>
 
                         {asset.asset_type === 'note' && (
                           <button
                             onClick={() => openNoteEditor(asset)}
-                            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-xs"
-                            title="Edit"
+                            aria-label="Edit note"
+                            style={{
+                              padding: '0.375rem 0.5rem', borderRadius: '0.25rem',
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              color: T.textMuted, fontSize: '0.75rem',
+                            }}
                           >
                             Edit
                           </button>
@@ -482,27 +675,42 @@ export default function AssetsPanel({
                         {asset.asset_type === 'file' && (
                           <button
                             onClick={() => downloadFile(asset)}
-                            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                            title="Download"
+                            aria-label="Download file"
+                            style={{
+                              padding: '0.375rem', borderRadius: '0.25rem',
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              color: T.textDim,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
                           >
-                            <Download className="w-3.5 h-3.5 text-gray-400" />
+                            <Download className="w-3.5 h-3.5" />
                           </button>
                         )}
 
                         <button
                           onClick={() => toggleArchive(asset)}
-                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                          title="Archive/Unarchive"
+                          aria-label={asset.is_archived ? 'Unarchive asset' : 'Archive asset'}
+                          style={{
+                            padding: '0.375rem', borderRadius: '0.25rem',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            color: asset.is_archived ? T.amber : T.textDim,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
                         >
-                          <Archive className={`w-3.5 h-3.5 ${asset.is_archived ? 'text-orange-500' : 'text-gray-400'}`} />
+                          <Archive className="w-3.5 h-3.5" />
                         </button>
 
                         <button
                           onClick={() => deleteAsset(asset.id)}
-                          className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900 rounded ml-auto"
-                          title="Delete"
+                          aria-label="Delete asset"
+                          style={{
+                            padding: '0.375rem', borderRadius: '0.25rem',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            color: T.red, marginLeft: 'auto',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -516,23 +724,72 @@ export default function AssetsPanel({
 
       {/* Note Editor Modal */}
       {showNoteEditor && (
-        <div className="absolute inset-0 bg-white dark:bg-gray-900 z-10 flex flex-col">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            background: T.pageBg,
+            zIndex: 10, display: 'flex', flexDirection: 'column',
+          }}
+        >
+          <div
+            style={{
+              padding: '1rem', borderBottom: `1px solid ${T.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}
+          >
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: T.textPrimary, margin: 0 }}>
               {editingNote ? 'Edit Note' : 'New Note'}
             </h3>
-            <button onClick={resetNoteEditor} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
+            <button
+              onClick={resetNoteEditor}
+              aria-label="Close note editor"
+              style={{
+                padding: '0.5rem', borderRadius: '0.5rem', background: 'transparent',
+                border: 'none', cursor: 'pointer', color: T.textMuted,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Error banner inside editor */}
+          {error && (
+            <div
+              style={{
+                margin: '0.75rem 1rem 0',
+                padding: '0.5rem 0.75rem',
+                background: 'rgba(239,68,68,0.15)',
+                border: '1px solid rgba(239,68,68,0.35)',
+                borderRadius: '0.5rem',
+                color: '#fca5a5',
+                fontSize: '0.8125rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem',
+              }}
+            >
+              <span>{error}</span>
+              <button
+                onClick={() => setError(null)}
+                aria-label="Dismiss error"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fca5a5', flexShrink: 0 }}
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <input
               type="text"
               placeholder="Note title..."
               value={noteTitle}
               onChange={(e) => setNoteTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+              style={{
+                width: '100%', padding: '0.5rem 1rem',
+                border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+                background: T.inputBg, color: T.textPrimary, fontSize: '0.875rem',
+                outline: 'none', boxSizing: 'border-box',
+              }}
             />
 
             <textarea
@@ -540,7 +797,12 @@ export default function AssetsPanel({
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
               rows={10}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 resize-none"
+              style={{
+                width: '100%', padding: '0.5rem 1rem',
+                border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+                background: T.inputBg, color: T.textPrimary, fontSize: '0.875rem',
+                outline: 'none', resize: 'none', boxSizing: 'border-box',
+              }}
             />
 
             <input
@@ -548,26 +810,57 @@ export default function AssetsPanel({
               placeholder="Tags (comma-separated)..."
               value={noteTags.join(', ')}
               onChange={(e) => setNoteTags(e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
+              style={{
+                width: '100%', padding: '0.5rem 1rem',
+                border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+                background: T.inputBg, color: T.textPrimary, fontSize: '0.875rem',
+                outline: 'none', boxSizing: 'border-box',
+              }}
             />
           </div>
 
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+          <div
+            style={{
+              padding: '1rem', borderTop: `1px solid ${T.border}`,
+              display: 'flex', gap: '0.5rem', flexWrap: 'wrap',
+            }}
+          >
             <button
               onClick={resetNoteEditor}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              disabled={savingNote}
+              style={{
+                flex: '1 1 auto', padding: '0.5rem 1rem',
+                border: `1px solid ${T.border}`, borderRadius: '0.5rem',
+                background: 'transparent', color: T.textMuted,
+                cursor: savingNote ? 'not-allowed' : 'pointer',
+                opacity: savingNote ? 0.6 : 1,
+              }}
             >
               Cancel
             </button>
             <button
               onClick={editingNote ? updateNote : createNote}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={savingNote || !noteTitle.trim()}
+              style={{
+                flex: '1 1 auto', padding: '0.5rem 1rem',
+                background: savingNote || !noteTitle.trim() ? T.textDim : T.blue,
+                color: '#fff', border: 'none', borderRadius: '0.5rem',
+                cursor: savingNote || !noteTitle.trim() ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                fontWeight: 500,
+              }}
             >
-              {editingNote ? 'Update' : 'Create'}
+              {savingNote && (
+                <Loader2 className="w-4 h-4" style={{ animation: 'spin 1s linear infinite' }} />
+              )}
+              {savingNote ? 'Saving…' : editingNote ? 'Update' : 'Create'}
             </button>
           </div>
         </div>
       )}
+
+      {/* keyframe for spinner */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

@@ -251,13 +251,17 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
       <div
         key={conversation.id}
         onClick={() => handleConversationClick(conversation)}
-        title={fullTitle} // Hover tooltip with full title
-        className={`w-full text-left px-2 py-1.5 rounded-lg transition-colors group cursor-pointer relative ${
-          isActive
-            ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-[#ffc82c]'
-            : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-        }`}
+        onMouseEnter={(e) => {
+          if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)';
+        }}
+        title={fullTitle}
+        className="w-full text-left px-2 py-1.5 rounded-lg transition-colors group cursor-pointer relative"
         style={{
+          background: isActive ? 'rgba(252,200,36,0.1)' : 'rgba(18,18,31,0.8)',
+          border: isActive ? '1px solid #fcc824' : '1px solid #1e1e30',
           borderLeftWidth: '3px',
           borderLeftColor: accentColor,
         }}
@@ -265,19 +269,18 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
         <div className="flex items-center justify-between gap-1">
           <div className="flex-1 min-w-0 flex items-center gap-1">
             {conversation.isStarred && (
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+              <Star className="w-3 h-3 flex-shrink-0" style={{ color: '#fcc824', fill: '#fcc824' }} />
             )}
-            <p className={`text-xs font-medium truncate flex-1 ${
-              isActive
-                ? 'text-gray-900 dark:text-white'
-                : 'text-gray-900 dark:text-gray-300'
-            }`}>
+            <p
+              className="text-xs font-medium truncate flex-1"
+              style={{ color: isActive ? '#ededf5' : '#ededf5' }}
+            >
               {title}
             </p>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             {shortDate && (
-              <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+              <span className="text-[10px] whitespace-nowrap" style={{ color: '#5a5a72' }}>
                 {shortDate}
               </span>
             )}
@@ -301,22 +304,28 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
           filterStarred === true ? (
             /* Starred empty state */
             <div className="px-3 py-4 text-center">
-              <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/20 flex items-center justify-center mx-auto mb-2.5">
-                <Star className="w-4 h-4 text-amber-400" />
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
+                style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.18)' }}
+              >
+                <Star className="w-4 h-4" style={{ color: '#fcc824' }} />
               </div>
-              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Nothing starred yet</p>
-              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+              <p className="text-xs font-medium mb-0.5" style={{ color: '#ededf5' }}>Nothing starred yet</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#9090a8' }}>
                 Star any conversation to pin it here for quick access.
               </p>
             </div>
           ) : currentAgentData ? (
             /* This Agent empty state — encourage first message */
             <div className="px-3 py-4 text-center">
-              <div className="w-9 h-9 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.06] flex items-center justify-center mx-auto mb-2.5">
-                <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1e1e30' }}
+              >
+                <MessageSquare className="w-4 h-4" style={{ color: '#9090a8' }} />
               </div>
-              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">No sessions yet</p>
-              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+              <p className="text-xs font-medium mb-0.5" style={{ color: '#ededf5' }}>No sessions yet</p>
+              <p className="text-[11px] leading-relaxed" style={{ color: '#9090a8' }}>
                 Start a conversation to see it here.
               </p>
             </div>
@@ -325,18 +334,18 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
             <div className="px-3 py-4">
               <div
                 className="rounded-xl border border-dashed p-3.5 text-center"
-                style={{ borderColor: '#f59e0b50', background: '#f59e0b06' }}
+                style={{ borderColor: 'rgba(252,200,36,0.3)', background: 'rgba(252,200,36,0.04)' }}
               >
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2.5"
-                  style={{ background: '#f59e0b14', border: '1.5px solid #f59e0b30' }}
+                  style={{ background: 'rgba(252,200,36,0.1)', border: '1.5px solid rgba(252,200,36,0.2)' }}
                 >
-                  <BarChart2 className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                  <BarChart2 className="w-4 h-4" style={{ color: '#fcc824' }} />
                 </div>
-                <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                <p className="text-xs font-semibold mb-1" style={{ color: '#ededf5' }}>
                   Start with your Mindset Score
                 </p>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                <p className="text-[11px] leading-relaxed mb-3" style={{ color: '#9090a8' }}>
                   Free, 5 questions, 3 minutes. Find out exactly where to focus first.
                 </p>
                 <button
@@ -345,8 +354,8 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                       window.location.href = '/dashboard?agent=mindset-score';
                     }
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-black transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: 'linear-gradient(135deg, #fcc824, #f59e0b)' }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: 'linear-gradient(135deg, #fcc824, #e6b400)', color: '#09090f' }}
                 >
                   Take the score
                   <ArrowRight className="w-3 h-3" />
@@ -368,7 +377,10 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                   <div className="mt-2 px-2">
                     <button
                       onClick={() => setShowAllStarred(true)}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                      style={{ color: '#9090a8', background: 'transparent' }}
                     >
                       Show More ({sortedConversations.length - 5} more)
                     </button>
@@ -379,7 +391,10 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                   <div className="mt-2 px-2">
                     <button
                       onClick={() => setShowAllRecent(true)}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                      style={{ color: '#9090a8', background: 'transparent' }}
                     >
                       Show More ({Math.min(sortedConversations.length - 5, 25)} more)
                     </button>
@@ -394,7 +409,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                 {/* Today */}
                 {groupedConversations.today.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 mb-1">
+                    <h3 className="text-xs font-semibold px-2 mb-1" style={{ color: '#9090a8' }}>
                       Today
                     </h3>
                     <div className="space-y-1">
@@ -406,7 +421,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                 {/* Previous 7 Days */}
                 {groupedConversations.previous7Days.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 mb-1">
+                    <h3 className="text-xs font-semibold px-2 mb-1" style={{ color: '#9090a8' }}>
                       Previous 7 Days
                     </h3>
                     <div className="space-y-1">
@@ -418,7 +433,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                 {/* Earlier this Month */}
                 {groupedConversations.thisMonth.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 mb-1">
+                    <h3 className="text-xs font-semibold px-2 mb-1" style={{ color: '#9090a8' }}>
                       Earlier this Month
                     </h3>
                     <div className="space-y-1">
@@ -430,7 +445,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
                 {/* Last Month */}
                 {groupedConversations.lastMonth.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 mb-1">
+                    <h3 className="text-xs font-semibold px-2 mb-1" style={{ color: '#9090a8' }}>
                       Last Month
                     </h3>
                     <div className="space-y-1">
@@ -446,7 +461,10 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
               <div className="mt-4 px-2">
                 <button
                   onClick={() => setAllChatsDialogOpen(true)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                  style={{ color: '#9090a8', background: 'transparent' }}
                 >
                   <List className="w-4 h-4" />
                   All Chats ({sortedConversations.length - 30} more)

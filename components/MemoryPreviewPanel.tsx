@@ -16,6 +16,37 @@ interface MemoryPreviewPanelProps {
   onConfirm?: () => void;
 }
 
+// Token map for source-agent card accents (bg, border) — all inline, no Tailwind color tokens
+const sourceStyles: Record<string, { background: string; border: string }> = {
+  'mindset-score':        { background: 'rgba(20,184,166,0.08)',  border: '1px solid rgba(20,184,166,0.3)'  },
+  'reset-guide':          { background: 'rgba(79,110,247,0.08)',  border: '1px solid rgba(79,110,247,0.3)'  },
+  'architecture-coach':   { background: 'rgba(252,200,36,0.08)',  border: '1px solid rgba(252,200,36,0.3)'  },
+  'inner-world-mapper':   { background: 'rgba(124,91,246,0.08)',  border: '1px solid rgba(124,91,246,0.3)'  },
+  'accountability-partner': { background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)'  },
+  'default':              { background: 'rgba(144,144,168,0.08)', border: '1px solid rgba(144,144,168,0.3)' },
+};
+
+function getSourceStyle(source: string) {
+  return sourceStyles[source] ?? sourceStyles['default'];
+}
+
+const getSourceName = (source: string) => {
+  const names: Record<string, string> = {
+    'client-onboarding':      'Welcome Guide',
+    'mindset-score':          'Mindset Score Agent',
+    'reset-guide':            'Reset Guide',
+    'architecture-coach':     'Architecture Coach',
+    'inner-world-mapper':     'Inner World Mapper',
+    'practice-builder':       'Practice Builder',
+    'decision-framework':     'Decision Framework Agent',
+    'accountability-partner': 'Accountability Partner',
+    'story-excavator':        'Story Excavator',
+    'conversation-curator':   'Conversation Curator',
+    'launch-companion':       'Launch Companion',
+  };
+  return names[source] || 'Previous Coach';
+};
+
 export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }: MemoryPreviewPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -57,45 +88,24 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
     setEditedMemory(updated);
   };
 
-  // Get unique source agents for color coding
-  const sourceColors: Record<string, string> = {
-    'mindset-score': 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-700',
-    'reset-guide': 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700',
-    'architecture-coach': 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700',
-    'inner-world-mapper': 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700',
-    'accountability-partner': 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700',
-    'default': 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-700',
-  };
-
-  const getSourceColor = (source: string) => {
-    return sourceColors[source] || sourceColors['default'];
-  };
-
-  const getSourceName = (source: string) => {
-    const names: Record<string, string> = {
-      'client-onboarding': 'Welcome Guide',
-      'mindset-score': 'Mindset Score Agent',
-      'reset-guide': 'Reset Guide',
-      'architecture-coach': 'Architecture Coach',
-      'inner-world-mapper': 'Inner World Mapper',
-      'practice-builder': 'Practice Builder',
-      'decision-framework': 'Decision Framework Agent',
-      'accountability-partner': 'Accountability Partner',
-      'story-excavator': 'Story Excavator',
-      'conversation-curator': 'Conversation Curator',
-      'launch-companion': 'Launch Companion',
-    };
-    return names[source] || 'Previous Coach';
-  };
-
   return (
-    <div className="mb-4 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 shadow-sm">
+    <div
+      className="mb-4 rounded-lg shadow-sm"
+      style={{
+        border: '2px solid rgba(79,110,247,0.4)',
+        background: 'rgba(79,110,247,0.06)',
+      }}
+    >
       {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between">
+      <div
+        className="px-4 py-3 flex items-center justify-between flex-wrap gap-2"
+      >
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-semibold hover:text-indigo-900 dark:hover:text-indigo-100 transition-colors"
+            aria-label={isExpanded ? 'Collapse imported context' : 'Expand imported context'}
+            className="flex items-center gap-2 font-semibold transition-colors"
+            style={{ color: '#4f6ef7' }}
           >
             {isExpanded ? (
               <ChevronUp className="w-5 h-5" />
@@ -105,27 +115,36 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
             <span>📋 Imported Context ({importedMemory.length} items)</span>
           </button>
           {confirmed && (
-            <span className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-              <Check className="w-4 h-4" /> Confirmed
+            <span
+              className="text-xs font-medium flex items-center gap-1"
+              style={{ color: '#4ade80' }}
+            >
+              <Check className="w-4 h-4" aria-hidden="true" /> Confirmed
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Action buttons — flex-wrap so they stack on mobile */}
+        <div className="flex items-center gap-2 flex-wrap">
           {!confirmed && !isEditing && (
             <>
               <button
                 onClick={handleEdit}
-                className="px-3 py-1 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-md transition-colors flex items-center gap-1"
+                aria-label="Edit imported context"
+                className="px-3 py-1 text-sm font-medium rounded-md transition-colors flex items-center gap-1"
+                style={{ color: '#4f6ef7', background: 'rgba(79,110,247,0.1)' }}
               >
-                <Edit2 className="w-4 h-4" />
+                <Edit2 className="w-4 h-4" aria-hidden="true" />
                 Edit
               </button>
               <button
                 onClick={handleConfirm}
-                className="px-3 py-1 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 rounded-md transition-colors flex items-center gap-1"
+                aria-label="Confirm and continue"
+                className="px-3 py-1 text-sm font-medium rounded-md transition-colors flex items-center gap-1"
+                style={{ color: '#ededf5', background: '#4f6ef7' }}
               >
-                <Check className="w-4 h-4" />
-                Confirm & Continue
+                <Check className="w-4 h-4" aria-hidden="true" />
+                Confirm &amp; Continue
               </button>
             </>
           )}
@@ -133,16 +152,20 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
             <>
               <button
                 onClick={handleCancel}
-                className="px-3 py-1 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900/30 rounded-md transition-colors flex items-center gap-1"
+                aria-label="Cancel editing"
+                className="px-3 py-1 text-sm font-medium rounded-md transition-colors flex items-center gap-1"
+                style={{ color: '#9090a8', background: 'rgba(144,144,168,0.1)' }}
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-3 py-1 text-sm font-medium text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 rounded-md transition-colors flex items-center gap-1"
+                aria-label="Save changes"
+                className="px-3 py-1 text-sm font-medium rounded-md transition-colors flex items-center gap-1"
+                style={{ color: '#ededf5', background: '#4f6ef7' }}
               >
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4" aria-hidden="true" />
                 Save Changes
               </button>
             </>
@@ -153,46 +176,72 @@ export function MemoryPreviewPanel({ importedMemory, onMemoryUpdate, onConfirm }
       {/* Content */}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm" style={{ color: '#9090a8' }}>
             This agent will use the following context from your previous conversations.
             {!confirmed && ' Review and edit if needed, then confirm to continue.'}
           </p>
 
           <div className="space-y-2">
-            {(isEditing ? editedMemory : importedMemory).map((item, index) => (
-              <div
-                key={item.key}
-                className={`border-2 rounded-md p-3 ${getSourceColor(item.source)}`}
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                    {item.label}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-500 italic">
-                    from {getSourceName(item.source)}
-                  </span>
+            {(isEditing ? editedMemory : importedMemory).map((item, index) => {
+              const accentStyle = getSourceStyle(item.source);
+              return (
+                <div
+                  key={item.key}
+                  className="rounded-md p-3"
+                  style={{
+                    background: accentStyle.background,
+                    border: accentStyle.border,
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-1 flex-wrap gap-1">
+                    <span
+                      className="text-xs font-semibold uppercase tracking-wide"
+                      style={{ color: '#9090a8' }}
+                    >
+                      {item.label}
+                    </span>
+                    <span
+                      className="text-xs italic"
+                      style={{ color: '#5a5a72' }}
+                    >
+                      from {getSourceName(item.source)}
+                    </span>
+                  </div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editedMemory[index].value}
+                      onChange={(e) => handleFieldChange(index, e.target.value)}
+                      className="w-full px-3 py-2 text-sm rounded-md"
+                      style={{
+                        background: 'rgba(18,18,31,0.8)',
+                        border: '1px solid #1e1e30',
+                        color: '#ededf5',
+                        outline: 'none',
+                      }}
+                    />
+                  ) : (
+                    <p className="text-sm font-medium" style={{ color: '#ededf5' }}>
+                      {item.value}
+                    </p>
+                  )}
                 </div>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editedMemory[index].value}
-                    onChange={(e) => handleFieldChange(index, e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent"
-                  />
-                ) : (
-                  <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
-                    {item.value}
-                  </p>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {!confirmed && (
-            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-md">
-              <p className="text-xs text-blue-800 dark:text-blue-300">
-                💡 <strong>Tip:</strong> The agent will use this context to provide more personalized and relevant guidance.
-                Click "Edit" to modify any information before proceeding.
+            <div
+              className="mt-3 p-3 rounded-md"
+              style={{
+                background: 'rgba(79,110,247,0.08)',
+                border: '1px solid rgba(79,110,247,0.25)',
+              }}
+            >
+              <p className="text-xs" style={{ color: '#9090a8' }}>
+                💡 <strong style={{ color: '#ededf5' }}>Tip:</strong>{' '}
+                The agent will use this context to provide more personalized and relevant guidance.
+                Click &ldquo;Edit&rdquo; to modify any information before proceeding.
               </p>
             </div>
           )}

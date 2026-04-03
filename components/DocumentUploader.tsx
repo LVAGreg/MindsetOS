@@ -13,15 +13,31 @@ import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
 import { format } from 'date-fns';
 
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const T = {
+  bgPage:    '#09090f',
+  bgCard:    'rgba(18,18,31,0.8)',
+  bgRow:     'rgba(255,255,255,0.04)',
+  border:    '#1e1e30',
+  textPrimary: '#ededf5',
+  textMuted:   '#9090a8',
+  textDim:     '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  purple:    '#7c5bf6',
+  green:     '#22c55e',
+  red:       '#f87171',
+} as const;
+
 export default function DocumentUploader() {
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
-    {}
-  );
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [isUploading, setIsUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { documents, addDocument, updateDocument, currentAgent } =
-    useAppStore();
+  const { documents, addDocument, updateDocument, currentAgent } = useAppStore();
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -44,7 +60,6 @@ export default function DocumentUploader() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-
     const files = Array.from(e.dataTransfer.files);
     await handleFiles(files);
   };
@@ -57,14 +72,15 @@ export default function DocumentUploader() {
 
   const handleFiles = async (files: File[]) => {
     if (!currentAgent) {
-      alert('Please select an agent first');
+      setUploadError('Please select an agent first');
       return;
     }
 
     const agentId = MINDSET_AGENTS[currentAgent].id;
+    setIsUploading(true);
+    setUploadError(null);
 
     for (const file of files) {
-      // Validate file type
       const allowedTypes = [
         'application/pdf',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -73,25 +89,20 @@ export default function DocumentUploader() {
       ];
 
       if (!allowedTypes.includes(file.type)) {
-        alert(
-          `File type not supported: ${file.name}. Please upload PDF, DOCX, TXT, or MD files.`
-        );
+        setUploadError(`File type not supported: ${file.name}. Please upload PDF, DOCX, TXT, or MD files.`);
         continue;
       }
 
-      // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`File too large: ${file.name}. Maximum size is 10MB.`);
+        setUploadError(`File too large: ${file.name}. Maximum size is 10MB.`);
         continue;
       }
 
       try {
         setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
 
-        // Upload file
         const response = await apiClient.uploadDocument(file, agentId);
 
-        // Add to documents list
         addDocument({
           id: response.documentId,
           filename: file.name,
@@ -103,19 +114,19 @@ export default function DocumentUploader() {
         });
 
         setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
-
-        // Poll for processing status
         pollDocumentStatus(response.documentId);
       } catch (error) {
         console.error('Error uploading file:', error);
+        setUploadError(`Failed to upload ${file.name}. Please try again.`);
         setUploadProgress((prev) => {
-          const newProgress = { ...prev };
-          delete newProgress[file.name];
-          return newProgress;
+          const next = { ...prev };
+          delete next[file.name];
+          return next;
         });
-        alert(`Failed to upload ${file.name}`);
       }
     }
+
+    setIsUploading(false);
   };
 
   const pollDocumentStatus = async (documentId: string) => {
@@ -137,12 +148,14 @@ export default function DocumentUploader() {
         }
       } catch (error) {
         console.error('Error polling document status:', error);
+        setUploadError('Lost contact with server while processing document. Check status manually.');
         clearInterval(interval);
       }
     }, 2000);
   };
 
   const handleDeleteDocument = async (documentId: string) => {
+    setDeletingId(documentId);
     try {
       await apiClient.deleteDocument(documentId);
       useAppStore.setState((state) => ({
@@ -150,29 +163,78 @@ export default function DocumentUploader() {
       }));
     } catch (error) {
       console.error('Error deleting document:', error);
-      alert('Failed to delete document');
+      setUploadError('Failed to delete document. Please try again.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle style={{ width: 20, height: 20, color: T.green }} />;
       case 'failed':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle style={{ width: 20, height: 20, color: T.red }} />;
       case 'processing':
       case 'pending':
-        return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
+        return (
+          <Loader2
+            className="animate-spin"
+            style={{ width: 20, height: 20, color: T.blue }}
+          />
+        );
       default:
-        return <File className="w-5 h-5 text-gray-400" />;
+        return <File style={{ width: 20, height: 20, color: T.textDim }} />;
     }
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <div
+      style={{
+        padding: '1.5rem',
+        background: T.bgCard,
+        borderRadius: '0.5rem',
+        border: `1px solid ${T.border}`,
+      }}
+    >
+      <h3
+        style={{
+          fontSize: '1.125rem',
+          fontWeight: 600,
+          color: T.textPrimary,
+          marginBottom: '1rem',
+        }}
+      >
         Training Documents
       </h3>
+
+      {/* Error banner */}
+      {uploadError && (
+        <div
+          style={{
+            marginBottom: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '0.375rem',
+            background: 'rgba(248,113,113,0.1)',
+            border: `1px solid ${T.red}`,
+            color: T.red,
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+          }}
+        >
+          <span>{uploadError}</span>
+          <button
+            onClick={() => setUploadError(null)}
+            aria-label="Dismiss error"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.red, padding: 0 }}
+          >
+            <X style={{ width: 16, height: 16 }} />
+          </button>
+        </div>
+      )}
 
       {/* Upload area */}
       <div
@@ -180,23 +242,38 @@ export default function DocumentUploader() {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          isDragging
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-            : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
-        }`}
+        style={{
+          border: `2px dashed ${isDragging ? T.blue : T.border}`,
+          borderRadius: '0.5rem',
+          padding: '2rem',
+          textAlign: 'center',
+          background: isDragging ? 'rgba(79,110,247,0.08)' : 'transparent',
+          transition: 'border-color 0.2s, background 0.2s',
+        }}
       >
-        <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+        <Upload
+          style={{ width: 48, height: 48, margin: '0 auto 1rem', color: T.textDim, display: 'block' }}
+        />
+        <p style={{ fontSize: '0.875rem', color: T.textMuted, marginBottom: '0.5rem' }}>
           Drag and drop files here, or{' '}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="text-blue-600 hover:underline"
+            disabled={isUploading}
+            aria-label="Browse files to upload"
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: isUploading ? 'not-allowed' : 'pointer',
+              color: isUploading ? T.textDim : T.blue,
+              textDecoration: 'underline',
+              font: 'inherit',
+            }}
           >
             browse
           </button>
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-500">
+        <p style={{ fontSize: '0.75rem', color: T.textDim }}>
           Supported: PDF, DOCX, TXT, MD (Max 10MB)
         </p>
         <input
@@ -206,26 +283,60 @@ export default function DocumentUploader() {
           accept=".pdf,.docx,.txt,.md"
           onChange={handleFileSelect}
           className="hidden"
+          disabled={isUploading}
         />
       </div>
 
       {/* Upload progress */}
       {Object.keys(uploadProgress).length > 0 && (
-        <div className="mt-4 space-y-2">
+        <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {Object.entries(uploadProgress).map(([filename, progress]) => (
             <div
               key={filename}
-              className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '0.75rem',
+                background: T.bgRow,
+                borderRadius: '0.5rem',
+              }}
             >
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <Loader2
+                className="animate-spin"
+                style={{ width: 16, height: 16, color: T.blue, flexShrink: 0 }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: T.textPrimary,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {filename}
                 </p>
-                <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-1">
+                <div
+                  style={{
+                    width: '100%',
+                    background: T.border,
+                    borderRadius: '9999px',
+                    height: 6,
+                    marginTop: 4,
+                  }}
+                >
                   <div
-                    className="bg-blue-600 h-1.5 rounded-full transition-all"
-                    style={{ width: `${progress}%` }}
+                    style={{
+                      background: T.blue,
+                      height: 6,
+                      borderRadius: '9999px',
+                      transition: 'width 0.3s',
+                      width: `${progress}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -236,41 +347,97 @@ export default function DocumentUploader() {
 
       {/* Document list */}
       {documents.length > 0 && (
-        <div className="mt-6 space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div style={{ marginTop: '1.5rem' }}>
+          <h4
+            style={{
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              color: T.textMuted,
+              marginBottom: '0.5rem',
+            }}
+          >
             Uploaded Documents
           </h4>
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg group"
-            >
-              {getStatusIcon(doc.processingStatus)}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                  {doc.filename}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <span className="capitalize">{doc.processingStatus}</span>
-                  {doc.chunkCount > 0 && (
-                    <>
-                      <span>•</span>
-                      <span>{doc.chunkCount} chunks</span>
-                    </>
-                  )}
-                  <span>•</span>
-                  <span>{format(new Date(doc.createdAt), 'MMM d, yyyy')}</span>
-                </div>
-              </div>
-              <button
-                onClick={() => handleDeleteDocument(doc.id)}
-                className="opacity-0 group-hover:opacity-100 p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-opacity"
-                title="Delete document"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {documents.map((doc) => (
+              <div
+                key={doc.id}
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '0.75rem',
+                  background: T.bgRow,
+                  borderRadius: '0.5rem',
+                }}
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+                {getStatusIcon(doc.processingStatus)}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: T.textPrimary,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {doc.filename}
+                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.75rem',
+                      color: T.textDim,
+                    }}
+                  >
+                    <span style={{ textTransform: 'capitalize' }}>{doc.processingStatus}</span>
+                    {doc.chunkCount > 0 && (
+                      <>
+                        <span>•</span>
+                        <span>{doc.chunkCount} chunks</span>
+                      </>
+                    )}
+                    <span>•</span>
+                    <span>{format(new Date(doc.createdAt), 'MMM d, yyyy')}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDeleteDocument(doc.id)}
+                  disabled={deletingId === doc.id}
+                  aria-label={`Delete ${doc.filename}`}
+                  style={{
+                    padding: '0.5rem',
+                    background: 'none',
+                    border: 'none',
+                    cursor: deletingId === doc.id ? 'not-allowed' : 'pointer',
+                    color: T.red,
+                    borderRadius: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: deletingId === doc.id ? 0.4 : 1,
+                    transition: 'opacity 0.15s',
+                    flexShrink: 0,
+                  }}
+                >
+                  {deletingId === doc.id ? (
+                    <Loader2
+                      className="animate-spin"
+                      style={{ width: 16, height: 16 }}
+                    />
+                  ) : (
+                    <X style={{ width: 16, height: 16 }} />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

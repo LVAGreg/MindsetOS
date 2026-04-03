@@ -522,6 +522,7 @@ export default function VoiceChat({
       }
     } catch (err) {
       console.error('Error getting agent response:', err);
+      setError(err instanceof Error ? err.message : 'Failed to get agent response');
     } finally {
       setIsAgentSpeaking(false);
       setIsProcessing(false);
@@ -628,6 +629,7 @@ export default function VoiceChat({
         }
       } catch (err) {
         console.error('Error ending session:', err);
+        setError(err instanceof Error ? err.message : 'Failed to end session cleanly');
       }
     }
 
@@ -688,7 +690,7 @@ export default function VoiceChat({
               className="w-1 rounded-full transition-all duration-75"
               style={{
                 height: `${Math.max(baseHeight, Math.abs(height))}px`,
-                backgroundColor: isActive ? color : '#4B5563',
+                backgroundColor: isActive ? color : '#5a5a72',
                 opacity: isActive ? 0.8 + (level * 0.2) : 0.3,
               }}
             />
@@ -699,9 +701,12 @@ export default function VoiceChat({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0D1117]">
+    <div className="flex flex-col h-full" style={{ backgroundColor: '#09090f' }}>
       {/* Header bar - consistent with other agents */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/50 bg-[#0D1117]">
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: '1px solid #1e1e30', backgroundColor: '#09090f' }}
+      >
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -710,37 +715,41 @@ export default function VoiceChat({
             <span className="text-xl">{agentType === 'sales-roleplay-coach' ? '🎭' : '🎙️'}</span>
           </div>
           <div>
-            <h3 className="text-white font-semibold text-base">{agentName}</h3>
+            <h3 className="font-semibold text-base" style={{ color: '#ededf5' }}>{agentName}</h3>
             <div className="flex items-center gap-2">
               {sessionStatus === 'active' && (
                 <>
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#4f6ef7' }} />
                   <span className="text-xs font-medium" style={{ color: accentColor }}>
                     Live • {formatDuration(callDuration)}
                   </span>
                 </>
               )}
               {sessionStatus === 'idle' && (
-                <span className="text-xs text-gray-500">Voice Agent</span>
+                <span className="text-xs" style={{ color: '#5a5a72' }}>Voice Agent</span>
               )}
               {sessionStatus === 'connecting' && (
                 <>
                   <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
-                  <span className="text-xs text-gray-400">Connecting...</span>
+                  <span className="text-xs" style={{ color: '#9090a8' }}>Connecting...</span>
                 </>
               )}
               {sessionStatus === 'ending' && (
-                <span className="text-xs text-gray-400">Ending call...</span>
+                <span className="text-xs" style={{ color: '#9090a8' }}>Ending call...</span>
               )}
               {sessionStatus === 'ended' && (
-                <span className="text-xs text-gray-500">Call ended</span>
+                <span className="text-xs" style={{ color: '#5a5a72' }}>Call ended</span>
               )}
             </div>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="p-2 rounded-lg hover:bg-gray-800/50 text-gray-500 hover:text-gray-300 transition-colors"
+          aria-label="Close voice chat"
+          className="p-2 rounded-lg transition-colors"
+          style={{ color: '#5a5a72' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(30,30,48,0.5)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#5a5a72'; (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
         >
           <X className="w-5 h-5" />
         </button>
@@ -749,7 +758,7 @@ export default function VoiceChat({
       {/* Main content area */}
       <div className="flex-1 overflow-y-auto">
         {/* Pre-call: Start screen */}
-        {sessionStatus === 'idle' && (
+        {(sessionStatus as string) === 'idle' && (
           <div className="flex flex-col h-full p-6">
             {/* Welcome message */}
             <div className="flex-1 flex flex-col justify-center">
@@ -760,8 +769,8 @@ export default function VoiceChat({
                 >
                   <span className="text-xl">{agentType === 'sales-roleplay-coach' ? '🎭' : '🎙️'}</span>
                 </div>
-                <div className="bg-gray-800/60 rounded-2xl rounded-bl-md px-4 py-3 max-w-[85%]">
-                  <p className="text-sm text-gray-100 leading-relaxed">
+                <div className="rounded-2xl rounded-bl-md px-4 py-3 max-w-[85%]" style={{ backgroundColor: 'rgba(30,30,48,0.6)' }}>
+                  <p className="text-sm leading-relaxed" style={{ color: '#ededf5' }}>
                     {agentType === 'sales-roleplay-coach'
                       ? "Ready to practice your sales skills? I'll roleplay as different prospect types. Select a difficulty and hit start!"
                       : "I'm your live voice consultant. Start a call and we can talk through your offer, marketing, or sales challenges."}
@@ -774,18 +783,16 @@ export default function VoiceChat({
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-10 h-10 flex-shrink-0" /> {/* Spacer */}
                   <div>
-                    <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide">Prospect Difficulty</p>
-                    <div className="flex gap-2">
+                    <p className="text-xs mb-2 uppercase tracking-wide" style={{ color: '#5a5a72' }}>Prospect Difficulty</p>
+                    <div className="flex flex-wrap gap-2">
                       {(['kind', 'medium', 'hard_ass'] as const).map((level) => (
                         <button
                           key={level}
                           onClick={() => setDifficulty(level)}
-                          className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                            difficulty === level
-                              ? 'text-white shadow-lg'
-                              : 'bg-gray-800/60 text-gray-300 hover:bg-gray-700'
-                          }`}
-                          style={difficulty === level ? { backgroundColor: accentColor } : {}}
+                          className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                          style={difficulty === level
+                            ? { backgroundColor: accentColor, color: '#ededf5' }
+                            : { backgroundColor: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
                         >
                           {level === 'kind' ? '😊 Easy' : level === 'medium' ? '😐 Medium' : '😤 Hard'}
                         </button>
@@ -800,10 +807,11 @@ export default function VoiceChat({
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-10 h-10 flex-shrink-0" /> {/* Spacer */}
                   <div className="relative">
-                    <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide">Microphone</p>
+                    <p className="text-xs mb-2 uppercase tracking-wide" style={{ color: '#5a5a72' }}>Microphone</p>
                     <button
                       onClick={() => setShowDeviceSelector(!showDeviceSelector)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-800/60 text-gray-300 hover:bg-gray-700 transition-all min-w-[200px]"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all min-w-[200px]"
+                      style={{ backgroundColor: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
                     >
                       <Mic className="w-4 h-4" />
                       <span className="flex-1 text-left text-sm truncate max-w-[180px]">
@@ -812,7 +820,7 @@ export default function VoiceChat({
                       <ChevronDown className={`w-4 h-4 transition-transform ${showDeviceSelector ? 'rotate-180' : ''}`} />
                     </button>
                     {showDeviceSelector && (
-                      <div className="absolute top-full left-0 mt-1 w-full bg-gray-800 rounded-xl border border-gray-700 shadow-xl z-10 overflow-hidden">
+                      <div className="absolute top-full left-0 mt-1 w-full rounded-xl shadow-xl z-10 overflow-hidden" style={{ backgroundColor: '#12121f', border: '1px solid #1e1e30' }}>
                         {audioDevices.map((device) => (
                           <button
                             key={device.deviceId}
@@ -820,9 +828,10 @@ export default function VoiceChat({
                               setSelectedDeviceId(device.deviceId);
                               setShowDeviceSelector(false);
                             }}
-                            className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-700 transition-colors ${
-                              selectedDeviceId === device.deviceId ? 'bg-gray-700/50 text-white' : 'text-gray-300'
-                            }`}
+                            className="w-full px-4 py-2.5 text-left text-sm transition-colors"
+                            style={selectedDeviceId === device.deviceId
+                              ? { backgroundColor: 'rgba(30,30,48,0.5)', color: '#ededf5' }
+                              : { color: '#9090a8' }}
                           >
                             <span className="truncate block">{device.label}</span>
                           </button>
@@ -835,17 +844,30 @@ export default function VoiceChat({
             </div>
 
             {/* Start call button - at bottom like chat input */}
-            <div className="pt-4 border-t border-gray-800/50">
+            <div className="pt-4" style={{ borderTop: '1px solid #1e1e30' }}>
               <button
                 onClick={startSession}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-medium transition-all hover:opacity-90"
-                style={{ backgroundColor: accentColor }}
+                disabled={sessionStatus === 'connecting'}
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-medium transition-all hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: accentColor, color: '#ededf5' }}
               >
-                <Phone className="w-5 h-5" />
-                Start Voice Call
+                {sessionStatus === 'connecting' ? (
+                  <>
+                    <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <Phone className="w-5 h-5" />
+                    Start Voice Call
+                  </>
+                )}
               </button>
               {error && (
-                <p className="mt-3 text-red-400 text-sm text-center">{error}</p>
+                <p className="mt-3 text-sm text-center" style={{ color: '#fcc824' }}>{error}</p>
               )}
             </div>
           </div>
@@ -901,7 +923,7 @@ export default function VoiceChat({
                     className="w-2.5 rounded-full transition-all duration-75"
                     style={{
                       height: `${height}px`,
-                      backgroundColor: isAgentSpeaking ? accentColor : isUserSpeaking ? '#60A5FA' : '#4B5563',
+                      backgroundColor: isAgentSpeaking ? accentColor : isUserSpeaking ? '#4f6ef7' : '#5a5a72',
                       opacity: isAgentSpeaking || isUserSpeaking ? 0.9 : 0.3,
                       transform: `scaleY(${isUserSpeaking && bin > 0.3 ? 1.1 : 1})`,
                     }}
@@ -911,13 +933,13 @@ export default function VoiceChat({
             </div>
 
             {/* Status text */}
-            <p className="text-gray-400 text-sm">
+            <p className="text-sm" style={{ color: '#9090a8' }}>
               {processingStep === 'transcribing' ? '📝 Processing your voice...' :
                processingStep === 'thinking' ? '🤔 Thinking...' :
                processingStep === 'speaking' || isAgentSpeaking ? `${agentName} is speaking...` :
                isUserSpeaking ? 'Listening to you...' : 'Speak anytime...'}
             </p>
-            <p className="text-gray-600 text-xs mt-2">
+            <p className="text-xs mt-2" style={{ color: '#5a5a72' }}>
               {formatDuration(callDuration)}
             </p>
           </div>
@@ -925,8 +947,8 @@ export default function VoiceChat({
 
         {/* Post-call: Show transcript */}
         {sessionStatus === 'ended' && transcript.length > 0 && (
-          <div className="p-4 space-y-3 max-h-64 overflow-y-auto border-b border-gray-800">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Call Transcript</p>
+          <div className="p-4 space-y-3 max-h-64 overflow-y-auto" style={{ borderBottom: '1px solid #1e1e30' }}>
+            <p className="text-xs uppercase tracking-wide mb-2" style={{ color: '#5a5a72' }}>Call Transcript</p>
             {transcript.map((msg, idx) => (
               <div
                 key={idx}
@@ -942,13 +964,13 @@ export default function VoiceChat({
                 )}
                 <div
                   className={`max-w-[80%] rounded-xl px-3 py-2 ${
-                    msg.role === 'user'
-                      ? 'rounded-br-sm'
-                      : 'bg-gray-800/60 text-gray-300 rounded-bl-sm'
+                    msg.role === 'user' ? 'rounded-br-sm' : 'rounded-bl-sm'
                   }`}
-                  style={msg.role === 'user' ? { backgroundColor: `${accentColor}80` } : {}}
+                  style={msg.role === 'user'
+                    ? { backgroundColor: `${accentColor}80` }
+                    : { backgroundColor: 'rgba(30,30,48,0.6)', color: '#9090a8' }}
                 >
-                  <p className="text-xs leading-relaxed text-white">{msg.content}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: '#ededf5' }}>{msg.content}</p>
                 </div>
               </div>
             ))}
@@ -958,9 +980,9 @@ export default function VoiceChat({
 
         {/* Post-call: Results */}
         {sessionStatus === 'ended' && score !== null && (
-          <div className="p-6 border-t border-gray-800">
+          <div className="p-6" style={{ borderTop: '1px solid #1e1e30' }}>
             <div className="text-center mb-4">
-              <p className="text-gray-400 text-sm">Your Score</p>
+              <p className="text-sm" style={{ color: '#9090a8' }}>Your Score</p>
               <p className="text-4xl font-bold" style={{ color: accentColor }}>{score}/100</p>
             </div>
 
@@ -968,16 +990,16 @@ export default function VoiceChat({
               <div className="space-y-4">
                 {feedback.strengths.length > 0 && (
                   <div>
-                    <p className="text-green-400 text-sm font-medium mb-2">Strengths</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
+                    <p className="text-sm font-medium mb-2" style={{ color: '#4f6ef7' }}>Strengths</p>
+                    <ul className="text-sm space-y-1" style={{ color: '#9090a8' }}>
                       {feedback.strengths.map((s, i) => <li key={i}>• {s}</li>)}
                     </ul>
                   </div>
                 )}
                 {feedback.improvements.length > 0 && (
                   <div>
-                    <p className="text-yellow-400 text-sm font-medium mb-2">Areas to Improve</p>
-                    <ul className="text-gray-300 text-sm space-y-1">
+                    <p className="text-sm font-medium mb-2" style={{ color: '#fcc824' }}>Areas to Improve</p>
+                    <ul className="text-sm space-y-1" style={{ color: '#9090a8' }}>
                       {feedback.improvements.map((s, i) => <li key={i}>• {s}</li>)}
                     </ul>
                   </div>
@@ -989,36 +1011,37 @@ export default function VoiceChat({
       </div>
 
       {/* Bottom controls - Chat-style input with voice controls */}
-      <div className="border-t border-gray-800 bg-[#161B22]">
+      <div style={{ borderTop: '1px solid #1e1e30', backgroundColor: 'rgba(18,18,31,0.8)' }}>
         {sessionStatus === 'active' && (
           <div className="p-4">
             {/* Simplified voice controls - no text input */}
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className={`p-4 rounded-full transition-all ${
-                  isMuted
-                    ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500/50'
-                    : 'text-white hover:opacity-80'
-                }`}
-                style={!isMuted ? { backgroundColor: accentColor } : {}}
-                title={isMuted ? 'Unmute mic' : 'Mute mic'}
+                aria-label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+                className="p-4 rounded-full transition-all"
+                style={isMuted
+                  ? { backgroundColor: 'rgba(124,91,246,0.2)', color: '#7c5bf6', outline: '2px solid rgba(124,91,246,0.5)' }
+                  : { backgroundColor: accentColor, color: '#ededf5' }}
               >
                 {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
               </button>
               <button
                 onClick={endSession}
-                className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all"
-                title="End call"
+                disabled={sessionStatus === 'ending' as any}
+                aria-label="End call"
+                className="p-4 rounded-full transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#7c5bf6', color: '#ededf5' }}
               >
                 <PhoneOff className="w-6 h-6" />
               </button>
               <button
                 onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-                className={`p-4 rounded-full transition-all ${
-                  !isSpeakerOn ? 'bg-gray-700 text-gray-400' : 'bg-gray-800 text-white hover:bg-gray-700'
-                }`}
-                title={isSpeakerOn ? 'Mute speaker' : 'Unmute speaker'}
+                aria-label={isSpeakerOn ? 'Mute speaker' : 'Unmute speaker'}
+                className="p-4 rounded-full transition-all"
+                style={!isSpeakerOn
+                  ? { backgroundColor: '#1e1e30', color: '#5a5a72' }
+                  : { backgroundColor: '#12121f', color: '#ededf5' }}
               >
                 {isSpeakerOn ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
               </button>
@@ -1027,7 +1050,7 @@ export default function VoiceChat({
         )}
 
         {sessionStatus === 'ended' && (
-          <div className="p-4 flex items-center justify-center gap-3">
+          <div className="p-4 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
                 setSessionStatus('idle');
@@ -1036,14 +1059,15 @@ export default function VoiceChat({
                 setFeedback(null);
                 setCallDuration(0);
               }}
-              className="px-6 py-3 rounded-xl text-white font-medium transition-all hover:opacity-90"
-              style={{ backgroundColor: accentColor }}
+              className="px-6 py-3 rounded-xl font-medium transition-all hover:opacity-90"
+              style={{ backgroundColor: accentColor, color: '#ededf5' }}
             >
               New Call
             </button>
             <button
               onClick={onClose}
-              className="px-6 py-3 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 transition-all"
+              className="px-6 py-3 rounded-xl transition-all"
+              style={{ backgroundColor: '#1e1e30', color: '#9090a8' }}
             >
               Close
             </button>
@@ -1052,7 +1076,7 @@ export default function VoiceChat({
 
         {sessionStatus === 'connecting' && (
           <div className="p-4 flex items-center justify-center">
-            <div className="flex items-center gap-2 text-gray-400">
+            <div className="flex items-center gap-2" style={{ color: '#9090a8' }}>
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
               <span>Connecting to {agentName}...</span>
             </div>

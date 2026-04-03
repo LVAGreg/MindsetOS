@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Search, MessageSquare, Calendar, User, Filter, Folder, BookOpen, FileText, Star, Trash2 } from 'lucide-react';
+import { X, Search, MessageSquare, Calendar, Filter, Folder, BookOpen, FileText, Star, Trash2 } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS, Conversation } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 import { fetchArtifacts, deleteArtifact } from '@/lib/api-client';
@@ -20,6 +20,7 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
   const [activeTab, setActiveTab] = useState<'conversations' | 'playbook'>('conversations');
   const [plays, setPlays] = useState<any[]>([]);
   const [playsLoading, setPlaysLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const { conversations, currentConversationId, projects } = useAppStore();
   const setCurrentArtifact = useAppStore(s => s.setCurrentArtifact);
   const setCanvasContent = useAppStore(s => s.setCanvasContent);
@@ -67,10 +68,13 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
 
   const removePlay = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    setDeleteError(null);
     try {
       await deleteArtifact(id);
       setPlays(prev => prev.filter(p => p.id !== id));
-    } catch {}
+    } catch (err) {
+      setDeleteError('Failed to delete play. Please try again.');
+    }
   };
 
   // Convert conversations object to array and sort by most recent
@@ -176,7 +180,7 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
       name: 'Unknown Agent',
       icon: '❓',
       description: '',
-      color: 'bg-gray-500',
+      color: '#5a5a72',
       starterPrompts: []
     };
   };
@@ -218,108 +222,120 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div
+          className="rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col"
+          style={{ background: 'rgba(18,18,31,0.98)', border: '1px solid #1e1e30' }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 pb-0 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className="flex items-center justify-between p-6 pb-0"
+            style={{ borderBottom: '1px solid #1e1e30' }}
+          >
             <div className="flex-1">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                   Search
                 </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: '#9090a8' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                   aria-label="Close"
                 >
-                  <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
               {/* Tabs */}
               <div className="flex gap-1">
                 <button
                   onClick={() => setActiveTab('conversations')}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
-                    activeTab === 'conversations'
-                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-b-0 border-gray-200 dark:border-gray-700'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors"
+                  style={activeTab === 'conversations'
+                    ? { background: 'rgba(18,18,31,0.98)', color: '#ededf5', border: '1px solid #1e1e30', borderBottom: 'none' }
+                    : { color: '#9090a8' }}
                 >
                   <MessageSquare className="w-4 h-4" />
                   Conversations
-                  <span className="text-xs text-gray-400">({filteredConversations.length})</span>
+                  <span className="text-xs" style={{ color: '#5a5a72' }}>({filteredConversations.length})</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('playbook')}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
-                    activeTab === 'playbook'
-                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-b-0 border-gray-200 dark:border-gray-700'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors"
+                  style={activeTab === 'playbook'
+                    ? { background: 'rgba(18,18,31,0.98)', color: '#ededf5', border: '1px solid #1e1e30', borderBottom: 'none' }
+                    : { color: '#9090a8' }}
                 >
                   <BookOpen className="w-4 h-4" />
                   Playbook
-                  <span className="text-xs text-gray-400">({filteredPlays.length})</span>
+                  <span className="text-xs" style={{ color: '#5a5a72' }}>({filteredPlays.length})</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Search and Filters */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 space-y-4">
+          <div className="p-6 space-y-4" style={{ borderBottom: '1px solid #1e1e30' }}>
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#9090a8' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={activeTab === 'conversations' ? 'Search conversations, messages, or agents...' : 'Search your saved plays...'}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                className="w-full pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2"
+                style={{
+                  background: '#09090f',
+                  border: '1px solid #1e1e30',
+                  color: '#ededf5',
+                  '--tw-ring-color': '#4f6ef7',
+                } as React.CSSProperties}
               />
             </div>
 
             {/* Agent Filters — conversations tab only */}
-            {activeTab === 'conversations' && <div className="flex items-center gap-2 overflow-x-auto pb-2">
-              <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">Agent:</span>
-              <button
-                onClick={() => setSelectedAgent(null)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
-                  selectedAgent === null
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-500 dark:border-blue-400'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                All
-              </button>
-              {agentsWithConversations.map((agent) => (
+            {activeTab === 'conversations' && (
+              <div className="flex items-center gap-2 flex-wrap pb-2">
+                <Filter className="w-4 h-4 flex-shrink-0" style={{ color: '#9090a8' }} />
+                <span className="text-xs font-medium flex-shrink-0" style={{ color: '#9090a8' }}>Agent:</span>
                 <button
-                  key={agent.id}
-                  onClick={() => setSelectedAgent(agent.id)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                    selectedAgent === agent.id
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-500 dark:border-blue-400'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                  onClick={() => setSelectedAgent(null)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
+                  style={selectedAgent === null
+                    ? { background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '2px solid #4f6ef7' }
+                    : { background: 'rgba(255,255,255,0.05)', color: '#9090a8', border: '2px solid transparent' }}
                 >
-                  <AgentIcon agentId={agent.id} className="w-4 h-4" />
-                  <span>{agent.name}</span>
+                  All
                 </button>
-              ))}
-            </div>}
+                {agentsWithConversations.map((agent) => (
+                  <button
+                    key={agent.id}
+                    onClick={() => setSelectedAgent(agent.id)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5"
+                    style={selectedAgent === agent.id
+                      ? { background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '2px solid #4f6ef7' }
+                      : { background: 'rgba(255,255,255,0.05)', color: '#9090a8', border: '2px solid transparent' }}
+                  >
+                    <AgentIcon agentId={agent.id} className="w-4 h-4" />
+                    <span>{agent.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Project Filters — conversations tab only */}
             {activeTab === 'conversations' && projectsWithConversations.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                <Folder className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 flex-shrink-0">Project:</span>
+              <div className="flex items-center gap-2 flex-wrap pb-2">
+                <Folder className="w-4 h-4 flex-shrink-0" style={{ color: '#9090a8' }} />
+                <span className="text-xs font-medium flex-shrink-0" style={{ color: '#9090a8' }}>Project:</span>
                 <button
                   onClick={() => setSelectedProject(null)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
-                    selectedProject === null
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-2 border-purple-500 dark:border-purple-400'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap"
+                  style={selectedProject === null
+                    ? { background: 'rgba(124,91,246,0.15)', color: '#7c5bf6', border: '2px solid #7c5bf6' }
+                    : { background: 'rgba(255,255,255,0.05)', color: '#9090a8', border: '2px solid transparent' }}
                 >
                   All
                 </button>
@@ -327,14 +343,11 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                   <button
                     key={project.id}
                     onClick={() => setSelectedProject(project.id)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                      selectedProject === project.id
-                        ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-2 border-purple-500 dark:border-purple-400'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5"
                     style={{
-                      borderColor: selectedProject === project.id ? project.color : undefined,
-                      backgroundColor: selectedProject === project.id ? `${project.color}20` : undefined,
+                      border: `2px solid ${selectedProject === project.id ? project.color : 'transparent'}`,
+                      backgroundColor: selectedProject === project.id ? `${project.color}25` : 'rgba(255,255,255,0.05)',
+                      color: selectedProject === project.id ? project.color : '#9090a8',
                     }}
                   >
                     <span>{project.name}</span>
@@ -351,11 +364,11 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
               <>
                 {filteredConversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <MessageSquare className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <MessageSquare className="w-16 h-16 mb-4" style={{ color: '#5a5a72' }} />
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>
                       No conversations found
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: '#9090a8' }}>
                       {searchQuery ? 'Try adjusting your search or filters' : 'Start a conversation with an agent to see it here'}
                     </p>
                   </div>
@@ -370,21 +383,20 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                         <button
                           key={conv.id}
                           onClick={() => handleSelectConversation(conv.id)}
-                          className={`w-full text-left p-2 rounded-lg border-2 transition-all hover:shadow-md ${
-                            isActive
-                              ? 'bg-yellow-50 dark:bg-yellow-900/20 border-[#ffc82c]'
-                              : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900'
-                          }`}
+                          className="w-full text-left p-2 rounded-lg border-2 transition-all hover:shadow-md"
+                          style={isActive
+                            ? { background: 'rgba(252,200,36,0.08)', borderColor: '#fcc824' }
+                            : { background: 'rgba(255,255,255,0.03)', borderColor: '#1e1e30' }}
                         >
                           <div className="flex items-start gap-2">
-                            <AgentIcon agentId={agent.id} className="w-6 h-6 text-gray-700 dark:text-gray-300 flex-shrink-0" />
+                            <AgentIcon agentId={agent.id} className="w-6 h-6 flex-shrink-0" style={{ color: '#9090a8' } as React.CSSProperties} />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                                <span className="font-semibold text-xs text-gray-900 dark:text-white">
+                                <span className="font-semibold text-xs" style={{ color: '#ededf5' }}>
                                   {agent.name}
                                 </span>
                                 {isActive && (
-                                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-yellow-500 text-black rounded">
+                                  <span className="px-1.5 py-0.5 text-[10px] font-medium rounded" style={{ background: '#fcc824', color: '#09090f' }}>
                                     Active
                                   </span>
                                 )}
@@ -395,6 +407,7 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                                       backgroundColor: `${project.color}20`,
                                       color: project.color,
                                       borderWidth: '1px',
+                                      borderStyle: 'solid',
                                       borderColor: project.color,
                                     }}
                                   >
@@ -403,10 +416,10 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-gray-700 dark:text-gray-300 mb-1 line-clamp-1">
+                              <p className="text-[10px] mb-1 line-clamp-1" style={{ color: '#9090a8' }}>
                                 {getMessagePreview(conv)}
                               </p>
-                              <div className="flex items-center gap-3 text-[10px] text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-3 text-[10px]" style={{ color: '#5a5a72' }}>
                                 <div className="flex items-center gap-0.5">
                                   <MessageSquare className="w-3 h-3" />
                                   <span>{conv.messageCount || Object.keys(conv.history?.messages || {}).length || 0} msgs</span>
@@ -429,18 +442,26 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
             {/* Playbook Tab */}
             {activeTab === 'playbook' && (
               <>
+                {deleteError && (
+                  <div
+                    className="mb-3 px-4 py-2 rounded-lg text-sm"
+                    style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}
+                  >
+                    {deleteError}
+                  </div>
+                )}
                 {playsLoading ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="w-8 h-8 border-2 border-[#fcc824] border-t-transparent rounded-full animate-spin mb-4" />
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Loading your plays...</p>
+                    <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: '#fcc824', borderTopColor: 'transparent' }} />
+                    <p className="text-sm" style={{ color: '#9090a8' }}>Loading your plays...</p>
                   </div>
                 ) : filteredPlays.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <BookOpen className="w-16 h-16 mb-4" style={{ color: '#5a5a72' }} />
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>
                       {searchQuery ? 'No plays match your search' : 'No plays saved yet'}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm" style={{ color: '#9090a8' }}>
                       {searchQuery ? 'Try a different search term' : 'Use "Save as Play" on any agent response to build your Playbook'}
                     </p>
                   </div>
@@ -450,33 +471,40 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                       <button
                         key={play.id}
                         onClick={() => openPlay(play)}
-                        className="w-full text-left p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 hover:shadow-md transition-all group"
+                        className="w-full text-left p-3 rounded-lg border-2 hover:shadow-md transition-all group"
+                        style={{ background: 'rgba(255,255,255,0.03)', borderColor: '#1e1e30' }}
                       >
                         <div className="flex items-start gap-3">
-                          <FileText className="w-5 h-5 text-[#fcc824] flex-shrink-0 mt-0.5" />
+                          <FileText className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#fcc824' }} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                              <span className="font-semibold text-sm truncate" style={{ color: '#ededf5' }}>
                                 {play.title || 'Untitled Play'}
                               </span>
                               {play.is_starred && (
-                                <Star className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" fill="currentColor" />
+                                <Star className="w-3.5 h-3.5 flex-shrink-0" fill="#fcc824" style={{ color: '#fcc824' }} />
                               )}
-                              <span className="ml-auto px-2 py-0.5 text-[10px] font-medium bg-amber-50 dark:bg-amber-900/20 text-[#fcc824] rounded capitalize flex-shrink-0">
+                              <span
+                                className="ml-auto px-2 py-0.5 text-[10px] font-medium rounded capitalize flex-shrink-0"
+                                style={{ background: 'rgba(252,200,36,0.12)', color: '#fcc824' }}
+                              >
                                 {play.type}
                               </span>
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                            <p className="text-xs line-clamp-2" style={{ color: '#9090a8' }}>
                               {play.content?.replace(/[#*_`]/g, '').substring(0, 150)}
                             </p>
-                            <div className="flex items-center gap-3 mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+                            <div className="flex items-center gap-3 mt-1.5 text-[10px]" style={{ color: '#5a5a72' }}>
                               <span>{new Date(play.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                             </div>
                           </div>
                           <button
                             onClick={(e) => removePlay(e, play.id)}
-                            className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-500 text-gray-400 transition-all flex-shrink-0"
-                            title="Delete play"
+                            className="opacity-0 group-hover:opacity-100 p-1 transition-all flex-shrink-0"
+                            style={{ color: '#9090a8' }}
+                            aria-label="Delete play"
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -490,12 +518,18 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-b-xl">
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>💡 Tip: Use the search bar to find specific conversations</span>
+          <div
+            className="p-4 rounded-b-xl"
+            style={{ borderTop: '1px solid #1e1e30', background: 'rgba(9,9,15,0.6)' }}
+          >
+            <div className="flex items-center justify-between text-xs" style={{ color: '#9090a8' }}>
+              <span>Tip: Use the search bar to find specific conversations</span>
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{ background: 'rgba(255,255,255,0.07)', color: '#9090a8' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
               >
                 Close
               </button>

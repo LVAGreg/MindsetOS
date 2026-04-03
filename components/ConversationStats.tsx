@@ -22,6 +22,7 @@ interface ConversationAnalytics {
 export default function ConversationStats({ conversationId }: ConversationStatsProps) {
   const [analytics, setAnalytics] = useState<ConversationAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
@@ -45,14 +46,15 @@ export default function ConversationStats({ conversationId }: ConversationStatsP
         const data = await response.json();
         setAnalytics(data);
       }
-    } catch (error) {
-      console.error('Failed to fetch conversation analytics:', error);
+    } catch (err) {
+      console.error('Failed to fetch conversation analytics:', err);
+      setError('Failed to load conversation stats');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading || !analytics || Number(analytics.stats.total_messages) === 0) {
+  if (loading || error || !analytics || Number(analytics.stats.total_messages) === 0) {
     return null;
   }
 
@@ -68,64 +70,82 @@ export default function ConversationStats({ conversationId }: ConversationStatsP
 
   return (
     <div className="mx-6 mt-4 mb-2">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden">
+      <div
+        style={{
+          background: 'rgba(18,18,31,0.8)',
+          border: '1px solid #1e1e30',
+          borderRadius: '0.5rem',
+          overflow: 'hidden',
+        }}
+      >
         {/* Collapsed Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors"
+          aria-label={isExpanded ? 'Collapse conversation stats' : 'Expand conversation stats'}
+          className="w-full px-4 py-3 flex items-center justify-between transition-colors"
+          style={{ background: 'transparent' }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.background = 'transparent';
+          }}
         >
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Zap className="w-4 h-4" style={{ color: '#fcc824' }} />
+              <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                 {formatNumber(Number(analytics.stats.total_tokens))} tokens
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <DollarSign className="w-4 h-4" style={{ color: '#4f6ef7' }} />
+              <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                 {formatCost(Number(analytics.stats.total_cost))}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <MessageSquare className="w-4 h-4" style={{ color: '#7c5bf6' }} />
+              <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
                 {analytics.stats.total_messages} msgs
               </span>
             </div>
           </div>
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <ChevronUp className="w-4 h-4" style={{ color: '#9090a8' }} />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="w-4 h-4" style={{ color: '#9090a8' }} />
           )}
         </button>
 
         {/* Expanded Details */}
         {isExpanded && (
-          <div className="px-4 pb-4 border-t border-blue-200 dark:border-blue-800 pt-3">
+          <div
+            className="px-4 pb-4 pt-3"
+            style={{ borderTop: '1px solid #1e1e30' }}
+          >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Input Tokens</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                <div className="text-xs mb-1" style={{ color: '#9090a8' }}>Input Tokens</div>
+                <div className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                   {formatNumber(Number(analytics.stats.total_input_tokens))}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Output Tokens</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                <div className="text-xs mb-1" style={{ color: '#9090a8' }}>Output Tokens</div>
+                <div className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                   {formatNumber(Number(analytics.stats.total_output_tokens))}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Total Cost</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                <div className="text-xs mb-1" style={{ color: '#9090a8' }}>Total Cost</div>
+                <div className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                   {formatCost(Number(analytics.stats.total_cost))}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Avg Latency</div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                <div className="text-xs mb-1" style={{ color: '#9090a8' }}>Avg Latency</div>
+                <div className="text-sm font-semibold" style={{ color: '#ededf5' }}>
                   {Number(analytics.stats.avg_latency_ms).toFixed(0)}ms
                 </div>
               </div>

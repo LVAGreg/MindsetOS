@@ -15,6 +15,27 @@ interface BrandVoiceSetupProps {
   onComplete?: () => void;
 }
 
+// ── Design tokens ─────────────────────────────────────────────────────────────
+const T = {
+  pageBg:    '#09090f',
+  cardBg:    'rgba(18,18,31,0.8)',
+  border:    '#1e1e30',
+  textPri:   '#ededf5',
+  textMuted: '#9090a8',
+  textDim:   '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  purple:    '#7c5bf6',
+  // status surfaces
+  errorBg:   'rgba(220,38,38,0.12)',
+  errorBorder:'rgba(220,38,38,0.35)',
+  successBg:  'rgba(34,197,94,0.12)',
+  successBorder:'rgba(34,197,94,0.35)',
+  infoBg:    'rgba(79,110,247,0.1)',
+  infoBorder:'rgba(79,110,247,0.3)',
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function BrandVoiceSetup({ onComplete }: BrandVoiceSetupProps) {
   const [documentType, setDocumentType] = useState<string>('website_copy');
   const [content, setContent] = useState('');
@@ -86,7 +107,7 @@ export default function BrandVoiceSetup({ onComplete }: BrandVoiceSetupProps) {
     setSuccess(null);
 
     try {
-      const response = await apiClient.post('/api/brand-voice/analyze');
+      await apiClient.post('/api/brand-voice/analyze');
 
       setSuccess('Brand voice analysis completed successfully!');
 
@@ -105,171 +126,330 @@ export default function BrandVoiceSetup({ onComplete }: BrandVoiceSetupProps) {
   const canUpload = wordCount >= 50;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-8 w-8" />
-          <h2 className="text-2xl font-bold">Brand Voice Setup</h2>
+    <div style={{ maxWidth: '56rem', margin: '0 auto', padding: '1.5rem' }}>
+
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: `linear-gradient(to right, ${T.purple}, ${T.blue})`,
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          color: T.textPri,
+          marginBottom: '1.5rem',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <Sparkles style={{ width: '2rem', height: '2rem' }} />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Brand Voice Setup</h2>
         </div>
-        <p className="text-purple-100">
+        <p style={{ color: 'rgba(237,237,245,0.75)', margin: 0 }}>
           Upload samples of your writing to create a personalized brand voice profile.
           We'll analyze your style and apply it to all AI-generated content.
         </p>
       </div>
 
-      {/* Status Messages */}
+      {/* ── Status: error ───────────────────────────────────────────────────── */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-red-900">Error</p>
-            <p className="text-sm text-red-700">{error}</p>
+        <div
+          style={{
+            background: T.errorBg,
+            border: `1px solid ${T.errorBorder}`,
+            borderRadius: '0.5rem',
+            padding: '1rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <AlertCircle style={{ width: '1.25rem', height: '1.25rem', color: '#f87171', flexShrink: 0, marginTop: '0.125rem' }} />
+          <div>
+            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fca5a5', margin: '0 0 0.25rem' }}>Error</p>
+            <p style={{ fontSize: '0.875rem', color: '#fca5a5', margin: 0 }}>{error}</p>
           </div>
         </div>
       )}
 
+      {/* ── Status: success ─────────────────────────────────────────────────── */}
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-green-900">Success</p>
-            <p className="text-sm text-green-700">{success}</p>
+        <div
+          style={{
+            background: T.successBg,
+            border: `1px solid ${T.successBorder}`,
+            borderRadius: '0.5rem',
+            padding: '1rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <CheckCircle style={{ width: '1.25rem', height: '1.25rem', color: '#4ade80', flexShrink: 0, marginTop: '0.125rem' }} />
+          <div>
+            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#86efac', margin: '0 0 0.25rem' }}>Success</p>
+            <p style={{ fontSize: '0.875rem', color: '#86efac', margin: 0 }}>{success}</p>
           </div>
         </div>
       )}
 
-      {/* Upload Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Upload className="h-5 w-5" />
+      {/* ── Upload form ─────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: T.cardBg,
+          borderRadius: '0.75rem',
+          border: `1px solid ${T.border}`,
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+        }}
+      >
+        <h3
+          style={{
+            fontSize: '1.125rem',
+            fontWeight: 600,
+            color: T.textPri,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            marginTop: 0,
+            marginBottom: '1rem',
+          }}
+        >
+          <Upload style={{ width: '1.25rem', height: '1.25rem' }} />
           Upload Writing Sample
         </h3>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        {/* Document type selector */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: T.textMuted, marginBottom: '0.5rem' }}>
             Document Type
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {documentTypes.map((type) => (
-              <button
-                key={type.value}
-                onClick={() => setDocumentType(type.value)}
-                className={`p-3 rounded-lg border-2 transition-all ${
-                  documentType === type.value
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className="text-2xl mb-1">{type.icon}</div>
-                <div className="text-sm font-medium text-gray-900">{type.label}</div>
-              </button>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+            {documentTypes.map((type) => {
+              const active = documentType === type.value;
+              return (
+                <button
+                  key={type.value}
+                  onClick={() => setDocumentType(type.value)}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
+                    border: `2px solid ${active ? T.purple : T.border}`,
+                    background: active ? 'rgba(124,91,246,0.15)' : 'transparent',
+                    color: T.textPri,
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    transition: 'border-color 0.15s, background 0.15s',
+                  }}
+                >
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{type.icon}</div>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{type.label}</div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        {/* Textarea */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: T.textMuted, marginBottom: '0.5rem' }}>
             Content (minimum 50 words recommended)
           </label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Paste your writing sample here... This could be website copy, an email you sent, a social media post, or a transcript of your speaking."
-            className="w-full h-64 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+            style={{
+              width: '100%',
+              height: '16rem',
+              padding: '0.75rem 1rem',
+              border: `1px solid ${T.border}`,
+              borderRadius: '0.5rem',
+              background: 'rgba(9,9,15,0.6)',
+              color: T.textPri,
+              fontSize: '0.875rem',
+              resize: 'none',
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
           />
-          <div className="flex items-center justify-between mt-2">
-            <span className={`text-sm ${canUpload ? 'text-green-600' : 'text-gray-500'}`}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+            <span style={{ fontSize: '0.875rem', color: canUpload ? '#4ade80' : T.textDim }}>
               {wordCount} words {canUpload ? '✓' : '(need at least 50)'}
             </span>
           </div>
         </div>
 
+        {/* Upload button */}
         <button
           onClick={handleUpload}
           disabled={uploading || !canUpload}
-          className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          style={{
+            width: '100%',
+            background: uploading || !canUpload ? 'rgba(90,90,114,0.4)' : T.blue,
+            color: uploading || !canUpload ? T.textDim : '#fff',
+            padding: '0.75rem 1.5rem',
+            borderRadius: '0.5rem',
+            fontWeight: 600,
+            border: 'none',
+            cursor: uploading || !canUpload ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            transition: 'background 0.15s',
+          }}
         >
           {uploading ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 style={{ width: '1.25rem', height: '1.25rem' }} className="animate-spin" />
               Uploading...
             </>
           ) : (
             <>
-              <Plus className="h-5 w-5" />
+              <Plus style={{ width: '1.25rem', height: '1.25rem' }} />
               Upload Document
             </>
           )}
         </button>
       </div>
 
-      {/* Uploaded Documents */}
+      {/* ── Uploaded documents ──────────────────────────────────────────────── */}
       {uploadedDocs.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+        <div
+          style={{
+            background: T.cardBg,
+            borderRadius: '0.75rem',
+            border: `1px solid ${T.border}`,
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '1.125rem',
+              fontWeight: 600,
+              color: T.textPri,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginTop: 0,
+              marginBottom: '1rem',
+            }}
+          >
+            <FileText style={{ width: '1.25rem', height: '1.25rem' }} />
             Uploaded Documents ({uploadedDocs.length})
           </h3>
 
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {uploadedDocs.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  padding: '0.75rem',
+                  background: 'rgba(9,9,15,0.5)',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${T.border}`,
+                }}
               >
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-gray-400" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <FileText style={{ width: '1.25rem', height: '1.25rem', color: T.textDim }} />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p style={{ fontSize: '0.875rem', fontWeight: 500, color: T.textPri, margin: 0 }}>
                       {documentTypes.find(t => t.value === doc.documentType)?.label}
                     </p>
-                    <p className="text-xs text-gray-500">{doc.wordCount} words</p>
+                    <p style={{ fontSize: '0.75rem', color: T.textMuted, margin: 0 }}>{doc.wordCount} words</p>
                   </div>
                 </div>
                 <button
                   onClick={() => handleDeleteDocument(doc.id)}
-                  className="text-red-600 hover:text-red-700"
+                  aria-label="Delete document"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#f87171',
+                    padding: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#fca5a5'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 style={{ width: '1rem', height: '1rem' }} />
                 </button>
               </div>
             ))}
           </div>
 
-          <div className="pt-4 border-t border-gray-200">
+          <div
+            style={{
+              paddingTop: '1rem',
+              borderTop: `1px solid ${T.border}`,
+              marginTop: '1rem',
+            }}
+          >
             <button
               onClick={handleAnalyze}
               disabled={analyzing}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              style={{
+                width: '100%',
+                background: analyzing
+                  ? 'rgba(90,90,114,0.4)'
+                  : `linear-gradient(to right, ${T.purple}, ${T.blue})`,
+                color: analyzing ? T.textDim : '#fff',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: analyzing ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'opacity 0.15s',
+              }}
             >
               {analyzing ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 style={{ width: '1.25rem', height: '1.25rem' }} className="animate-spin" />
                   Analyzing Your Brand Voice...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-5 w-5" />
+                  <Sparkles style={{ width: '1.25rem', height: '1.25rem' }} />
                   Analyze Brand Voice
                 </>
               )}
             </button>
-            <p className="text-xs text-gray-500 text-center mt-2">
+            <p style={{ fontSize: '0.75rem', color: T.textMuted, textAlign: 'center', marginTop: '0.5rem', marginBottom: 0 }}>
               This will use AI to analyze your writing style and create your brand voice profile
             </p>
           </div>
         </div>
       )}
 
-      {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="text-sm font-semibold text-blue-900 mb-2">💡 Tips for Best Results</h4>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Upload at least 500 words total for accurate analysis</li>
-          <li>• Include multiple document types (emails, website copy, etc.)</li>
-          <li>• Use your most representative writing samples</li>
-          <li>• You can upload more documents anytime to refine your profile</li>
+      {/* ── Tips ────────────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: T.infoBg,
+          border: `1px solid ${T.infoBorder}`,
+          borderRadius: '0.5rem',
+          padding: '1rem',
+        }}
+      >
+        <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: T.textPri, marginTop: 0, marginBottom: '0.5rem' }}>
+          💡 Tips for Best Results
+        </h4>
+        <ul style={{ fontSize: '0.875rem', color: T.textMuted, margin: 0, paddingLeft: '1.25rem', lineHeight: '1.75' }}>
+          <li>Upload at least 500 words total for accurate analysis</li>
+          <li>Include multiple document types (emails, website copy, etc.)</li>
+          <li>Use your most representative writing samples</li>
+          <li>You can upload more documents anytime to refine your profile</li>
         </ul>
       </div>
     </div>

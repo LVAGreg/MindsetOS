@@ -71,6 +71,8 @@ export default function MyAgentsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [toggleError, setToggleError] = useState<string | null>(null);
@@ -143,22 +145,28 @@ export default function MyAgentsPage() {
 
   const handleDelete = async (agentId: string) => {
     setDeleteError(null);
+    setDeleting(agentId);
     try {
       await deleteCustomAgent(agentId);
       setDeleteConfirmId(null);
     } catch (err: any) {
       console.error('Failed to delete agent:', err);
       setDeleteError(err?.message || 'Failed to delete agent. Please try again.');
+    } finally {
+      setDeleting(null);
     }
   };
 
   const handleToggleActive = async (agent: CustomAgent) => {
     setToggleError(null);
+    setToggling(agent.id);
     try {
       await updateCustomAgent(agent.id, { isActive: !agent.isActive } as any);
     } catch (err: any) {
       console.error('Failed to toggle agent:', err);
       setToggleError(err?.message || 'Failed to update agent. Please try again.');
+    } finally {
+      setToggling(null);
     }
   };
 
@@ -198,6 +206,7 @@ export default function MyAgentsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/dashboard')}
+                aria-label="Back to dashboard"
                 className="p-2 rounded-lg transition-colors hover:bg-white/5"
               >
                 <ArrowLeft className="w-5 h-5" style={{ color: '#9090a8' }} />
@@ -304,20 +313,49 @@ export default function MyAgentsPage() {
                         <span>Created {new Date(agent.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button onClick={() => handleToggleActive(agent)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title={agent.isActive ? 'Deactivate' : 'Activate'}>
-                        {agent.isActive ? <ToggleRight className="w-5 h-5 text-green-400" /> : <ToggleLeft className="w-5 h-5" style={{ color: '#9090a8' }} />}
+                    <div className="flex items-center gap-1 flex-shrink-0 flex-wrap">
+                      <button
+                        onClick={() => handleToggleActive(agent)}
+                        disabled={toggling === agent.id}
+                        aria-label={agent.isActive ? 'Deactivate agent' : 'Activate agent'}
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {toggling === agent.id ? (
+                          <div className="w-5 h-5 border-2 border-[#9090a8]/30 border-t-[#9090a8] rounded-full animate-spin" />
+                        ) : agent.isActive ? (
+                          <ToggleRight className="w-5 h-5 text-green-400" />
+                        ) : (
+                          <ToggleLeft className="w-5 h-5" style={{ color: '#9090a8' }} />
+                        )}
                       </button>
-                      <button onClick={() => router.push(`/dashboard?agent=${agent.id}`)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="Test agent">
+                      <button
+                        onClick={() => router.push(`/dashboard?agent=${agent.id}`)}
+                        aria-label="Test agent"
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                      >
                         <MessageSquare className="w-5 h-5 text-[#7b8ff8]" />
                       </button>
-                      <button onClick={() => handleEdit(agent)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="Edit">
+                      <button
+                        onClick={() => handleEdit(agent)}
+                        aria-label="Edit agent"
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                      >
                         <Pencil className="w-5 h-5" style={{ color: '#9090a8' }} />
                       </button>
-                      <button onClick={() => setExpandedId(expandedId === agent.id ? null : agent.id)} className="p-2 hover:bg-white/5 rounded-lg transition-colors" title="View prompt">
-                        {expandedId === agent.id ? <EyeOff className="w-5 h-5" style={{ color: '#9090a8' }} /> : <Eye className="w-5 h-5" style={{ color: '#9090a8' }} />}
+                      <button
+                        onClick={() => setExpandedId(expandedId === agent.id ? null : agent.id)}
+                        aria-label={expandedId === agent.id ? 'Hide system prompt' : 'View system prompt'}
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        {expandedId === agent.id
+                          ? <EyeOff className="w-5 h-5" style={{ color: '#9090a8' }} />
+                          : <Eye className="w-5 h-5" style={{ color: '#9090a8' }} />}
                       </button>
-                      <button onClick={() => setDeleteConfirmId(agent.id)} className="p-2 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete">
+                      <button
+                        onClick={() => setDeleteConfirmId(agent.id)}
+                        aria-label="Delete agent"
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors"
+                      >
                         <Trash2 className="w-5 h-5 text-red-400" />
                       </button>
                     </div>
@@ -331,9 +369,27 @@ export default function MyAgentsPage() {
                   {deleteConfirmId === agent.id && (
                     <div className="mt-4 p-4 rounded-lg" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
                       <p className="text-sm text-red-400 mb-3">Delete <strong>{agent.name}</strong>?</p>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleDelete(agent.id)} className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg">Delete</button>
-                        <button onClick={() => setDeleteConfirmId(null)} className="px-3 py-1.5 text-sm rounded-lg" style={{ color: '#9090a8' }}>Cancel</button>
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => handleDelete(agent.id)}
+                          disabled={deleting === agent.id}
+                          className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg flex items-center gap-1.5 disabled:opacity-50"
+                        >
+                          {deleting === agent.id ? (
+                            <>
+                              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Deleting...
+                            </>
+                          ) : 'Delete'}
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          disabled={deleting === agent.id}
+                          className="px-3 py-1.5 text-sm rounded-lg disabled:opacity-50"
+                          style={{ color: '#9090a8' }}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}
@@ -398,7 +454,11 @@ export default function MyAgentsPage() {
             <div className="px-6 py-4" style={{ borderBottom: '1px solid #1e1e30' }}>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Create Agent</h2>
-                <button onClick={() => { setShowCreate(false); setForm({ ...emptyForm }); setCreateStep(0); }} className="p-2 hover:bg-white/5 rounded-lg">
+                <button
+                  onClick={() => { setShowCreate(false); setForm({ ...emptyForm }); setCreateStep(0); }}
+                  aria-label="Close create agent modal"
+                  className="p-2 hover:bg-white/5 rounded-lg"
+                >
                   <X className="w-5 h-5" style={{ color: '#9090a8' }} />
                 </button>
               </div>
@@ -536,8 +596,11 @@ export default function MyAgentsPage() {
                           className="flex-1 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
                         />
                         {form.conversationStarters.length > 1 && (
-                          <button onClick={() => setForm({ ...form, conversationStarters: form.conversationStarters.filter((_, i) => i !== idx) })}
-                            className="p-2 hover:bg-red-500/10 rounded-lg">
+                          <button
+                            onClick={() => setForm({ ...form, conversationStarters: form.conversationStarters.filter((_, i) => i !== idx) })}
+                            aria-label="Remove conversation starter"
+                            className="p-2 hover:bg-red-500/10 rounded-lg"
+                          >
                             <X className="w-4 h-4 text-red-400" />
                           </button>
                         )}
@@ -635,7 +698,11 @@ export default function MyAgentsPage() {
           <div className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30', borderRadius: 16 }}>
             <div className="sticky top-0 px-6 py-4 flex items-center justify-between" style={{ background: 'rgba(18,18,31,0.97)', borderBottom: '1px solid #1e1e30' }}>
               <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Edit Agent</h2>
-              <button onClick={() => setEditingId(null)} className="p-2 hover:bg-white/5 rounded-lg">
+              <button
+                onClick={() => setEditingId(null)}
+                aria-label="Close edit agent modal"
+                className="p-2 hover:bg-white/5 rounded-lg"
+              >
                 <X className="w-5 h-5" style={{ color: '#9090a8' }} />
               </button>
             </div>
@@ -679,8 +746,13 @@ export default function MyAgentsPage() {
                       updated[idx] = e.target.value;
                       setEditForm({ ...editForm, conversationStarters: updated });
                     }} className="flex-1 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40" />
-                    <button onClick={() => setEditForm({ ...editForm, conversationStarters: editForm.conversationStarters.filter((_, i) => i !== idx) })}
-                      className="p-2 hover:bg-red-500/10 rounded-lg"><X className="w-4 h-4 text-red-400" /></button>
+                    <button
+                      onClick={() => setEditForm({ ...editForm, conversationStarters: editForm.conversationStarters.filter((_, i) => i !== idx) })}
+                      aria-label="Remove conversation starter"
+                      className="p-2 hover:bg-red-500/10 rounded-lg"
+                    >
+                      <X className="w-4 h-4 text-red-400" />
+                    </button>
                   </div>
                 ))}
                 <button onClick={() => setEditForm({ ...editForm, conversationStarters: [...editForm.conversationStarters, ''] })}
@@ -689,9 +761,22 @@ export default function MyAgentsPage() {
             </div>
             <div className="sticky bottom-0 px-6 py-4 flex justify-end gap-3" style={{ background: 'rgba(18,18,31,0.97)', borderTop: '1px solid #1e1e30' }}>
               <button onClick={() => setEditingId(null)} className="px-4 py-2 text-sm rounded-lg hover:bg-white/5" style={{ color: '#9090a8' }}>Cancel</button>
-              <button onClick={handleSave} disabled={saving || !editForm.name || !editForm.systemPrompt}
-                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50">
-                <Save className="w-4 h-4" />{saving ? 'Saving...' : 'Save Changes'}
+              <button
+                onClick={handleSave}
+                disabled={saving || !editForm.name || !editForm.systemPrompt}
+                className="bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Changes
+                  </>
+                )}
               </button>
             </div>
           </div>

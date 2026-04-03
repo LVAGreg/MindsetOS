@@ -26,62 +26,103 @@ import dynamic from 'next/dynamic';
 
 const VoiceChatLive = dynamic(() => import('./VoiceChatLive'), { ssr: false });
 
+// ─── Design tokens ─────────────────────────────────────────────────────────
+const T = {
+  bg:        '#09090f',
+  card:      'rgba(18,18,31,0.8)',
+  border:    '#1e1e30',
+  primary:   '#ededf5',
+  muted:     '#9090a8',
+  dim:       '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  amberBg:   'rgba(252,200,36,0.12)',
+  amberBd:   'rgba(252,200,36,0.35)',
+  purple:    '#7c5bf6',
+  purpleBg:  'rgba(124,91,246,0.12)',
+  purpleBd:  'rgba(124,91,246,0.35)',
+} as const;
+
 // ─── Category visual config ────────────────────────────────────────────────
 type CategoryConfig = {
   label: string;
-  pillClass: string;
+  pillStyle: React.CSSProperties;
   icon: React.ElementType;
 };
 
 const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
   assessment: {
     label: 'Assessment',
-    pillClass:
-      'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-800',
+    pillStyle: {
+      background: 'rgba(124,91,246,0.12)',
+      color: '#a78bfa',
+      borderColor: 'rgba(124,91,246,0.35)',
+    },
     icon: Brain,
   },
   coaching: {
     label: 'Coaching',
-    pillClass:
-      'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    pillStyle: {
+      background: 'rgba(79,110,247,0.12)',
+      color: '#818cf8',
+      borderColor: 'rgba(79,110,247,0.35)',
+    },
     icon: Target,
   },
   'self-awareness': {
     label: 'Self-Awareness',
-    pillClass:
-      'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800',
+    pillStyle: {
+      background: 'rgba(20,184,166,0.12)',
+      color: '#2dd4bf',
+      borderColor: 'rgba(20,184,166,0.35)',
+    },
     icon: Compass,
   },
   strategy: {
     label: 'Strategy',
-    pillClass:
-      'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+    pillStyle: {
+      background: 'rgba(249,115,22,0.12)',
+      color: '#fb923c',
+      borderColor: 'rgba(249,115,22,0.35)',
+    },
     icon: RefreshCcw,
   },
   accountability: {
     label: 'Accountability',
-    pillClass:
-      'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    pillStyle: {
+      background: 'rgba(34,197,94,0.12)',
+      color: '#4ade80',
+      borderColor: 'rgba(34,197,94,0.35)',
+    },
     icon: Calendar,
   },
   content: {
     label: 'Content',
-    pillClass:
-      'bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800',
+    pillStyle: {
+      background: 'rgba(236,72,153,0.12)',
+      color: '#f472b6',
+      borderColor: 'rgba(236,72,153,0.35)',
+    },
     icon: Radio,
   },
   admin: {
     label: 'Admin',
-    pillClass:
-      'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+    pillStyle: {
+      background: 'rgba(148,163,184,0.10)',
+      color: '#94a3b8',
+      borderColor: 'rgba(148,163,184,0.25)',
+    },
     icon: Rocket,
   },
 };
 
 const DEFAULT_CATEGORY_CONFIG: CategoryConfig = {
   label: 'General',
-  pillClass:
-    'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+  pillStyle: {
+    background: 'rgba(144,144,168,0.10)',
+    color: T.muted,
+    borderColor: 'rgba(144,144,168,0.25)',
+  },
   icon: BookOpen,
 };
 
@@ -117,7 +158,7 @@ export default function AgentCard({
   name,
   description,
   icon,
-  color = 'bg-gray-500',
+  color = '#6b7280',
   accent_color = '#3B82F6',
   category,
   tags = [],
@@ -152,14 +193,14 @@ export default function AgentCard({
     }, 50);
   };
 
-  // ── Border ──
-  const baseBorder = locked
-    ? 'border-gray-200 dark:border-white/[0.06]'
+  // ── Border colour (inline) ──
+  const borderColor = locked
+    ? T.border
     : isFree
-    ? 'border-amber-300 dark:border-amber-500/50'
+    ? T.amberBd
     : premium
-    ? 'border-purple-200 dark:border-purple-700/60'
-    : 'border-gray-200 dark:border-white/[0.08]';
+    ? T.purpleBd
+    : T.border;
 
   const hoverStyle =
     hovered && !locked
@@ -172,10 +213,14 @@ export default function AgentCard({
 
   return (
     <div
-      className={`group relative flex flex-col bg-white dark:bg-[#111827] rounded-2xl border-2 transition-all duration-300 overflow-hidden ${baseBorder} ${
+      className={`group relative flex flex-col rounded-2xl border-2 transition-all duration-300 overflow-hidden ${
         locked ? 'opacity-60 cursor-default' : 'cursor-pointer'
       }`}
-      style={hoverStyle}
+      style={{
+        background: T.card,
+        borderColor,
+        ...hoverStyle,
+      }}
       onMouseEnter={() => !locked && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={locked ? undefined : isVoice ? () => setShowVoiceChat(true) : handleStartChat}
@@ -185,7 +230,10 @@ export default function AgentCard({
 
       {/* Free entry glow ring */}
       {isFree && (
-        <div className="absolute inset-0 rounded-2xl pointer-events-none ring-2 ring-amber-400/30 dark:ring-amber-500/20" />
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ boxShadow: `inset 0 0 0 2px rgba(252,200,36,0.30)` }}
+        />
       )}
 
       {/* Premium hover gradient */}
@@ -205,23 +253,38 @@ export default function AgentCard({
       {/* Card body */}
       <div className="relative flex flex-col flex-1 p-5">
         {/* Row 1: category pill + premium/free badge */}
-        <div className="flex items-center justify-between mb-4 gap-2">
+        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
           <span
-            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border leading-none ${cat.pillClass}`}
+            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border leading-none"
+            style={cat.pillStyle}
           >
             <CatIcon className="w-3 h-3 flex-shrink-0" />
             {cat.label}
           </span>
 
           {isFree && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-600/60 rounded-full text-[11px] font-bold leading-none flex-shrink-0">
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold leading-none flex-shrink-0"
+              style={{
+                background: T.amberBg,
+                color: T.amber,
+                border: `1px solid ${T.amberBd}`,
+              }}
+            >
               <Star className="w-3 h-3 fill-current" />
               Free
             </span>
           )}
 
           {premium && !isFree && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-700/60 rounded-full text-[11px] font-bold leading-none flex-shrink-0">
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold leading-none flex-shrink-0"
+              style={{
+                background: T.purpleBg,
+                color: T.purple,
+                border: `1px solid ${T.purpleBd}`,
+              }}
+            >
               <Crown className="w-3 h-3" />
               Premium
             </span>
@@ -242,13 +305,16 @@ export default function AgentCard({
           </div>
 
           <div className="flex-1 min-w-0 pt-0.5">
-            <h3 className="text-sm font-bold tracking-tight text-gray-900 dark:text-white leading-snug line-clamp-2">
+            <h3
+              className="text-sm font-bold tracking-tight leading-snug line-clamp-2"
+              style={{ color: T.primary }}
+            >
               {name}
             </h3>
             {popularity > 0 && (
               <div className="flex items-center gap-1 mt-1">
-                <TrendingUp className="w-3 h-3 text-gray-400 dark:text-gray-600" />
-                <span className="text-[10px] text-gray-400 dark:text-gray-600">
+                <TrendingUp className="w-3 h-3" style={{ color: T.dim }} />
+                <span className="text-[10px]" style={{ color: T.dim }}>
                   {popularity.toLocaleString()} sessions
                 </span>
               </div>
@@ -257,7 +323,10 @@ export default function AgentCard({
         </div>
 
         {/* Row 3: description */}
-        <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed line-clamp-3 flex-1 mb-5">
+        <p
+          className="text-xs leading-relaxed line-clamp-3 flex-1 mb-5"
+          style={{ color: T.muted }}
+        >
           {description}
         </p>
 
@@ -265,7 +334,14 @@ export default function AgentCard({
         <div className="mt-auto space-y-2">
           {locked ? (
             <>
-              <div className="w-full px-3 py-2 bg-gray-100 dark:bg-white/[0.05] text-gray-400 dark:text-gray-600 font-medium rounded-xl flex items-center justify-center gap-2 text-xs border border-gray-200 dark:border-white/[0.06]">
+              <div
+                className="w-full px-3 py-2 font-medium rounded-xl flex items-center justify-center gap-2 text-xs"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  color: T.dim,
+                  border: `1px solid ${T.border}`,
+                }}
+              >
                 <Lock className="w-3.5 h-3.5" />
                 {lockedReason || 'Locked'}
               </div>
@@ -274,7 +350,18 @@ export default function AgentCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="w-full px-3 py-1.5 text-amber-700 dark:text-amber-400 font-semibold rounded-xl border border-amber-300 dark:border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-500/10 flex items-center justify-center gap-1 text-xs transition-colors"
+                className="w-full px-3 py-1.5 font-semibold rounded-xl flex items-center justify-center gap-1 text-xs transition-colors"
+                style={{
+                  color: T.amber,
+                  border: `1px solid ${T.amberBd}`,
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = T.amberBg;
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = 'transparent';
+                }}
               >
                 Unlock Access
                 <ArrowUpRight className="w-3 h-3" />
@@ -293,7 +380,19 @@ export default function AgentCard({
               Start Voice Session
             </button>
           ) : isFree ? (
-            <button className="w-full px-3 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md hover:shadow-amber-400/25 hover:-translate-y-px group/btn">
+            <button
+              className="w-full px-3 py-2.5 font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:-translate-y-px group/btn"
+              style={{
+                background: T.amber,
+                color: '#09090f',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(252,200,36,0.85)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = T.amber;
+              }}
+            >
               <Star className="w-3.5 h-3.5 fill-current flex-shrink-0" />
               <span>Start Free</span>
               <ChevronRight className="w-3.5 h-3.5 ml-auto transition-transform duration-200 group-hover/btn:translate-x-0.5 flex-shrink-0" />
@@ -324,7 +423,10 @@ export default function AgentCard({
 
       {/* Lock overlay */}
       {locked && (
-        <div className="absolute inset-0 bg-white/20 dark:bg-gray-900/20 rounded-2xl pointer-events-none" />
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ background: 'rgba(9,9,15,0.20)' }}
+        />
       )}
 
       {/* Voice modal */}

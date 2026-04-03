@@ -15,6 +15,41 @@ interface AdminUser {
   conversation_count: number;
 }
 
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const TOKEN = {
+  bgPage:    '#09090f',
+  bgCard:    'rgba(18,18,31,0.8)',
+  bgCardSolid: 'rgb(18,18,31)',
+  border:    '#1e1e30',
+  textPrimary: '#ededf5',
+  textMuted:   '#9090a8',
+  textDim:     '#5a5a72',
+  blue:      '#4f6ef7',
+  amber:     '#fcc824',
+  amberBg:   'rgba(252,200,36,0.12)',
+  amberBorder:'rgba(252,200,36,0.25)',
+  purple:    '#7c5bf6',
+  green:     '#22c55e',
+  greenBg:   'rgba(34,197,94,0.12)',
+  greenBorder:'rgba(34,197,94,0.25)',
+  blueBg:    'rgba(79,110,247,0.12)',
+  blueBorder:'rgba(79,110,247,0.25)',
+  red:       '#f87171',
+  redBg:     'rgba(239,68,68,0.10)',
+  redBorder: 'rgba(239,68,68,0.25)',
+};
+
+// Role badge: returns { color, background, border } style values
+function roleStyle(role: string): React.CSSProperties {
+  switch (role) {
+    case 'admin':      return { color: TOKEN.red,    background: TOKEN.redBg,   border: `1px solid ${TOKEN.redBorder}` };
+    case 'agency':     return { color: TOKEN.purple,  background: 'rgba(124,91,246,0.12)', border: '1px solid rgba(124,91,246,0.25)' };
+    case 'power_user': return { color: TOKEN.purple,  background: 'rgba(124,91,246,0.10)', border: '1px solid rgba(124,91,246,0.20)' };
+    case 'trial':      return { color: TOKEN.green,   background: TOKEN.greenBg,  border: `1px solid ${TOKEN.greenBorder}` };
+    default:           return { color: TOKEN.textMuted, background: 'rgba(144,144,168,0.10)', border: `1px solid ${TOKEN.border}` };
+  }
+}
+
 export function AdminUserSwitcher() {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -24,6 +59,7 @@ export function AdminUserSwitcher() {
   const [confirmingEdit, setConfirmingEdit] = useState(false);
   const [endingSession, setEndingSession] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [selectingUserId, setSelectingUserId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -48,12 +84,12 @@ export function AdminUserSwitcher() {
       setLoading(true);
       apiClient.get('/api/admin/users?limit=500')
         .then((data: AdminUser[] | { users: AdminUser[] }) => {
-          // Handle both response formats: plain array or { users: [...] }
           const userList = Array.isArray(data) ? data : (data.users || []);
           setUsers(userList);
         })
         .catch((err: unknown) => {
           console.error('Failed to fetch users:', err);
+          setActionError('Failed to load users. Try again.');
         })
         .finally(() => setLoading(false));
     }
@@ -71,7 +107,6 @@ export function AdminUserSwitcher() {
               permissions: data.session.permissions,
               expires_at: data.session.expires_at,
             });
-            // Also set viewAsUser from session data
             setViewAsUser({
               id: data.session.target_user_id,
               email: data.session.target_email,
@@ -83,13 +118,12 @@ export function AdminUserSwitcher() {
             });
           }
         })
-        .catch(() => { /* no active session */ });
+        .catch(() => { /* no active session — silent is correct here */ });
     }
   }, [isAdmin]);
 
   // Poll for session status changes (when edit_requested, check if approved/declined)
   useEffect(() => {
-    // Clear any existing interval before potentially creating a new one
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -107,7 +141,6 @@ export function AdminUserSwitcher() {
             permissions: data.session.permissions,
             expires_at: data.session.expires_at,
           });
-          // Terminal state reached — stop polling
           if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
@@ -115,7 +148,6 @@ export function AdminUserSwitcher() {
         }
       } catch (err: any) {
         if (err?.status === 401) {
-          // Unauthorized — stop polling immediately
           if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
@@ -143,6 +175,7 @@ export function AdminUserSwitcher() {
   });
 
   const handleSelectUser = async (selectedUser: AdminUser) => {
+    setSelectingUserId(selectedUser.id);
     try {
       const result = await apiClient.startImpersonation(selectedUser.id);
       setViewAsUser({
@@ -164,6 +197,8 @@ export function AdminUserSwitcher() {
     } catch (err) {
       console.error('Failed to start impersonation:', err);
       setActionError('Failed to switch user. Try again.');
+    } finally {
+      setSelectingUserId(null);
     }
   };
 
@@ -199,41 +234,59 @@ export function AdminUserSwitcher() {
     }
   };
 
-  const roleColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'text-red-600 bg-red-50';
-      case 'agency': return 'text-indigo-600 bg-indigo-50';
-      case 'power_user': return 'text-purple-600 bg-purple-50';
-      case 'trial': return 'text-green-600 bg-green-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
-  };
-
   const statusBadge = () => {
     if (!impersonationSession) return null;
     switch (impersonationSession.status) {
       case 'viewing':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600">
-            <Eye className="w-3 h-3" /> View Only
+          <span
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 9999,
+              background: TOKEN.blueBg, color: TOKEN.blue,
+              border: `1px solid ${TOKEN.blueBorder}`,
+            }}
+          >
+            <Eye style={{ width: 12, height: 12 }} /> View Only
           </span>
         );
       case 'edit_requested':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600">
-            <Clock className="w-3 h-3" /> Edit Pending
+          <span
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 9999,
+              background: TOKEN.amberBg, color: TOKEN.amber,
+              border: `1px solid ${TOKEN.amberBorder}`,
+            }}
+          >
+            <Clock style={{ width: 12, height: 12 }} /> Edit Pending
           </span>
         );
       case 'edit_approved':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-50 text-green-600">
-            <CheckCircle className="w-3 h-3" /> Edit Active
+          <span
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 9999,
+              background: TOKEN.greenBg, color: TOKEN.green,
+              border: `1px solid ${TOKEN.greenBorder}`,
+            }}
+          >
+            <CheckCircle style={{ width: 12, height: 12 }} /> Edit Active
           </span>
         );
       case 'edit_declined':
         return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-50 text-red-600">
-            <XCircle className="w-3 h-3" /> Edit Declined
+          <span
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 9999,
+              background: TOKEN.redBg, color: TOKEN.red,
+              border: `1px solid ${TOKEN.redBorder}`,
+            }}
+          >
+            <XCircle style={{ width: 12, height: 12 }} /> Edit Declined
           </span>
         );
       default:
@@ -241,65 +294,93 @@ export function AdminUserSwitcher() {
     }
   };
 
-  // Active session banner
+  // ── Active session banner ────────────────────────────────────────────────────
   if (viewAsUser && impersonationSession) {
     const canEdit = impersonationSession.status === 'edit_approved';
-    const bannerColor = canEdit
-      ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
-      : 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700';
-    const iconColor = canEdit ? 'text-green-500' : 'text-blue-500';
-    const textColor = canEdit ? 'text-green-700 dark:text-green-300' : 'text-blue-700 dark:text-blue-300';
-    const labelColor = canEdit ? 'text-green-500' : 'text-blue-500';
+    const bannerBg     = canEdit ? TOKEN.greenBg  : TOKEN.blueBg;
+    const bannerBorder = canEdit ? TOKEN.greenBorder : TOKEN.blueBorder;
+    const iconColor    = canEdit ? TOKEN.green : TOKEN.blue;
+    const labelColor   = canEdit ? TOKEN.green : TOKEN.blue;
+    const textColor    = canEdit ? TOKEN.green : TOKEN.blue;
 
     return (
       <div className="relative" ref={dropdownRef}>
-        <div className={`flex items-center gap-2 px-3 py-1.5 ${bannerColor} border rounded-lg`}>
+        <div
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '6px 12px',
+            background: bannerBg,
+            border: `1px solid ${bannerBorder}`,
+            borderRadius: 8,
+            flexWrap: 'wrap',
+          }}
+        >
           {canEdit ? (
-            <Edit3 className={`w-4 h-4 ${iconColor}`} />
+            <Edit3 style={{ width: 16, height: 16, color: iconColor, flexShrink: 0 }} />
           ) : (
-            <Eye className={`w-4 h-4 ${iconColor}`} />
+            <Eye style={{ width: 16, height: 16, color: iconColor, flexShrink: 0 }} />
           )}
-          <div className="text-left">
-            <div className={`text-[10px] font-semibold uppercase tracking-wide leading-none ${labelColor}`}>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1, color: labelColor }}>
               {canEdit ? 'Editing As' : 'Viewing'}
             </div>
-            <div className={`text-sm font-bold ${textColor} leading-tight max-w-[140px] truncate`}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: textColor, lineHeight: 1.2, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {viewAsUser.name}
             </div>
           </div>
           {statusBadge()}
 
-          {/* Request Edit button — only show when viewing and not already requested */}
+          {/* Request Edit button */}
           {impersonationSession.status === 'viewing' && !confirmingEdit && (
             <button
               onClick={() => setConfirmingEdit(true)}
-              className="ml-1 px-2 py-1 text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded transition-colors"
+              style={{
+                marginLeft: 4, padding: '4px 8px',
+                fontSize: 10, fontWeight: 700,
+                background: TOKEN.amberBg,
+                color: TOKEN.amber,
+                border: `1px solid ${TOKEN.amberBorder}`,
+                borderRadius: 6,
+                cursor: 'pointer',
+                transition: 'opacity 0.15s',
+              }}
               title="Request permission to send messages and save playbooks as this user"
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.8'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
             >
               Request Edit
             </button>
           )}
+
           {/* Confirm dialog for Request Edit */}
           {confirmingEdit && !requestingEdit && (
-            <div className="ml-1 flex items-center gap-1">
-              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">Send request?</span>
+            <div style={{ marginLeft: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 10, color: TOKEN.amber, fontWeight: 500, whiteSpace: 'nowrap' }}>Send request?</span>
               <button
                 onClick={() => { setConfirmingEdit(false); handleRequestEdit(); }}
-                className="px-1.5 py-0.5 text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded transition-colors"
+                style={{
+                  padding: '2px 6px', fontSize: 10, fontWeight: 700,
+                  background: TOKEN.amber, color: '#09090f',
+                  border: 'none', borderRadius: 4, cursor: 'pointer',
+                }}
               >
                 Yes
               </button>
               <button
                 onClick={() => setConfirmingEdit(false)}
-                className="px-1.5 py-0.5 text-[10px] font-bold bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 rounded transition-colors"
+                style={{
+                  padding: '2px 6px', fontSize: 10, fontWeight: 700,
+                  background: 'rgba(144,144,168,0.15)', color: TOKEN.textMuted,
+                  border: `1px solid ${TOKEN.border}`, borderRadius: 4, cursor: 'pointer',
+                }}
               >
                 No
               </button>
             </div>
           )}
           {requestingEdit && (
-            <div className="ml-1">
-              <Loader2 className="w-3 h-3 animate-spin text-amber-500" />
+            <div style={{ marginLeft: 4 }}>
+              <Loader2 style={{ width: 12, height: 12, color: TOKEN.amber }} className="animate-spin" />
             </div>
           )}
 
@@ -307,18 +388,29 @@ export function AdminUserSwitcher() {
           <button
             onClick={handleEndSession}
             disabled={endingSession}
-            className="ml-1 p-0.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+            aria-label="End impersonation session"
+            style={{
+              marginLeft: 4, padding: 2,
+              background: 'transparent',
+              border: 'none', borderRadius: 4,
+              cursor: endingSession ? 'not-allowed' : 'pointer',
+              opacity: endingSession ? 0.5 : 1,
+              transition: 'opacity 0.15s',
+              display: 'flex', alignItems: 'center',
+            }}
             title="End impersonation session"
+            onMouseEnter={(e) => { if (!endingSession) (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+            onMouseLeave={(e) => { if (!endingSession) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
           >
             {endingSession ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+              <Loader2 style={{ width: 14, height: 14, color: TOKEN.textMuted }} className="animate-spin" />
             ) : (
-              <X className="w-3.5 h-3.5 text-gray-500" />
+              <X style={{ width: 14, height: 14, color: TOKEN.textMuted }} />
             )}
           </button>
         </div>
         {actionError && (
-          <div className="mt-1 text-xs px-2 py-1 rounded" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}>
+          <div style={{ marginTop: 4, fontSize: 12, padding: '4px 8px', borderRadius: 4, background: TOKEN.redBg, color: TOKEN.red, border: `1px solid ${TOKEN.redBorder}` }}>
             {actionError}
           </div>
         )}
@@ -326,93 +418,183 @@ export function AdminUserSwitcher() {
     );
   }
 
-  // Default: selector button
+  // ── Default: selector button ─────────────────────────────────────────────────
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg transition-all shadow-sm hover:shadow-md hover:border-gray-400"
+        aria-label="View as user — admin switcher"
+        style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '6px 12px',
+          background: TOKEN.bgCard,
+          border: `1px solid ${TOKEN.border}`,
+          borderRadius: 8,
+          cursor: 'pointer',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+          transition: 'border-color 0.15s, box-shadow 0.15s',
+        }}
+        onMouseEnter={(e) => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.borderColor = TOKEN.blue;
+          el.style.boxShadow = `0 2px 8px rgba(79,110,247,0.25)`;
+        }}
+        onMouseLeave={(e) => {
+          const el = e.currentTarget as HTMLElement;
+          el.style.borderColor = TOKEN.border;
+          el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.3)';
+        }}
       >
-        <Shield className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-        <div className="text-left">
-          <div className="text-[10px] font-semibold uppercase tracking-wide leading-none text-gray-500 dark:text-gray-400">
+        <Shield style={{ width: 16, height: 16, color: TOKEN.textMuted, flexShrink: 0 }} />
+        <div style={{ textAlign: 'left' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1, color: TOKEN.textDim }}>
             View As
           </div>
-          <div className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
+          <div style={{ fontSize: 14, fontWeight: 700, color: TOKEN.textPrimary, lineHeight: 1.2 }}>
             User
           </div>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          style={{ width: 14, height: 14, color: TOKEN.textDim, transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+        <div
+          style={{
+            position: 'absolute', top: '100%', left: 0, marginTop: 8,
+            width: 320,
+            background: TOKEN.bgCardSolid,
+            border: `1px solid ${TOKEN.border}`,
+            borderRadius: 12,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            zIndex: 50,
+            overflow: 'hidden',
+          }}
+        >
           {/* Header */}
-          <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">View As User</span>
+          <div style={{ padding: '8px 12px', borderBottom: `1px solid ${TOKEN.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shield style={{ width: 16, height: 16, color: TOKEN.blue }} />
+              <span style={{ fontSize: 14, fontWeight: 600, color: TOKEN.textPrimary }}>View As User</span>
             </div>
-            <p className="text-[10px] text-gray-400 mt-0.5">Select a user to view their data. Edit requires their approval.</p>
+            <p style={{ fontSize: 10, color: TOKEN.textDim, marginTop: 2 }}>
+              Select a user to view their data. Edit requires their approval.
+            </p>
           </div>
 
           {/* Search */}
-          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div style={{ padding: 8, borderBottom: `1px solid ${TOKEN.border}` }}>
+            <div style={{ position: 'relative' }}>
+              <Search style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 16, height: 16, color: TOKEN.textDim }} />
               <input
                 type="text"
                 placeholder="Search by name, email, or role..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  paddingLeft: 32, paddingRight: 12, paddingTop: 6, paddingBottom: 6,
+                  fontSize: 14,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${TOKEN.border}`,
+                  borderRadius: 8,
+                  color: TOKEN.textPrimary,
+                  outline: 'none',
+                }}
+                onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = TOKEN.blue; }}
+                onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = TOKEN.border; }}
                 autoFocus
               />
             </div>
           </div>
 
           {/* User list */}
-          <div className="max-h-64 overflow-y-auto p-2">
+          <div style={{ maxHeight: 256, overflowY: 'auto', padding: 8 }}>
             {loading ? (
-              <div className="text-center py-4 text-sm text-gray-500">
-                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-1" />
+              <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 14, color: TOKEN.textMuted }}>
+                <Loader2 style={{ width: 20, height: 20, margin: '0 auto 4px' }} className="animate-spin" />
                 Loading users...
               </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="text-center py-4 text-sm text-gray-500">No users found</div>
+              <div style={{ textAlign: 'center', padding: '16px 0', fontSize: 14, color: TOKEN.textMuted }}>
+                No users found
+              </div>
             ) : (
-              filteredUsers.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => handleSelectUser(u)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                      {(u.first_name?.[0] || u.email[0]).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
-                      {u.first_name || u.last_name
-                        ? `${u.first_name || ''} ${u.last_name || ''}`.trim()
-                        : u.email}
+              filteredUsers.map((u) => {
+                const isSelecting = selectingUserId === u.id;
+                return (
+                  <button
+                    key={u.id}
+                    onClick={() => handleSelectUser(u)}
+                    disabled={selectingUserId !== null}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '8px 12px', borderRadius: 8,
+                      textAlign: 'left',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: selectingUserId !== null ? 'not-allowed' : 'pointer',
+                      opacity: selectingUserId !== null && !isSelecting ? 0.5 : 1,
+                      transition: 'background 0.1s, opacity 0.15s',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!selectingUserId) (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.background = 'transparent';
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 28, height: 28, borderRadius: '50%',
+                        background: `linear-gradient(135deg, rgba(79,110,247,0.3), rgba(124,91,246,0.3))`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isSelecting ? (
+                        <Loader2 style={{ width: 14, height: 14, color: TOKEN.blue }} className="animate-spin" />
+                      ) : (
+                        <span style={{ fontSize: 12, fontWeight: 700, color: TOKEN.blue }}>
+                          {(u.first_name?.[0] || u.email[0]).toUpperCase()}
+                        </span>
+                      )}
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 truncate">{u.email}</div>
-                  </div>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${roleColor(u.role)}`}>
-                    {u.role}
-                  </span>
-                </button>
-              ))
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: TOKEN.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {u.first_name || u.last_name
+                          ? `${u.first_name || ''} ${u.last_name || ''}`.trim()
+                          : u.email}
+                      </div>
+                      <div style={{ fontSize: 12, color: TOKEN.textDim, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 10, fontWeight: 700,
+                        padding: '2px 6px', borderRadius: 9999, flexShrink: 0,
+                        ...roleStyle(u.role),
+                      }}
+                    >
+                      {u.role}
+                    </span>
+                  </button>
+                );
+              })
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-3 py-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex items-center gap-1.5">
-              <Eye className="w-3 h-3 text-blue-400" />
-              <span className="text-[10px] text-gray-500">View-only by default. Request edit access after selecting.</span>
+          <div
+            style={{
+              padding: '6px 12px',
+              borderTop: `1px solid ${TOKEN.border}`,
+              background: 'rgba(255,255,255,0.02)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Eye style={{ width: 12, height: 12, color: TOKEN.blue }} />
+              <span style={{ fontSize: 10, color: TOKEN.textDim }}>View-only by default. Request edit access after selecting.</span>
             </div>
           </div>
         </div>
