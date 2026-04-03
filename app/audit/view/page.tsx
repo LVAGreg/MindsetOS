@@ -173,22 +173,26 @@ export default function AuditViewPage() {
     const lowestQ = QUESTIONS.reduce((min, q) => (scores[q.id] || 0) < (scores[min.id] || 0) ? q : min);
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4">
+      <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
         <div className="max-w-xl mx-auto space-y-6">
-          {/* Score */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 text-center">
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Your OS Audit Score</p>
-            <div className="text-7xl font-black text-gray-900 dark:text-white mb-1">{totalScore}</div>
-            <div className="text-lg text-gray-400 mb-4">out of 35</div>
-            <div className="inline-block px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold mb-4">
+
+          {/* Score card */}
+          <div className="rounded-2xl border p-8 text-center"
+            style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}>
+            <p className="text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Your OS Audit Score</p>
+            <div className="text-7xl font-black mb-1" style={{ color: '#ededf5' }}>{totalScore}</div>
+            <div className="text-lg mb-4" style={{ color: '#5a5a72' }}>out of 35</div>
+            <div className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4"
+              style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.3)' }}>
               {result.label}
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{result.body}</p>
+            <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{result.body}</p>
           </div>
 
           {/* Score breakdown */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
-            <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">Your Dimension Scores</h2>
+          <div className="rounded-2xl border p-6"
+            style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}>
+            <h2 className="text-base font-bold mb-4" style={{ color: '#ededf5' }}>Your Dimension Scores</h2>
             <div className="space-y-3">
               {QUESTIONS.map(q => {
                 const s = scores[q.id] || 0;
@@ -197,14 +201,16 @@ export default function AuditViewPage() {
                   <div key={q.id} className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className={`text-xs font-medium truncate ${isLow ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <span className="text-xs font-medium truncate" style={{ color: isLow ? '#f87171' : '#9090a8' }}>
                           Q{q.id}: {q.title.split('?')[0].replace('How Do You ', '').replace('What Do You ', 'Your ').replace('What Drives You Into ', '').replace('What Stops You From Moving Forward', 'What Blocks You').replace('What Does Your Relationship With Risk Reveal', 'Risk Relationship')}
-                          {isLow && <span className="ml-1 text-red-500">← lowest</span>}
+                          {isLow && <span className="ml-1" style={{ color: '#f87171' }}>← lowest</span>}
                         </span>
-                        <span className={`text-xs font-bold ml-2 flex-shrink-0 ${isLow ? 'text-red-600 dark:text-red-400' : 'text-gray-500'}`}>{s}/5</span>
+                        <span className="text-xs font-bold ml-2 flex-shrink-0"
+                          style={{ color: isLow ? '#f87171' : '#5a5a72' }}>{s}/5</span>
                       </div>
-                      <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${(s / 5) * 100}%` }} />
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e1e30' }}>
+                        <div className="h-full rounded-full transition-all"
+                          style={{ width: `${(s / 5) * 100}%`, background: '#4f6ef7' }} />
                       </div>
                     </div>
                   </div>
@@ -214,10 +220,11 @@ export default function AuditViewPage() {
           </div>
 
           {/* CTA */}
-          <div className="bg-gray-900 dark:bg-gray-800 rounded-2xl p-6 text-white">
-            <p className="text-xs text-gray-400 mb-1">Your next move</p>
-            <h3 className="text-base font-bold mb-2">{result.label}</h3>
-            <p className="text-sm text-gray-300 mb-4">{result.cta.note}</p>
+          <div className="rounded-2xl border p-6"
+            style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}>
+            <p className="text-xs mb-1" style={{ color: '#5a5a72' }}>Your next move</p>
+            <h3 className="text-base font-bold mb-2" style={{ color: '#ededf5' }}>{result.label}</h3>
+            <p className="text-sm mb-4" style={{ color: '#9090a8' }}>{result.cta.note}</p>
             <a
               href={result.cta.href}
               target="_blank"
@@ -229,7 +236,8 @@ export default function AuditViewPage() {
                   }
                 } catch (_) {}
               }}
-              className="inline-block px-5 py-2.5 bg-white text-gray-900 text-sm font-bold rounded-xl hover:opacity-90 transition-opacity"
+              className="inline-block px-5 py-2.5 text-sm font-bold rounded-xl transition-opacity hover:opacity-90"
+              style={{ background: '#4f6ef7', color: '#ededf5' }}
             >
               {result.cta.label}
             </a>
@@ -237,13 +245,19 @@ export default function AuditViewPage() {
 
           {/* Retake */}
           <div className="text-center">
-            <button onClick={reset} className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+            <button
+              onClick={reset}
+              className="inline-flex items-center gap-2 text-sm transition-colors"
+              style={{ color: '#5a5a72' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#5a5a72'; }}
+            >
               <RotateCcw className="w-4 h-4" />
               Retake the audit
             </button>
           </div>
 
-          <p className="text-center text-xs text-gray-400 dark:text-gray-600">
+          <p className="text-center text-xs" style={{ color: '#5a5a72' }}>
             <Link href="https://mindset.show" target="_blank" className="hover:underline">mindset.show</Link>
           </p>
         </div>
@@ -252,16 +266,17 @@ export default function AuditViewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
       <div className="max-w-2xl mx-auto space-y-8">
+
         {/* Header */}
         <div className="text-center">
-          <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-2">MindsetOS</p>
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">The OS Audit</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+          <p className="text-sm font-medium mb-2" style={{ color: '#4f6ef7' }}>MindsetOS</p>
+          <h1 className="text-3xl font-black mb-2" style={{ color: '#ededf5' }}>The OS Audit</h1>
+          <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
             7 questions · ~15 minutes · be honest
           </p>
-          <p className="text-gray-600 dark:text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="text-sm max-w-md mx-auto leading-relaxed" style={{ color: '#9090a8' }}>
             Answer based on what you actually do — not what you think you should do.
             Your first instinct is usually the honest one.
           </p>
@@ -271,74 +286,110 @@ export default function AuditViewPage() {
         {QUESTIONS.map((q, idx) => {
           const score = scores[q.id];
           return (
-            <div key={q.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div key={q.id} className="rounded-2xl border overflow-hidden"
+              style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}>
+
               {/* Question header */}
-              <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+              <div className="border-b px-6 py-4"
+                style={{ background: 'rgba(255,255,255,0.02)', borderColor: '#1e1e30' }}>
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center text-xs font-bold">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold"
+                    style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.25)' }}>
                     {idx + 1}
                   </span>
                   <div>
-                    <h2 className="text-base font-bold text-gray-900 dark:text-white leading-snug">{q.title}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 italic">&ldquo;{q.prompt}&rdquo;</p>
+                    <h2 className="text-base font-bold leading-snug" style={{ color: '#ededf5' }}>{q.title}</h2>
+                    <p className="text-sm mt-0.5 italic" style={{ color: '#9090a8' }}>&ldquo;{q.prompt}&rdquo;</p>
                   </div>
                 </div>
               </div>
 
               <div className="p-6 space-y-5">
+
                 {/* Why this matters */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Why This Matters</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{q.why}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#5a5a72' }}>
+                    Why This Matters
+                  </p>
+                  <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{q.why}</p>
                 </div>
 
                 {/* Reflect */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Reflect</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-2">{q.reflect}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#5a5a72' }}>
+                    Reflect
+                  </p>
+                  <p className="text-sm leading-relaxed mb-2" style={{ color: '#9090a8' }}>{q.reflect}</p>
                   <textarea
                     value={reflects[q.id] || ''}
                     onChange={e => setReflects(prev => ({ ...prev, [q.id]: e.target.value }))}
                     placeholder="Write your thoughts here..."
                     rows={3}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-600 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
+                    style={{
+                      background: '#09090f',
+                      border: '1px solid #1e1e30',
+                      color: '#ededf5',
+                      caretColor: '#4f6ef7',
+                    }}
+                    onFocus={e => (e.currentTarget.style.borderColor = '#4f6ef7')}
+                    onBlur={e => (e.currentTarget.style.borderColor = '#1e1e30')}
                   />
                 </div>
 
                 {/* Score */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Score Yourself (1–5)</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#5a5a72' }}>
+                    Score Yourself (1–5)
+                  </p>
                   <div className="space-y-2">
-                    {q.scores.map(s => (
-                      <button
-                        key={s.value}
-                        onClick={() => setScore(q.id, s.value)}
-                        className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all flex gap-3 items-start ${
-                          score === s.value
-                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                        }`}
-                      >
-                        <span className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold mt-0.5 ${
-                          score === s.value
-                            ? 'border-indigo-500 bg-indigo-500 text-white'
-                            : 'border-gray-300 dark:border-gray-600 text-gray-400'
-                        }`}>
-                          {s.value}
-                        </span>
-                        <span className={`text-sm leading-relaxed ${score === s.value ? 'text-indigo-700 dark:text-indigo-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
-                          {s.label}
-                        </span>
-                      </button>
-                    ))}
+                    {q.scores.map(s => {
+                      const isSelected = score === s.value;
+                      return (
+                        <button
+                          key={s.value}
+                          onClick={() => setScore(q.id, s.value)}
+                          className="w-full text-left px-4 py-3 rounded-xl border-2 transition-all flex gap-3 items-start"
+                          style={{
+                            borderColor: isSelected ? '#7c5bf6' : '#1e1e30',
+                            background: isSelected ? 'rgba(124,91,246,0.1)' : 'transparent',
+                          }}
+                        >
+                          <span
+                            className="flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold mt-0.5"
+                            style={{
+                              borderColor: isSelected ? '#7c5bf6' : '#2a2a3f',
+                              background: isSelected ? '#7c5bf6' : 'transparent',
+                              color: isSelected ? '#ededf5' : '#5a5a72',
+                            }}
+                          >
+                            {s.value}
+                          </span>
+                          <span
+                            className="text-sm leading-relaxed"
+                            style={{ color: isSelected ? '#ededf5' : '#9090a8', fontWeight: isSelected ? 500 : 400 }}
+                          >
+                            {s.label}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Pattern watch — show after answering */}
+                {/* Pattern watch — show after answering low */}
                 {score !== undefined && score <= 2 && (
-                  <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Pattern Watch</p>
-                    <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">{q.patternWatch}</p>
+                  <div className="rounded-xl p-4"
+                    style={{
+                      background: 'rgba(252,200,36,0.06)',
+                      border: '1px solid rgba(252,200,36,0.2)',
+                    }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#fcc824' }}>
+                      Pattern Watch
+                    </p>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(252,200,36,0.85)' }}>
+                      {q.patternWatch}
+                    </p>
                   </div>
                 )}
               </div>
@@ -347,17 +398,18 @@ export default function AuditViewPage() {
         })}
 
         {/* Submit */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <div className="rounded-xl border p-5"
+          style={{ background: 'rgba(18,18,31,0.8)', borderColor: '#1e1e30' }}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">{answeredCount} of {QUESTIONS.length} scored</span>
+            <span className="text-sm" style={{ color: '#9090a8' }}>{answeredCount} of {QUESTIONS.length} scored</span>
             {isComplete && (
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total: {totalScore} / 35</span>
+              <span className="text-sm font-semibold" style={{ color: '#ededf5' }}>Total: {totalScore} / 35</span>
             )}
           </div>
-          <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full mb-4 overflow-hidden">
+          <div className="h-1.5 rounded-full mb-4 overflow-hidden" style={{ background: '#1e1e30' }}>
             <div
-              className="h-full bg-indigo-500 rounded-full transition-all duration-300"
-              style={{ width: `${(answeredCount / QUESTIONS.length) * 100}%` }}
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: `${(answeredCount / QUESTIONS.length) * 100}%`, background: '#4f6ef7' }}
             />
           </div>
           <button
@@ -370,13 +422,14 @@ export default function AuditViewPage() {
               setSubmitted(true);
             }}
             disabled={!isComplete}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 font-bold rounded-xl transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: '#4f6ef7', color: '#ededf5' }}
           >
             {isComplete ? 'See My OS Score →' : `Score ${QUESTIONS.length - answeredCount} remaining question${QUESTIONS.length - answeredCount !== 1 ? 's' : ''}`}
           </button>
         </div>
 
-        <p className="text-center text-xs text-gray-400 dark:text-gray-600">
+        <p className="text-center text-xs" style={{ color: '#5a5a72' }}>
           <Link href="https://mindset.show" target="_blank" className="hover:underline">mindset.show</Link>
           {' · '}Stop reacting. Start designing.
         </p>
