@@ -213,8 +213,10 @@ export default function JoinPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-sm transition-colors duration-200 rounded-lg px-3 py-1.5 hover:bg-white/[0.04]"
+              className="text-sm transition-colors duration-200 rounded-lg px-3 py-1.5"
               style={{ color: '#9090a8' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
             >
               Sign In
             </Link>
@@ -330,7 +332,7 @@ export default function JoinPage() {
               <div
                 key={i}
                 className="join-card-hover relative p-7 rounded-2xl group backdrop-blur-sm"
-                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
               >
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ background: 'radial-gradient(ellipse at top left, rgba(252,200,36,0.06) 0%, transparent 60%)' }} />
@@ -453,7 +455,7 @@ export default function JoinPage() {
               <div
                 key={i}
                 className="join-card-hover flex items-center justify-between p-5 rounded-xl group"
-                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300"
@@ -502,9 +504,9 @@ export default function JoinPage() {
           <div className="relative rounded-3xl overflow-hidden">
             {/* Card background with gradient mesh */}
             <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d0d18 0%, #12121f 50%, #0d0d18 100%)' }} />
-            <div className="absolute top-0 right-0 w-80 h-80 bg-[#fcc824]/8 rounded-full blur-[100px]" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#fcc824]/5 rounded-full blur-[80px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#fcc824]/3 rounded-full blur-[120px]" />
+            <div className="absolute top-0 right-0 w-80 h-80 rounded-full blur-[100px]" style={{ background: 'rgba(252,200,36,0.08)' }} />
+            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-[80px]" style={{ background: 'rgba(252,200,36,0.05)' }} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-[120px]" style={{ background: 'rgba(252,200,36,0.03)' }} />
             {/* Subtle dot grid inside card */}
             <div className="absolute inset-0 opacity-[0.03]" style={{
               backgroundImage: 'radial-gradient(circle at 1px 1px, #fcc824 1px, transparent 0)',
@@ -512,58 +514,88 @@ export default function JoinPage() {
             }} />
 
             <div className="relative p-8 sm:p-12 md:p-16 text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 tracking-tight" style={{ color: '#ededf5' }}>
                 Join the Mindset Architecture
               </h2>
-              <p className="text-gray-400 mb-10 max-w-lg mx-auto text-base sm:text-lg leading-relaxed">
+              <p className="mb-10 max-w-lg mx-auto text-base sm:text-lg leading-relaxed" style={{ color: '#9090a8' }}>
                 Training course + AI agents + live coaching + bonuses worth $7,250. Everything you need to go from idea to income.
               </p>
 
               {/* Pricing options */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 max-w-4xl mx-auto mb-10">
                 {/* $47 Reset option */}
-                <a href="/buy/reset" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
-                  <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">48-Hr Reset</div>
-                  <div className="text-3xl font-extrabold text-white tracking-tight">$47</div>
-                  <div className="text-xs text-gray-500 mt-1.5">One payment</div>
+                <a
+                  href="/buy/reset"
+                  className="group relative rounded-2xl p-5 text-center transition-all duration-300 block"
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#2e2e48'; (e.currentTarget as HTMLElement).style.background = 'rgba(22,22,38,0.9)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)'; }}
+                >
+                  <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#9090a8' }}>48-Hr Reset</div>
+                  <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>$47</div>
+                  <div className="text-xs mt-1.5" style={{ color: '#5a5a72' }}>One payment</div>
                 </a>
                 {/* Weekly option */}
-                <div className="group relative bg-white/[0.08] border-2 border-[#fcc824]/50 rounded-2xl p-5 text-center transition-all duration-300 hover:border-[#fcc824] hover:bg-white/[0.12]" style={{ animation: 'join-pulse-glow 3s ease-in-out infinite' }}>
-                  <div className="text-xs text-[#fcc824] font-bold uppercase tracking-widest mb-2">Weekly</div>
-                  <div className="text-3xl font-extrabold text-white tracking-tight">$47<span className="text-base font-medium text-gray-400">/wk</span></div>
-                  <div className="text-xs text-gray-400 mt-1.5">Billed weekly</div>
+                <div
+                  className="group relative rounded-2xl p-5 text-center transition-all duration-300"
+                  style={{ background: 'rgba(22,22,34,0.9)', border: '2px solid rgba(252,200,36,0.5)', animation: 'join-pulse-glow 3s ease-in-out infinite' }}
+                >
+                  <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#fcc824' }}>Weekly</div>
+                  <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>$47<span className="text-base font-medium" style={{ color: '#9090a8' }}>/wk</span></div>
+                  <div className="text-xs mt-1.5" style={{ color: '#9090a8' }}>Billed weekly</div>
                 </div>
                 {/* Annual option */}
-                <a href="/checkout?plan=individual_annual" className="col-span-2 sm:col-span-1 group relative bg-white/[0.06] border border-emerald-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-emerald-400 hover:bg-white/[0.1] block">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap">
+                <a
+                  href="/checkout?plan=individual_annual"
+                  className="col-span-2 sm:col-span-1 group relative rounded-2xl p-5 text-center transition-all duration-300 block"
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(79,110,247,0.4)' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.7)'; (e.currentTarget as HTMLElement).style.background = 'rgba(22,22,38,0.9)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.4)'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)'; }}
+                >
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg whitespace-nowrap"
+                    style={{ background: '#4f6ef7', color: '#ededf5' }}
+                  >
                     BEST VALUE
                   </div>
-                  <div className="text-xs text-emerald-400 font-bold uppercase tracking-widest mb-2">Annual</div>
-                  <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
-                  <div className="text-xs text-gray-400 mt-1.5">Save $440 vs weekly</div>
+                  <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#4f6ef7' }}>Annual</div>
+                  <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>$1,997</div>
+                  <div className="text-xs mt-1.5" style={{ color: '#9090a8' }}>Save $440 vs weekly</div>
                 </a>
                 {/* 90-Day Architecture */}
-                <a href="/checkout?plan=architecture_997" className="group relative bg-white/[0.06] border border-gray-600/60 rounded-2xl p-5 text-center transition-all duration-300 hover:border-gray-500 hover:bg-white/[0.1] block">
-                  <div className="text-xs text-gray-300 font-bold uppercase tracking-widest mb-2">90-Day Cohort</div>
-                  <div className="text-3xl font-extrabold text-white tracking-tight">$997</div>
-                  <div className="text-xs text-gray-500 mt-1.5">Group program</div>
+                <a
+                  href="/checkout?plan=architecture_997"
+                  className="group relative rounded-2xl p-5 text-center transition-all duration-300 block"
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#2e2e48'; (e.currentTarget as HTMLElement).style.background = 'rgba(22,22,38,0.9)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)'; }}
+                >
+                  <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#9090a8' }}>90-Day Cohort</div>
+                  <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>$997</div>
+                  <div className="text-xs mt-1.5" style={{ color: '#5a5a72' }}>Group program</div>
                 </a>
                 {/* 1:1 Intensive */}
-                <a href="/checkout?plan=intensive_1997" className="group relative bg-white/[0.06] rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.1] block"
-                  style={{ border: '1px solid rgba(124,91,246,0.4)' }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.7)')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.4)')}>
+                <a
+                  href="/checkout?plan=intensive_1997"
+                  className="group relative rounded-2xl p-5 text-center transition-all duration-300 block"
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid rgba(124,91,246,0.4)' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.7)'; (e.currentTarget as HTMLElement).style.background = 'rgba(22,22,38,0.9)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.4)'; (e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)'; }}
+                >
                   <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#a07ef9' }}>1:1 Intensive</div>
-                  <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
-                  <div className="text-xs text-gray-500 mt-1.5">Private add-on</div>
+                  <div className="text-3xl font-extrabold tracking-tight" style={{ color: '#ededf5' }}>$1,997</div>
+                  <div className="text-xs mt-1.5" style={{ color: '#5a5a72' }}>Private add-on</div>
                 </a>
               </div>
 
               {/* Guarantee badge */}
-              <div className="flex items-center justify-center gap-3 mb-8 px-6 py-4 rounded-xl border border-emerald-500/30 bg-emerald-900/10 max-w-lg mx-auto">
-                <Lock className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <p className="text-sm text-gray-300 text-left">
-                  <span className="font-bold text-white">100% risk-free.</span>{' '}
+              <div
+                className="flex items-center justify-center gap-3 mb-8 px-6 py-4 rounded-xl max-w-lg mx-auto"
+                style={{ border: '1px solid rgba(79,110,247,0.3)', background: 'rgba(79,110,247,0.06)' }}
+              >
+                <Lock className="w-5 h-5 flex-shrink-0" style={{ color: '#4f6ef7' }} />
+                <p className="text-sm text-left" style={{ color: '#9090a8' }}>
+                  <span className="font-bold" style={{ color: '#ededf5' }}>100% risk-free.</span>{' '}
                   30-day money-back guarantee. If MindsetOS doesn&apos;t change how you think, we&apos;ll refund every cent.
                 </p>
               </div>
@@ -577,7 +609,7 @@ export default function JoinPage() {
                   'MindsetOS community + coaching support',
                   'Bonuses worth $7,250',
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-sm sm:text-base text-gray-300">
+                  <div key={i} className="flex items-center gap-3 text-sm sm:text-base" style={{ color: '#9090a8' }}>
                     <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#fcc824' }} />
                     {item}
                   </div>
@@ -592,7 +624,7 @@ export default function JoinPage() {
                 <ArrowRight className="w-5 h-5" />
               </a>
 
-              <p className="text-xs text-gray-500 mt-5 flex items-center justify-center gap-4">
+              <p className="text-xs mt-5 flex items-center justify-center gap-4" style={{ color: '#5a5a72' }}>
                 <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Secure payment</span>
                 <span>&middot;</span>
                 <span>Cancel anytime</span>
