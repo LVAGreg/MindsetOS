@@ -18,7 +18,16 @@ export default function SevenDaysPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim() || submitting) return;
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!trimmedEmail || submitting) return;
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
+
     setSubmitting(true);
     setFormError('');
 
@@ -27,7 +36,7 @@ export default function SevenDaysPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.trim().toLowerCase(),
+          email: trimmedEmail,
           firstName: firstName.trim(),
           magnetType: '7days',
         }),
@@ -36,8 +45,8 @@ export default function SevenDaysPage() {
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
       try { posthog.capture('lead_magnet_submitted', { source: '7days' }); } catch {}
       setSubmitted(true);
-    } catch (err: any) {
-      setFormError(err.message);
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -172,7 +181,7 @@ export default function SevenDaysPage() {
                     <button
                       type="submit"
                       disabled={submitting || !email.trim()}
-                      className="w-full bg-[#4f6ef7] hover:bg-[#3d5ce0] text-white font-semibold py-3.5 px-6 rounded-xl text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-[#4f6ef7] hover:bg-[#3d5ce0] text-[#ededf5] font-semibold py-3.5 px-6 rounded-xl text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {submitting ? (
                         <>
