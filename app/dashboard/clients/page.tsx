@@ -1,17 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Building2, Plus, Edit3, Archive, Check, X,
-  MessageSquare, Brain, Palette, Search, ToggleLeft, ToggleRight,
-  BookOpen, ArrowLeft
+  MessageSquare, Brain, Search, ToggleLeft, ToggleRight,
+  BookOpen, ArrowLeft, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
 import type { ClientProfile } from '@/lib/store';
 
-const PROFILE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+// Avatar palette — cosmetic only, not UI design tokens
+const PROFILE_COLORS = ['#3b82f6', '#10b981', '#fcc824', '#ef4444', '#7c5bf6', '#ec4899', '#06b6d4', '#f97316'];
+
+// Milliseconds before an agent-settings fetch is considered stalled
+const AGENT_FETCH_TIMEOUT_MS = 12_000;
 
 interface AgentSetting {
   id: string;
@@ -40,9 +44,12 @@ export default function ClientsPage() {
   const [creating, setCreating] = useState(false);
   const [agentSettings, setAgentSettings] = useState<AgentSetting[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(false);
+  const [agentError, setAgentError] = useState<string | null>(null);
   const [savingAgents, setSavingAgents] = useState(false);
+  const [savingAgentError, setSavingAgentError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   const isAgencyOrAdmin = user?.role === 'agency' || user?.role === 'admin';
 
@@ -54,20 +61,33 @@ export default function ClientsPage() {
     fetchClientProfiles();
   }, [isAgencyOrAdmin]);
 
-  // Fetch agent settings when a client is selected
+  // Fetch agent settings when a client is selected — with stall timeout
   useEffect(() => {
-    if (selectedClient) {
-      setLoadingAgents(true);
-      apiClient.get(`/api/client-profiles/${selectedClient.id}/agents`)
-        .then((data: any) => setAgentSettings(data.agents || []))
-        .catch((err: any) => {
-          console.error('Failed to fetch agent settings:', err);
-          // Fail-open: keep agentSettings empty so the UI renders with defaults
-          setAgentSettings([]);
-          setActionError('Failed to load agent settings. Some settings may not be displayed correctly.');
-        })
-        .finally(() => setLoadingAgents(false));
-    }
+    if (!selectedClient) return;
+
+    setLoadingAgents(true);
+    setAgentError(null);
+    setAgentSettings([]);
+
+    const timeoutId = setTimeout(() => {
+      setLoadingAgents(false);
+      setAgentError('Agent settings took too long to load. Check your connection and try again.');
+    }, AGENT_FETCH_TIMEOUT_MS);
+
+    apiClient.get(`/api/client-profiles/${selectedClient.id}/agents`)
+      .then((data: any) => {
+        clearTimeout(timeoutId);
+        setAgentSettings(data.agents || []);
+      })
+      .catch((err: any) => {
+        clearTimeout(timeoutId);
+        const msg = err?.response?.data?.message || err?.message || 'Failed to load agent settings.';
+        setAgentError(msg);
+        setAgentSettings([]);
+      })
+      .finally(() => setLoadingAgents(false));
+
+    return () => clearTimeout(timeoutId);
   }, [selectedClient?.id]);
 
   const handleSelectClient = (client: ClientProfile) => {
@@ -76,8 +96,15 @@ export default function ClientsPage() {
     setEditName(client.clientName);
     setEditIndustry(client.industry || '');
     setEditDescription(client.description || '');
-    setEditColor(client.color || '#3b82f6');
+    setEditColor(client.color || '#4f6ef7');
   };
+
+  // Scroll detail pane into view on mobile when a client is selected
+  useEffect(() => {
+    if (selectedClient) {
+      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedClient?.id]);
 
   const handleSaveEdit = async () => {
     if (!selectedClient || !editName.trim()) return;
@@ -142,6 +169,7 @@ export default function ClientsPage() {
   const handleToggleAgent = async (agentId: string, currentActive: boolean) => {
     if (!selectedClient) return;
     // Optimistic update
+    setSavingAgentError(null);
     setAgentSettings(prev => prev.map(a => a.id === agentId ? { ...a, isActive: !currentActive } : a));
 
     setSavingAgents(true);
@@ -149,10 +177,11 @@ export default function ClientsPage() {
       await apiClient.put(`/api/client-profiles/${selectedClient.id}/agents`, {
         agents: [{ id: agentId, isActive: !currentActive }]
       });
-    } catch (err) {
-      // Revert on failure
+    } catch (err: any) {
+      // Revert optimistic update and surface the error
       setAgentSettings(prev => prev.map(a => a.id === agentId ? { ...a, isActive: currentActive } : a));
-      console.error('Failed to toggle agent:', err);
+      const msg = err?.response?.data?.message || err?.message || 'Failed to update agent access. Please try again.';
+      setSavingAgentError(msg);
     } finally {
       setSavingAgents(false);
     }
@@ -185,7 +214,7 @@ export default function ClientsPage() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <Building2 className="w-6 h-6" style={{ color: '#7b8ff8' }} />
+              <Building2 className="w-6 h-6" style={{ color: '#4f6ef7' }} />
               <div>
                 <h1 className="text-xl font-bold" style={{ color: '#ededf5' }}>Client Management</h1>
                 <p className="text-sm" style={{ color: '#9090a8' }}>
@@ -211,9 +240,9 @@ export default function ClientsPage() {
             <button onClick={() => setActionError(null)} className="ml-2 text-red-400 hover:text-red-300">✕</button>
           </div>
         )}
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Left panel - client list */}
-          <div className="w-80 flex-shrink-0">
+          <div className="w-full lg:w-80 lg:flex-shrink-0">
             {/* Search */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#9090a8' }} />
@@ -222,7 +251,7 @@ export default function ClientsPage() {
                 placeholder="Search clients..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 placeholder-[#5a5a72]"
+                className="w-full pl-10 pr-4 bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 placeholder-[#5a5a72]"
               />
             </div>
 
@@ -263,7 +292,7 @@ export default function ClientsPage() {
                   <button
                     onClick={() => setShowCreate(true)}
                     className="text-sm mt-1 transition-colors"
-                    style={{ color: '#7b8ff8' }}
+                    style={{ color: '#4f6ef7' }}
                   >
                     Add your first client
                   </button>
@@ -273,7 +302,7 @@ export default function ClientsPage() {
           </div>
 
           {/* Right panel - detail/edit */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" ref={detailRef}>
             {showCreate ? (
               /* Create form */
               <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
@@ -385,7 +414,7 @@ export default function ClientsPage() {
                           <button
                             onClick={() => handleSetActiveAndGo(selectedClient)}
                             className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
-                            style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#7b8ff8' }}
+                            style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#4f6ef7' }}
                           >
                             <MessageSquare className="w-4 h-4" /> Open
                           </button>
@@ -467,7 +496,7 @@ export default function ClientsPage() {
                 <div style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }} className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-base font-bold flex items-center gap-2" style={{ color: '#ededf5' }}>
-                      <BookOpen className="w-5 h-5" style={{ color: '#7b8ff8' }} />
+                      <BookOpen className="w-5 h-5" style={{ color: '#4f6ef7' }} />
                       Agent Access
                     </h3>
                     {savingAgents && <span className="text-xs" style={{ color: '#9090a8' }}>Saving...</span>}
@@ -476,8 +505,39 @@ export default function ClientsPage() {
                     Toggle which agents are available when working in this client&#39;s context.
                   </p>
 
+                  {/* Save-toggle error */}
+                  {savingAgentError && (
+                    <div className="mb-3 px-3 py-2 rounded-lg text-sm flex items-center justify-between gap-2" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+                      <span className="flex items-center gap-2"><AlertCircle className="w-4 h-4 flex-shrink-0" />{savingAgentError}</span>
+                      <button onClick={() => setSavingAgentError(null)} style={{ color: '#f87171' }}>✕</button>
+                    </div>
+                  )}
+
                   {loadingAgents ? (
-                    <div className="text-center py-8" style={{ color: '#9090a8' }}>Loading agents...</div>
+                    <div className="flex items-center justify-center gap-2 py-8" style={{ color: '#9090a8' }}>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">Loading agents...</span>
+                    </div>
+                  ) : agentError ? (
+                    <div className="flex flex-col items-center gap-3 py-8">
+                      <AlertCircle className="w-8 h-8" style={{ color: '#f87171' }} />
+                      <p className="text-sm text-center" style={{ color: '#9090a8' }}>{agentError}</p>
+                      <button
+                        onClick={() => {
+                          if (!selectedClient) return;
+                          setAgentError(null);
+                          setLoadingAgents(true);
+                          apiClient.get(`/api/client-profiles/${selectedClient.id}/agents`)
+                            .then((data: any) => setAgentSettings(data.agents || []))
+                            .catch((err: any) => setAgentError(err?.response?.data?.message || err?.message || 'Failed to load agent settings.'))
+                            .finally(() => setLoadingAgents(false));
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)', color: '#4f6ef7' }}
+                      >
+                        <RefreshCw className="w-4 h-4" /> Retry
+                      </button>
+                    </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {agentSettings.map(agent => (
@@ -494,7 +554,7 @@ export default function ClientsPage() {
                         >
                           <button onClick={() => handleToggleAgent(agent.id, agent.isActive)} className="flex-shrink-0">
                             {agent.isActive ? (
-                              <ToggleRight className="w-6 h-6" style={{ color: '#7b8ff8' }} />
+                              <ToggleRight className="w-6 h-6" style={{ color: '#4f6ef7' }} />
                             ) : (
                               <ToggleLeft className="w-6 h-6" style={{ color: '#3a3a52' }} />
                             )}
@@ -505,6 +565,9 @@ export default function ClientsPage() {
                           </div>
                         </div>
                       ))}
+                      {agentSettings.length === 0 && (
+                        <p className="col-span-2 text-sm text-center py-4" style={{ color: '#5a5a72' }}>No agents configured for this client.</p>
+                      )}
                     </div>
                   )}
                 </div>
