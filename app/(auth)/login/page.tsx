@@ -46,7 +46,7 @@ export default function LoginPage() {
       try {
         posthog.identify(userData.id || userData.email, { email: userData.email });
         posthog.capture('user_signed_in', { role: userData.role });
-      } catch {}
+      } catch { /* intentionally swallow PostHog errors — never block login */ }
 
       // Load user's conversation history
       try {
@@ -128,7 +128,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#09090f]">
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: '#09090f' }}>
 
       {/* --- Atmospheric background layers --- */}
 
@@ -257,8 +257,8 @@ export default function LoginPage() {
                     <input
                       id="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 rounded border-[#1e1e30] bg-white/5"
-                      style={{ accentColor: '#fcc824' }}
+                      className="h-4 w-4 rounded border-[#1e1e30]"
+                      style={{ background: 'rgba(255,255,255,0.05)', accentColor: '#fcc824' }}
                     />
                     <label
                       htmlFor="remember-me"
@@ -279,7 +279,7 @@ export default function LoginPage() {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || isGoogleLoading}
                   className="login-btn-primary group w-full py-3 px-4 text-black font-semibold rounded-xl transition-all duration-300 shadow-[0_4px_24px_rgba(252,200,36,0.25)] hover:shadow-[0_8px_40px_rgba(252,200,36,0.35)] hover:scale-[1.015] active:scale-[0.985] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
                   style={{ background: 'linear-gradient(135deg, #fcc824 0%, #f0b800 100%)' }}
                 >
@@ -311,7 +311,18 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading || isLoading}
-                className="w-full py-3 px-4 bg-[#12121f] border border-[#1e1e30] rounded-xl transition-all duration-300 hover:bg-white/[0.07] hover:border-white/[0.14] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                className="w-full py-3 px-4 rounded-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                style={{ background: '#12121f', border: '1px solid #1e1e30' }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = 'rgba(255,255,255,0.07)';
+                  el.style.borderColor = 'rgba(255,255,255,0.14)';
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = '#12121f';
+                  el.style.borderColor = '#1e1e30';
+                }}
               >
                 {isGoogleLoading ? (
                   <>
@@ -443,7 +454,7 @@ export default function LoginPage() {
                     </p>
                   </div>
                 </div>
-                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/[0.06] flex justify-between items-center">
+                <div className="px-6 py-4 border-t border-white/[0.06] flex justify-between items-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <Link href="/terms" target="_blank" className="text-sm text-[#fcc824] hover:text-[#fdd84e] transition-colors">
                     View Full Terms &rarr;
                   </Link>
@@ -507,7 +518,7 @@ export default function LoginPage() {
                     </ul>
                   </div>
                 </div>
-                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/[0.06] flex justify-between items-center">
+                <div className="px-6 py-4 border-t border-white/[0.06] flex justify-between items-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <Link href="/privacy" target="_blank" className="text-sm text-[#fcc824] hover:text-[#fdd84e] transition-colors">
                     View Full Privacy Policy &rarr;
                   </Link>

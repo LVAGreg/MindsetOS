@@ -431,7 +431,7 @@ export default function ProfilePage() {
             style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
           >
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0" style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #7c5bf6 100%)', color: '#fff' }}>
                 {coreMemoriesData.fullName?.[0] || profile.first_name?.[0] || profile.email[0].toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -460,7 +460,7 @@ export default function ProfilePage() {
                       placeholder="Email address"
                       className="w-full bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl px-4 py-3 text-sm placeholder:text-[#9090a8]/60 focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7]"
                     />
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={handleSaveProfile}
                         disabled={savingProfile}
@@ -497,6 +497,7 @@ export default function ProfilePage() {
                         className="p-1 transition-colors"
                         style={{ color: '#9090a8' }}
                         title="Edit profile"
+                        aria-label="Edit profile"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -591,7 +592,7 @@ export default function ProfilePage() {
                     <li>Agent memory of your previous work</li>
                   </ul>
                   <p className="text-xs mt-1" style={{ color: 'rgba(248,113,113,0.7)' }}>Your conversations, playbooks, and usage history are kept.</p>
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     <button
                       onClick={handleResetMemory}
                       disabled={resetting}
@@ -926,8 +927,8 @@ export default function ProfilePage() {
             )}
 
             {!brandVoiceData.isEnabled && (
-              <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)' }}>
-                <p className="text-sm" style={{ color: '#fbbf24' }}>
+              <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(252,200,36,0.08)', border: '1px solid rgba(252,200,36,0.25)' }}>
+                <p className="text-sm" style={{ color: '#fcc824' }}>
                   Brand voice is currently disabled. Agents will not use your custom voice settings. Enable it above to activate.
                 </p>
               </div>
@@ -1162,6 +1163,7 @@ export default function ProfilePage() {
                     onClick={() => setShowByokKey(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
                     style={{ color: '#9090a8' }}
+                    aria-label={showByokKey ? 'Hide API key' : 'Show API key'}
                   >
                     <Eye className="w-4 h-4" />
                   </button>

@@ -142,7 +142,7 @@ export default function CoachingPracticeLandingPage() {
         {/* Background depth layers */}
         <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-[#fcc824]/[0.04] rounded-full blur-[150px]" />
         <div className="absolute top-[100px] left-[5%] w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: 'rgba(252,200,36,0.03)' }} />
-        <div className="absolute top-[200px] right-[5%] w-[350px] h-[350px] bg-purple-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute top-[200px] right-[5%] w-[350px] h-[350px] rounded-full blur-[120px]" style={{ background: 'rgba(124,91,246,0.03)' }} />
         {/* Subtle dot grid */}
         <div className="absolute inset-0 opacity-[0.03]" style={{
           backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
@@ -192,7 +192,7 @@ export default function CoachingPracticeLandingPage() {
       </section>
 
       {/* Bridge */}
-      <section className="relative border-y border-white/[0.06] bg-gradient-to-r from-[#fcc824]/[0.03] via-transparent to-purple-500/[0.03]">
+      <section className="relative border-y border-white/[0.06]" style={{ background: 'linear-gradient(to right, rgba(252,200,36,0.03), transparent, rgba(124,91,246,0.03))' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <p className="text-lg sm:text-xl font-medium text-white/70">
             You&apos;re already using MindsetOS to transform your own mindset.{' '}
@@ -274,7 +274,7 @@ export default function CoachingPracticeLandingPage() {
 
             <div className="relative">
               {/* Card glow */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-[#fcc824]/[0.08] via-transparent to-purple-500/[0.05] rounded-3xl blur-xl" />
+              <div className="absolute -inset-1 rounded-3xl blur-xl" style={{ background: 'linear-gradient(to bottom right, rgba(252,200,36,0.08), transparent, rgba(124,91,246,0.05))' }} />
               <div className="relative bg-white/[0.03] rounded-2xl p-8 border border-white/[0.08]">
                 <h3 className="text-lg font-bold text-white mb-6">
                   How the Coaching Practice Works
@@ -302,7 +302,7 @@ export default function CoachingPracticeLandingPage() {
 
       {/* Comparison Table */}
       <section className="relative py-20 sm:py-28">
-        <div className="absolute top-[50%] right-[10%] w-[300px] h-[300px] bg-purple-500/[0.03] rounded-full blur-[100px]" />
+        <div className="absolute top-[50%] right-[10%] w-[300px] h-[300px] rounded-full blur-[100px]" style={{ background: 'rgba(124,91,246,0.03)' }} />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -412,7 +412,10 @@ export default function CoachingPracticeLandingPage() {
                   : 'border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] hover:bg-white/[0.03]'
               }`}
             >
-              <div className="absolute -top-3 right-4 px-3 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wide shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+              <div
+                className="absolute -top-3 right-4 px-3 py-1 text-white text-[10px] font-bold rounded-full uppercase tracking-wide"
+                style={{ background: '#7c5bf6', boxShadow: '0 0 15px rgba(124,91,246,0.35)' }}
+              >
                 Best Value
               </div>
               {selectedPlan === 'practice10' && (
