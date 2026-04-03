@@ -7,7 +7,7 @@ import { AgentIcon } from '@/lib/agent-icons';
 
 // Hex color map — mirrors ChatWindow.tsx AGENT_HEX
 const AGENT_HEX: Record<string, string> = {
-  'mindset-score': '#f59e0b',
+  'mindset-score': '#fcc824',
   'reset-guide': '#0ea5e9',
   'architecture-coach': '#7c3aed',
   'practice-builder': '#10b981',
@@ -17,7 +17,7 @@ const AGENT_HEX: Record<string, string> = {
   'conversation-curator': '#14b8a6',
   'decision-framework': '#2563eb',
   'inner-world-mapper': '#ec4899',
-  'goal-architect': '#eab308',
+  'goal-architect': '#fcc824',
   'belief-debugger': '#9333ea',
   'morning-ritual-builder': '#f43f5e',
   'energy-optimizer': '#84cc16',

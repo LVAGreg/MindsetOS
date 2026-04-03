@@ -18,7 +18,7 @@ interface PlaybookArtifact {
 
 // Hex accent colors keyed by agent slug — matches Tailwind classes in MINDSET_AGENTS
 const AGENT_HEX: Record<string, string> = {
-  'mindset-score':           '#f59e0b', // amber-500
+  'mindset-score':           '#fcc824',
   'reset-guide':             '#0ea5e9', // sky-500
   'architecture-coach':      '#7c3aed', // violet-600
   'practice-builder':        '#10b981', // emerald-500
@@ -28,7 +28,7 @@ const AGENT_HEX: Record<string, string> = {
   'conversation-curator':    '#14b8a6', // teal-500
   'decision-framework':      '#2563eb', // blue-600
   'inner-world-mapper':      '#ec4899', // pink-500
-  'goal-architect':          '#eab308', // yellow-500
+  'goal-architect':          '#fcc824',
   'belief-debugger':         '#9333ea', // purple-600
   'morning-ritual-builder':  '#f43f5e', // rose-500
   'energy-optimizer':        '#84cc16', // lime-500
@@ -421,7 +421,7 @@ export function PlaybookList() {
         setPlays(prev => prev.map(p => p.id === editingId ? { ...p, title: editTitle.trim() } : p));
       } catch (err: unknown) {
         console.error('[PlaybookList] Rename failed:', err);
-        // Revert to original title — optimistic update was never applied so nothing to undo
+        setError('Could not rename play. Please try again.');
       }
     }
     setEditingId(null);

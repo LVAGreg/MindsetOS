@@ -11,15 +11,15 @@ const TOKEN = {
   amberBorder:     'rgba(252,200,36,0.45)',
   amberText:       '#fcc824',
   // Surfaces
-  surface:         '#1a1a2e',
-  surfaceRaised:   '#16213e',
-  surfaceInput:    'rgba(255,255,255,0.04)',
-  border:          'rgba(255,255,255,0.08)',
+  surface:         'rgba(18,18,31,0.8)',
+  surfaceRaised:   '#12121f',
+  surfaceInput:    'rgba(18,18,31,0.6)',
+  border:          '#1e1e30',
   borderFocus:     'rgba(252,200,36,0.55)',
   // Text
-  textPrimary:     '#e2e8f0',
-  textMuted:       '#64748b',
-  textPlaceholder: '#475569',
+  textPrimary:     '#ededf5',
+  textMuted:       '#9090a8',
+  textPlaceholder: '#5a5a72',
   // Actions
   dangerText:      '#ef4444',
   dangerBg:        'rgba(239,68,68,0.1)',

@@ -10,7 +10,7 @@ const TOKEN = {
   amberBg: 'rgba(252,200,36,0.15)',
   amberBorder: '#fcc824',
   errorText: '#ef4444',
-  mutedText: '#6b7280',
+  mutedText: '#9090a8',
   successText: '#10b981',
   transparent: 'transparent',
 } as const;

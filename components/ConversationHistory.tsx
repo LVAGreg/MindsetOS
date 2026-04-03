@@ -6,6 +6,7 @@ import { format, formatDistanceToNow, isToday, isYesterday, isThisWeek } from 'd
 import { useState, useMemo } from 'react';
 import ConversationMenu from './ConversationMenu';
 import RenameDialog from './RenameDialog';
+import { apiClient } from '@/lib/api-client';
 import ProjectSelector from './ProjectSelector';
 import AllChatsDialog from './AllChatsDialog';
 
@@ -41,6 +42,7 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
     currentAgent,
     setCurrentAgent,
     createConversation,
+    updateConversation,
   } = useAppStore();
 
   // Handle conversation click - also update the active agent
@@ -89,6 +91,24 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
   const handleMoveToProject = (conversationId: string) => {
     setProjectSelectorConvId(conversationId);
     setProjectSelectorOpen(true);
+  };
+
+  const handlePin = async (conversationId: string) => {
+    try {
+      await apiClient.post(`/api/conversations/${conversationId}/pin`, {});
+      updateConversation(conversationId, { is_pinned: true, pinned_at: new Date().toISOString() });
+    } catch (err) {
+      console.error('[ConversationHistory] Pin failed:', err);
+    }
+  };
+
+  const handleUnpin = async (conversationId: string) => {
+    try {
+      await apiClient.post(`/api/conversations/${conversationId}/unpin`, {});
+      updateConversation(conversationId, { is_pinned: false, pinned_at: undefined });
+    } catch (err) {
+      console.error('[ConversationHistory] Unpin failed:', err);
+    }
   };
 
   // Get abbreviated agent name
@@ -316,6 +336,9 @@ export default function ConversationHistory({ currentAgentData, filterStarred, a
               isStarred={conversation.isStarred || false}
               onRename={() => handleRename(conversation.id)}
               onMoveToProject={() => handleMoveToProject(conversation.id)}
+              isPinned={conversation.is_pinned || false}
+              onPin={handlePin}
+              onUnpin={handleUnpin}
             />
           </div>
         </div>

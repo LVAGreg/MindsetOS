@@ -90,9 +90,9 @@ function useAccountabilityStreak(): [number, () => void] {
       try {
         // Try dedicated endpoint first
         const innerClient = (apiClient as unknown as { client: { get: (url: string) => Promise<{ data: StreakData }> } }).client;
-        const res = await innerClient.get('/api/users/streak');
-        if (!cancelled && res?.data?.daily_streak !== undefined) {
-          const val = res.data.daily_streak;
+        const res = await innerClient.get('/api/streak');
+        if (!cancelled && res?.data?.current_streak !== undefined) {
+          const val = res.data.current_streak;
           setStreak(val);
           // Keep localStorage in sync
           localStorage.setItem(LS_STREAK_KEY, String(val));

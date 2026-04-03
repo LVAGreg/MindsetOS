@@ -43,7 +43,7 @@ export function MindsetScoreWidget({ onNavigateToAgent }: MindsetScoreWidgetProp
         const token = localStorage.getItem('accessToken');
         if (!token) { setLoading(false); return; }
 
-        const res = await fetch(`${API_URL}/api/users/mindset-score`, {
+        const res = await fetch(`${API_URL}/api/mindset-score/latest`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 

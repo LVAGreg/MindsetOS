@@ -53,9 +53,21 @@ function toDateString(value: Date | string | null | undefined): string {
   }
 }
 
-/** Lightweight markdown-to-html conversion for PDF rendering (subset). */
+/** Escape HTML special characters to prevent XSS in rendered output. */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Lightweight markdown-to-html conversion for PDF rendering (subset).
+ *  Input is HTML-escaped first to prevent XSS from user-supplied message content.
+ */
 function markdownToHtml(md: string): string {
-  return md
+  const escaped = escapeHtml(md);
+  return escaped
     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
     .replace(/^## (.*$)/gm, '<h2>$1</h2>')
     .replace(/^# (.*$)/gm, '<h1>$1</h1>')
