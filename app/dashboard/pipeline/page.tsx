@@ -233,8 +233,8 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
             onClick={onClose}
             className="p-1.5 rounded-lg transition-colors"
             style={{ color: '#9090a8' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <X className="w-5 h-5" />
           </button>
@@ -377,8 +377,8 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
               disabled={saving || !email.trim()}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{ background: '#4f6ef7' }}
-              onMouseEnter={e => !saving && (e.currentTarget.style.background = '#3d5ce0')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
+              onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
             >
               <Check className="w-4 h-4" />
               {saving ? 'Adding...' : 'Add Contact'}
@@ -388,8 +388,8 @@ function AddContactModal({ onClose, onCreated }: AddModalProps) {
               onClick={onClose}
               className="px-4 py-2.5 text-sm rounded-lg transition-colors"
               style={{ color: '#9090a8' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#ededf5'; e.currentTarget.style.background = '#1e1e30'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#9090a8'; e.currentTarget.style.background = 'transparent'; }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#ededf5'; el.style.background = '#1e1e30'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#9090a8'; el.style.background = 'transparent'; }}
             >
               Cancel
             </button>
@@ -525,8 +525,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
             onClick={onClose}
             className="p-1.5 rounded-lg transition-colors flex-shrink-0"
             style={{ color: '#9090a8' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <X className="w-5 h-5" />
           </button>
@@ -573,8 +573,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
                 href={`mailto:${contact.email}`}
                 className="flex items-center gap-2 text-sm transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#4f6ef7'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 <Mail className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">{contact.email}</span>
@@ -585,8 +585,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
                 href={`tel:${contact.phone}`}
                 className="flex items-center gap-2 text-sm transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#4f6ef7'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 <Phone className="w-4 h-4 flex-shrink-0" />
                 <span>{contact.phone}</span>
@@ -599,8 +599,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#4f6ef7')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#9090a8')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#4f6ef7'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
               >
                 <Linkedin className="w-4 h-4 flex-shrink-0" />
                 <span className="truncate">LinkedIn Profile</span>
@@ -624,8 +624,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               disabled={markingContacted}
               className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
               style={{ background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.2)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.18)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(34,197,94,0.1)')}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.18)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.1)'; }}
             >
               <Check className="w-3.5 h-3.5" />
               {markingContacted ? 'Saving...' : 'Mark Contacted'}
@@ -685,8 +685,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
             disabled={deleting}
             className="flex items-center gap-1.5 text-sm rounded-lg px-3 py-2 transition-colors disabled:opacity-50"
             style={{ color: '#f87171' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
           >
             <Trash2 className="w-4 h-4" />
             {deleting ? 'Deleting...' : 'Delete'}
@@ -698,8 +698,8 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               disabled={saving}
               className="flex items-center gap-1.5 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               style={{ background: '#4f6ef7' }}
-              onMouseEnter={e => !saving && (e.currentTarget.style.background = '#3d5ce0')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
+              onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
             >
               <Check className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save Changes'}
@@ -734,8 +734,8 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
         background: 'rgba(18,18,31,0.8)',
         border: '1px solid #1e1e30',
       }}
-      onMouseEnter={e => (e.currentTarget.style.borderColor = '#2a2a42')}
-      onMouseLeave={e => (e.currentTarget.style.borderColor = '#1e1e30')}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#2a2a42'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30'; }}
     >
       <div className="flex items-start justify-between gap-2">
         {/* Avatar + name */}
@@ -763,8 +763,8 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
           className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
           title="Delete contact"
           style={{ color: '#f87171' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -826,8 +826,9 @@ export default function PipelinePage() {
         pitch_done: data.grouped?.pitch_done || [],
         client: data.grouped?.client || [],
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Pipeline fetch error:', err);
+      setPageError(err?.message || 'Failed to load contacts. Please refresh.');
     } finally {
       setLoading(false);
     }
@@ -874,8 +875,8 @@ export default function PipelinePage() {
                 onClick={() => router.push('/dashboard')}
                 className="p-2 rounded-lg transition-colors"
                 style={{ color: '#9090a8' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#1e1e30')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -891,8 +892,8 @@ export default function PipelinePage() {
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
               style={{ background: '#4f6ef7' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#3d5ce0')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#4f6ef7')}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#3d5ce0'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#4f6ef7'; }}
             >
               <Plus className="w-4 h-4" />
               Add Contact
