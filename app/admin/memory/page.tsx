@@ -154,7 +154,7 @@ export default function AdminMemoryPage() {
     setUserSearchLoading(true);
     try {
       const res = await fetch(
-        `${API}/api/admin/users/search?q=${encodeURIComponent(q)}&limit=8`,
+        `${API}/api/admin/users?q=${encodeURIComponent(q)}&limit=8`,
         { headers: authHeaders() }
       );
       if (res.ok) {

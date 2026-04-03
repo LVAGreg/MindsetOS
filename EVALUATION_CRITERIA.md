@@ -180,7 +180,7 @@ When introducing a new `fixed`-position overlay, document its z-index and verify
 ### `Math.random()` in render
 Using `Math.random()` inside JSX or a component render path produces a different value on every re-render, causing visual instability (flickering, layout jumps) and defeating React reconciliation. Stable pseudo-random placeholder sequences must be defined as constants outside the component. Flag for Correctness and Craft.
 
-<!-- hits:5 | last_caught:Loop-71 | class:token-violation | severity:craft | blocker:no -->
+<!-- hits:6 | last_caught:Loop-74 | class:token-violation | severity:craft | blocker:no -->
 ### Incomplete colour-token migration
 When a PR replaces a colour token (e.g., generic purple/indigo → MindsetOS amber `#fcc824` or blue `#4f6ef7`), every usage in changed files must be updated: CTA backgrounds, focus rings (`focus:ring-*`), icon colour classes, and border-colour classes. Leaving focus rings or icon accents in the old colour means the visual pass is half-done. Reviewers should grep all changed files for the old token names before accepting. Scores Craft ≤7 if the pass is partial.
 
@@ -284,7 +284,7 @@ When a constant array (e.g., `CLAPS_FIELDS`) assigns a styling field (`letterCol
 ### Residual indigo-* classes after an indigo → hex migration
 When a PR migrates `bg-indigo-400` or `border-indigo-500` to hex values, every other `indigo-*` reference in the same file must also be migrated: icon classes (`text-indigo-500`), button backgrounds (`bg-indigo-600 hover:bg-indigo-700`), focus rings (`focus:ring-indigo-500`), and inline badges (`text-indigo-500`). A sweep that fixes only the bar chart colors while leaving the Save button, icons, focus rings, and "current" badges on `indigo-*` is incomplete. Grep the full file for `indigo-` after every targeted migration. Caps Craft at 6 if more than two residual indigo-* usages remain in the changed file.
 
-<!-- hits:8 | last_caught:Loop-72 | class:token-violation | severity:craft | blocker:no -->
+<!-- hits:9 | last_caught:Loop-74 | class:token-violation | severity:craft | blocker:no -->
 ### Off-token yellow/amber hex values (#eab308, #f59e0b) in data arrays
 When a token sweep targets `#f59e0b`, reviewers must also check for `#eab308` (Tailwind yellow-500) in the same file — it is a different non-token yellow that is visually similar but distinct from `#fcc824`. Both values must be migrated to `#fcc824`. A sweep that clears `#f59e0b` but leaves `#eab308` is incomplete. Include `eab308` in the grep pattern for every amber/yellow token sweep. Caps Craft at 7 per the "Incomplete colour-token migration" rule; combined with other violations, caps at 6.
 
@@ -336,19 +336,27 @@ When a card uses a gradient-border wrapper technique (a `padding: 1px` div with 
 ### Interactive WebGL canvas with no-op onAgentSelect on marketing page
 When `BrainVariantB` (or equivalent Three.js canvas with hover-highlight and lobe-click handlers) is embedded on a landing/marketing page, hover affordance (lobe highlighting, label appearance, implied cursor-pointer) signals interactivity. Passing `onAgentSelect={() => {}}` silently no-ops every click — a user receives no feedback after clicking a highlighted lobe. Acceptable resolutions: (1) wire `onAgentSelect` to a meaningful CTA route (e.g., `router.push('/trial-v3b')`), or (2) apply `pointerEvents: 'none'` to the container div to remove the interactive affordance entirely. Scores Functionality ≤7 and User Intent ≤7 if unresolved.
 
+<!-- hits:1 | last_caught:Loop-74 | class:cross-file-mismatch | severity:functionality | blocker:yes -->
+### Admin page calls non-existent /api/admin/users/search endpoint
+When building admin UI with a user-search picker, verify the backend route exists before wiring. `GET /api/admin/users/search` was referenced in `app/admin/memory/page.tsx` but was never registered in `real-backend.cjs` — the only registered route is `GET /api/admin/users` (params: `page`, `limit`, `tier`, `membership_status`, `days`). To add search: add a `q` ILIKE param to the existing handler rather than creating a new route. To fix the frontend: change `/api/admin/users/search?q=` to `/api/admin/users?q=`. Blocker: any admin page with a non-functional user picker is completely broken at load.
+
+<!-- hits:1 | last_caught:Loop-74 | class:accessibility | severity:craft | blocker:no -->
+### title= used instead of aria-label on icon-only table action buttons
+Icon-only buttons (e.g., pin, delete, edit icons in admin tables) must use `aria-label` to announce their purpose to screen readers. Using `title=` provides a tooltip on hover but is not reliably announced by assistive technologies — some screen readers ignore it entirely. Always pair `aria-label="Pin memory"` (etc.) alongside any `title=` if both are desired. Scores Accessibility ≤7 if the pattern is present.
+
 ---
 
 ## Anti-Pattern Class Index
 
 | Class | Count | Highest-hit Pattern |
 |-------|-------|-------------------|
-| token-violation | 8 | Off-token yellow/amber (#eab308, #f59e0b) / Tailwind `violet-*` (hits:8 each) |
+| token-violation | 8 | Off-token yellow/amber (#eab308, #f59e0b) (hits:9) |
 | silent-failure | 3 | Silent async failure / Silent feature-gate API check / Silent initial-load failure (hits:6 each) |
-| cross-file-mismatch | 4 | Agent slug format inconsistency / Frontend validPlans out of sync (hits:3 each) |
+| cross-file-mismatch | 5 | Agent slug format inconsistency / Admin page calls non-existent search endpoint (hits:3 / hits:1) |
 | security | 1 | Cross-product metadata leak into Stripe (hits:1) |
 | integration-gap | 1 | Prop wiring type mismatch at integration site (hits:3) |
 | typescript | 5 | onMouseEnter/onMouseLeave `as HTMLElement` cast (hits:5) |
-| accessibility | 2 | Redundant keyboard handler on native button elements (hits:1) |
+| accessibility | 3 | Redundant keyboard handler / title= instead of aria-label on icon buttons (hits:1 each) |
 | mobile | 5 | hover-only delete affordance on touch devices (hits:3) |
 | state-management | 5 | `setTimeout`-based state re-trigger / `fetchContacts` stale-closure (hits:3 each) |
 | design-duplication | 4 | Duplicated detail/pane rendering across breakpoints (hits:2) |
