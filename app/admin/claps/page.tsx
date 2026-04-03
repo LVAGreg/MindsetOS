@@ -83,6 +83,7 @@ export default function ClapsPage() {
         setFetchError(`Failed to load current week (${curR.status})`);
       }
       if (histR.ok) setHistory(await histR.json());
+      else setFetchError(`Failed to load history (${histR.status})`);
     } catch (err) {
       console.error('Failed to fetch CLAPS data:', err);
       setFetchError(err instanceof Error ? err.message : 'Failed to load CLAPS data');
@@ -156,7 +157,7 @@ export default function ClapsPage() {
       )}
 
       {/* Current Week */}
-      <div className="p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+      <div className="p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>This week</h2>
@@ -183,7 +184,7 @@ export default function ClapsPage() {
               <input
                 type="number" min={0}
                 value={current[f.key as ClapsKey]}
-                onChange={e => update(f.key as ClapsKey, parseInt(e.target.value) || 0)}
+                onChange={e => update(f.key as ClapsKey, parseInt(e.target.value, 10) || 0)}
                 className="w-full px-3 py-2 text-lg font-bold text-center bg-[#09090f] border border-[#1e1e30] text-[#ededf5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40"
               />
             </div>
@@ -213,7 +214,7 @@ export default function ClapsPage() {
         <button
           onClick={handleSave} disabled={saving}
           className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl disabled:opacity-50 transition-opacity hover:opacity-80"
-          style={{ background: '#4f6ef7', color: '#fff' }}
+          style={{ background: '#fcc824', color: '#09090f' }}
         >
           {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save this week'}
@@ -222,7 +223,7 @@ export default function ClapsPage() {
 
       {/* Trend Chart */}
       {history.length > 0 && (
-        <div className="p-6" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="p-6" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <h2 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>8-Week Trend</h2>
           <div className="flex items-center gap-4 mb-5 flex-wrap">
             {CLAPS_FIELDS.map(f => (
@@ -247,7 +248,7 @@ export default function ClapsPage() {
                         />
                         <div
                           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block text-xs rounded px-1.5 py-0.5 whitespace-nowrap z-10"
-                          style={{ background: '#1e1e30', color: '#ededf5', border: '1px solid #1e1e30' }}
+                          style={{ background: '#1e1e30', color: '#ededf5', border: '1px solid rgba(255,255,255,0.08)' }}
                         >
                           {f.label}: {val}
                         </div>
@@ -264,7 +265,7 @@ export default function ClapsPage() {
 
       {/* History Table */}
       {history.length > 0 ? (
-        <div className="overflow-hidden" style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16 }}>
+        <div className="overflow-hidden" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16 }}>
           <div className="p-5" style={{ borderBottom: '1px solid #1e1e30' }}>
             <h2 className="text-lg font-bold" style={{ color: '#ededf5' }}>History</h2>
           </div>
@@ -286,8 +287,8 @@ export default function ClapsPage() {
                     key={row.week_start}
                     className={i === 0 ? 'font-medium' : ''}
                     style={{ borderBottom: '1px solid rgba(30,30,48,0.5)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(30,30,48,0.4)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.4)')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                   >
                     <td className="px-4 py-3 whitespace-nowrap" style={{ color: '#ededf5' }}>
                       {formatWeek(row.week_start)}
@@ -313,7 +314,7 @@ export default function ClapsPage() {
       ) : (
         <div
           className="flex flex-col items-center justify-center h-32"
-          style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30', borderRadius: 16, color: '#9090a8' }}
+          style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16, color: '#9090a8' }}
         >
           <TrendingUp className="w-8 h-8 mb-2 opacity-40" />
           <p className="text-sm">Save your first week to start tracking</p>
