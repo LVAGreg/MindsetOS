@@ -58,6 +58,9 @@ export default function MemoryDashboard() {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [activityLog, setActivityLog] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [dbUserId, setDbUserId] = useState<string | null>(null);
 
   // Memory editing state
@@ -135,6 +138,7 @@ export default function MemoryDashboard() {
       }
     } catch (error) {
       console.error('Failed to fetch memory data:', error);
+      setError('Failed to load memory data. Please refresh.');
     } finally {
       setIsLoading(false);
     }
@@ -151,6 +155,7 @@ export default function MemoryDashboard() {
       }
     } catch (error) {
       console.error('Failed to fetch activity log:', error);
+      setError('Failed to load activity log.');
     }
   };
 
@@ -183,15 +188,15 @@ export default function MemoryDashboard() {
     }
   };
 
-  const getActionColor = (action: string) => {
+  const getActionStyle = (action: string): { background: string; borderColor: string } => {
     switch (action) {
-      case 'created': return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
-      case 'updated': return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
-      case 'merged': return 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800';
-      case 'archived': return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
-      case 'reactivated': return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
-      case 'boosted': return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800';
-      default: return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
+      case 'created':     return { background: 'rgba(34,197,94,0.1)',   borderColor: 'rgba(34,197,94,0.3)' };
+      case 'updated':     return { background: 'rgba(79,110,247,0.1)',  borderColor: 'rgba(79,110,247,0.3)' };
+      case 'merged':      return { background: 'rgba(124,91,246,0.1)',  borderColor: 'rgba(124,91,246,0.3)' };
+      case 'archived':    return { background: 'rgba(90,90,114,0.15)', borderColor: 'rgba(90,90,114,0.3)' };
+      case 'reactivated': return { background: 'rgba(252,200,36,0.1)', borderColor: 'rgba(252,200,36,0.3)' };
+      case 'boosted':     return { background: 'rgba(252,200,36,0.12)',borderColor: 'rgba(252,200,36,0.35)' };
+      default:            return { background: 'rgba(90,90,114,0.15)', borderColor: 'rgba(90,90,114,0.3)' };
     }
   };
 
@@ -217,13 +222,13 @@ export default function MemoryDashboard() {
   const totalCost = inputCost + outputCost;
 
   // Context window (200K for Claude Sonnet 4.5, but show as percentage of active conversation)
-  const contextWindowSize = 200000; // Claude Sonnet 4.5 context window
+  const contextWindowSize = 200000;
   const contextUsage = (totalTokens / contextWindowSize) * 100;
 
   const formatCost = (cost: number) => {
-    if (cost < 0.0001) return `${(cost * 100000).toFixed(3)}µ¢`; // Micro-cents (very small)
-    if (cost < 0.01) return `${(cost * 100).toFixed(3)}¢`; // Cents only
-    return `$${cost.toFixed(4)}`; // Dollars
+    if (cost < 0.0001) return `${(cost * 100000).toFixed(3)}µ¢`;
+    if (cost < 0.01) return `${(cost * 100).toFixed(3)}¢`;
+    return `$${cost.toFixed(4)}`;
   };
   const formatNumber = (num: number) => num >= 1000 ? `${(num / 1000).toFixed(1)}K` : num.toString();
 
@@ -231,13 +236,19 @@ export default function MemoryDashboard() {
   const handleDelete = async (memoryId: string) => {
     if (!confirm('Delete this memory? This action cannot be undone.')) return;
 
+    setIsDeleting(memoryId);
+    setError(null);
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/memory/${memoryId}`, { method: 'DELETE' });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/memory/${memoryId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
       setMemories(memories.filter(m => m.id !== memoryId));
-      fetchMemoryData(); // Refresh stats
-      fetchActivityLog(); // Refresh activity log
+      fetchMemoryData();
+      fetchActivityLog();
     } catch (error) {
       console.error('Failed to delete memory:', error);
+      setError('Failed to delete memory. Please try again.');
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -248,6 +259,8 @@ export default function MemoryDashboard() {
   };
 
   const handleEditSave = async (memoryId: string) => {
+    setIsSaving(true);
+    setError(null);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/memory/${memoryId}`, {
         method: 'PUT',
@@ -259,10 +272,15 @@ export default function MemoryDashboard() {
       if (data.success) {
         setMemories(memories.map(m => m.id === memoryId ? data.memory : m));
         setEditingId(null);
-        fetchActivityLog(); // Refresh activity log
+        fetchActivityLog();
+      } else {
+        setError('Failed to save memory. Please try again.');
       }
     } catch (error) {
       console.error('Failed to update memory:', error);
+      setError('Failed to save memory. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -277,10 +295,11 @@ export default function MemoryDashboard() {
 
       if (data.success) {
         setMemories(memories.map(m => m.id === memory.id ? data.memory : m));
-        fetchActivityLog(); // Refresh activity log
+        fetchActivityLog();
       }
     } catch (error) {
       console.error('Failed to toggle pin:', error);
+      setError('Failed to update pin. Please try again.');
     }
   };
 
@@ -305,7 +324,7 @@ export default function MemoryDashboard() {
       }
     } catch (error) {
       console.error('Failed to optimize memory:', error);
-      alert('Failed to optimize memory');
+      setError('Failed to optimize memory. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -325,13 +344,48 @@ export default function MemoryDashboard() {
   const userCount = memories.filter(m => m.source === 'user').length;
   const aiCount = memories.filter(m => m.source === 'ai').length;
 
+  // Shared style helpers
+  const sectionHeaderStyle: { background: string; border: string; cursor: string; color: string; width: string } = {
+    background: 'rgba(255,255,255,0.03)',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#ededf5',
+    width: '100%',
+  };
+
   return (
-    <div className={`fixed right-0 top-0 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 transition-all duration-300 z-50 shadow-xl ${
-      isExpanded ? 'w-96' : 'w-0'
-    }`}>
+    <div
+      style={{
+        position: 'fixed',
+        right: 0,
+        top: 0,
+        height: '100%',
+        background: 'rgba(18,18,31,0.97)',
+        borderLeft: '1px solid #1e1e30',
+        transition: 'width 0.3s',
+        zIndex: 50,
+        boxShadow: '-4px 0 24px rgba(0,0,0,0.5)',
+        width: isExpanded ? '24rem' : '0',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Toggle tab */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute left-0 top-24 -translate-x-full bg-blue-600 hover:bg-blue-700 text-white rounded-l-lg p-3 shadow-lg transition-colors"
+        aria-label={isExpanded ? 'Close analytics panel' : 'Open analytics panel'}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: '6rem',
+          transform: 'translateX(-100%)',
+          background: '#4f6ef7',
+          color: '#ededf5',
+          borderRadius: '0.5rem 0 0 0.5rem',
+          padding: '0.75rem',
+          boxShadow: '-2px 2px 8px rgba(0,0,0,0.4)',
+          border: 'none',
+          cursor: 'pointer',
+        }}
       >
         {isExpanded ? (
           <ChevronRight className="w-5 h-5" />
@@ -345,36 +399,98 @@ export default function MemoryDashboard() {
 
       {isExpanded && (
         <div className="h-full flex flex-col overflow-hidden">
+          {/* User header */}
           {user && (
-            <div className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <div
+              style={{
+                padding: '1rem',
+                background: 'linear-gradient(90deg, #4f6ef7 0%, #7c5bf6 100%)',
+                color: '#ededf5',
+              }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <div
+                  style={{
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    background: 'rgba(255,255,255,0.15)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
                   <User className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold truncate">{user.email}</div>
-                  <div className="text-xs opacity-90">
-                    {currentAgent && MINDSET_AGENTS[currentAgent] ? MINDSET_AGENTS[currentAgent].icon + ' ' + MINDSET_AGENTS[currentAgent].name : 'No agent'}
+                  <div style={{ fontSize: '0.75rem', opacity: 0.85 }}>
+                    {currentAgent && MINDSET_AGENTS[currentAgent]
+                      ? MINDSET_AGENTS[currentAgent].icon + ' ' + MINDSET_AGENTS[currentAgent].name
+                      : 'No agent'}
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          {/* Error banner */}
+          {error && (
+            <div
+              style={{
+                padding: '0.5rem 1rem',
+                background: 'rgba(239,68,68,0.15)',
+                borderBottom: '1px solid rgba(239,68,68,0.3)',
+                color: '#fca5a5',
+                fontSize: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.5rem',
+              }}
+            >
+              <span>{error}</span>
+              <button
+                onClick={() => setError(null)}
+                aria-label="Dismiss error"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#fca5a5',
+                  padding: '0.125rem',
+                  flexShrink: 0,
+                }}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
+          {/* Controls header */}
+          <div style={{ padding: '1rem', borderBottom: '1px solid #1e1e30' }}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Brain className="w-5 h-5 text-blue-600" />
+              <h2
+                className="text-lg font-semibold flex items-center gap-2"
+                style={{ color: '#ededf5' }}
+              >
+                <Brain className="w-5 h-5" style={{ color: '#4f6ef7' }} />
                 Analytics Dashboard
               </h2>
               <button
-                onClick={() => {
-                  fetchMemoryData();
-                  fetchActivityLog();
-                }}
+                onClick={() => { fetchMemoryData(); fetchActivityLog(); }}
                 disabled={isLoading || !dbUserId}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                aria-label="Refresh memory data"
                 title="Refresh memory data"
+                style={{
+                  padding: '0.5rem',
+                  borderRadius: '0.5rem',
+                  background: 'none',
+                  border: 'none',
+                  cursor: isLoading || !dbUserId ? 'not-allowed' : 'pointer',
+                  opacity: isLoading || !dbUserId ? 0.4 : 1,
+                  color: '#9090a8',
+                }}
               >
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
@@ -382,57 +498,98 @@ export default function MemoryDashboard() {
             <button
               onClick={handleOptimizeMemory}
               disabled={!dbUserId || memories.length === 0 || isLoading}
-              className="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
               title="Merge duplicates and archive low-importance memories"
+              className="w-full flex items-center justify-center gap-2"
+              style={{
+                padding: '0.5rem 0.75rem',
+                background:
+                  !dbUserId || memories.length === 0 || isLoading
+                    ? '#2a2a3d'
+                    : 'linear-gradient(90deg, #4f6ef7 0%, #7c5bf6 100%)',
+                color:
+                  !dbUserId || memories.length === 0 || isLoading ? '#5a5a72' : '#ededf5',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor:
+                  !dbUserId || memories.length === 0 || isLoading ? 'not-allowed' : 'pointer',
+              }}
             >
-              <Sparkles className="w-4 h-4" />
+              {isLoading ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
               Optimize Memory
             </button>
           </div>
 
+          {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto">
-            {/* User Stats Panel */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+
+            {/* ── User Stats Panel ── */}
+            <div style={{ borderBottom: '1px solid #1e1e30' }}>
               <button
                 onClick={() => setShowUserStats(!showUserStats)}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center justify-between p-3"
+                style={sectionHeaderStyle}
               >
                 <div className="flex items-center gap-2">
                   {showUserStats ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  <TrendingUp className="w-4 h-4 text-blue-600" />
+                  <TrendingUp className="w-4 h-4" style={{ color: '#4f6ef7' }} />
                   <span className="font-medium text-sm">User Stats</span>
                 </div>
               </button>
 
               {showUserStats && memoryStats && (
-                <div className="p-3 space-y-3">
-                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-3 rounded-lg">
+                <div className="p-3">
+                  <div
+                    style={{
+                      background: 'rgba(79,110,247,0.08)',
+                      border: '1px solid rgba(79,110,247,0.2)',
+                      borderRadius: '0.5rem',
+                      padding: '0.75rem',
+                    }}
+                  >
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Conversations</div>
-                        <div className="text-xl font-bold text-blue-600">{memoryStats.conversations.total}</div>
+                        <div style={{ color: '#9090a8', marginBottom: '0.25rem' }}>Conversations</div>
+                        <div className="text-xl font-bold" style={{ color: '#4f6ef7' }}>
+                          {memoryStats.conversations.total}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Agents Used</div>
-                        <div className="text-xl font-bold text-purple-600">{memoryStats.conversations.agents_used}</div>
+                        <div style={{ color: '#9090a8', marginBottom: '0.25rem' }}>Agents Used</div>
+                        <div className="text-xl font-bold" style={{ color: '#7c5bf6' }}>
+                          {memoryStats.conversations.agents_used}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Messages</div>
-                        <div className="text-xl font-bold text-green-600">{memoryStats.conversations.total_messages}</div>
+                        <div style={{ color: '#9090a8', marginBottom: '0.25rem' }}>Messages</div>
+                        <div className="text-xl font-bold" style={{ color: '#34d399' }}>
+                          {memoryStats.conversations.total_messages}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Memories</div>
-                        <div className="text-xl font-bold text-orange-600">{memoryStats.memories.total}</div>
+                        <div style={{ color: '#9090a8', marginBottom: '0.25rem' }}>Memories</div>
+                        <div className="text-xl font-bold" style={{ color: '#fcc824' }}>
+                          {memoryStats.memories.total}
+                        </div>
                       </div>
                     </div>
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                    <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #1e1e30' }}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600 dark:text-gray-400">Total Tokens:</span>
-                        <span className="font-semibold">{formatNumber(memoryStats.usage.estimated_tokens)}</span>
+                        <span style={{ color: '#9090a8' }}>Total Tokens:</span>
+                        <span className="font-semibold" style={{ color: '#ededf5' }}>
+                          {formatNumber(memoryStats.usage.estimated_tokens)}
+                        </span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-gray-600 dark:text-gray-400">Total Cost:</span>
-                        <span className="font-semibold text-green-600">${memoryStats.usage.estimated_cost}</span>
+                        <span style={{ color: '#9090a8' }}>Total Cost:</span>
+                        <span className="font-semibold" style={{ color: '#34d399' }}>
+                          ${memoryStats.usage.estimated_cost}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -440,62 +597,65 @@ export default function MemoryDashboard() {
               )}
             </div>
 
-            {/* Memory Context Panel */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            {/* ── Memory Context Panel ── */}
+            <div style={{ borderBottom: '1px solid #1e1e30' }}>
               <button
                 onClick={() => setShowMemories(!showMemories)}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center justify-between p-3"
+                style={sectionHeaderStyle}
               >
                 <div className="flex items-center gap-2">
                   {showMemories ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  <Database className="w-4 h-4 text-purple-600" />
-                  <span className="font-medium text-sm">Memory Context ({filteredMemories.length}/{memories.length})</span>
+                  <Database className="w-4 h-4" style={{ color: '#7c5bf6' }} />
+                  <span className="font-medium text-sm">
+                    Memory Context ({filteredMemories.length}/{memories.length})
+                  </span>
                 </div>
               </button>
 
               {showMemories && (
                 <>
                   {/* Filter Controls */}
-                  <div className="p-3 border-b border-gray-200 dark:border-gray-700 space-y-2">
-                    {/* Source Filter Buttons */}
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => setSourceFilter('all')}
-                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                          sourceFilter === 'all'
-                            ? 'bg-[#ffc82c] text-black'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        All ({memories.length})
-                      </button>
-                      <button
-                        onClick={() => setSourceFilter('user')}
-                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                          sourceFilter === 'user'
-                            ? 'bg-[#ffc82c] text-black'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        👤 User ({userCount})
-                      </button>
-                      <button
-                        onClick={() => setSourceFilter('ai')}
-                        className={`flex-1 px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-                          sourceFilter === 'ai'
-                            ? 'bg-[#ffc82c] text-black'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        🤖 AI ({aiCount})
-                      </button>
+                  <div className="p-3 space-y-2" style={{ borderBottom: '1px solid #1e1e30' }}>
+                    {/* Source Filter — flex-wrap so buttons don't overflow on narrow panel */}
+                    <div className="flex gap-1 flex-wrap">
+                      {(['all', 'user', 'ai'] as const).map((f) => (
+                        <button
+                          key={f}
+                          onClick={() => setSourceFilter(f)}
+                          style={{
+                            flex: 1,
+                            padding: '0.375rem 0.5rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            borderRadius: '0.375rem',
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: sourceFilter === f ? '#fcc824' : 'rgba(255,255,255,0.06)',
+                            color: sourceFilter === f ? '#09090f' : '#9090a8',
+                            minWidth: '3.5rem',
+                          }}
+                        >
+                          {f === 'all' && `All (${memories.length})`}
+                          {f === 'user' && `👤 User (${userCount})`}
+                          {f === 'ai' && `🤖 AI (${aiCount})`}
+                        </button>
+                      ))}
                     </div>
 
                     {/* Type Filter Dropdown */}
                     <select
                       value={typeFilter}
                       onChange={(e) => setTypeFilter(e.target.value)}
-                      className="w-full px-2 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded"
+                      style={{
+                        width: '100%',
+                        padding: '0.375rem 0.5rem',
+                        fontSize: '0.75rem',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid #1e1e30',
+                        borderRadius: '0.375rem',
+                        color: '#9090a8',
+                      }}
                     >
                       <option value="all">All Types</option>
                       {uniqueTypes.map(type => (
@@ -503,14 +663,20 @@ export default function MemoryDashboard() {
                       ))}
                     </select>
 
-                    {/* Clear Filters Button */}
+                    {/* Clear Filters */}
                     {(sourceFilter !== 'all' || typeFilter !== 'all') && (
                       <button
-                        onClick={() => {
-                          setSourceFilter('all');
-                          setTypeFilter('all');
+                        onClick={() => { setSourceFilter('all'); setTypeFilter('all'); }}
+                        style={{
+                          width: '100%',
+                          padding: '0.25rem 0.5rem',
+                          fontSize: '0.75rem',
+                          color: '#9090a8',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
                         }}
-                        className="w-full px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline"
                       >
                         Clear Filters
                       </button>
@@ -518,175 +684,309 @@ export default function MemoryDashboard() {
                   </div>
 
                   {/* Memory List */}
-                  <div className="p-3 space-y-2 max-h-64 overflow-y-auto">
-                  {filteredMemories.length === 0 ? (
-                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-4">
-                      {memories.length === 0
-                        ? 'No memories stored yet. Have conversations to build memory.'
-                        : 'No memories match the selected filters.'}
-                    </div>
-                  ) : (
-                    filteredMemories.map((memory) => (
+                  <div
+                    className="p-3 space-y-2"
+                    style={{ maxHeight: '16rem', overflowY: 'auto' }}
+                  >
+                    {filteredMemories.length === 0 ? (
                       <div
-                        key={memory.id}
-                        className={`p-2 rounded border ${memory.pinned ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700' : 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'}`}
+                        className="text-xs text-center py-4"
+                        style={{ color: '#5a5a72' }}
                       >
-                        {editingId === memory.id ? (
-                          // Edit mode
-                          <div className="space-y-2">
-                            <textarea
-                              value={editContent}
-                              onChange={(e) => setEditContent(e.target.value)}
-                              className="w-full text-xs p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                              rows={3}
-                            />
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs text-gray-600 dark:text-gray-400">Importance:</label>
-                              <input
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.1"
-                                value={editImportance}
-                                onChange={(e) => setEditImportance(parseFloat(e.target.value))}
-                                className="flex-1"
-                              />
-                              <span className="text-xs font-medium">{(editImportance * 100).toFixed(0)}%</span>
-                            </div>
-                            <div className="flex gap-1">
-                              <button
-                                onClick={() => handleEditSave(memory.id)}
-                                className="flex-1 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
-                              >
-                                <Save className="w-3 h-3 inline mr-1" />
-                                Save
-                              </button>
-                              <button
-                                onClick={() => setEditingId(null)}
-                                className="flex-1 px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700"
-                              >
-                                <X className="w-3 h-3 inline mr-1" />
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          // View mode
-                          <>
-                            <div className="flex justify-between items-start gap-2 mb-1">
-                              <div className="text-xs text-gray-900 dark:text-gray-100 flex-1 flex items-start gap-2">
-                                {memory.source === 'user' ? (
-                                  <span className="text-blue-600 dark:text-blue-400 flex-shrink-0" title="User-provided information">👤</span>
-                                ) : (
-                                  <span className="text-purple-600 dark:text-purple-400 flex-shrink-0" title="AI-extracted insight">🤖</span>
-                                )}
-                                <span className="flex-1">{memory.content}</span>
-                              </div>
-                              <div className="flex gap-1">
-                                <button
-                                  onClick={() => handleTogglePin(memory)}
-                                  className="p-1 hover:bg-purple-100 dark:hover:bg-purple-800 rounded"
-                                  title={memory.pinned ? 'Unpin' : 'Pin (prevent decay)'}
-                                >
-                                  {memory.pinned ? <Pin className="w-3 h-3 text-yellow-600" /> : <PinOff className="w-3 h-3 text-gray-400" />}
-                                </button>
-                                <button
-                                  onClick={() => handleEditStart(memory)}
-                                  className="p-1 hover:bg-purple-100 dark:hover:bg-purple-800 rounded"
-                                  title="Edit"
-                                >
-                                  <Edit2 className="w-3 h-3 text-gray-600" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(memory.id)}
-                                  className="p-1 hover:bg-red-100 dark:hover:bg-red-800 rounded"
-                                  title="Delete"
-                                >
-                                  <Trash2 className="w-3 h-3 text-red-600" />
-                                </button>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center text-xs">
-                              <span className="text-purple-600 dark:text-purple-400 font-medium">
-                                {memory.memory_type}
-                              </span>
-                              <span className="text-gray-500">
-                                {(memory.importance_score * 100).toFixed(0)}% important
-                              </span>
-                            </div>
-                          </>
-                        )}
+                        {memories.length === 0
+                          ? 'No memories stored yet. Have conversations to build memory.'
+                          : 'No memories match the selected filters.'}
                       </div>
-                    ))
-                  )}
+                    ) : (
+                      filteredMemories.map((memory) => (
+                        <div
+                          key={memory.id}
+                          style={{
+                            padding: '0.5rem',
+                            borderRadius: '0.375rem',
+                            border: '1px solid',
+                            ...(memory.pinned
+                              ? { background: 'rgba(252,200,36,0.08)', borderColor: 'rgba(252,200,36,0.35)' }
+                              : { background: 'rgba(124,91,246,0.07)', borderColor: 'rgba(124,91,246,0.25)' }),
+                          }}
+                        >
+                          {editingId === memory.id ? (
+                            /* Edit mode */
+                            <div className="space-y-2">
+                              <textarea
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                rows={3}
+                                style={{
+                                  width: '100%',
+                                  fontSize: '0.75rem',
+                                  padding: '0.5rem',
+                                  border: '1px solid #1e1e30',
+                                  borderRadius: '0.375rem',
+                                  background: 'rgba(255,255,255,0.05)',
+                                  color: '#ededf5',
+                                  resize: 'vertical',
+                                  boxSizing: 'border-box',
+                                }}
+                              />
+                              <div className="flex items-center gap-2">
+                                <label style={{ fontSize: '0.75rem', color: '#9090a8', flexShrink: 0 }}>
+                                  Importance:
+                                </label>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="1"
+                                  step="0.1"
+                                  value={editImportance}
+                                  onChange={(e) => setEditImportance(parseFloat(e.target.value))}
+                                  className="flex-1"
+                                />
+                                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ededf5', flexShrink: 0 }}>
+                                  {(editImportance * 100).toFixed(0)}%
+                                </span>
+                              </div>
+                              {/* Edit action buttons — flex-wrap for mobile */}
+                              <div className="flex gap-1 flex-wrap">
+                                <button
+                                  onClick={() => handleEditSave(memory.id)}
+                                  disabled={isSaving}
+                                  className="flex-1 flex items-center justify-center gap-1"
+                                  style={{
+                                    padding: '0.25rem 0.5rem',
+                                    background: isSaving ? '#2a2a3d' : '#34d399',
+                                    color: isSaving ? '#5a5a72' : '#09090f',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    borderRadius: '0.25rem',
+                                    border: 'none',
+                                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                                    minWidth: '4rem',
+                                  }}
+                                >
+                                  {isSaving
+                                    ? <RefreshCw className="w-3 h-3 animate-spin" />
+                                    : <Save className="w-3 h-3" />}
+                                  Save
+                                </button>
+                                <button
+                                  onClick={() => setEditingId(null)}
+                                  disabled={isSaving}
+                                  className="flex-1 flex items-center justify-center gap-1"
+                                  style={{
+                                    padding: '0.25rem 0.5rem',
+                                    background: 'rgba(255,255,255,0.06)',
+                                    color: '#9090a8',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    borderRadius: '0.25rem',
+                                    border: 'none',
+                                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                                    minWidth: '4rem',
+                                  }}
+                                >
+                                  <X className="w-3 h-3" />
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* View mode */
+                            <>
+                              <div className="flex justify-between items-start gap-2 mb-1">
+                                <div
+                                  className="flex-1 flex items-start gap-2"
+                                  style={{ fontSize: '0.75rem', color: '#ededf5' }}
+                                >
+                                  {memory.source === 'user' ? (
+                                    <span
+                                      style={{ color: '#4f6ef7', flexShrink: 0 }}
+                                      title="User-provided information"
+                                    >
+                                      👤
+                                    </span>
+                                  ) : (
+                                    <span
+                                      style={{ color: '#7c5bf6', flexShrink: 0 }}
+                                      title="AI-extracted insight"
+                                    >
+                                      🤖
+                                    </span>
+                                  )}
+                                  <span className="flex-1">{memory.content}</span>
+                                </div>
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => handleTogglePin(memory)}
+                                    aria-label={memory.pinned ? 'Unpin memory' : 'Pin memory (prevent decay)'}
+                                    title={memory.pinned ? 'Unpin' : 'Pin (prevent decay)'}
+                                    style={{
+                                      padding: '0.25rem',
+                                      background: 'none',
+                                      border: 'none',
+                                      borderRadius: '0.25rem',
+                                      cursor: 'pointer',
+                                      color: memory.pinned ? '#fcc824' : '#5a5a72',
+                                    }}
+                                  >
+                                    {memory.pinned
+                                      ? <Pin className="w-3 h-3" />
+                                      : <PinOff className="w-3 h-3" />}
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditStart(memory)}
+                                    aria-label="Edit memory"
+                                    title="Edit"
+                                    style={{
+                                      padding: '0.25rem',
+                                      background: 'none',
+                                      border: 'none',
+                                      borderRadius: '0.25rem',
+                                      cursor: 'pointer',
+                                      color: '#9090a8',
+                                    }}
+                                  >
+                                    <Edit2 className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(memory.id)}
+                                    disabled={isDeleting === memory.id}
+                                    aria-label="Delete memory"
+                                    title="Delete"
+                                    style={{
+                                      padding: '0.25rem',
+                                      background: 'none',
+                                      border: 'none',
+                                      borderRadius: '0.25rem',
+                                      cursor: isDeleting === memory.id ? 'not-allowed' : 'pointer',
+                                      opacity: isDeleting === memory.id ? 0.5 : 1,
+                                      color: '#f87171',
+                                    }}
+                                  >
+                                    {isDeleting === memory.id
+                                      ? <RefreshCw className="w-3 h-3 animate-spin" />
+                                      : <Trash2 className="w-3 h-3" />}
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-center text-xs">
+                                <span style={{ color: '#7c5bf6', fontWeight: 500 }}>
+                                  {memory.memory_type}
+                                </span>
+                                <span style={{ color: '#5a5a72' }}>
+                                  {(memory.importance_score * 100).toFixed(0)}% important
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </>
               )}
             </div>
 
-            {/* Current Conversation Stats Panel */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            {/* ── Current Conversation Stats Panel ── */}
+            <div style={{ borderBottom: '1px solid #1e1e30' }}>
               <button
                 onClick={() => setShowConversation(!showConversation)}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center justify-between p-3"
+                style={sectionHeaderStyle}
               >
                 <div className="flex items-center gap-2">
                   {showConversation ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  <MessageSquare className="w-4 h-4 text-green-600" />
+                  <MessageSquare className="w-4 h-4" style={{ color: '#34d399' }} />
                   <span className="font-medium text-sm">Current Conversation</span>
                 </div>
               </button>
 
               {showConversation && currentConv && (
-                <div className="p-3 space-y-3">
-                  <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-3 rounded-lg">
+                <div className="p-3">
+                  <div
+                    style={{
+                      background: 'rgba(52,211,153,0.06)',
+                      border: '1px solid rgba(52,211,153,0.2)',
+                      borderRadius: '0.5rem',
+                      padding: '0.75rem',
+                    }}
+                  >
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Messages:</span>
-                        <span className="font-semibold">{messageCount}</span>
+                        <span style={{ color: '#9090a8' }}>Messages:</span>
+                        <span className="font-semibold" style={{ color: '#ededf5' }}>{messageCount}</span>
                       </div>
 
                       {/* Token breakdown */}
-                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <div className="pt-2" style={{ borderTop: '1px solid #1e1e30' }}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-gray-600 dark:text-gray-400">Tokens In:</span>
-                          <span className="font-semibold text-blue-600">{formatNumber(inputTokens)}</span>
+                          <span style={{ color: '#9090a8' }}>Tokens In:</span>
+                          <span className="font-semibold" style={{ color: '#4f6ef7' }}>
+                            {formatNumber(inputTokens)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">Tokens Out:</span>
-                          <span className="font-semibold text-purple-600">{formatNumber(outputTokens)}</span>
+                          <span style={{ color: '#9090a8' }}>Tokens Out:</span>
+                          <span className="font-semibold" style={{ color: '#7c5bf6' }}>
+                            {formatNumber(outputTokens)}
+                          </span>
                         </div>
                       </div>
 
                       {/* Cost breakdown */}
-                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <div className="pt-2" style={{ borderTop: '1px solid #1e1e30' }}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-gray-600 dark:text-gray-400">Cost In:</span>
-                          <span className="font-semibold text-blue-600">{formatCost(inputCost)}</span>
+                          <span style={{ color: '#9090a8' }}>Cost In:</span>
+                          <span className="font-semibold" style={{ color: '#4f6ef7' }}>
+                            {formatCost(inputCost)}
+                          </span>
                         </div>
                         <div className="flex justify-between mb-1">
-                          <span className="text-gray-600 dark:text-gray-400">Cost Out:</span>
-                          <span className="font-semibold text-purple-600">{formatCost(outputCost)}</span>
+                          <span style={{ color: '#9090a8' }}>Cost Out:</span>
+                          <span className="font-semibold" style={{ color: '#7c5bf6' }}>
+                            {formatCost(outputCost)}
+                          </span>
                         </div>
                         <div className="flex justify-between font-bold">
-                          <span className="text-gray-700 dark:text-gray-300">Total Cost:</span>
-                          <span className="text-green-600">{formatCost(totalCost)}</span>
+                          <span style={{ color: '#ededf5' }}>Total Cost:</span>
+                          <span style={{ color: '#34d399' }}>{formatCost(totalCost)}</span>
                         </div>
                       </div>
 
                       {/* Context window */}
-                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <div className="pt-2" style={{ borderTop: '1px solid #1e1e30' }}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-gray-600 dark:text-gray-400">Context Window:</span>
-                          <span className="font-semibold">{contextUsage.toFixed(1)}%</span>
+                          <span style={{ color: '#9090a8' }}>Context Window:</span>
+                          <span className="font-semibold" style={{ color: '#ededf5' }}>
+                            {contextUsage.toFixed(1)}%
+                          </span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          style={{
+                            width: '100%',
+                            background: 'rgba(255,255,255,0.07)',
+                            borderRadius: '9999px',
+                            height: '0.5rem',
+                          }}
+                        >
                           <div
-                            className={`h-2 rounded-full ${contextUsage < 50 ? 'bg-green-500' : contextUsage < 75 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                            style={{ width: `${Math.min(100, contextUsage)}%` }}
+                            style={{
+                              height: '0.5rem',
+                              borderRadius: '9999px',
+                              width: `${Math.min(100, contextUsage)}%`,
+                              background:
+                                contextUsage < 50
+                                  ? '#34d399'
+                                  : contextUsage < 75
+                                  ? '#fcc824'
+                                  : '#f87171',
+                              transition: 'width 0.3s',
+                            }}
                           />
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">{formatNumber(totalTokens)} / {formatNumber(contextWindowSize)} tokens</div>
+                        <div style={{ fontSize: '0.75rem', color: '#5a5a72', marginTop: '0.25rem' }}>
+                          {formatNumber(totalTokens)} / {formatNumber(contextWindowSize)} tokens
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -694,50 +994,66 @@ export default function MemoryDashboard() {
               )}
             </div>
 
-            {/* Activity Log Panel */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            {/* ── Activity Log Panel ── */}
+            <div style={{ borderBottom: '1px solid #1e1e30' }}>
               <button
                 onClick={() => setShowActivity(!showActivity)}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center justify-between p-3"
+                style={sectionHeaderStyle}
               >
                 <div className="flex items-center gap-2">
                   {showActivity ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  <Activity className="w-4 h-4 text-orange-600" />
+                  <Activity className="w-4 h-4" style={{ color: '#fcc824' }} />
                   <span className="font-medium text-sm">Activity Log ({activityLog.length})</span>
                 </div>
               </button>
 
               {showActivity && (
-                <div className="p-3 space-y-2 max-h-64 overflow-y-auto">
+                <div
+                  className="p-3 space-y-2"
+                  style={{ maxHeight: '16rem', overflowY: 'auto' }}
+                >
                   {activityLog.length === 0 ? (
-                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-4">
+                    <div className="text-xs text-center py-4" style={{ color: '#5a5a72' }}>
                       No activity logged yet.
                     </div>
                   ) : (
                     activityLog.map((activity) => (
                       <div
                         key={activity.id}
-                        className={`p-2 rounded border ${getActionColor(activity.action)}`}
+                        style={{
+                          padding: '0.5rem',
+                          borderRadius: '0.375rem',
+                          border: '1px solid',
+                          ...getActionStyle(activity.action),
+                        }}
                       >
                         <div className="flex items-start gap-2">
                           <span className="text-sm">{getActionIcon(activity.action)}</span>
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-start gap-2 mb-1">
-                              <span className="text-xs font-medium capitalize">{activity.action}</span>
-                              <span className="text-xs text-gray-500">{formatTimestamp(activity.created_at)}</span>
+                              <span
+                                className="text-xs font-medium capitalize"
+                                style={{ color: '#ededf5' }}
+                              >
+                                {activity.action}
+                              </span>
+                              <span className="text-xs" style={{ color: '#5a5a72' }}>
+                                {formatTimestamp(activity.created_at)}
+                              </span>
                             </div>
                             {activity.new_content && (
-                              <div className="text-xs text-gray-700 dark:text-gray-300 truncate mb-1">
+                              <div className="text-xs truncate mb-1" style={{ color: '#9090a8' }}>
                                 {activity.new_content.slice(0, 60)}...
                               </div>
                             )}
                             {activity.new_importance !== undefined && activity.old_importance !== undefined && (
-                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                              <div className="text-xs" style={{ color: '#9090a8' }}>
                                 Importance: {(activity.old_importance * 100).toFixed(0)}% → {(activity.new_importance * 100).toFixed(0)}%
                               </div>
                             )}
                             {activity.reason && (
-                              <div className="text-xs text-gray-500 italic mt-1">
+                              <div className="text-xs italic mt-1" style={{ color: '#5a5a72' }}>
                                 {activity.reason}
                               </div>
                             )}
@@ -749,6 +1065,7 @@ export default function MemoryDashboard() {
                 </div>
               )}
             </div>
+
           </div>
         </div>
       )}
