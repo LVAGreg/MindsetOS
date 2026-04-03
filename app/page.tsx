@@ -55,8 +55,32 @@ export default function LandingPage() {
 
   /* ── Pillars scroll reveal — IntersectionObserver ────────── */
   const pillarsRef = useRef<HTMLElement>(null);
+
+  /* ── Steps scroll reveal — IntersectionObserver (independent) */
+  const stepsRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const section = pillarsRef.current;
+    if (!section) return;
+    const targets = section.querySelectorAll<HTMLElement>('.reveal-up');
+    if (!targets.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  /* ── Steps scroll reveal — IntersectionObserver ─────────── */
+  useEffect(() => {
+    const section = stepsRef.current;
     if (!section) return;
     const targets = section.querySelectorAll<HTMLElement>('.reveal-up');
     if (!targets.length) return;
@@ -506,7 +530,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── How It Works ───────────────────────────────── */}
-      <section id="how-it-works" className="relative z-10 py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
+      <section ref={stepsRef} id="how-it-works" className="relative z-10 py-28" style={{ background: 'rgba(13,13,24,0.6)' }}>
         <div className="max-w-7xl mx-auto px-6">
 
           <div className="text-center mb-16">
@@ -519,22 +543,110 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {steps.map((s, i) => (
-              <div key={i} className="relative p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-2px]"
+          {/* Cards row — flex on desktop so SVG arrows can sit between cards */}
+          <div className="flex flex-col md:flex-row md:items-stretch gap-6 max-w-5xl mx-auto">
+
+            {/* Step 1 */}
+            <div className="reveal-up flex-1 relative p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-2px]"
+              style={{
+                background: 'rgba(18,18,31,0.8)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(14px)',
+              }}>
+              {/* Badge — circular, step-1 blue gradient */}
+              <div
                 style={{
-                  background: 'rgba(18,18,31,0.8)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  backdropFilter: 'blur(14px)',
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(79,110,247,0.2) 0%, rgba(79,110,247,0.1) 100%)',
+                  border: '1px solid rgba(79,110,247,0.3)',
+                  marginBottom: 24,
+                  color: '#ededf5',
+                  fontWeight: 700,
+                  fontSize: 14,
                 }}>
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-extrabold text-lg mb-6"
-                  style={{ background: `linear-gradient(135deg,${s.color} 0%,${s.color}cc 100%)` }}>
-                  {s.n}
-                </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#ededf5' }}>{s.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{s.desc}</p>
+                1
               </div>
-            ))}
+              <h3 className="text-xl font-bold mb-3" style={{ color: '#ededf5' }}>{steps[0].title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{steps[0].desc}</p>
+            </div>
+
+            {/* Connector arrow 1→2 (desktop only) */}
+            <div className="hidden md:flex items-center flex-shrink-0 self-center" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="#4f6ef7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            {/* Step 2 */}
+            <div className="reveal-up delay-150 flex-1 relative p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-2px]"
+              style={{
+                background: 'rgba(18,18,31,0.8)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(14px)',
+              }}>
+              {/* Badge — circular, step-2 purple gradient */}
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(124,91,246,0.2) 0%, rgba(124,91,246,0.1) 100%)',
+                  border: '1px solid rgba(124,91,246,0.3)',
+                  marginBottom: 24,
+                  color: '#ededf5',
+                  fontWeight: 700,
+                  fontSize: 14,
+                }}>
+                2
+              </div>
+              <h3 className="text-xl font-bold mb-3" style={{ color: '#ededf5' }}>{steps[1].title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{steps[1].desc}</p>
+            </div>
+
+            {/* Connector arrow 2→3 (desktop only) */}
+            <div className="hidden md:flex items-center flex-shrink-0 self-center" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="#4f6ef7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            {/* Step 3 */}
+            <div className="reveal-up delay-300 flex-1 relative p-8 rounded-2xl transition-all duration-300 hover:translate-y-[-2px]"
+              style={{
+                background: 'rgba(18,18,31,0.8)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(14px)',
+              }}>
+              {/* Badge — circular, step-3 amber gradient */}
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(252,200,36,0.15) 0%, rgba(252,200,36,0.08) 100%)',
+                  border: '1px solid rgba(252,200,36,0.3)',
+                  marginBottom: 24,
+                  color: '#ededf5',
+                  fontWeight: 700,
+                  fontSize: 14,
+                }}>
+                3
+              </div>
+              <h3 className="text-xl font-bold mb-3" style={{ color: '#ededf5' }}>{steps[2].title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{steps[2].desc}</p>
+            </div>
+
           </div>
         </div>
       </section>
