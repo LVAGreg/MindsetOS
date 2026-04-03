@@ -1315,7 +1315,7 @@ function DashboardContent() {
                                 <AgentBrowserRow
                                   key={agent.id}
                                   agent={agent}
-                                  accentColor={agent.accent_color || '#8b5cf6'}
+                                  accentColor={agent.accent_color || '#7c5bf6'}
                                   isActive={currentAgent === agent.id}
                                   isCustom
                                   userRole={effectiveUser?.role}
@@ -1392,8 +1392,8 @@ function DashboardContent() {
                   {/* ---- Journey Pathway ---- */}
                   {(() => {
                     const PATHWAY_STAGES = [
-                      { id: 'mindset-score', label: 'Mindset Score', subtitle: 'Start here · Free', color: '#f59e0b', step: 1 },
-                      { id: 'reset-guide', label: '48-Hour Reset', subtitle: '$47 · Entry', color: '#8b5cf6', step: 2 },
+                      { id: 'mindset-score', label: 'Mindset Score', subtitle: 'Start here · Free', color: '#fcc824', step: 1 },
+                      { id: 'reset-guide', label: '48-Hour Reset', subtitle: '$47 · Entry', color: '#7c5bf6', step: 2 },
                       { id: 'architecture-coach', label: '90-Day Architecture', subtitle: '$997 · Core', color: '#4f6ef7', step: 3 },
                       { id: 'launch-companion', label: 'Architecture Intensive', subtitle: '$1,997 · Premium', color: '#ec4899', step: 4 },
                     ];
