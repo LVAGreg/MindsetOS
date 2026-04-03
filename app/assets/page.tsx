@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, Copy, MessageSquare, Check } from 'lucide-react';
+import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, Copy, MessageSquare, Check, AlertCircle } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 
@@ -26,6 +26,7 @@ export default function AssetsPage() {
   const [sortBy, setSortBy] = useState<'recent' | 'importance' | 'agent'>('recent');
   const [agentFilter, setAgentFilter] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   // Fetch database user ID
   useEffect(() => {
@@ -140,13 +141,15 @@ export default function AssetsPage() {
 
   // Copy asset to clipboard
   const handleCopy = async (asset: Asset) => {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(asset.content);
       setCopiedId(asset.id);
-      setTimeout(() => setCopiedId(null), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopiedId(null), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
-      alert('Failed to copy to clipboard');
+      setCopyError('Failed to copy to clipboard. Please select and copy the text manually.');
+      setTimeout(() => setCopyError(null), 4000);
     }
   };
 
@@ -191,34 +194,45 @@ export default function AssetsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#09090f' }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading assets...</p>
+          <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ borderColor: '#4f6ef7', borderTopColor: 'transparent' }}></div>
+          <p style={{ color: '#9090a8' }}>Loading assets...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: '#09090f' }}>
+      {/* Copy Error Banner */}
+      {copyError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', color: '#fca5a5' }}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {copyError}
+        </div>
+      )}
+
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div style={{ background: 'rgba(18,18,31,0.8)', borderBottom: '1px solid #1e1e30' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#9090a8' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 title="Back to Dashboard"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-3">
-                <Trophy className="w-8 h-8 text-[#ffc82c]" />
+                <Trophy className="w-8 h-8" style={{ color: '#fcc824' }} />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Assets & Deliverables</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Track things agents helped you create and generate</p>
+                  <h1 className="text-2xl font-bold" style={{ color: '#ededf5' }}>Assets &amp; Deliverables</h1>
+                  <p className="text-sm" style={{ color: '#9090a8' }}>Track things agents helped you create and generate</p>
                 </div>
               </div>
             </div>
@@ -227,14 +241,16 @@ export default function AssetsPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleExportJSON}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                className="px-4 py-2 rounded-lg transition-opacity flex items-center gap-2 text-sm font-medium hover:opacity-90"
+                style={{ background: '#4f6ef7', color: '#ffffff' }}
               >
                 <Download className="w-4 h-4" />
                 Export JSON
               </button>
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                className="px-4 py-2 rounded-lg transition-opacity flex items-center gap-2 text-sm font-medium hover:opacity-90"
+                style={{ background: '#7c5bf6', color: '#ffffff' }}
               >
                 <Download className="w-4 h-4" />
                 Export CSV
@@ -244,17 +260,17 @@ export default function AssetsPage() {
 
           {/* Stats Bar */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Assets</div>
-              <div className="text-2xl font-bold text-blue-600">{assets.length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(79,110,247,0.12)', border: '1px solid rgba(79,110,247,0.25)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>Total Assets</div>
+              <div className="text-2xl font-bold" style={{ color: '#4f6ef7' }}>{assets.length}</div>
             </div>
-            <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">User Provided</div>
-              <div className="text-2xl font-bold text-green-600">{assets.filter(o => o.source === 'user').length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(124,91,246,0.12)', border: '1px solid rgba(124,91,246,0.25)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>User Provided</div>
+              <div className="text-2xl font-bold" style={{ color: '#7c5bf6' }}>{assets.filter(o => o.source === 'user').length}</div>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-lg">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">AI Extracted</div>
-              <div className="text-2xl font-bold text-purple-600">{assets.filter(o => o.source === 'ai').length}</div>
+            <div className="p-4 rounded-lg" style={{ background: 'rgba(252,200,36,0.10)', border: '1px solid rgba(252,200,36,0.25)' }}>
+              <div className="text-sm mb-1" style={{ color: '#9090a8' }}>AI Extracted</div>
+              <div className="text-2xl font-bold" style={{ color: '#fcc824' }}>{assets.filter(o => o.source === 'ai').length}</div>
             </div>
           </div>
 
@@ -262,11 +278,12 @@ export default function AssetsPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             {/* Sort By */}
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <TrendingUp className="w-4 h-4" style={{ color: '#9090a8' }} />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                onChange={(e) => setSortBy(e.target.value as 'recent' | 'importance' | 'agent')}
+                className="px-3 py-2 rounded-lg text-sm"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#ededf5' }}
               >
                 <option value="recent">Most Recent</option>
                 <option value="importance">Highest Importance</option>
@@ -276,11 +293,12 @@ export default function AssetsPage() {
 
             {/* Agent Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <Filter className="w-4 h-4" style={{ color: '#9090a8' }} />
               <select
                 value={agentFilter}
                 onChange={(e) => setAgentFilter(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                className="px-3 py-2 rounded-lg text-sm"
+                style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', color: '#ededf5' }}
               >
                 <option value="all">All Agents</option>
                 {uniqueAgents.map(agentId => (
@@ -292,7 +310,7 @@ export default function AssetsPage() {
             </div>
 
             {/* Showing count */}
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ml-auto">
+            <div className="flex items-center gap-2 text-sm ml-auto" style={{ color: '#9090a8' }}>
               Showing {filteredAssets.length} of {assets.length} assets
             </div>
           </div>
@@ -303,9 +321,9 @@ export default function AssetsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {filteredAssets.length === 0 ? (
           <div className="text-center py-12">
-            <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Assets Yet</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <Trophy className="w-16 h-16 mx-auto mb-4" style={{ color: '#5a5a72' }} />
+            <h3 className="text-lg font-semibold mb-2" style={{ color: '#ededf5' }}>No Assets Yet</h3>
+            <p style={{ color: '#9090a8' }}>
               {assets.length === 0
                 ? 'Start conversations to capture assets and deliverables agents help you create.'
                 : 'No assets match the selected filters.'}
@@ -319,22 +337,23 @@ export default function AssetsPage() {
               return (
                 <div
                   key={asset.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                  className="rounded-lg p-6 transition-shadow hover:shadow-xl"
+                  style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
                       {asset.source === 'user' ? (
                         <div title="User-provided">
-                          <UserIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                          <UserIcon className="w-6 h-6" style={{ color: '#9090a8' }} />
                         </div>
                       ) : (
                         <div title="AI-extracted">
-                          <Sparkles className="w-6 h-6 text-purple-500" />
+                          <Sparkles className="w-6 h-6" style={{ color: '#7c5bf6' }} />
                         </div>
                       )}
                       {agent && (
-                        <AgentIcon agentId={agent.id} className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                        <AgentIcon agentId={agent.id} className="w-5 h-5" style={{ color: '#9090a8' }} />
                       )}
                     </div>
 
@@ -343,28 +362,28 @@ export default function AssetsPage() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Sparkles
                           key={i}
-                          className={`w-3 h-3 ${
-                            i < Math.round(asset.importance_score * 5)
-                              ? 'text-[#ffc82c] fill-[#ffc82c]'
-                              : 'text-gray-300 dark:text-gray-600'
-                          }`}
+                          className="w-3 h-3"
+                          style={{
+                            color: i < Math.round(asset.importance_score * 5) ? '#fcc824' : '#5a5a72',
+                            fill: i < Math.round(asset.importance_score * 5) ? '#fcc824' : 'transparent',
+                          }}
                         />
                       ))}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <p className="text-gray-900 dark:text-white mb-4 leading-relaxed">
+                  <p className="mb-4 leading-relaxed" style={{ color: '#ededf5' }}>
                     {asset.content}
                   </p>
 
                   {/* Footer with Date/Importance */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700 mb-3">
+                  <div className="flex items-center justify-between text-xs pt-4 mb-3" style={{ borderTop: '1px solid #1e1e30', color: '#5a5a72' }}>
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {formatDate(asset.created_at)}
                     </div>
-                    <div className="font-medium text-[#ffc82c]">
+                    <div className="font-medium" style={{ color: '#fcc824' }}>
                       {(asset.importance_score * 100).toFixed(0)}% important
                     </div>
                   </div>
@@ -373,7 +392,8 @@ export default function AssetsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleCopy(asset)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg transition-colors text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-opacity text-sm font-medium hover:opacity-80"
+                      style={{ background: 'rgba(79,110,247,0.15)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.3)' }}
                       title="Copy to clipboard"
                     >
                       {copiedId === asset.id ? (
@@ -390,7 +410,8 @@ export default function AssetsPage() {
                     </button>
                     <button
                       onClick={() => handleContinue(asset)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg transition-colors text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-opacity text-sm font-medium hover:opacity-80"
+                      style={{ background: 'rgba(124,91,246,0.15)', color: '#7c5bf6', border: '1px solid rgba(124,91,246,0.3)' }}
                       title="Continue working on this asset"
                     >
                       <MessageSquare className="w-4 h-4" />
