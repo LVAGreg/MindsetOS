@@ -24,6 +24,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Initialize conversation with client-onboarding agent
   useEffect(() => {
@@ -36,7 +37,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       if (!token) return;
 
       // Create a new conversation with the client-onboarding agent
-      const response = await fetch('http://localhost:3010/api/conversations', {
+      const response = await fetch('/api/conversations', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -57,6 +58,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       await sendMessage('Hello, I\'m ready to get started!', data.conversationId, true);
     } catch (error) {
       console.error('Error initializing conversation:', error);
+      setErrorMessage('Could not start your onboarding session. Please refresh and try again.');
     }
   }
 
@@ -65,6 +67,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     if (!messageConvId) return;
 
     setIsLoading(true);
+    setErrorMessage(null);
 
     // Add user message to UI (unless it's initialization)
     if (!isInit) {
@@ -72,11 +75,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       setInputValue('');
     }
 
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsLoading(false);
+      setErrorMessage('Session expired — please refresh the page.');
+      return;
+    }
 
-      const response = await fetch('http://localhost:3010/api/letta/chat', {
+    try {
+      const response = await fetch('/api/letta/chat', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -114,6 +121,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.'
       }]);
+      setErrorMessage('Message failed to send. Check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +132,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      await fetch('http://localhost:3010/api/onboarding/update', {
+      const response = await fetch('/api/onboarding/update', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -132,8 +140,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         },
         body: JSON.stringify({ step })
       });
+
+      if (!response.ok) {
+        console.error('Failed to update onboarding progress — step:', step);
+        // Non-fatal: don't block the user, but surface a soft warning
+        setErrorMessage('Progress save failed. Your conversation is still active.');
+      }
     } catch (error) {
       console.error('Error updating onboarding progress:', error);
+      setErrorMessage('Could not save your progress. Continue — your responses are still recorded.');
     }
   }
 
@@ -142,7 +157,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch('http://localhost:3010/api/onboarding/complete', {
+      const response = await fetch('/api/onboarding/complete', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -162,6 +177,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       router.push('/');
     } catch (error) {
       console.error('Error completing onboarding:', error);
+      setErrorMessage('Onboarding completion failed. Please refresh or contact support.');
     }
   }
 
@@ -171,81 +187,229 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     sendMessage(inputValue);
   }
 
+  const progressPct = Math.round((currentStep / totalSteps) * 100);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div
+      style={{ minHeight: '100vh', background: '#09090f' }}
+      className="flex items-center justify-center p-4"
+    >
+      <div
+        style={{
+          background: 'rgba(18,18,31,0.8)',
+          border: '1px solid #1e1e30',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          maxWidth: '896px',
+          width: '100%',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)'
+        }}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
-          <h1 className="text-3xl font-bold mb-2">Welcome to MindsetOS!</h1>
-          <p className="text-indigo-100">Let's get you set up for your mindset journey</p>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #4f6ef7 0%, #7c5bf6 100%)',
+            padding: '24px'
+          }}
+        >
+          <h1 style={{ color: '#ededf5', fontSize: '1.75rem', fontWeight: 700, marginBottom: '6px' }}>
+            Welcome to MindsetOS!
+          </h1>
+          <p style={{ color: 'rgba(237,237,245,0.75)', fontSize: '0.95rem' }}>
+            Let&apos;s get you set up for your mindset journey
+          </p>
 
           {/* Progress bar */}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span>Step {currentStep} of {totalSteps}</span>
-              <span>{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
+          <div style={{ marginTop: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: 'rgba(237,237,245,0.85)', fontSize: '0.8rem' }}>
+                Step {currentStep} of {totalSteps}
+              </span>
+              <span style={{ color: 'rgba(237,237,245,0.85)', fontSize: '0.8rem' }}>
+                {progressPct}% Complete
+              </span>
             </div>
-            <div className="w-full bg-indigo-400 rounded-full h-2">
+            <div
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: '9999px',
+                height: '6px'
+              }}
+            >
               <div
-                className="bg-white rounded-full h-2 transition-all duration-300"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              ></div>
+                style={{
+                  background: '#fcc824',
+                  borderRadius: '9999px',
+                  height: '6px',
+                  width: `${progressPct}%`,
+                  transition: 'width 300ms ease'
+                }}
+              />
             </div>
           </div>
         </div>
 
+        {/* Error banner */}
+        {errorMessage && (
+          <div
+            style={{
+              background: 'rgba(239,68,68,0.12)',
+              borderBottom: '1px solid rgba(239,68,68,0.3)',
+              padding: '10px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ color: '#f87171', fontSize: '0.85rem' }}>{errorMessage}</span>
+            <button
+              onClick={() => setErrorMessage(null)}
+              style={{
+                marginLeft: 'auto',
+                color: '#f87171',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                lineHeight: 1
+              }}
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Chat area */}
-        <div className="h-96 overflow-y-auto p-6 space-y-4">
+        <div
+          style={{
+            height: '384px',
+            overflowY: 'auto',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}
+        >
           {messages.length === 0 ? (
-            <div className="text-center text-gray-500 py-12">
-              <p className="text-lg">Initializing your onboarding session...</p>
+            <div style={{ textAlign: 'center', padding: '48px 0' }}>
+              <div style={{ color: '#fcc824', fontSize: '1.5rem', marginBottom: '12px' }}>✦</div>
+              <p style={{ color: '#ededf5', fontSize: '0.95rem', fontWeight: 600, marginBottom: '6px' }}>
+                Getting your session ready…
+              </p>
+              <p style={{ color: '#9090a8', fontSize: '0.85rem' }}>
+                Your mindset coach will be with you in a moment.
+              </p>
             </div>
           ) : (
             messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                style={{
+                  display: 'flex',
+                  justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start'
+                }}
               >
                 <div
-                  className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${
-                    message.role === 'user'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
+                  style={{
+                    maxWidth: '28rem',
+                    padding: '12px 16px',
+                    borderRadius: '16px',
+                    ...(message.role === 'user'
+                      ? {
+                          background: '#4f6ef7',
+                          color: '#ededf5'
+                        }
+                      : {
+                          background: 'rgba(30,30,48,0.9)',
+                          border: '1px solid #1e1e30',
+                          color: '#ededf5'
+                        })
+                  }}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p style={{ whiteSpace: 'pre-wrap', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 }}>
+                    {message.content}
+                  </p>
                 </div>
               </div>
             ))
           )}
+
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="max-w-xs px-4 py-3 rounded-2xl bg-gray-100">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '16px',
+                  background: 'rgba(30,30,48,0.9)',
+                  border: '1px solid #1e1e30',
+                  display: 'flex',
+                  gap: '6px',
+                  alignItems: 'center'
+                }}
+              >
+                {[0, 0.1, 0.2].map((delay, i) => (
+                  <div
+                    key={i}
+                    className="animate-bounce"
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      background: '#9090a8',
+                      borderRadius: '50%',
+                      animationDelay: `${delay}s`
+                    }}
+                  />
+                ))}
               </div>
             </div>
           )}
         </div>
 
         {/* Input area */}
-        <form onSubmit={handleSubmit} className="border-t p-4">
-          <div className="flex space-x-2">
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            borderTop: '1px solid #1e1e30',
+            padding: '16px'
+          }}
+        >
+          <div style={{ display: 'flex', gap: '8px' }}>
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Type your response..."
               disabled={isLoading}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                borderRadius: '8px',
+                border: '1px solid #1e1e30',
+                background: 'rgba(9,9,15,0.8)',
+                color: '#ededf5',
+                fontSize: '0.9rem',
+                outline: 'none',
+                opacity: isLoading ? 0.5 : 1,
+                cursor: isLoading ? 'not-allowed' : 'text'
+              }}
             />
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                background: isLoading || !inputValue.trim() ? '#1e1e30' : '#fcc824',
+                color: isLoading || !inputValue.trim() ? '#5a5a72' : '#09090f',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: isLoading || !inputValue.trim() ? 'not-allowed' : 'pointer',
+                transition: 'background 150ms ease, color 150ms ease',
+                whiteSpace: 'nowrap'
+              }}
             >
               Send
             </button>
@@ -253,8 +417,17 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         </form>
 
         {/* Helper text */}
-        <div className="bg-gray-50 p-4 text-center text-sm text-gray-600">
-          <p>Answer honestly and thoughtfully. This information will help personalize your MindsetOS experience.</p>
+        <div
+          style={{
+            background: 'rgba(9,9,15,0.5)',
+            borderTop: '1px solid #1e1e30',
+            padding: '12px 24px',
+            textAlign: 'center'
+          }}
+        >
+          <p style={{ color: '#5a5a72', fontSize: '0.8rem', margin: 0 }}>
+            Answer honestly and thoughtfully. This information will help personalize your MindsetOS experience.
+          </p>
         </div>
       </div>
     </div>
