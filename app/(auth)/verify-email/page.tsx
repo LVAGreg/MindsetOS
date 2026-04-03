@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2, ArrowLeft, Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 
 function VerifyEmailForm() {
@@ -65,7 +65,10 @@ function VerifyEmailForm() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
+      <div
+        className="min-h-screen flex flex-col px-4"
+        style={{ backgroundColor: '#09090f' }}
+      >
         <div className="w-full pt-6 pb-4">
           <div className="flex justify-center">
             <MindsetOSLogo size="lg" variant="auto" />
@@ -74,12 +77,18 @@ function VerifyEmailForm() {
 
         <div className="flex-1 flex items-center justify-center">
           <div className="max-w-md w-full">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center" style={{ borderColor: '#fcc824' }}>
+            <div
+              className="backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center"
+              style={{
+                backgroundColor: 'rgba(18,18,31,0.8)',
+                borderColor: '#fcc824',
+              }}
+            >
               <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#fcc824' }} />
-              <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+              <h2 className="text-xl font-bold mb-2" style={{ color: '#ededf5' }}>
                 Verifying Your Email...
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p style={{ color: '#9090a8' }}>
                 Please wait while we verify your email address.
               </p>
             </div>
@@ -92,7 +101,10 @@ function VerifyEmailForm() {
   // Success state
   if (isSuccess || alreadyVerified) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
+      <div
+        className="min-h-screen flex flex-col px-4"
+        style={{ backgroundColor: '#09090f' }}
+      >
         <div className="w-full pt-6 pb-4">
           <div className="flex justify-center">
             <MindsetOSLogo size="lg" variant="auto" />
@@ -101,29 +113,38 @@ function VerifyEmailForm() {
 
         <div className="flex-1 flex items-center justify-center">
           <div className="max-w-md w-full">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center" style={{ borderColor: '#10b981' }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 bg-green-500">
-                <CheckCircle className="w-8 h-8 text-white" />
+            <div
+              className="backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center"
+              style={{
+                backgroundColor: 'rgba(18,18,31,0.8)',
+                borderColor: '#1e1e30',
+              }}
+            >
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: '#10b981' }}
+              >
+                <CheckCircle className="w-8 h-8" style={{ color: '#ededf5' }} />
               </div>
 
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#ededf5' }}>
                 {alreadyVerified ? 'Email Already Verified!' : 'Email Verified!'}
               </h2>
 
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="mb-6" style={{ color: '#9090a8' }}>
                 {alreadyVerified
                   ? 'Your email was already verified. You can start using MindsetOS.'
                   : 'Your email has been verified successfully. Welcome to MindsetOS!'}
               </p>
 
-              <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+              <p className="text-sm mb-6" style={{ color: '#5a5a72' }}>
                 Redirecting to dashboard...
               </p>
 
               <Link
                 href="/dashboard"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 text-black font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                style={{ backgroundColor: '#fcc824' }}
+                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                style={{ backgroundColor: '#fcc824', color: '#09090f' }}
               >
                 Go to Dashboard
               </Link>
@@ -136,7 +157,10 @@ function VerifyEmailForm() {
 
   // Error state
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900 px-4">
+    <div
+      className="min-h-screen flex flex-col px-4"
+      style={{ backgroundColor: '#09090f' }}
+    >
       <div className="w-full pt-6 pb-4">
         <div className="flex justify-center">
           <MindsetOSLogo size="lg" variant="auto" />
@@ -145,24 +169,33 @@ function VerifyEmailForm() {
 
       <div className="flex-1 flex items-center justify-center">
         <div className="max-w-md w-full">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center" style={{ borderColor: '#ef4444' }}>
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-500">
-              <AlertCircle className="w-8 h-8 text-white" />
+          <div
+            className="backdrop-blur-sm p-8 rounded-xl shadow-2xl border-2 text-center"
+            style={{
+              backgroundColor: 'rgba(18,18,31,0.8)',
+              borderColor: '#1e1e30',
+            }}
+          >
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: '#ef4444' }}
+            >
+              <AlertCircle className="w-8 h-8" style={{ color: '#ededf5' }} />
             </div>
 
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: '#ededf5' }}>
               Verification Failed
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="mb-6" style={{ color: '#9090a8' }}>
               {error}
             </p>
 
             <div className="space-y-3">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 text-black font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                style={{ backgroundColor: '#fcc824' }}
+                className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                style={{ backgroundColor: '#fcc824', color: '#09090f' }}
               >
                 <Mail className="w-5 h-5" />
                 Sign In to Resend
@@ -189,7 +222,10 @@ function VerifyEmailForm() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-900">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: '#09090f' }}
+      >
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#fcc824' }} />
       </div>
     }>
