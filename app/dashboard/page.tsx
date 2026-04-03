@@ -915,7 +915,7 @@ function DashboardContent() {
       {user?.membershipTier === 'trial' && user?.trialExpiresAt && new Date(user.trialExpiresAt) > new Date() && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#fcc824] via-amber-400 to-[#fcc824] text-black text-center py-1.5 text-[13px] font-semibold shadow-lg shadow-amber-500/10">
           <span className="opacity-80">Free trial:</span> {Math.max(0, Math.ceil((new Date(user.trialExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days left &mdash;{' '}
-          <a href="/join" className="underline font-bold hover:text-amber-900 transition-colors">Upgrade now</a>
+          <a href="/join" className="underline font-bold transition-colors" style={{ color: '#000' }} onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#7a5a00')} onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#000')}>Upgrade now</a>
         </div>
       )}
 
@@ -1022,7 +1022,9 @@ function DashboardContent() {
           {!isSidebarOpen && (
             <button
               onClick={toggleSidebar}
-              className="flex md:hidden min-w-[44px] min-h-[44px] items-center justify-center p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 flex-shrink-0"
+              className="flex md:hidden min-w-[44px] min-h-[44px] items-center justify-center p-2 rounded-xl transition-all duration-200 flex-shrink-0"
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
               title="Open sidebar"
               aria-label="Open sidebar"
             >
@@ -1066,7 +1068,7 @@ function DashboardContent() {
               )}
             </div>
             <div className="flex-1 text-left min-w-0">
-              <div className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate">
+              <div className="text-sm font-bold leading-tight truncate" style={{ color: '#ededf5' }}>
                 {currentAgentData?.name || 'Select Agent'}
               </div>
               <div
@@ -1076,17 +1078,20 @@ function DashboardContent() {
                 {currentAgentData ? 'Active' : 'Browse Agents'}
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+            <ChevronDown className="w-4 h-4 flex-shrink-0 transition-colors" style={{ color: '#9090a8' }} />
           </button>
 
           {/* Search Conversations - Moved from sidebar */}
           <button
             onClick={() => setShowConversationBrowser(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-white/[0.04] hover:bg-gray-200 dark:hover:bg-white/[0.07] border border-gray-200 dark:border-white/[0.08] rounded-xl transition-all duration-200"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)')}
             title="Search conversations"
           >
-            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span className="text-[13px] font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">Search</span>
+            <Search className="w-4 h-4" style={{ color: '#9090a8' }} />
+            <span className="text-[13px] font-medium hidden sm:inline" style={{ color: '#9090a8' }}>Search</span>
           </button>
 
           {/* Spacer to push notification bell to right */}
@@ -1095,7 +1100,10 @@ function DashboardContent() {
           {/* Feedback Button */}
           <button
             onClick={() => setShowFeedbackModal(true)}
-            className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+            className="relative p-2 rounded-lg transition-all"
+            style={{ color: '#9090a8' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ededf5'; (e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.8)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#9090a8'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             title="Send Feedback"
             aria-label="Send Feedback"
           >
@@ -1120,13 +1128,16 @@ function DashboardContent() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">Browse Agents</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-0.5">Choose a coach to begin your session</p>
+                    <h1 className="text-2xl font-black tracking-tight" style={{ color: '#ededf5' }}>Browse Agents</h1>
+                    <p className="text-sm mt-0.5" style={{ color: '#9090a8' }}>Choose a coach to begin your session</p>
                   </div>
                   {(effectiveUser?.role === 'agency' || effectiveUser?.role === 'admin') && (
                     <button
                       onClick={() => router.push('/dashboard/my-agents')}
-                      className="px-3 py-1.5 text-xs font-medium bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors flex items-center gap-1.5"
+                      className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                      style={{ background: 'rgba(124,91,246,0.15)', color: '#7c5bf6' }}
+                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(124,91,246,0.25)')}
+                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(124,91,246,0.15)')}
                     >
                       <Plus className="w-3.5 h-3.5" /> Create Agent
                     </button>
@@ -1209,28 +1220,26 @@ function DashboardContent() {
                       </div>
 
                       {(isAgency || hasCustom) && (
-                        <div className="flex gap-1 mb-5 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex gap-1 mb-5 border-b" style={{ borderColor: '#1e1e30' }}>
                           <button
                             onClick={() => setAgentBrowserTab('core')}
-                            className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                              agentBrowserTab === 'core'
-                                ? 'text-gray-900 dark:text-white'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                            }`}
+                            className="px-3 py-2 text-sm font-medium transition-colors relative"
+                            style={{ color: agentBrowserTab === 'core' ? '#ededf5' : '#9090a8' }}
+                            onMouseEnter={e => { if (agentBrowserTab !== 'core') (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+                            onMouseLeave={e => { if (agentBrowserTab !== 'core') (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
                           >
                             Core Agents
                             {agentBrowserTab === 'core' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffc82c]" />}
                           </button>
                           <button
                             onClick={() => setAgentBrowserTab('custom')}
-                            className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                              agentBrowserTab === 'custom'
-                                ? 'text-gray-900 dark:text-white'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                            }`}
+                            className="px-3 py-2 text-sm font-medium transition-colors relative"
+                            style={{ color: agentBrowserTab === 'custom' ? '#ededf5' : '#9090a8' }}
+                            onMouseEnter={e => { if (agentBrowserTab !== 'custom') (e.currentTarget as HTMLElement).style.color = '#ededf5'; }}
+                            onMouseLeave={e => { if (agentBrowserTab !== 'custom') (e.currentTarget as HTMLElement).style.color = '#9090a8'; }}
                           >
                             My Agents
-                            {customAgents.length > 0 && <span className="ml-1 text-xs text-gray-400">({customAgents.length})</span>}
+                            {customAgents.length > 0 && <span className="ml-1 text-xs" style={{ color: '#9090a8' }}>({customAgents.length})</span>}
                             {agentBrowserTab === 'custom' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ffc82c]" />}
                           </button>
                         </div>
@@ -1241,7 +1250,7 @@ function DashboardContent() {
                         <div className="space-y-5">
                           {categoryOrder.map((category, categoryIndex) => (
                             <div key={category} className={categoryIndex > 0 ? 'border-t border-[#1e1e30] pt-4 mt-2' : ''}>
-                              <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-1">
+                              <h2 className="text-xs font-semibold uppercase tracking-wider mb-2 px-1" style={{ color: '#9090a8' }}>
                                 {CATEGORY_LABELS[category] || category}
                               </h2>
                               <div className="space-y-1.5">
@@ -1271,9 +1280,9 @@ function DashboardContent() {
                         <div>
                           {customAgents.length === 0 ? (
                             <div className="text-center py-12">
-                              <Sparkles className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-1">No custom agents yet</h3>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                              <Sparkles className="w-12 h-12 mx-auto mb-3" style={{ color: '#5a5a72' }} />
+                              <h3 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>No custom agents yet</h3>
+                              <p className="text-sm mb-5" style={{ color: '#9090a8' }}>
                                 Build agents tailored to your practice.
                               </p>
                               <div className="flex gap-3 justify-center">
@@ -1282,13 +1291,19 @@ function DashboardContent() {
                                     handleSelectAgent('agent-creator');
                                     setShowAgentBrowser(false);
                                   }}
-                                  className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center gap-2"
+                                  className="px-4 py-2 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2"
+                                  style={{ background: '#7c5bf6' }}
+                                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#6a4de0')}
+                                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#7c5bf6')}
                                 >
                                   <Wand2 className="w-4 h-4" /> AI-Guided Setup
                                 </button>
                                 <button
                                   onClick={() => router.push('/dashboard/my-agents')}
-                                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium flex items-center gap-2"
+                                  className="px-4 py-2 text-sm rounded-lg transition-colors font-medium flex items-center gap-2"
+                                  style={{ background: 'rgba(18,18,31,0.8)', color: '#ededf5', border: '1px solid #1e1e30' }}
+                                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.9)')}
+                                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(18,18,31,0.8)')}
                                 >
                                   <Settings2 className="w-4 h-4" /> Manual Setup
                                 </button>
@@ -1619,20 +1634,24 @@ function DashboardContent() {
       {showFeedbackModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" onClick={() => setShowFeedbackModal(false)}>
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" aria-hidden="true"></div>
+            <div className="fixed inset-0 transition-opacity" style={{ background: 'rgba(9,9,15,0.85)' }} aria-hidden="true"></div>
 
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            <div className="inline-block align-bottom rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                 style={{ background: 'rgba(18,18,31,0.97)', border: '1px solid #1e1e30' }}
                  onClick={(e) => e.stopPropagation()}>
 
               {/* Header */}
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b" style={{ borderColor: '#1e1e30' }}>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-2xl font-bold" style={{ color: '#ededf5' }}>
                     Send Feedback
                   </h3>
                   <button
                     onClick={() => setShowFeedbackModal(false)}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    className="transition-colors"
+                    style={{ color: '#9090a8' }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#ededf5')}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9090a8')}
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -1643,27 +1662,27 @@ function DashboardContent() {
               <div className="px-6 py-4">
                 {feedbackSuccess ? (
                   <div className="text-center py-8">
-                    <Check className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                    <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                    <Check className="w-16 h-16 mx-auto mb-4" style={{ color: '#4ade80' }} />
+                    <h4 className="text-xl font-bold mb-2" style={{ color: '#ededf5' }}>
                       Thank You!
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p style={{ color: '#9090a8' }}>
                       Your feedback has been submitted successfully.
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleFeedbackSubmit} className="space-y-4">
                     {/* User Info Display */}
-                    <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Submitting as: <span className="font-medium text-gray-900 dark:text-white">{user?.firstName} {user?.lastName}</span>
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(30,30,48,0.6)', border: '1px solid #1e1e30' }}>
+                      <p className="text-sm" style={{ color: '#9090a8' }}>
+                        Submitting as: <span className="font-medium" style={{ color: '#ededf5' }}>{user?.firstName} {user?.lastName}</span>
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-500">{user?.email}</p>
+                      <p className="text-sm" style={{ color: '#5a5a72' }}>{user?.email}</p>
                     </div>
 
                     {/* Message Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                         Message
                       </label>
                       <textarea
@@ -1671,21 +1690,26 @@ function DashboardContent() {
                         rows={4}
                         value={feedbackForm.message}
                         onChange={(e) => setFeedbackForm({ ...feedbackForm, message: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                        style={{ '--tw-ring-color': '#fcc824' } as React.CSSProperties}
+                        className="w-full px-4 py-2 rounded-lg focus:outline-none resize-none"
+                        style={{ background: 'rgba(9,9,15,0.8)', border: '1px solid #1e1e30', color: '#ededf5', outline: 'none' }}
+                        onFocus={e => (e.currentTarget.style.borderColor = '#4f6ef7')}
+                        onBlur={e => (e.currentTarget.style.borderColor = '#1e1e30')}
                         placeholder="Tell us what you think..."
                       />
                     </div>
 
                     {/* Attachment Field */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: '#9090a8' }}>
                         Screenshot (optional)
                       </label>
                       <div className="flex items-center gap-2">
-                        <label className="flex-1 flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                          <Paperclip className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                        <label className="flex-1 flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors"
+                          style={{ background: 'rgba(9,9,15,0.8)', border: '1px solid #1e1e30' }}
+                          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(30,30,48,0.8)')}
+                          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(9,9,15,0.8)')}>
+                          <Paperclip className="w-4 h-4" style={{ color: '#9090a8' }} />
+                          <span className="text-sm truncate" style={{ color: '#9090a8' }}>
                             {feedbackForm.attachment ? feedbackForm.attachment.name : 'Attach an image'}
                           </span>
                           <input
@@ -1730,7 +1754,10 @@ function DashboardContent() {
                     {/* View Feedback History Link */}
                     <a
                       href="/feedback"
-                      className="block text-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                      className="block text-center text-sm transition-colors"
+                      style={{ color: '#9090a8' }}
+                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#ededf5')}
+                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9090a8')}
                     >
                       View your feedback history
                       {unreadFeedbackCount > 0 && (

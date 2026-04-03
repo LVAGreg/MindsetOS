@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import posthog from 'posthog-js';
+import { trackAgentFirstMessage } from '@/lib/analytics';
 import { Send, Loader2, Sparkles, ChevronUp, ChevronDown, Square, Paperclip, X, FileText, Mic, ThumbsUp, ThumbsDown, Copy, Check, Edit2, RefreshCw, Phone, PanelRightOpen, BarChart2, ArrowRight } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS, type AgentId } from '@/lib/store';
 import { apiClient } from '@/lib/api-client';
@@ -1892,7 +1892,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
     addMessage(convId, userMsg);
 
     if (isFirstMessage) {
-      try { posthog.capture('agent_first_message', { agent_slug: agentId }); } catch {}
+      trackAgentFirstMessage(agentId);
     }
 
     setIsLoading(true);
@@ -3143,7 +3143,20 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                               key={idx}
                               onClick={() => isLastAssistantMessage && handleSendMessage(option)}
                               disabled={isLoading || !isLastAssistantMessage}
-                              className="quick-add-btn w-full px-4 py-3 rounded-xl text-left group disabled:opacity-40 disabled:cursor-not-allowed"
+                              className="quick-add-btn w-full px-4 py-3 text-left group disabled:opacity-40 disabled:cursor-not-allowed"
+                              style={{
+                                background: '#12121f',
+                                border: '1px solid #1e1e30',
+                                borderRadius: 10,
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = 'rgba(79,110,247,0.05)';
+                                e.currentTarget.style.borderColor = 'rgba(79,110,247,0.4)';
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = '#12121f';
+                                e.currentTarget.style.borderColor = '#1e1e30';
+                              }}
                             >
                               <div className="flex items-start gap-3">
                                 <span className="font-bold text-sm flex-shrink-0 mt-0.5 tabular-nums" style={{ color: 'rgba(252,200,36,0.6)' }}>
@@ -3252,7 +3265,22 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                 <button
                   key={i}
                   onClick={() => setInput(prompt)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-[#1e1e30] bg-[#12121f] text-[#9090a8] hover:text-[#ededf5] hover:border-[#fcc824]/40 transition-all"
+                  className="text-xs px-3 py-1.5 rounded-full border transition-all"
+                  style={{
+                    background: '#12121f',
+                    borderColor: '#1e1e30',
+                    color: '#9090a8',
+                    borderLeft: `2px solid ${agentHex}50`,
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = '#ededf5';
+                    e.currentTarget.style.borderColor = `${agentHex}60`;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = '#9090a8';
+                    e.currentTarget.style.borderColor = '#1e1e30';
+                    e.currentTarget.style.borderLeftColor = `${agentHex}50`;
+                  }}
                 >
                   {prompt}
                 </button>
