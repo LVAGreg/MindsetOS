@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import {
   ArrowRight,
@@ -14,16 +15,20 @@ import {
   Activity,
   ChevronRight,
   Sparkles,
-  MessageSquare,
-  BookOpen,
-  Compass,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+
+/* ── BrainVariantB — SSR-off (Three.js) ──────────────────── */
+const BrainVariantB = dynamic(
+  () => import('../components/BrainInterface/BrainVariantB'),
+  { ssr: false }
+);
 
 export default function LandingPage() {
   const router = useRouter();
   const [vis, setVis] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
   const { user, isAuthenticated } = useAppStore();
 
   useEffect(() => { setHasHydrated(true); }, []);
@@ -39,6 +44,15 @@ export default function LandingPage() {
 
   useEffect(() => { setVis(true); }, []);
 
+  /* ── Scroll listener for sticky nav shadow ─────────────── */
+  useEffect(() => {
+    const handleScroll = () => {
+      setNavScrolled(window.scrollY > 80);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   /* ── Data ─────────────────────────────────────────────── */
 
   const agents = [
@@ -53,7 +67,7 @@ export default function LandingPage() {
     },
     {
       Icon: Zap,
-      color: '#0ea5e9',
+      color: '#4f6ef7',
       name: '48-Hour Reset',
       tagline: 'Interrupt the Pattern Now',
       description: 'Six targeted exercises that break your reactive cycle and install a new behavioral baseline. Fastest results in the system.',
@@ -62,7 +76,7 @@ export default function LandingPage() {
     },
     {
       Icon: Layers,
-      color: '#7c3aed',
+      color: '#7c5bf6',
       name: 'Architecture Coach',
       tagline: 'Build Your Mental OS',
       description: 'The 90-day cohort that builds all three layers of mindset architecture. Awareness, interruption, and design — working together.',
@@ -71,7 +85,7 @@ export default function LandingPage() {
     },
     {
       Icon: Eye,
-      color: '#ec4899',
+      color: '#7c5bf6',
       name: 'Inner World Mapper',
       tagline: "Surface What's Running You",
       description: 'Map the beliefs, values, and emotional patterns driving your decisions. Clarity on what to keep, rewire, and release.',
@@ -80,7 +94,7 @@ export default function LandingPage() {
     },
     {
       Icon: Target,
-      color: '#10b981',
+      color: '#4f6ef7',
       name: 'Decision Framework',
       tagline: 'Cut Through Overthinking',
       description: 'The DESIGN process — Define, Examine, Separate, Identify, Generate, Name — for high-stakes decisions under pressure.',
@@ -89,7 +103,7 @@ export default function LandingPage() {
     },
     {
       Icon: Activity,
-      color: '#f59e0b',
+      color: '#fcc824',
       name: 'Accountability Partner',
       tagline: 'Daily Check-In That Compounds',
       description: 'A 5-minute daily practice that tracks commitments, celebrates wins, and recalibrates when you drift — every day.',
@@ -126,10 +140,10 @@ export default function LandingPage() {
   ];
 
   const stats = [
-    { value: '10', label: 'AI agents', sub: 'Complete system' },
-    { value: '3×', label: 'faster decisions', sub: 'Measured at 30 days' },
-    { value: '90', label: 'day architecture', sub: 'Group cohort' },
-    { value: '48hr', label: 'reset protocol', sub: 'Fastest entry point' },
+    { value: '10', label: 'AI Coaches', sub: 'Complete system', accentColor: '#4f6ef7' },
+    { value: '48hr', label: 'Pattern Break', sub: 'Fastest entry point', accentColor: '#7c5bf6' },
+    { value: '3×', label: 'Faster Decisions', sub: 'Measured at 30 days', accentColor: '#4f6ef7' },
+    { value: '500+', label: 'Founders', sub: 'And counting', accentColor: '#fcc824' },
   ];
 
   const steps = [
@@ -174,94 +188,170 @@ export default function LandingPage() {
           }} />
       </div>
 
-      {/* ── Nav ───────────────────────────────────────── */}
-      <nav className="relative z-10 w-full px-6 py-5 max-w-7xl mx-auto flex items-center justify-between"
-        style={{ animation: `${vis ? 'landingFadeUp 0.6s 0s ease-out both' : 'none'}` }}>
-        <MindsetOSLogo size="lg" variant="light" />
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => router.push('/login')}
-            className="px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04]"
-            style={{ color: '#9090a8' }}
-          >
-            Sign in
-          </button>
-          <button
-            onClick={() => router.push('/trial-v3b')}
-            className="px-5 py-2.5 text-sm font-bold text-black rounded-xl transition-all duration-300 hover:shadow-[0_0_24px_rgba(252,200,36,0.35)] hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
-          >
-            Start Free
-          </button>
+      {/* ── Sticky Nav ────────────────────────────────── */}
+      <nav
+        className="header-glass w-full px-6 py-5"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: navScrolled ? '0 4px 24px rgba(0,0,0,0.5)' : 'none',
+          transition: 'box-shadow 0.2s ease',
+          animation: vis ? 'landingFadeUp 0.6s 0s ease-out both' : 'none',
+        }}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <MindsetOSLogo size="lg" variant="light" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push('/login')}
+              className="hidden sm:inline-flex px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04]"
+              style={{ color: '#9090a8' }}
+              aria-label="Sign in to MindsetOS"
+            >
+              Sign in
+            </button>
+            <button
+              onClick={() => router.push('/trial-v3b')}
+              className="px-5 py-2.5 text-sm font-bold text-black rounded-xl transition-all duration-300 hover:shadow-[0_0_24px_rgba(252,200,36,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+              aria-label="Start free — no credit card required"
+            >
+              Start Free
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* ── Hero ──────────────────────────────────────── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-28 text-center">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-14 pb-24">
+        {/* Hero texture overlay */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-3xl"
+          style={{
+            backgroundImage: 'url(/generated/hero-texture.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.08,
+          }}
+        />
 
-        {/* Badge */}
-        <div className={`mb-8 lp-float-1 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
-            style={{
-              color: '#fcc824',
-              border: '1px solid rgba(252,200,36,0.28)',
-              background: 'rgba(252,200,36,0.07)',
-            }}>
-            <Sparkles className="w-3.5 h-3.5" />
-            Personal Operating System for Entrepreneurs
-          </span>
-        </div>
+        {/* 2-column asymmetric layout: 60/40 */}
+        <div className="relative flex flex-col md:flex-row md:items-center md:gap-12 lg:gap-16">
 
-        {/* Headline */}
-        <div className={`mb-7 lp-float-2 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
-          <h1 className="font-extrabold leading-none mb-5 heading-tighter"
-            style={{ fontSize: 'clamp(3rem,8vw,6rem)', color: '#ededf5' }}>
-            Stop reacting.<br />
-            <span className="gradient-text-brand">Start designing.</span>
-          </h1>
-          <p className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed" style={{ color: '#9090a8' }}>
-            10 AI agents built on Greg's proven frameworks.<br />
-            Your mindset, rebuilt from the architecture up.
-          </p>
-        </div>
+          {/* Left — text column (full width mobile, ~60% desktop) */}
+          <div className="w-full md:flex-[6] md:max-w-none">
 
-        {/* CTAs */}
-        <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 lp-float-3 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
-          <button
-            onClick={() => router.push('/trial-v3b')}
-            className="group flex items-center gap-2.5 px-8 py-4 font-bold text-black text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_44px_rgba(252,200,36,0.38)] hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
-          >
-            Start Free — No credit card
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-          <button
-            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 px-6 py-4 rounded-xl text-sm font-medium transition-all duration-300 hover:bg-white/[0.04]"
-            style={{
-              color: '#9090a8',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
-            See how it works
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto lp-float-4 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
-          {stats.map((s, i) => (
-            <div key={i} className="p-5 rounded-2xl text-center"
-              style={{
-                background: 'rgba(18,18,31,0.7)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(12px)',
-              }}>
-              <div className="text-3xl font-extrabold heading-tighter mb-1 gradient-text-brand">{s.value}</div>
-              <div className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#ededf5' }}>{s.label}</div>
-              <div className="text-xs" style={{ color: '#5a5a72' }}>{s.sub}</div>
+            {/* Badge */}
+            <div className={`mb-8 lp-float-1 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
+                style={{
+                  color: '#fcc824',
+                  border: '1px solid rgba(252,200,36,0.28)',
+                  background: 'rgba(252,200,36,0.07)',
+                }}>
+                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+                The Mindset Operating System
+              </span>
             </div>
-          ))}
+
+            {/* Headline */}
+            <div className={`mb-7 lp-float-2 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+              <h1
+                className="font-extrabold leading-none mb-5 heading-tighter"
+                style={{
+                  fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
+                  color: '#ededf5',
+                }}
+              >
+                Stop reacting.<br />
+                <span className="gradient-text-brand">Start designing.</span>
+              </h1>
+              <p className="text-xl md:text-2xl max-w-xl leading-relaxed" style={{ color: '#9090a8' }}>
+                10 AI agents built on Greg&rsquo;s proven frameworks.<br />
+                Your mindset, rebuilt from the architecture up.
+              </p>
+            </div>
+
+            {/* CTAs */}
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-16 lp-float-3 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+              <button
+                onClick={() => router.push('/trial-v3b')}
+                className="group flex items-center gap-2.5 px-8 py-4 font-bold text-black text-lg rounded-xl transition-all duration-300 hover:shadow-[0_0_44px_rgba(252,200,36,0.38)] hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+                aria-label="Start free — no credit card required"
+              >
+                Start Free — No credit card
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+              </button>
+              <button
+                onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                className="flex items-center gap-2 px-6 py-4 rounded-xl text-sm font-medium transition-all duration-300 hover:bg-white/[0.04]"
+                style={{
+                  color: '#9090a8',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
+                aria-label="See how MindsetOS works"
+              >
+                See how it works
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Stats — 2×2 mobile, 4-col desktop */}
+            <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lp-float-4 ${vis ? 'lp-vis' : 'lp-hidden'}`}>
+              {stats.map((s, i) => (
+                <div
+                  key={i}
+                  className="p-5 rounded-2xl text-center"
+                  style={{
+                    background: 'rgba(18,18,31,0.7)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    backdropFilter: 'blur(12px)',
+                    borderTop: `2px solid ${s.accentColor}`,
+                  }}
+                >
+                  <div className="text-3xl font-extrabold heading-tighter mb-1 gradient-text-brand">{s.value}</div>
+                  <div className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#ededf5' }}>{s.label}</div>
+                  <div className="text-xs" style={{ color: '#5a5a72' }}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — brain column (~40% desktop, hidden mobile) */}
+          <div className="hidden md:flex md:flex-[4] items-center justify-center flex-shrink-0">
+            <div className="relative flex flex-col items-center">
+              {/* Brain container */}
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: 480,
+                  height: 480,
+                  background: 'radial-gradient(circle at 50% 50%, rgba(79,110,247,0.12) 0%, transparent 70%)',
+                  border: '1px solid rgba(79,110,247,0.15)',
+                  borderRadius: 24,
+                }}
+              >
+                <BrainVariantB onAgentSelect={() => {}} />
+              </div>
+
+              {/* LIVE SYSTEM badge */}
+              <div className="mt-4 flex items-center gap-2">
+                <span
+                  className="block rounded-full animate-subtle-pulse"
+                  style={{
+                    width: 8,
+                    height: 8,
+                    background: '#22c55e',
+                    flexShrink: 0,
+                  }}
+                  aria-hidden="true"
+                />
+                <span className="text-xs" style={{ color: '#9090a8' }}>System Active</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -272,10 +362,10 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The Framework</p>
             <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
-              3-Layer Architecture
+              3 Layers Most Mindset Programs Skip
             </h2>
             <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
-              Most mindset work skips to Layer 3.<br />That's why it doesn't stick.
+              Most mindset work skips to Layer 3.<br />That&rsquo;s why it doesn&rsquo;t stick.
             </p>
           </div>
 
@@ -295,7 +385,7 @@ export default function LandingPage() {
 
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
                   style={{ background: `${p.color}18`, border: `1px solid ${p.color}2a` }}>
-                  <p.Icon className="w-5 h-5" style={{ color: p.color }} />
+                  <p.Icon className="w-5 h-5" style={{ color: p.color }} aria-hidden="true" />
                 </div>
 
                 <div className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: p.color }}>
@@ -316,10 +406,10 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The System</p>
             <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
-              10 Agents. One Architecture.
+              10 AI Coaches. One Unified System.
             </h2>
             <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
-              Each agent handles a specific layer of your mindset work.<br />Together, they're a complete operating system.
+              Each agent handles a specific layer of your mindset work.<br />Together, they&rsquo;re a complete operating system.
             </p>
           </div>
 
@@ -334,9 +424,10 @@ export default function LandingPage() {
               onClick={() => router.push('/trial-v3b')}
               className="group inline-flex items-center gap-3 px-10 py-5 font-bold text-black text-xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_50px_rgba(252,200,36,0.35)] hover:scale-[1.02] active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+              aria-label="Access all 10 AI agents free — no credit card required"
             >
               Access All 10 Agents Free
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -349,7 +440,7 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>The Journey</p>
             <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-4" style={{ color: '#ededf5' }}>
-              How It Works
+              From Reactive to Designed
             </h2>
             <p className="text-lg max-w-md mx-auto" style={{ color: '#9090a8' }}>
               Three steps from reactive to designed.
@@ -384,7 +475,7 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#5a5a72' }}>Why it works</p>
               <h2 className="text-4xl md:text-5xl font-extrabold heading-tighter mb-6" style={{ color: '#ededf5' }}>
-                Built on Greg's<br />proven frameworks
+                Built on Frameworks.<br />Not AI Guesses.
               </h2>
               <p className="mb-10 leading-relaxed text-lg" style={{ color: '#9090a8' }}>
                 MindsetOS is the AI-powered version of the coaching system Greg has used with high-performing entrepreneurs worldwide. Every agent is trained on real methodology — not generic advice.
@@ -399,7 +490,7 @@ export default function LandingPage() {
                   <div key={i} className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(79,110,247,0.18)', border: '1px solid rgba(79,110,247,0.35)' }}>
-                      <Check className="w-3 h-3" style={{ color: '#7b92ff' }} />
+                      <Check className="w-3 h-3" style={{ color: '#7b92ff' }} aria-hidden="true" />
                     </div>
                     <span className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{item}</span>
                   </div>
@@ -420,7 +511,7 @@ export default function LandingPage() {
                 }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
                   style={{ background: 'rgba(79,110,247,0.15)', border: '1px solid rgba(79,110,247,0.25)' }}>
-                  <Brain className="w-6 h-6" style={{ color: '#7b92ff' }} />
+                  <Brain className="w-6 h-6" style={{ color: '#7b92ff' }} aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3" style={{ color: '#ededf5' }}>
                   MindsetOS Methodology
@@ -431,11 +522,11 @@ export default function LandingPage() {
                 <a href="https://www.mindset.show" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
                   style={{ color: '#7b92ff' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#a07ef9')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#7b92ff')}
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#a07ef9')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#7b92ff')}
                 >
                   Learn more about MindsetOS
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </a>
               </div>
             </div>
@@ -453,20 +544,22 @@ export default function LandingPage() {
 
         <div className="relative max-w-3xl mx-auto px-6 text-center">
           <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: '#5a5a72' }}>Get started</p>
-          <h2 className="font-extrabold heading-tighter mb-6" style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', color: '#ededf5', lineHeight: 1.08 }}>
-            Your mind is running<br />
-            <span className="gradient-text-brand">on default settings.</span>
+          <h2 className="font-extrabold heading-tighter mb-6"
+            style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', color: '#ededf5', lineHeight: 1.08 }}>
+            The Next 90 Days<br />
+            <span className="gradient-text-brand">Will Happen Anyway.</span>
           </h2>
           <p className="text-xl mb-12 max-w-xl mx-auto" style={{ color: '#9090a8' }}>
-            Every day you spend reacting is a day you're not designing. Start free. No credit card. Results in 48 hours.
+            Every day you spend reacting is a day you&rsquo;re not designing. Start free. No credit card. Results in 48 hours.
           </p>
           <button
             onClick={() => router.push('/trial-v3b')}
             className="group inline-flex items-center gap-3 px-12 py-6 font-bold text-black text-2xl rounded-2xl transition-all duration-300 hover:shadow-[0_0_60px_rgba(252,200,36,0.4)] hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: 'linear-gradient(135deg,#fcc824 0%,#f0b800 100%)' }}
+            aria-label="Start MindsetOS free — no credit card required"
           >
             Start Free
-            <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
           </button>
           <p className="text-xs mt-5" style={{ color: '#5a5a72' }}>
             No credit card required · Get started in 60 seconds
@@ -480,7 +573,7 @@ export default function LandingPage() {
           <p className="text-sm" style={{ color: '#5a5a72' }}>
             © 2026 MindsetOS — Mindset Operating System
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6">
             {[
               { label: 'mindset.show', href: 'https://www.mindset.show' },
               { label: 'Connect with Greg', href: 'https://www.linkedin.com/in/gregmindset/' },
@@ -492,8 +585,8 @@ export default function LandingPage() {
                 rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="text-sm transition-colors duration-200"
                 style={{ color: '#5a5a72' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#fcc824')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5a5a72')}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#fcc824')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = '#5a5a72')}
               >
                 {l.label}
               </a>
@@ -543,7 +636,7 @@ function AgentCard({
       {/* Icon */}
       <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
         style={{ background: `${color}18`, border: `1px solid ${color}28` }}>
-        <Icon className="w-5 h-5" style={{ color }} />
+        <Icon className="w-5 h-5" style={{ color }} aria-hidden="true" />
       </div>
 
       <h3 className="text-lg font-bold mb-1" style={{ color: '#ededf5' }}>{name}</h3>
