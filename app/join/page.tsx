@@ -549,8 +549,11 @@ export default function JoinPage() {
                   <div className="text-xs text-gray-500 mt-1.5">Group program</div>
                 </a>
                 {/* 1:1 Intensive */}
-                <a href="/checkout?plan=intensive_1997" className="group relative bg-white/[0.06] border border-violet-500/40 rounded-2xl p-5 text-center transition-all duration-300 hover:border-violet-400 hover:bg-white/[0.1] block">
-                  <div className="text-xs text-violet-400 font-bold uppercase tracking-widest mb-2">1:1 Intensive</div>
+                <a href="/checkout?plan=intensive_1997" className="group relative bg-white/[0.06] rounded-2xl p-5 text-center transition-all duration-300 hover:bg-white/[0.1] block"
+                  style={{ border: '1px solid rgba(124,91,246,0.4)' }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.7)')}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,91,246,0.4)')}>
+                  <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#a07ef9' }}>1:1 Intensive</div>
                   <div className="text-3xl font-extrabold text-white tracking-tight">$1,997</div>
                   <div className="text-xs text-gray-500 mt-1.5">Private add-on</div>
                 </a>
