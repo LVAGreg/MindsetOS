@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { X, Search, MessageSquare, Calendar, Filter, Folder, BookOpen, FileText, Star, Trash2 } from 'lucide-react';
+import { X, Search, MessageSquare, Calendar, Filter, Folder, BookOpen, FileText, Star, Trash2, ArrowRight } from 'lucide-react';
 import { useAppStore, MINDSET_AGENTS, Conversation } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
 import { fetchArtifacts, deleteArtifact } from '@/lib/api-client';
@@ -25,6 +25,40 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
   const setCurrentArtifact = useAppStore(s => s.setCurrentArtifact);
   const setCanvasContent = useAppStore(s => s.setCanvasContent);
   const setCanvasPanelOpen = useAppStore(s => s.setCanvasPanelOpen);
+  const createConversation = useAppStore(s => s.createConversation);
+  const setCurrentConversation = useAppStore(s => s.setCurrentConversation);
+
+  // ── Workflow step lookup: step number → agent key ──────────────────────────
+  const stepToAgent = useMemo(() => {
+    const map = new Map<number, keyof typeof MINDSET_AGENTS>();
+    (Object.keys(MINDSET_AGENTS) as Array<keyof typeof MINDSET_AGENTS>).forEach((key) => {
+      const step = MINDSET_AGENTS[key].workflowStep;
+      if (step !== undefined) map.set(step, key);
+    });
+    return map;
+  }, []);
+
+  // Max workflow step across all agents
+  const maxWorkflowStep = useMemo(() => {
+    return Math.max(...Object.values(MINDSET_AGENTS).map(a => a.workflowStep));
+  }, []);
+
+  // ── Most-recent conversation per agentId ────────────────────────────────────
+  // Used to show the nudge only on the freshest card for each agent.
+  const mostRecentConvByAgent = useMemo(() => {
+    const map = new Map<string, string>(); // agentId → conversationId
+    Object.values(conversations)
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .forEach((conv) => {
+        if (!map.has(conv.agentId)) map.set(conv.agentId, conv.id);
+      });
+    return map;
+  }, [conversations]);
+
+  // ── Set of agentIds the user already has at least one conversation with ─────
+  const agentsWithAnyConv = useMemo(() => {
+    return new Set(Object.values(conversations).map(c => c.agentId));
+  }, [conversations]);
 
   // Set initial project filter when provided
   useEffect(() => {
@@ -212,6 +246,52 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
     return preview.length === lastMessage.content.length ? preview : preview + '...';
   };
 
+  // ── Compute the handoff nudge for a given conversation card ─────────────────
+  // Returns null if no nudge should be shown.
+  type NudgeInfo =
+    | { kind: 'next'; agentName: string; agentId: string }
+    | { kind: 'explore' };
+
+  const getNudge = (conv: Conversation): NudgeInfo | null => {
+    // Only show on the most-recent card for this agent
+    if (mostRecentConvByAgent.get(conv.agentId) !== conv.id) return null;
+
+    const agentData = Object.values(MINDSET_AGENTS).find(a => a.id === conv.agentId);
+    if (!agentData) return null;
+
+    const nextStep = agentData.workflowStep + 1;
+    const nextAgentKey = stepToAgent.get(nextStep);
+
+    if (nextAgentKey) {
+      const nextAgent = MINDSET_AGENTS[nextAgentKey];
+      // Only show if the user hasn't started a convo with the next agent yet
+      if (!agentsWithAnyConv.has(nextAgent.id)) {
+        return { kind: 'next', agentName: nextAgent.name, agentId: nextAgent.id };
+      }
+      return null; // User already has the next step covered
+    }
+
+    // This is the last workflow step — offer "Explore more agents"
+    if (agentData.workflowStep === maxWorkflowStep) {
+      return { kind: 'explore' };
+    }
+
+    return null;
+  };
+
+  // ── Handle clicking a nudge button ─────────────────────────────────────────
+  const handleNudgeClick = (e: React.MouseEvent, nudge: NudgeInfo) => {
+    e.stopPropagation(); // Don't also select the existing conversation
+    if (nudge.kind === 'explore') {
+      onClose();
+      return;
+    }
+    // Create a new conversation with the next agent
+    const newConvId = createConversation(nudge.agentId);
+    setCurrentConversation(newConvId);
+    onSelectConversation(newConvId);
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -378,60 +458,93 @@ export function ConversationBrowser({ isOpen, onClose, onSelectConversation, ini
                       const agent = getAgentInfo(conv.agentId);
                       const isActive = currentConversationId === conv.id;
                       const project = conv.projectId ? projects[conv.projectId] : null;
+                      const nudge = getNudge(conv);
 
                       return (
-                        <button
-                          key={conv.id}
-                          onClick={() => handleSelectConversation(conv.id)}
-                          className="w-full text-left p-2 rounded-lg border-2 transition-all hover:shadow-md"
-                          style={isActive
-                            ? { background: 'rgba(252,200,36,0.08)', borderColor: '#fcc824' }
-                            : { background: 'rgba(255,255,255,0.03)', borderColor: '#1e1e30' }}
-                        >
-                          <div className="flex items-start gap-2">
-                            <AgentIcon agentId={agent.id} className="w-6 h-6 flex-shrink-0" style={{ color: '#9090a8' } as React.CSSProperties} />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                                <span className="font-semibold text-xs" style={{ color: '#ededf5' }}>
-                                  {agent.name}
-                                </span>
-                                {isActive && (
-                                  <span className="px-1.5 py-0.5 text-[10px] font-medium rounded" style={{ background: '#fcc824', color: '#09090f' }}>
-                                    Active
+                        <div key={conv.id}>
+                          <button
+                            onClick={() => handleSelectConversation(conv.id)}
+                            className="w-full text-left p-2 rounded-lg border-2 transition-all hover:shadow-md"
+                            style={isActive
+                              ? { background: 'rgba(252,200,36,0.08)', borderColor: '#fcc824' }
+                              : { background: 'rgba(255,255,255,0.03)', borderColor: '#1e1e30' }}
+                          >
+                            <div className="flex items-start gap-2">
+                              <AgentIcon agentId={agent.id} className="w-6 h-6 flex-shrink-0" style={{ color: '#9090a8' } as React.CSSProperties} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                                  <span className="font-semibold text-xs" style={{ color: '#ededf5' }}>
+                                    {agent.name}
                                   </span>
-                                )}
-                                {project && (
-                                  <span
-                                    className="px-1.5 py-0.5 text-[10px] font-medium rounded flex items-center gap-1"
-                                    style={{
-                                      backgroundColor: `${project.color}20`,
-                                      color: project.color,
-                                      borderWidth: '1px',
-                                      borderStyle: 'solid',
-                                      borderColor: project.color,
-                                    }}
-                                  >
-                                    <Folder className="w-2.5 h-2.5" />
-                                    {project.name}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[10px] mb-1 line-clamp-1" style={{ color: '#9090a8' }}>
-                                {getMessagePreview(conv)}
-                              </p>
-                              <div className="flex items-center gap-3 text-[10px]" style={{ color: '#5a5a72' }}>
-                                <div className="flex items-center gap-0.5">
-                                  <MessageSquare className="w-3 h-3" />
-                                  <span>{conv.messageCount || Object.keys(conv.history?.messages || {}).length || 0} msgs</span>
+                                  {isActive && (
+                                    <span className="px-1.5 py-0.5 text-[10px] font-medium rounded" style={{ background: '#fcc824', color: '#09090f' }}>
+                                      Active
+                                    </span>
+                                  )}
+                                  {project && (
+                                    <span
+                                      className="px-1.5 py-0.5 text-[10px] font-medium rounded flex items-center gap-1"
+                                      style={{
+                                        backgroundColor: `${project.color}20`,
+                                        color: project.color,
+                                        borderWidth: '1px',
+                                        borderStyle: 'solid',
+                                        borderColor: project.color,
+                                      }}
+                                    >
+                                      <Folder className="w-2.5 h-2.5" />
+                                      {project.name}
+                                    </span>
+                                  )}
                                 </div>
-                                <div className="flex items-center gap-0.5">
-                                  <Calendar className="w-3 h-3" />
-                                  <span>{formatDate(new Date(conv.updatedAt))}</span>
+                                <p className="text-[10px] mb-1 line-clamp-1" style={{ color: '#9090a8' }}>
+                                  {getMessagePreview(conv)}
+                                </p>
+                                <div className="flex items-center gap-3 text-[10px]" style={{ color: '#5a5a72' }}>
+                                  <div className="flex items-center gap-0.5">
+                                    <MessageSquare className="w-3 h-3" />
+                                    <span>{conv.messageCount || Object.keys(conv.history?.messages || {}).length || 0} msgs</span>
+                                  </div>
+                                  <div className="flex items-center gap-0.5">
+                                    <Calendar className="w-3 h-3" />
+                                    <span>{formatDate(new Date(conv.updatedAt))}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </button>
+                          </button>
+
+                          {/* Agent handoff nudge */}
+                          {nudge && (
+                            <button
+                              onClick={(e) => handleNudgeClick(e, nudge)}
+                              className="flex items-center gap-1.5 mt-1 ml-2 px-2.5 py-1 rounded-md transition-opacity"
+                              style={{
+                                background: 'rgba(79,110,247,0.08)',
+                                border: '1px solid rgba(79,110,247,0.2)',
+                                color: '#4f6ef7',
+                                fontSize: '12px',
+                                lineHeight: '1.4',
+                              }}
+                              onMouseEnter={e => {
+                                (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.14)';
+                                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.35)';
+                              }}
+                              onMouseLeave={e => {
+                                (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.08)';
+                                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(79,110,247,0.2)';
+                              }}
+                              aria-label={nudge.kind === 'next' ? `Start ${nudge.agentName}` : 'Explore more agents'}
+                            >
+                              <ArrowRight className="w-3 h-3 flex-shrink-0" />
+                              <span>
+                                {nudge.kind === 'next'
+                                  ? `Continue: ${nudge.agentName}`
+                                  : 'Explore more agents'}
+                              </span>
+                            </button>
+                          )}
+                        </div>
                       );
                     })}
                   </div>

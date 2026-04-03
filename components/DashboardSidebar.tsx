@@ -44,6 +44,8 @@ import {
   Lock,
   TrendingUp,
   GraduationCap,
+  CheckCircle2,
+  Key,
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { useAppStore } from '@/lib/store';
@@ -64,7 +66,156 @@ interface DashboardSidebarProps {
   /** Unread feedback count */
   unreadFeedbackCount?: number;
   onFeedbackClick?: () => void;
-  viewAsUser?: any;
+  viewAsUser?: { id?: string; name?: string; email?: string; role?: string; membershipTier?: string } | null;
+  /** Called when user clicks the Accountability Partner nav item */
+  onAccountabilityPartnerClick?: () => void;
+}
+
+/* ─── Streak hook ────────────────────────────────────────── */
+interface StreakData {
+  daily_streak: number;
+  longest_streak: number;
+  last_check_in_at: string;
+}
+
+const LS_STREAK_KEY = 'mindset_streak';
+
+function useAccountabilityStreak(): [number, () => void] {
+  const [streak, setStreak] = useState<number>(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchStreak() {
+      try {
+        // Try dedicated endpoint first
+        const innerClient = (apiClient as unknown as { client: { get: (url: string) => Promise<{ data: StreakData }> } }).client;
+        const res = await innerClient.get('/api/users/streak');
+        if (!cancelled && res?.data?.daily_streak !== undefined) {
+          const val = res.data.daily_streak;
+          setStreak(val);
+          // Keep localStorage in sync
+          localStorage.setItem(LS_STREAK_KEY, String(val));
+          return;
+        }
+      } catch {
+        // endpoint doesn't exist yet — fall back to localStorage
+      }
+      if (!cancelled) {
+        const stored = localStorage.getItem(LS_STREAK_KEY);
+        setStreak(stored ? parseInt(stored, 10) || 0 : 0);
+      }
+    }
+
+    fetchStreak();
+    return () => { cancelled = true; };
+  }, []);
+
+  const incrementStreak = () => {
+    setStreak(prev => {
+      const next = prev + 1;
+      localStorage.setItem(LS_STREAK_KEY, String(next));
+      return next;
+    });
+  };
+
+  return [streak, incrementStreak];
+}
+
+/* ─── Token usage meter ──────────────────────────────────── */
+interface TokenUsageData {
+  quota: number;
+  used: number;
+  pct_used: number;
+  resets_at: string;
+  byok_enabled: boolean;
+}
+
+function TokenUsageMeter() {
+  const router = useRouter();
+  const [data, setData] = useState<TokenUsageData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchUsage() {
+      try {
+        const innerClient = (apiClient as unknown as { client: { get: (url: string) => Promise<{ data: TokenUsageData }> } }).client;
+        const res = await innerClient.get('/api/tokens/usage');
+        if (!cancelled && res?.data) {
+          setData(res.data);
+        }
+      } catch {
+        // non-critical — hide meter on failure
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchUsage();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (loading || !data) return null;
+
+  // BYOK active: show green pill
+  if (data.byok_enabled) {
+    return (
+      <div className="mx-3 mb-2">
+        <button
+          onClick={() => router.push('/profile')}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-colors"
+          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+          aria-label="BYOK active — go to profile"
+        >
+          <Key className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22c55e' }} />
+          <span className="text-[11px] font-semibold" style={{ color: '#22c55e' }}>BYOK Active</span>
+        </button>
+      </div>
+    );
+  }
+
+  const pct = Math.min(100, data.pct_used ?? Math.round((data.used / Math.max(data.quota, 1)) * 100));
+  const barColor = pct >= 90 ? '#e05252' : pct >= 70 ? '#fcc824' : 'rgba(144,144,168,0.5)';
+  const labelColor = pct >= 90 ? '#e05252' : pct >= 70 ? '#fcc824' : '#5a5a72';
+
+  // Format reset date
+  let resetLabel = '';
+  if (data.resets_at) {
+    try {
+      const d = new Date(data.resets_at);
+      resetLabel = `Resets ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    } catch {
+      resetLabel = '';
+    }
+  }
+
+  return (
+    <div className="mx-3 mb-2">
+      <button
+        onClick={() => router.push('/profile')}
+        className="w-full text-left px-3 py-2 rounded-xl transition-colors"
+        style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid rgba(30,30,48,0.9)' }}
+        aria-label="Token usage — go to profile"
+      >
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#5a5a72' }}>Tokens</span>
+          <span className="text-[10px] font-bold" style={{ color: labelColor }}>{pct}%</span>
+        </div>
+        {/* Progress bar */}
+        <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(237,237,245,0.06)' }}>
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${pct}%`, background: barColor }}
+          />
+        </div>
+        {resetLabel && (
+          <p className="mt-1.5 text-[10px]" style={{ color: '#5a5a72' }}>{resetLabel}</p>
+        )}
+      </button>
+    </div>
+  );
 }
 
 /* ─── Role badge ─────────────────────────────────────────── */
@@ -329,6 +480,7 @@ export default function DashboardSidebar({
   unreadFeedbackCount = 0,
   onFeedbackClick,
   viewAsUser,
+  onAccountabilityPartnerClick,
 }: DashboardSidebarProps) {
   const router = useRouter();
   const {
@@ -349,6 +501,7 @@ export default function DashboardSidebar({
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAdminSection, setShowAdminSection] = useState(false);
+  const [streak, incrementStreak] = useAccountabilityStreak();
 
   const isAdmin = effectiveUser?.role === 'admin';
   const isPowerUser = effectiveUser?.role === 'power_user';
@@ -458,6 +611,19 @@ export default function DashboardSidebar({
             label="Conversations"
             isActive={activeSection === 'conversations'}
             onClick={() => onSectionChange('conversations')}
+          />
+          <NavItem
+            icon={<CheckCircle2 className="w-4.5 h-4.5" />}
+            label="Accountability"
+            badge={streak > 0 ? `🔥 ${streak}` : undefined}
+            onClick={() => {
+              incrementStreak();
+              if (onAccountabilityPartnerClick) {
+                onAccountabilityPartnerClick();
+              } else {
+                router.push('/dashboard?agent=ACCOUNTABILITY_PARTNER');
+              }
+            }}
           />
         </div>
 
@@ -574,6 +740,9 @@ export default function DashboardSidebar({
         )}
 
       </div>
+
+      {/* ── Token usage meter ─────────────────────────────── */}
+      <TokenUsageMeter />
 
       {/* ── Footer: user profile ──────────────────────────── */}
       <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }}>

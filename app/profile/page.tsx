@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Save, AlertCircle, CheckCircle, Eye, Key, ArrowLeft, Building2, MessageSquare, Target, Briefcase, TrendingUp, RotateCcw, Pencil, X, Webhook } from 'lucide-react';
+import { User, Save, AlertCircle, CheckCircle, Eye, Key, ArrowLeft, Building2, MessageSquare, Target, Briefcase, TrendingUp, RotateCcw, Pencil, X, Webhook, Bell } from 'lucide-react';
 import { RoleBadge, UserRole } from '@/components/RoleBadge';
 import { apiClient } from '@/lib/api-client';
 
@@ -66,6 +66,27 @@ interface BrandVoice {
   avoidPhrases: string[];
 }
 
+interface NotificationPrefs {
+  dailyNudge: boolean;
+  nudgeTime: string;
+  weeklyDigest: boolean;
+}
+
+const NUDGE_TIME_OPTIONS: string[] = [
+  '6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM',
+  '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+  '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
+  '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM',
+  '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM',
+  '9:00 PM', '9:30 PM', '10:00 PM',
+];
+
+const DEFAULT_NOTIF_PREFS: NotificationPrefs = {
+  dailyNudge: false,
+  nudgeTime: '9:00 AM',
+  weeklyDigest: false,
+};
+
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -94,6 +115,12 @@ export default function ProfilePage() {
   const [byokSuccess, setByokSuccess] = useState(false);
   const [byokError, setByokError] = useState<string | null>(null);
   const [showByokKey, setShowByokKey] = useState(false);
+
+  // Notification preferences state
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIF_PREFS);
+  const [savingNotif, setSavingNotif] = useState(false);
+  const [notifSuccess, setNotifSuccess] = useState(false);
+  const [notifError, setNotifError] = useState<string | null>(null);
 
   // Core memories form state
   const [coreMemoriesData, setCoreMemoriesData] = useState<CoreMemories>({
@@ -212,6 +239,19 @@ export default function ProfilePage() {
       } catch (brandVoiceErr: any) {
         // Brand voice might not exist yet
         console.log('Brand voice not found (user may not have analyzed their voice yet)');
+      }
+
+      // Load notification preferences (graceful — endpoint may not exist yet)
+      try {
+        const notifResponse = await apiClient.get('/api/users/notification-preferences');
+        setNotifPrefs({
+          dailyNudge: notifResponse.dailyNudge ?? false,
+          nudgeTime: notifResponse.nudgeTime ?? '9:00 AM',
+          weeklyDigest: notifResponse.weeklyDigest ?? false,
+        });
+      } catch {
+        // Endpoint not yet deployed — use defaults silently
+        setNotifPrefs(DEFAULT_NOTIF_PREFS);
       }
     } catch (err: any) {
       console.error('Error loading profile:', err);
@@ -344,6 +384,23 @@ export default function ProfilePage() {
       setByokError(err.message || 'Failed to save API key');
     } finally {
       setSavingByok(false);
+    }
+  };
+
+  const handleNotifChange = async (updates: Partial<NotificationPrefs>) => {
+    const next: NotificationPrefs = { ...notifPrefs, ...updates };
+    setNotifPrefs(next);
+    setSavingNotif(true);
+    setNotifError(null);
+    setNotifSuccess(false);
+    try {
+      await apiClient.post('/api/users/notification-preferences', next);
+      setNotifSuccess(true);
+      setTimeout(() => setNotifSuccess(false), 2000);
+    } catch (err: unknown) {
+      setNotifError(err instanceof Error ? err.message : 'Failed to save preferences');
+    } finally {
+      setSavingNotif(false);
     }
   };
 
@@ -1213,6 +1270,119 @@ export default function ProfilePage() {
             </form>
           </div>
         )}
+
+        {/* Notification Preferences Card */}
+        <div
+          className="rounded-xl p-6 mt-6"
+          style={{ background: 'rgba(18,18,31,0.7)', border: '1px solid #1e1e30' }}
+        >
+          {/* Section header */}
+          <div className="flex items-center gap-3 mb-5">
+            <Bell className="h-5 w-5" style={{ color: '#4f6ef7' }} />
+            <h2 className="text-lg font-semibold" style={{ color: '#ededf5' }}>Notifications</h2>
+          </div>
+
+          <div className="space-y-5">
+            {/* Daily check-in reminder row */}
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Toggle */}
+                <label className="flex items-center gap-3 cursor-pointer flex-shrink-0">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs.dailyNudge}
+                      onChange={(e) => handleNotifChange({ dailyNudge: e.target.checked })}
+                      className="sr-only peer"
+                      aria-label="Enable daily check-in reminder"
+                      disabled={savingNotif}
+                    />
+                    <div
+                      className="w-11 h-6 rounded-full peer-checked:bg-[#4f6ef7] transition-colors"
+                      style={{ background: '#1e1e30' }}
+                    />
+                    <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
+                    Daily check-in reminder
+                  </span>
+                </label>
+
+                {/* Time picker — only shown when daily nudge is enabled */}
+                {notifPrefs.dailyNudge && (
+                  <select
+                    value={notifPrefs.nudgeTime}
+                    onChange={(e) => handleNotifChange({ nudgeTime: e.target.value })}
+                    disabled={savingNotif}
+                    aria-label="Daily reminder time"
+                    className="rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]/40 focus:border-[#4f6ef7] transition-colors"
+                    style={{
+                      background: '#09090f',
+                      border: '1px solid #1e1e30',
+                      color: '#ededf5',
+                    }}
+                  >
+                    {NUDGE_TIME_OPTIONS.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <p className="text-xs mt-1.5 ml-14" style={{ color: '#9090a8' }}>
+                Get a nudge to complete your daily mindset check-in.
+              </p>
+            </div>
+
+            {/* Divider */}
+            <div style={{ borderTop: '1px solid #1e1e30' }} />
+
+            {/* Weekly progress digest row */}
+            <div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={notifPrefs.weeklyDigest}
+                    onChange={(e) => handleNotifChange({ weeklyDigest: e.target.checked })}
+                    className="sr-only peer"
+                    aria-label="Enable weekly progress digest"
+                    disabled={savingNotif}
+                  />
+                  <div
+                    className="w-11 h-6 rounded-full peer-checked:bg-[#4f6ef7] transition-colors"
+                    style={{ background: '#1e1e30' }}
+                  />
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+                </div>
+                <span className="text-sm font-medium" style={{ color: '#ededf5' }}>
+                  Weekly progress digest
+                </span>
+              </label>
+              <p className="text-xs mt-1.5 ml-14" style={{ color: '#9090a8' }}>
+                A weekly email summary of your mindset progress and wins.
+              </p>
+            </div>
+          </div>
+
+          {/* Save state feedback */}
+          <div className="mt-4 h-5 flex items-center gap-2">
+            {notifSuccess && (
+              <span className="flex items-center gap-1.5 text-sm" style={{ color: '#4ade80' }}>
+                <CheckCircle className="w-4 h-4" />
+                Saved ✓
+              </span>
+            )}
+            {notifError && (
+              <span className="flex items-center gap-1.5 text-sm" style={{ color: '#f87171' }}>
+                <AlertCircle className="w-4 h-4" />
+                {notifError}
+              </span>
+            )}
+            {savingNotif && !notifSuccess && !notifError && (
+              <div className="animate-spin h-4 w-4 border-2 border-t-transparent rounded-full" style={{ borderColor: '#4f6ef7', borderTopColor: 'transparent' }} />
+            )}
+          </div>
+        </div>
 
       </div>
     </div>

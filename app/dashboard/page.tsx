@@ -60,6 +60,7 @@ import TrialExpiredPopup from '@/components/TrialExpiredPopup';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import WelcomeGuide from '@/components/WelcomeGuide';
 import FirstTimeModal from '@/components/FirstTimeModal';
+import { MindsetScoreWidget, JourneyProgressStepper } from '@/components/MindsetScoreWidget';
 import { CanvasPanel } from '@/components/CanvasPanel';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import { CoworkModal } from '@/components/CoworkModal';
@@ -963,6 +964,7 @@ function DashboardContent() {
         unreadFeedbackCount={unreadFeedbackCount}
         onFeedbackClick={() => setShowFeedbackModal(true)}
         viewAsUser={viewAsUser}
+        onAccountabilityPartnerClick={() => handleSelectAgent('accountability-partner')}
       >
         {/* Conversation history + playbook injected as children */}
         {currentAgentData && (
@@ -1390,6 +1392,19 @@ function DashboardContent() {
                       </div>
                     );
                   })()}
+
+                  {/* ---- Mindset Score Widget ---- */}
+                  <div className="mb-3 animate-float-up-2">
+                    <MindsetScoreWidget onNavigateToAgent={handleSelectAgent} />
+                  </div>
+
+                  {/* ---- Journey Progress Stepper ---- */}
+                  <div className="mb-10 animate-float-up-2">
+                    <JourneyProgressStepper
+                      conversations={conversations}
+                      onNavigateToAgent={handleSelectAgent}
+                    />
+                  </div>
 
                   {/* ---- Interactive Brain ---- */}
                   <div className="mb-10 animate-float-up-2">
