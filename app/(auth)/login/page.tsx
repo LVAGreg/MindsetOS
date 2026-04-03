@@ -177,7 +177,7 @@ export default function LoginPage() {
         <div className="max-w-[420px] w-full space-y-6">
 
           {/* Subtitle */}
-          <p className="text-center text-gray-400 text-sm tracking-wide login-float-2">
+          <p className="text-center text-[#9090a8] text-sm tracking-wide login-float-2">
             AI-Powered Mindset Coaching
           </p>
 
@@ -209,7 +209,7 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-300 mb-1.5"
+                    className="block text-sm font-medium text-[#9090a8] mb-1.5"
                   >
                     Email Address
                   </label>
@@ -230,7 +230,7 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-300 mb-1.5"
+                    className="block text-sm font-medium text-[#9090a8] mb-1.5"
                   >
                     Password
                   </label>
@@ -253,12 +253,12 @@ export default function LoginPage() {
                     <input
                       id="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-600 bg-white/5"
+                      className="h-4 w-4 rounded border-[#1e1e30] bg-white/5"
                       style={{ accentColor: '#fcc824' }}
                     />
                     <label
                       htmlFor="remember-me"
-                      className="ml-2 block text-sm text-gray-400"
+                      className="ml-2 block text-sm text-[#9090a8]"
                     >
                       Remember me
                     </label>
@@ -307,12 +307,12 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading || isLoading}
-                className="w-full py-3 px-4 bg-white/[0.04] border border-white/[0.08] rounded-xl transition-all duration-300 hover:bg-white/[0.07] hover:border-white/[0.14] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                className="w-full py-3 px-4 bg-[#12121f] border border-[#1e1e30] rounded-xl transition-all duration-300 hover:bg-white/[0.07] hover:border-white/[0.14] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
               >
                 {isGoogleLoading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-                    <span className="text-gray-300 text-sm font-medium">Connecting to Google...</span>
+                    <Loader2 className="w-5 h-5 animate-spin text-[#9090a8]" />
+                    <span className="text-[#9090a8] text-sm font-medium">Connecting to Google...</span>
                   </>
                 ) : (
                   <>
@@ -334,14 +334,14 @@ export default function LoginPage() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    <span className="text-gray-300 text-sm font-medium">Sign in with Google</span>
+                    <span className="text-[#9090a8] text-sm font-medium">Sign in with Google</span>
                   </>
                 )}
               </button>
 
               {/* Sign up link */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-[#9090a8]">
                   Don&apos;t have an account?{' '}
                   <Link
                     href="/register/trial"
@@ -354,7 +354,7 @@ export default function LoginPage() {
 
               {/* Terms / Privacy links */}
               <div className="mt-4 text-center">
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-[#5a5a72]">
                   <button
                     type="button"
                     onClick={() => setShowTermsModal(true)}
@@ -377,7 +377,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <div className="login-float-4 text-center space-y-1 pb-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[#5a5a72]">
               <a
                 href="https://mindset.show"
                 target="_blank"
@@ -388,7 +388,7 @@ export default function LoginPage() {
               </a>
               {' '}&mdash; Mindset Operating System
             </p>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-[#5a5a72]">
               Copyright &copy; 2026 MindsetOS | All rights reserved.
             </p>
           </div>
@@ -401,14 +401,14 @@ export default function LoginPage() {
           <div className="fixed inset-0 z-50 overflow-y-auto" onClick={() => setShowTermsModal(false)}>
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true"></div>
-              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-white/[0.08] bg-[#0d0d24]"
+              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]" style={{ background: 'rgba(18,18,31,0.95)' }}
                    onClick={(e) => e.stopPropagation()}>
                 <div className="px-6 py-4 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h3 className="text-2xl font-bold text-white">Terms & Conditions</h3>
                     <button
                       onClick={() => setShowTermsModal(false)}
-                      className="text-gray-500 hover:text-gray-300 transition-colors"
+                      className="text-[#5a5a72] hover:text-[#9090a8] transition-colors"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -417,15 +417,15 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div className="px-6 py-4 max-h-96 overflow-y-auto">
-                  <div className="prose prose-sm prose-invert max-w-none text-gray-300 space-y-4">
-                    <p className="text-sm text-gray-500">Last Updated: March 27, 2026</p>
+                  <div className="prose prose-sm prose-invert max-w-none text-[#9090a8] space-y-4">
+                    <p className="text-sm text-[#5a5a72]">Last Updated: March 27, 2026</p>
                     <p>These terms and conditions outline the rules and regulations for the use of MindsetOS — Mindset Operating System.</p>
                     <h4 className="text-lg font-bold text-white mt-4">AI-Powered Services & Limitations</h4>
                     <ul className="list-disc pl-6 space-y-1 text-sm">
-                      <li><strong className="text-gray-200">Informational Only</strong>: AI content is NOT professional, legal, or financial advice</li>
-                      <li><strong className="text-gray-200">No Warranty</strong>: We make no guarantees about accuracy or suitability</li>
-                      <li><strong className="text-gray-200">Your Responsibility</strong>: You must review and validate all AI recommendations</li>
-                      <li><strong className="text-gray-200">Potential Errors</strong>: AI may produce inaccurate information</li>
+                      <li><strong className="text-[#ededf5]">Informational Only</strong>: AI content is NOT professional, legal, or financial advice</li>
+                      <li><strong className="text-[#ededf5]">No Warranty</strong>: We make no guarantees about accuracy or suitability</li>
+                      <li><strong className="text-[#ededf5]">Your Responsibility</strong>: You must review and validate all AI recommendations</li>
+                      <li><strong className="text-[#ededf5]">Potential Errors</strong>: AI may produce inaccurate information</li>
                     </ul>
                     <p className="text-sm font-semibold text-red-400 mt-3">
                       We are NOT liable for business decisions or losses from AI-generated content.
@@ -454,14 +454,14 @@ export default function LoginPage() {
           <div className="fixed inset-0 z-50 overflow-y-auto" onClick={() => setShowPrivacyModal(false)}>
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true"></div>
-              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-white/[0.08] bg-[#0d0d24]"
+              <div className="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-[#1e1e30]" style={{ background: 'rgba(18,18,31,0.95)' }}
                    onClick={(e) => e.stopPropagation()}>
                 <div className="px-6 py-4 border-b border-white/[0.06]">
                   <div className="flex items-center justify-between">
                     <h3 className="text-2xl font-bold text-white">Privacy Policy</h3>
                     <button
                       onClick={() => setShowPrivacyModal(false)}
-                      className="text-gray-500 hover:text-gray-300 transition-colors"
+                      className="text-[#5a5a72] hover:text-[#9090a8] transition-colors"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -470,8 +470,8 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div className="px-6 py-4 max-h-96 overflow-y-auto">
-                  <div className="prose prose-sm prose-invert max-w-none text-gray-300 space-y-4">
-                    <p className="text-sm text-gray-500">Last Updated: March 27, 2026</p>
+                  <div className="prose prose-sm prose-invert max-w-none text-[#9090a8] space-y-4">
+                    <p className="text-sm text-[#5a5a72]">Last Updated: March 27, 2026</p>
                     <p>This Privacy Policy describes our collection, use and disclosure of your information.</p>
                     <h4 className="text-lg font-bold text-white mt-4">Personal Data We Collect</h4>
                     <ul className="list-disc pl-6 space-y-1 text-sm">

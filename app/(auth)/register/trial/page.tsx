@@ -127,7 +127,7 @@ export default function TrialRegisterPage() {
               <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
                 You&apos;re In!
               </h2>
-              <p className="text-gray-400 mb-6">
+              <p className="text-[#9090a8] mb-6">
                 Your 7-day free trial is now active.
               </p>
 
@@ -137,7 +137,7 @@ export default function TrialRegisterPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#fcc824]/10">
                     <Clock className="h-4 w-4 text-[#fcc824]" />
                   </div>
-                  <span className="text-sm font-medium text-gray-300">
+                  <span className="text-sm font-medium text-[#9090a8]">
                     {trialInfo?.daysRemaining || 7} days remaining
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export default function TrialRegisterPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#fcc824]/10">
                     <Zap className="h-4 w-4 text-[#fcc824]" />
                   </div>
-                  <span className="text-sm font-medium text-gray-300">
+                  <span className="text-sm font-medium text-[#9090a8]">
                     Full access for 7 days
                   </span>
                 </div>
@@ -153,7 +153,7 @@ export default function TrialRegisterPage() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#fcc824]/10">
                     <Lock className="h-4 w-4 text-[#fcc824]" />
                   </div>
-                  <span className="text-sm font-medium text-gray-300">
+                  <span className="text-sm font-medium text-[#9090a8]">
                     All AI agents unlocked
                   </span>
                 </div>
@@ -167,7 +167,7 @@ export default function TrialRegisterPage() {
                 <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
               </button>
 
-              <p className="mt-5 text-xs text-gray-600">
+              <p className="mt-5 text-xs text-[#5a5a72]">
                 Want the full experience?{' '}
                 <a
                   href="https://www.mindset.show"
@@ -221,7 +221,7 @@ export default function TrialRegisterPage() {
       </div>
 
       {/* Subtitle */}
-      <p className="relative z-10 mb-6 text-sm text-gray-500 animate-[fadeSlideDown_0.5s_0.05s_ease-out_both]">
+      <p className="relative z-10 mb-6 text-sm text-[#5a5a72] animate-[fadeSlideDown_0.5s_0.05s_ease-out_both]">
         AI-Powered Mindset Coaching
       </p>
 
@@ -238,7 +238,7 @@ export default function TrialRegisterPage() {
       {/* ── "What's included" feature strip ───────────────── */}
       <div className="relative z-10 w-full max-w-md mb-5 animate-[fadeSlideUp_0.5s_0.12s_ease-out_both]">
         <div className="rounded-xl border border-[#1e1e30] backdrop-blur-sm p-4" style={{ background: 'rgba(18,18,31,0.7)' }}>
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#5a5a72]">
             What&apos;s included in your trial
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -252,7 +252,7 @@ export default function TrialRegisterPage() {
                 <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-[#fcc824]/10">
                   <item.icon className="h-3 w-3 text-[#fcc824]" />
                 </div>
-                <span className="text-sm text-gray-400">{item.text}</span>
+                <span className="text-sm text-[#9090a8]">{item.text}</span>
               </div>
             ))}
           </div>
@@ -267,7 +267,7 @@ export default function TrialRegisterPage() {
             <h2 className="text-2xl font-bold tracking-tight text-white mb-1">
               Start Your Free Trial
             </h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-[#5a5a72] mb-6">
               Transform how you think in under 5 minutes.
             </p>
 
@@ -281,7 +281,7 @@ export default function TrialRegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Full Name
                 </label>
                 <input
@@ -297,7 +297,7 @@ export default function TrialRegisterPage() {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Email Address
                 </label>
                 <input
@@ -313,7 +313,7 @@ export default function TrialRegisterPage() {
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Password
                 </label>
                 <div className="relative">
@@ -329,7 +329,7 @@ export default function TrialRegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -358,7 +358,7 @@ export default function TrialRegisterPage() {
 
               {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -380,7 +380,7 @@ export default function TrialRegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
                     {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -412,7 +412,7 @@ export default function TrialRegisterPage() {
             </form>
 
             {/* Terms note */}
-            <p className="mt-4 text-center text-xs text-gray-600">
+            <p className="mt-4 text-center text-xs text-[#5a5a72]">
               By signing up, you agree to our{' '}
               <Link href="/terms" className="text-[#fcc824]/60 hover:text-[#fcc824]/90 underline underline-offset-2 transition-colors">
                 Terms & Conditions
@@ -424,7 +424,7 @@ export default function TrialRegisterPage() {
             </p>
 
             {/* Sign in link */}
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-6 text-center text-sm text-[#9090a8]">
               Already have an account?{' '}
               <Link href="/login" className="font-semibold text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors">
                 Sign in
@@ -444,7 +444,7 @@ export default function TrialRegisterPage() {
         >
           mindset.show
         </a>
-        <p className="mt-1 text-xs text-gray-700">
+        <p className="mt-1 text-xs text-[#5a5a72]">
           Copyright &copy; 2026 MindsetOS | All rights reserved.
         </p>
       </div>

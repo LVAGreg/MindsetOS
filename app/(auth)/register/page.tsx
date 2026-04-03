@@ -196,7 +196,7 @@ function RegisterForm() {
             <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
               Check Your Email
             </h2>
-            <p className="text-gray-400 mb-8 leading-relaxed">
+            <p className="text-[#9090a8] mb-8 leading-relaxed">
               We sent a verification link to{' '}
               <strong className="text-white">{formData.email}</strong>. Click the link to activate your account.
             </p>
@@ -248,7 +248,7 @@ function RegisterForm() {
       </div>
 
       {/* Subtitle */}
-      <p className="relative z-10 mb-6 text-sm text-gray-500 animate-[fadeSlideDown_0.5s_0.05s_ease-out_both]">
+      <p className="relative z-10 mb-6 text-sm text-[#5a5a72] animate-[fadeSlideDown_0.5s_0.05s_ease-out_both]">
         AI-Powered Mindset Coaching
       </p>
 
@@ -271,7 +271,7 @@ function RegisterForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Full Name
                 </label>
                 <input
@@ -287,7 +287,7 @@ function RegisterForm() {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Email Address
                 </label>
                 <input
@@ -303,12 +303,12 @@ function RegisterForm() {
 
               {/* Invite Code */}
               <div>
-                <label htmlFor="inviteCode" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="inviteCode" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Invite Code <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Ticket className="h-4 w-4 text-gray-500" />
+                    <Ticket className="h-4 w-4 text-[#9090a8]" />
                   </div>
                   <input
                     id="inviteCode"
@@ -335,7 +335,7 @@ function RegisterForm() {
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">
                     {inviteCodeChecking ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                      <Loader2 className="h-4 w-4 animate-spin text-[#9090a8]" />
                     ) : inviteCodeValid === true ? (
                       <CheckCircle className="h-4 w-4 text-emerald-400" />
                     ) : inviteCodeValid === false ? (
@@ -343,7 +343,7 @@ function RegisterForm() {
                     ) : null}
                   </div>
                 </div>
-                <p className="mt-1.5 text-xs text-gray-600">
+                <p className="mt-1.5 text-xs text-[#5a5a72]">
                   Need an invite code? Contact{' '}
                   <a href="mailto:hello@mindset.show" className="text-[#fcc824]/80 hover:text-[#fcc824] transition-colors">
                     hello@mindset.show
@@ -353,7 +353,7 @@ function RegisterForm() {
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Password
                 </label>
                 <div className="relative">
@@ -369,7 +369,7 @@ function RegisterForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -398,7 +398,7 @@ function RegisterForm() {
 
               {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-gray-400">
+                <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-[#9090a8]">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -420,7 +420,7 @@ function RegisterForm() {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9090a8] hover:text-[#ededf5] transition-colors"
                     tabIndex={-1}
                   >
                     {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -438,10 +438,10 @@ function RegisterForm() {
                   id="terms-checkbox"
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/5 transition-colors"
+                  className="mt-0.5 h-4 w-4 rounded border-[#1e1e30] bg-[#12121f] transition-colors"
                   style={{ accentColor: '#fcc824' }}
                 />
-                <label htmlFor="terms-checkbox" className="text-sm leading-snug text-gray-400">
+                <label htmlFor="terms-checkbox" className="text-sm leading-snug text-[#9090a8]">
                   I agree to the{' '}
                   <button
                     type="button"
@@ -498,11 +498,11 @@ function RegisterForm() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isGoogleLoading || isLoading}
-              className="w-full flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] py-3 px-4 font-medium text-gray-300 transition-all duration-300 hover:bg-white/[0.07] hover:border-white/20 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 rounded-xl border border-[#1e1e30] bg-[#12121f] py-3 px-4 font-medium text-[#9090a8] transition-all duration-300 hover:bg-white/[0.07] hover:border-white/[0.14] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isGoogleLoading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[#9090a8]" />
                   <span>Connecting to Google...</span>
                 </>
               ) : (
@@ -519,7 +519,7 @@ function RegisterForm() {
             </button>
 
             {/* Sign in link */}
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-6 text-center text-sm text-[#9090a8]">
               Already have an account?{' '}
               <Link href="/login" className="font-semibold text-[#4f6ef7] hover:text-[#7b8ff9] transition-colors">
                 Sign in
@@ -539,7 +539,7 @@ function RegisterForm() {
         >
           mindset.show
         </a>
-        <p className="mt-1 text-xs text-gray-700">
+        <p className="mt-1 text-xs text-[#5a5a72]">
           Copyright &copy; 2026 MindsetOS | All rights reserved.
         </p>
       </div>
@@ -549,30 +549,30 @@ function RegisterForm() {
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4" onClick={() => setShowTermsModal(false)}>
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
           <div
-            className="relative z-10 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#0c0c1d]/95 backdrop-blur-xl shadow-2xl animate-[fadeSlideUp_0.3s_ease-out_both]"
+            className="relative z-10 w-full max-w-3xl rounded-2xl border border-[#1e1e30] backdrop-blur-xl shadow-2xl animate-[fadeSlideUp_0.3s_ease-out_both]" style={{ background: 'rgba(18,18,31,0.97)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
               <h3 className="text-xl font-bold text-white">Terms & Conditions</h3>
-              <button onClick={() => setShowTermsModal(false)} className="text-gray-500 hover:text-white transition-colors">
+              <button onClick={() => setShowTermsModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
             <div className="max-h-[60vh] overflow-y-auto px-6 py-4 custom-scrollbar">
-              <div className="prose prose-sm prose-invert max-w-none text-gray-400 space-y-4">
-                <p className="text-xs text-gray-600">Last Updated: March 27, 2026</p>
+              <div className="prose prose-sm prose-invert max-w-none text-[#9090a8] space-y-4">
+                <p className="text-xs text-[#5a5a72]">Last Updated: March 27, 2026</p>
                 <p>These terms and conditions outline the rules and regulations for the use of MindsetOS — Mindset Operating System, located at https://mindset.show.</p>
                 <h4 className="text-base font-bold text-white mt-4">AI-Powered Services & Limitations</h4>
-                <p className="text-sm font-semibold text-gray-300">IMPORTANT: By using MindsetOS, you acknowledge that:</p>
+                <p className="text-sm font-semibold text-[#9090a8]">IMPORTANT: By using MindsetOS, you acknowledge that:</p>
                 <ul className="list-disc pl-6 space-y-1 text-sm">
-                  <li><strong className="text-gray-300">Informational Only</strong>: AI-generated content is for informational purposes and NOT professional, legal, financial, or tax advice</li>
-                  <li><strong className="text-gray-300">No Warranty</strong>: We make no guarantees about accuracy, completeness, or suitability of AI outputs</li>
-                  <li><strong className="text-gray-300">Your Responsibility</strong>: You are solely responsible for reviewing and validating all AI recommendations before use</li>
-                  <li><strong className="text-gray-300">Potential Errors</strong>: AI systems may produce inaccurate or misleading information</li>
-                  <li><strong className="text-gray-300">Third-Party Models</strong>: We use third-party AI providers (OpenAI, Anthropic, Perplexity) subject to their terms</li>
-                  <li><strong className="text-gray-300">Content License</strong>: You retain ownership but grant us license to use your content for service improvement</li>
+                  <li><strong className="text-[#ededf5]">Informational Only</strong>: AI-generated content is for informational purposes and NOT professional, legal, financial, or tax advice</li>
+                  <li><strong className="text-[#ededf5]">No Warranty</strong>: We make no guarantees about accuracy, completeness, or suitability of AI outputs</li>
+                  <li><strong className="text-[#ededf5]">Your Responsibility</strong>: You are solely responsible for reviewing and validating all AI recommendations before use</li>
+                  <li><strong className="text-[#ededf5]">Potential Errors</strong>: AI systems may produce inaccurate or misleading information</li>
+                  <li><strong className="text-[#ededf5]">Third-Party Models</strong>: We use third-party AI providers (OpenAI, Anthropic, Perplexity) subject to their terms</li>
+                  <li><strong className="text-[#ededf5]">Content License</strong>: You retain ownership but grant us license to use your content for service improvement</li>
                 </ul>
                 <p className="text-sm font-semibold text-red-400 mt-3">We are NOT liable for business decisions, financial losses, or damages arising from AI-generated content or recommendations.</p>
                 <h4 className="text-base font-bold text-white mt-4">License & Usage</h4>
@@ -589,7 +589,7 @@ function RegisterForm() {
                 <p className="text-sm">Fees are based on API usage and token consumption. Pricing may vary by AI model. You are responsible for all charges incurred under your account.</p>
                 <h4 className="text-base font-bold text-white mt-4">Disclaimer</h4>
                 <p className="text-sm">We make no guarantees about accuracy, completeness, or suitability of AI-generated content. We reserve the right to modify, suspend, or discontinue services with reasonable notice.</p>
-                <p className="text-xs text-gray-600 mt-4 pt-4 border-t border-white/[0.06]">MindsetOS is operated by MindsetOS Pty. Ltd. By using our services, you agree to be bound by these terms and our Privacy Policy.</p>
+                <p className="text-xs text-[#5a5a72] mt-4 pt-4 border-t border-white/[0.06]">MindsetOS is operated by MindsetOS Pty. Ltd. By using our services, you agree to be bound by these terms and our Privacy Policy.</p>
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-white/[0.06] px-6 py-4">
@@ -612,20 +612,20 @@ function RegisterForm() {
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4" onClick={() => setShowPrivacyModal(false)}>
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
           <div
-            className="relative z-10 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#0c0c1d]/95 backdrop-blur-xl shadow-2xl animate-[fadeSlideUp_0.3s_ease-out_both]"
+            className="relative z-10 w-full max-w-3xl rounded-2xl border border-[#1e1e30] backdrop-blur-xl shadow-2xl animate-[fadeSlideUp_0.3s_ease-out_both]" style={{ background: 'rgba(18,18,31,0.97)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-4">
               <h3 className="text-xl font-bold text-white">Privacy Policy</h3>
-              <button onClick={() => setShowPrivacyModal(false)} className="text-gray-500 hover:text-white transition-colors">
+              <button onClick={() => setShowPrivacyModal(false)} className="text-[#5a5a72] hover:text-[#9090a8] transition-colors">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
             <div className="max-h-[60vh] overflow-y-auto px-6 py-4 custom-scrollbar">
-              <div className="prose prose-sm prose-invert max-w-none text-gray-400 space-y-4">
-                <p className="text-xs text-gray-600">Last Updated: March 27, 2026</p>
+              <div className="prose prose-sm prose-invert max-w-none text-[#9090a8] space-y-4">
+                <p className="text-xs text-[#5a5a72]">Last Updated: March 27, 2026</p>
                 <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service.</p>
                 <h4 className="text-base font-bold text-white mt-4">Personal Data We Collect</h4>
                 <ul className="list-disc pl-6 space-y-1 text-sm">
@@ -649,17 +649,17 @@ function RegisterForm() {
                 <p className="text-sm">We retain Personal Data as long as necessary to provide services. You may request data deletion at any time.</p>
                 <h4 className="text-base font-bold text-white mt-4">Your Rights (GDPR & CCPA)</h4>
                 <ul className="list-disc pl-6 space-y-1 text-sm">
-                  <li><strong className="text-gray-300">Access</strong>: Request access to your personal data</li>
-                  <li><strong className="text-gray-300">Correction</strong>: Request correction of inaccurate data</li>
-                  <li><strong className="text-gray-300">Deletion</strong>: Request deletion of your data</li>
-                  <li><strong className="text-gray-300">Opt-out</strong>: Opt out of marketing communications</li>
-                  <li><strong className="text-gray-300">Data Portability</strong>: Request data in machine-readable format</li>
+                  <li><strong className="text-[#ededf5]">Access</strong>: Request access to your personal data</li>
+                  <li><strong className="text-[#ededf5]">Correction</strong>: Request correction of inaccurate data</li>
+                  <li><strong className="text-[#ededf5]">Deletion</strong>: Request deletion of your data</li>
+                  <li><strong className="text-[#ededf5]">Opt-out</strong>: Opt out of marketing communications</li>
+                  <li><strong className="text-[#ededf5]">Data Portability</strong>: Request data in machine-readable format</li>
                 </ul>
                 <h4 className="text-base font-bold text-white mt-4">Security</h4>
                 <p className="text-sm">We use commercially acceptable security measures to protect your data. However, no method of transmission over the Internet is 100% secure.</p>
                 <h4 className="text-base font-bold text-white mt-4">Children&apos;s Privacy</h4>
                 <p className="text-sm">Our Service does not address anyone under the age of 13. We do not knowingly collect personal information from children under 13.</p>
-                <p className="text-xs text-gray-600 mt-4 pt-4 border-t border-white/[0.06]">MindsetOS is operated by MindsetOS Pty. Ltd. By using our services, you agree to this Privacy Policy and our Terms & Conditions.</p>
+                <p className="text-xs text-[#5a5a72] mt-4 pt-4 border-t border-white/[0.06]">MindsetOS is operated by MindsetOS Pty. Ltd. By using our services, you agree to this Privacy Policy and our Terms & Conditions.</p>
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-white/[0.06] px-6 py-4">
@@ -695,7 +695,7 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#060611]">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090f]">
         <Loader2 className="h-8 w-8 animate-spin text-[#fcc824]" />
       </div>
     }>
