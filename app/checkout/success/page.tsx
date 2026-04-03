@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
-import { CheckCircle, ArrowRight, Sparkles, Users, BookOpen, Video, ExternalLink } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, Users, Video, ExternalLink } from 'lucide-react';
 import { trackCheckoutCompleted } from '@/lib/analytics';
 
 // Plan → price map (mirrors checkout/page.tsx priceMap)
@@ -35,7 +35,7 @@ function CheckoutSuccessContent() {
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center gap-3">
           <MindsetOSLogo size="md" variant="light" />
           <span className="text-lg font-bold text-[#ededf5]">
-            <span className="text-gray-400 font-normal mx-1.5">+</span>
+            <span style={{ color: '#9090a8' }} className="font-normal mx-1.5">+</span>
             Mindset Architecture
           </span>
         </div>
@@ -50,7 +50,7 @@ function CheckoutSuccessContent() {
           <h1 className="text-3xl sm:text-4xl font-bold text-[#ededf5] mb-3">
             You&apos;re In!
           </h1>
-          <p className="text-lg text-gray-400">
+          <p className="text-lg" style={{ color: '#9090a8' }}>
             Welcome to Mindset Architecture. Let&apos;s get you set up.
           </p>
         </div>
@@ -66,7 +66,7 @@ function CheckoutSuccessContent() {
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">Step 1 — Done</span>
               </div>
               <h3 className="font-bold text-[#ededf5] mb-1">Your AI Agents Are Unlocked</h3>
-              <p className="text-sm text-gray-400 mb-3">
+              <p className="text-sm mb-3" style={{ color: '#9090a8' }}>
                 All 10 AI mindset coaching agents are now fully accessible — Mindset Score, Reset Guide, Architecture Coach,
                 Practice Builder, Accountability Partner, and more. They&apos;re trained on the 3-layer mindset architecture framework.
               </p>
@@ -93,7 +93,7 @@ function CheckoutSuccessContent() {
                 <span className="text-xs font-bold text-[#fcc824] uppercase tracking-wide">Step 2 — Action Required</span>
               </div>
               <h3 className="font-bold text-[#ededf5] text-lg mb-1">Get Your Community &amp; Content Access</h3>
-              <p className="text-sm text-gray-400 mb-2">
+              <p className="text-sm mb-2" style={{ color: '#9090a8' }}>
                 Your training modules, coaching calls, implementation support, and the MindsetOS community all live here.
                 This is where you&apos;ll access:
               </p>
@@ -107,7 +107,7 @@ function CheckoutSuccessContent() {
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 text-[#fcc824]" />
-                    <span className="text-sm text-gray-400">{item}</span>
+                    <span className="text-sm" style={{ color: '#9090a8' }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -127,15 +127,15 @@ function CheckoutSuccessContent() {
         {/* Step 3: First coaching call */}
         <div className="bg-[#12121f] rounded-xl p-6 border border-[#1e1e30] mb-8">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Video className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(124,91,246,0.1)' }}>
+              <Video className="w-5 h-5" style={{ color: '#7c5bf6' }} />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-purple-400 uppercase tracking-wide">Step 3 — This Week</span>
+                <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#7c5bf6' }}>Step 3 — This Week</span>
               </div>
               <h3 className="font-bold text-[#ededf5] mb-1">Join Your First Live Coaching Call</h3>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm" style={{ color: '#9090a8' }}>
                 Once you&apos;re in the community, check the schedule for the next live coaching session.
                 Bring your Mindset Score or practice plan — coaches give direct, actionable feedback.
               </p>
@@ -149,13 +149,16 @@ function CheckoutSuccessContent() {
             <Sparkles className="w-4 h-4 text-[#fcc824]" />
             <h3 className="font-bold text-[#ededf5] text-sm">Recommended First Move</h3>
           </div>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
             Open MindsetOS → Start a conversation with the <strong className="text-[#ededf5]">Mindset Score Agent</strong> →
             Get your baseline assessment in minutes. Then take it to coaching for feedback.
           </p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-[#ededf5] font-semibold rounded-lg transition-colors text-sm border border-white/20"
+            className="inline-flex items-center gap-2 px-6 py-3 text-[#ededf5] font-semibold rounded-lg transition-colors text-sm border border-[#1e1e30]"
+            style={{ backgroundColor: 'rgba(30,30,48,0.6)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(30,30,48,0.9)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(30,30,48,0.6)'; }}
           >
             Go to Dashboard
             <ArrowRight className="w-4 h-4" />
@@ -163,7 +166,7 @@ function CheckoutSuccessContent() {
         </div>
 
         {/* Support */}
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs" style={{ color: '#9090a8' }}>
           Questions? Email{' '}
           <a href="mailto:hello@mindset.show" className="text-[#fcc824] hover:underline">
             hello@mindset.show
