@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
 interface MessageEditModalProps {
   isOpen: boolean;
@@ -18,11 +18,13 @@ export default function MessageEditModal({
 }: MessageEditModalProps) {
   const [content, setContent] = useState(originalContent);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Update content when modal opens with new message
   useEffect(() => {
     if (isOpen) {
       setContent(originalContent);
+      setError(null);
     }
   }, [originalContent, isOpen]);
 
@@ -35,65 +37,231 @@ export default function MessageEditModal({
     }
 
     setIsSaving(true);
+    setError(null);
     try {
       await onSave(content);
       onClose();
-    } catch (error) {
-      console.error('Error saving message:', error);
-      alert('Failed to save message. Please try again.');
+    } catch (err) {
+      console.error('Error saving message:', err);
+      setError('Failed to save message. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        backdropFilter: 'blur(4px)',
+      }}
+    >
+      <div
+        style={{
+          background: 'rgba(18,18,31,0.8)',
+          border: '1px solid #1e1e30',
+          borderRadius: '12px',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+          width: '100%',
+          maxWidth: '672px',
+          margin: '0 16px',
+          maxHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px',
+            borderBottom: '1px solid #1e1e30',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '1.125rem',
+              fontWeight: 600,
+              color: '#ededf5',
+              margin: 0,
+            }}
+          >
             Edit Message
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Close"
+            style={{
+              padding: '4px',
+              borderRadius: '8px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#9090a8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = '#ededf5';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color = '#9090a8';
+            }}
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X style={{ width: '20px', height: '20px' }} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 overflow-y-auto">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+        <div
+          style={{
+            flex: 1,
+            padding: '16px',
+            overflowY: 'auto',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '0.875rem',
+              color: '#9090a8',
+              marginBottom: '12px',
+              margin: '0 0 12px',
+            }}
+          >
             Editing this message will create a new conversation branch. You can navigate between
             branches using the arrows.
           </p>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full h-64 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             placeholder="Enter your message..."
             autoFocus
+            style={{
+              width: '100%',
+              height: '256px',
+              padding: '12px',
+              borderRadius: '8px',
+              border: '1px solid #1e1e30',
+              background: '#09090f',
+              color: '#ededf5',
+              fontSize: '0.875rem',
+              lineHeight: 1.6,
+              resize: 'none',
+              outline: 'none',
+              boxSizing: 'border-box',
+              fontFamily: 'inherit',
+            }}
+            onFocus={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = '#4f6ef7';
+            }}
+            onBlur={(e) => {
+              (e.currentTarget as HTMLElement).style.borderColor = '#1e1e30';
+            }}
           />
+
+          {/* Inline error */}
+          {error && (
+            <p
+              style={{
+                marginTop: '8px',
+                fontSize: '0.8125rem',
+                color: '#f87171',
+              }}
+            >
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            padding: '16px',
+            borderTop: '1px solid #1e1e30',
+            flexWrap: 'wrap',
+          }}
+        >
           <button
             onClick={onClose}
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid #1e1e30',
+              background: 'transparent',
+              color: '#9090a8',
+              fontSize: '0.875rem',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+              opacity: isSaving ? 0.5 : 1,
+              transition: 'color 0.15s, border-color 0.15s',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => {
+              if (!isSaving) {
+                const el = e.currentTarget as HTMLElement;
+                el.style.color = '#ededf5';
+                el.style.borderColor = '#5a5a72';
+              }
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLElement;
+              el.style.color = '#9090a8';
+              el.style.borderColor = '#1e1e30';
+            }}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving || content.trim() === ''}
-            className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: '#4f6ef7',
+              color: '#ffffff',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: isSaving || content.trim() === '' ? 'not-allowed' : 'pointer',
+              opacity: isSaving || content.trim() === '' ? 0.5 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'opacity 0.15s',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => {
+              if (!isSaving && content.trim() !== '') {
+                (e.currentTarget as HTMLElement).style.background = '#3d5ce5';
+              }
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = '#4f6ef7';
+            }}
           >
             {isSaving ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <Loader2
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    animation: 'spin 1s linear infinite',
+                  }}
+                />
                 Saving...
               </>
             ) : (
