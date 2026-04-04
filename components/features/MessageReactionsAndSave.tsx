@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Bookmark, BookmarkCheck } from 'lucide-react';
-import { createArtifact, API_URL } from '@/lib/api-client';
+import { Bookmark, BookmarkCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { createArtifact, API_URL, apiClient } from '@/lib/api-client';
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const TOKEN = {
@@ -58,6 +58,11 @@ export default function MessageReactionsAndSave({
   const [saveError, setSaveError] = useState(false);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [noteSaved, setNoteSaved] = useState(false);
+  const [noteError, setNoteError] = useState(false);
+  const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noteErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Reaction handler ───────────────────────────────────────────────────────
   const handleReaction = async (type: ReactionType) => {
@@ -134,6 +139,25 @@ export default function MessageReactionsAndSave({
       setSaveError(true);
       clearTimeout(errorTimerRef.current ?? undefined);
       errorTimerRef.current = setTimeout(() => setSaveError(false), 2000);
+    }
+  };
+
+  // ── Save to Field Notes handler ────────────────────────────────────────────
+  const handleSaveNote = async () => {
+    if (noteSaved) return;
+    setNoteError(false);
+    try {
+      await apiClient.post('/api/field-notes', {
+        title: content.slice(0, 60).trimEnd(),
+        content,
+      });
+      setNoteSaved(true);
+      clearTimeout(noteTimerRef.current ?? undefined);
+      noteTimerRef.current = setTimeout(() => setNoteSaved(false), 2500);
+    } catch {
+      setNoteError(true);
+      clearTimeout(noteErrorTimerRef.current ?? undefined);
+      noteErrorTimerRef.current = setTimeout(() => setNoteError(false), 2000);
     }
   };
 
@@ -222,6 +246,36 @@ export default function MessageReactionsAndSave({
         )}
       </button>
 
+      {/* Save to Field Notes */}
+      <button
+        onClick={handleSaveNote}
+        aria-label="Save to Field Notes"
+        title="Save to Field Notes"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          border: 'none',
+          background: TOKEN.transparent,
+          cursor: noteSaved ? 'default' : 'pointer',
+          padding: '2px 4px',
+          borderRadius: '4px',
+          color: noteSaved ? TOKEN.successText : TOKEN.mutedText,
+          fontSize: '12px',
+          flexShrink: 0,
+          transition: 'color 0.15s',
+        }}
+      >
+        {noteSaved ? (
+          <CheckCircle2 size={16} aria-hidden="true" />
+        ) : (
+          <FileText size={16} aria-hidden="true" />
+        )}
+        {noteSaved && (
+          <span style={{ whiteSpace: 'nowrap' }}>Saved to Notes</span>
+        )}
+      </button>
+
       {/* Inline error messages */}
       {reactionError && (
         <span
@@ -232,6 +286,14 @@ export default function MessageReactionsAndSave({
         </span>
       )}
       {saveError && (
+        <span
+          role="alert"
+          style={{ fontSize: '11px', color: TOKEN.errorText, flexShrink: 0 }}
+        >
+          Failed
+        </span>
+      )}
+      {noteError && (
         <span
           role="alert"
           style={{ fontSize: '11px', color: TOKEN.errorText, flexShrink: 0 }}
