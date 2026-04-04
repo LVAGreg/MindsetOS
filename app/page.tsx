@@ -31,6 +31,40 @@ export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const { user, isAuthenticated } = useAppStore();
 
+  /* ── Email capture state ─────────────────────────────────── */
+  const [capEmail, setCapEmail] = useState('');
+  const [capName, setCapName] = useState('');
+  const [capLoading, setCapLoading] = useState(false);
+  const [capError, setCapError] = useState<string | null>(null);
+  const [capSuccess, setCapSuccess] = useState(false);
+
+  const handleEmailCapture = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!capEmail.trim()) return;
+    setCapLoading(true);
+    setCapError(null);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010'}/api/leads/capture`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: capEmail.trim(), firstName: capName.trim(), magnetType: 'scorecard' }),
+        }
+      );
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setCapError(d.error || 'Something went wrong. Try again.');
+      } else {
+        setCapSuccess(true);
+      }
+    } catch {
+      setCapError('Connection error. Please try again.');
+    } finally {
+      setCapLoading(false);
+    }
+  };
+
   useEffect(() => { setHasHydrated(true); }, []);
 
   useEffect(() => {
@@ -362,6 +396,86 @@ export default function LandingPage() {
                   <div className="text-xs" style={{ color: '#5a5a72' }}>{s.sub}</div>
                 </div>
               ))}
+            </div>
+
+            {/* ── Email capture ─────────────────────────────── */}
+            <div
+              className={`mt-8 lp-float-4 ${vis ? 'lp-vis' : 'lp-hidden'}`}
+              style={{ transitionDelay: '0.48s', maxWidth: 520 }}
+            >
+              {capSuccess ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#22c55e', fontSize: 14 }}>
+                  <Check className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  Check your inbox — your Mindset Score guide is on the way.
+                </div>
+              ) : (
+                <form onSubmit={handleEmailCapture} aria-label="Get free Mindset Score report">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'stretch' }}>
+                    <input
+                      type="text"
+                      placeholder="First name"
+                      value={capName}
+                      onChange={e => setCapName(e.target.value)}
+                      style={{
+                        flex: '0 1 110px',
+                        minWidth: 80,
+                        padding: '10px 14px',
+                        borderRadius: 8,
+                        background: 'rgba(18,18,31,0.9)',
+                        border: '1px solid #1e1e30',
+                        color: '#ededf5',
+                        fontSize: 14,
+                        outline: 'none',
+                      }}
+                      aria-label="First name"
+                    />
+                    <input
+                      type="email"
+                      required
+                      placeholder="Your email"
+                      value={capEmail}
+                      onChange={e => setCapEmail(e.target.value)}
+                      style={{
+                        flex: 1,
+                        minWidth: 160,
+                        padding: '10px 14px',
+                        borderRadius: 8,
+                        background: 'rgba(18,18,31,0.9)',
+                        border: '1px solid #1e1e30',
+                        color: '#ededf5',
+                        fontSize: 14,
+                        outline: 'none',
+                      }}
+                      aria-label="Email address"
+                    />
+                    <button
+                      type="submit"
+                      disabled={capLoading}
+                      style={{
+                        padding: '10px 20px',
+                        borderRadius: 8,
+                        background: '#4f6ef7',
+                        color: '#ededf5',
+                        fontWeight: 600,
+                        fontSize: 14,
+                        border: 'none',
+                        cursor: capLoading ? 'default' : 'pointer',
+                        whiteSpace: 'nowrap',
+                        opacity: capLoading ? 0.7 : 1,
+                      }}
+                      aria-label="Get free Mindset Score report"
+                    >
+                      {capLoading ? '…' : 'Get my score →'}
+                    </button>
+                  </div>
+                  {capError && (
+                    <p role="alert" style={{ color: '#f87171', fontSize: 12, margin: '6px 0 0' }}>{capError}</p>
+                  )}
+                </form>
+              )}
+              <p style={{ color: '#5a5a72', fontSize: 12, marginTop: 8 }}>
+                Free. No spam. Unsubscribe any time.
+              </p>
             </div>
           </div>
 
