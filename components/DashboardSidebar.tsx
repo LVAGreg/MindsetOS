@@ -620,6 +620,67 @@ function StreakWidget({
   );
 }
 
+/* ─── Pattern Insight Card ───────────────────────────────── */
+interface PatternInsights {
+  pattern: 'reactor' | 'avoider' | 'optimizer' | 'none';
+  label: string | null;
+  avg_score: number | null;
+  trend: number | null;
+  trend_direction: 'improving' | 'declining' | 'steady' | 'none';
+  entry_count: number;
+}
+
+function PatternInsightCard() {
+  const [insights, setInsights] = useState<PatternInsights | null>(null);
+
+  useEffect(() => {
+    apiClient.get('/api/mindset-score/insights')
+      .then((res: PatternInsights) => {
+        if (res && res.entry_count > 0) setInsights(res);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!insights) return null;
+
+  const COLOR_MAP: Record<string, string> = {
+    reactor: '#fcc824',
+    avoider: '#4f6ef7',
+    optimizer: '#7c5bf6',
+  };
+  const color = COLOR_MAP[insights.pattern] || '#9090a8';
+
+  const trendLabel =
+    insights.trend_direction === 'improving' ? '↑ improving'
+    : insights.trend_direction === 'declining' ? '↓ needs work'
+    : '→ steady';
+
+  return (
+    <div
+      className="mx-2 mb-2 px-3 py-2.5 rounded-xl"
+      style={{ background: 'rgba(18,18,31,0.6)', border: `1px solid ${color}30` }}
+    >
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: '#5a5a72' }}>
+          Your pattern
+        </span>
+        <span className="text-[10px] font-medium" style={{ color: color }}>
+          {trendLabel}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" style={{ color }} />
+        <span className="text-[13px] font-bold" style={{ color: '#ededf5' }}>
+          {insights.label}
+        </span>
+        <span className="text-[11px] ml-auto font-mono" style={{ color: '#9090a8' }}>
+          avg {insights.avg_score}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main component ─────────────────────────────────────── */
 export default function DashboardSidebar({
   activeSection,
@@ -901,6 +962,9 @@ export default function DashboardSidebar({
         streakData={streakData}
         membershipTier={effectiveUser?.membershipTier}
       />
+
+      {/* ── Persistent pattern insight ─────────────────────── */}
+      <PatternInsightCard />
 
       {/* ── Footer: user profile ──────────────────────────── */}
       <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }}>
