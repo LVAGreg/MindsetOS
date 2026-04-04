@@ -2,10 +2,142 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, AlertCircle, MessageSquare } from 'lucide-react';
+import { Trophy, Download, Calendar, User as UserIcon, Sparkles, TrendingUp, ArrowLeft, Filter, AlertCircle, MessageSquare, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useAppStore, MINDSET_AGENTS } from '@/lib/store';
 import { AgentIcon } from '@/lib/agent-icons';
+import { API_URL } from '@/lib/api-client';
+
+// ── Score history types ──────────────────────────────────────────────────────
+interface ScoreEntry {
+  id: string;
+  score: number;
+  category: string;
+  scored_at: string;
+}
+
+// ── SVG Line Chart — pure, no external deps ──────────────────────────────────
+function ScoreLineChart({ entries }: { entries: ScoreEntry[] }) {
+  const W = 400;
+  const H = 120;
+  const PAD_L = 32;
+  const PAD_R = 16;
+  const PAD_T = 10;
+  const PAD_B = 28;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+
+  // entries arrive newest-first from backend; reverse to chronological
+  const ordered = [...entries].reverse();
+  const n = ordered.length;
+
+  // Normalise score (0–100) → SVG y coordinate
+  const toY = (score: number) => PAD_T + chartH - (score / 100) * chartH;
+  // Spread x evenly
+  const toX = (i: number) => PAD_L + (n === 1 ? chartW / 2 : (i / (n - 1)) * chartW);
+
+  const points = ordered.map((e, i) => ({ x: toX(i), y: toY(e.score), entry: e }));
+
+  const polyline = points.map(p => `${p.x},${p.y}`).join(' ');
+
+  // X-axis date labels — show abbreviated date
+  const fmtDate = (ts: string) => {
+    const d = new Date(ts);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+
+  const gridScores = [0, 25, 50, 75, 100];
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width="100%"
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: 'block', overflow: 'visible' }}
+      aria-label="Mindset Score history chart"
+      role="img"
+    >
+      {/* Horizontal grid lines */}
+      {gridScores.map(s => (
+        <line
+          key={s}
+          x1={PAD_L}
+          y1={toY(s)}
+          x2={W - PAD_R}
+          y2={toY(s)}
+          stroke="rgba(255,255,255,0.05)"
+          strokeWidth="1"
+        />
+      ))}
+
+      {/* Y-axis labels */}
+      {gridScores.filter(s => s > 0).map(s => (
+        <text
+          key={s}
+          x={PAD_L - 4}
+          y={toY(s) + 4}
+          fontSize="8"
+          fill="#5a5a72"
+          textAnchor="end"
+        >
+          {s}
+        </text>
+      ))}
+
+      {/* Polyline connecting dots (only when 2+ points) */}
+      {n >= 2 && (
+        <polyline
+          points={polyline}
+          fill="none"
+          stroke="#4f6ef7"
+          strokeWidth="2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      )}
+
+      {/* Dots */}
+      {points.map((p, i) => {
+        const isLatest = i === n - 1;
+        return (
+          <g key={p.entry.id}>
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={isLatest ? 6 : 4}
+              fill={isLatest ? '#fcc824' : '#4f6ef7'}
+            />
+            {/* Score tooltip above dot */}
+            <text
+              x={p.x}
+              y={p.y - 10}
+              fontSize="9"
+              fill={isLatest ? '#fcc824' : '#9090a8'}
+              textAnchor="middle"
+              fontWeight={isLatest ? '700' : '400'}
+            >
+              {p.entry.score}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* X-axis date labels */}
+      {points.map((p, i) => (
+        <text
+          key={`date-${i}`}
+          x={p.x}
+          y={H - 4}
+          fontSize="8"
+          fill="#5a5a72"
+          textAnchor="middle"
+        >
+          {fmtDate(p.entry.scored_at)}
+        </text>
+      ))}
+    </svg>
+  );
+}
 
 interface Outcome {
   id: string;
@@ -27,6 +159,10 @@ export default function OutcomesPage() {
   const [sortBy, setSortBy] = useState<'recent' | 'importance' | 'agent'>('recent');
   const [agentFilter, setAgentFilter] = useState<string>('all');
   const [error, setError] = useState<string | null>(null);
+
+  // Score history state
+  const [scoreHistory, setScoreHistory] = useState<ScoreEntry[]>([]);
+  const [scoreError, setScoreError] = useState<string | null>(null);
 
   // Fetch database user ID
   useEffect(() => {
@@ -88,6 +224,31 @@ export default function OutcomesPage() {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  // Fetch score history
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) return;
+
+    const fetchScoreHistory = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/mindset-score/history`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          setScoreError('Could not load score history.');
+          return;
+        }
+        const data: ScoreEntry[] = await res.json();
+        setScoreHistory(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Score history fetch failed:', err);
+        setScoreError('Could not load score history.');
+      }
+    };
+
+    fetchScoreHistory();
+  }, []);
 
   // Filter and sort outcomes
   const filteredOutcomes = outcomes
@@ -222,6 +383,104 @@ export default function OutcomesPage() {
               </button>
             </div>
           )}
+
+          {/* ── Mindset Score Journey Card ─────────────────────────────────── */}
+          {(() => {
+            // newest-first from backend
+            const latest = scoreHistory[0] ?? null;
+            const oldest = scoreHistory[scoreHistory.length - 1] ?? null;
+            const delta = latest && oldest && scoreHistory.length > 1
+              ? latest.score - oldest.score
+              : null;
+
+            return (
+              <div
+                className="mt-6"
+                style={{
+                  background: 'rgba(18,18,31,0.8)',
+                  border: '1px solid #1e1e30',
+                  borderRadius: 12,
+                  padding: 24,
+                }}
+              >
+                {/* Card header */}
+                <div className="flex items-center gap-2 mb-4" style={{ flexWrap: 'wrap' }}>
+                  <Activity className="w-5 h-5 flex-shrink-0" style={{ color: '#4f6ef7' }} />
+                  <h2 className="text-base font-semibold" style={{ color: '#ededf5' }}>
+                    Your Mindset Score Journey
+                  </h2>
+                  {latest && (
+                    <span
+                      className="ml-auto text-sm font-medium"
+                      style={{ color: '#5a5a72' }}
+                    >
+                      Last {scoreHistory.length} score{scoreHistory.length !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+
+                {scoreError && (
+                  <div
+                    className="flex items-center gap-2 text-sm p-3 rounded-lg mb-4"
+                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {scoreError}
+                  </div>
+                )}
+
+                {!scoreError && scoreHistory.length === 0 ? (
+                  /* Empty state */
+                  <div className="flex flex-col items-center py-6 text-center">
+                    <p className="text-sm mb-4" style={{ color: '#9090a8' }}>
+                      Take your Mindset Score to start tracking progress over time.
+                    </p>
+                    <Link
+                      href="/scorecard"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:brightness-110"
+                      style={{ background: '#fcc824', color: '#09090f' }}
+                    >
+                      Take the Mindset Score
+                    </Link>
+                  </div>
+                ) : (
+                  !scoreError && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' }}>
+                      {/* Left: score + delta */}
+                      <div style={{ minWidth: 120, flexShrink: 0 }}>
+                        <div className="text-xs mb-1" style={{ color: '#5a5a72' }}>Current Score</div>
+                        <div
+                          className="font-bold leading-none"
+                          style={{ fontSize: '2.5rem', color: '#fcc824' }}
+                        >
+                          {latest?.score ?? '—'}
+                        </div>
+                        <div className="text-xs mt-1" style={{ color: '#5a5a72' }}>/ 100</div>
+                        {delta !== null && (
+                          <div
+                            className="mt-3 text-sm font-medium"
+                            style={{ color: delta >= 0 ? '#4f6ef7' : '#5a5a72' }}
+                          >
+                            {delta >= 0 ? '↑' : '↓'} {delta >= 0 ? '+' : ''}{delta} pts since you started
+                          </div>
+                        )}
+                        {latest && (
+                          <div className="mt-1 text-xs" style={{ color: '#5a5a72' }}>
+                            {latest.category}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right: chart */}
+                      <div style={{ flex: 1, minWidth: 180 }}>
+                        <ScoreLineChart entries={scoreHistory} />
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            );
+          })()}
 
           {/* Stats Bar */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
