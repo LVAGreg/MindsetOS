@@ -60,7 +60,7 @@ const STAGES: { key: Stage; label: string; dotColor: string; headerBg: string; h
     headerBg: 'rgba(124,91,246,0.08)',
     headerBorder: 'rgba(124,91,246,0.25)',
     badgeBg: 'rgba(124,91,246,0.18)',
-    badgeText: '#a98cf8',
+    badgeText: '#7c5bf6',
     emptyBorder: 'rgba(124,91,246,0.2)',
   },
   {
@@ -90,7 +90,7 @@ const STAGES: { key: Stage; label: string; dotColor: string; headerBg: string; h
     headerBg: 'rgba(124,91,246,0.08)',
     headerBorder: 'rgba(124,91,246,0.25)',
     badgeBg: 'rgba(124,91,246,0.18)',
-    badgeText: '#a98cf8',
+    badgeText: '#7c5bf6',
     emptyBorder: 'rgba(124,91,246,0.2)',
   },
 ];
@@ -118,8 +118,8 @@ function formatDate(iso: string | null): string | null {
 
 function sourceBadgeStyle(source: Source | null): React.CSSProperties {
   switch (source) {
-    case 'linkedin':   return { background: 'rgba(79,110,247,0.15)', color: '#8ba4fa' };
-    case 'zoom':       return { background: 'rgba(124,91,246,0.15)', color: '#a98cf8' };
+    case 'linkedin':   return { background: 'rgba(79,110,247,0.15)', color: '#4f6ef7' };
+    case 'zoom':       return { background: 'rgba(124,91,246,0.15)', color: '#7c5bf6' };
     case 'lead_magnet':return { background: 'rgba(252,200,36,0.15)', color: '#fcc824' };
     default:           return { background: 'rgba(144,144,168,0.15)', color: '#9090a8' };
   }

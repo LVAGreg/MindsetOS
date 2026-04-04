@@ -180,7 +180,7 @@ When introducing a new `fixed`-position overlay, document its z-index and verify
 ### `Math.random()` in render
 Using `Math.random()` inside JSX or a component render path produces a different value on every re-render, causing visual instability (flickering, layout jumps) and defeating React reconciliation. Stable pseudo-random placeholder sequences must be defined as constants outside the component. Flag for Correctness and Craft.
 
-<!-- hits:7 | last_caught:Loop-76 | class:token-violation | severity:craft | blocker:no -->
+<!-- hits:8 | last_caught:Loop-76 | class:token-violation | severity:craft | blocker:no -->
 ### Incomplete colour-token migration
 When a PR replaces a colour token (e.g., generic purple/indigo → MindsetOS amber `#fcc824` or blue `#4f6ef7`), every usage in changed files must be updated: CTA backgrounds, focus rings (`focus:ring-*`), icon colour classes, and border-colour classes. Leaving focus rings or icon accents in the old colour means the visual pass is half-done. Reviewers should grep all changed files for the old token names before accepting. Scores Craft ≤7 if the pass is partial.
 
