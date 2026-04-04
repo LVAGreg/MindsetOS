@@ -68,6 +68,7 @@ import DashboardSidebar from '@/components/DashboardSidebar';
 import { CoworkModal } from '@/components/CoworkModal';
 import QuickAgentSwitch from '@/components/QuickAgentSwitch';
 import MorningCheckin from '@/components/MorningCheckin';
+import OnboardingChecklist from '@/components/OnboardingChecklist';
 import dynamic from 'next/dynamic';
 const BrainInterface = dynamic(() => import('@/components/BrainInterface'), { ssr: false });
 
@@ -1137,6 +1138,8 @@ function DashboardContent() {
         {/* Chat Area */}
         <div className="flex-1 overflow-hidden flex">
           <div className="flex-1 min-w-0">
+          {/* Onboarding checklist — new users only, self-hides when done or dismissed */}
+          <OnboardingChecklist />
           {/* Morning Check-in — shows between 5am–12pm if not done today */}
           <MorningCheckin />
           {showAgentBrowser ? (
