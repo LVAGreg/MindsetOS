@@ -5,6 +5,49 @@ import Link from 'next/link';
 import { ChevronRight, RotateCcw } from 'lucide-react';
 import posthog from 'posthog-js';
 
+// ─── Named pattern definitions ────────────────────────────────────────────────
+const MINDSET_PATTERNS = {
+  reactor: {
+    name: 'The Reactor',
+    range: '0–40',
+    tagline: 'Running on autopilot.',
+    description: "Your responses are fast — but they're running on patterns installed before you became an entrepreneur. Under pressure, the reactive brain takes over. The good news: this is the most transformable pattern. The 48-Hour Reset was built specifically for you.",
+    color: '#fcc824',
+    icon: '⚡',
+    primaryCTA: { label: 'Start the 48-Hour Reset', href: '/checkout?product=reset' },
+    secondaryCTA: { label: 'Talk to the Reset Guide', href: '/dashboard?agent=reset-guide' },
+    agents: ['Reset Guide', 'Accountability Partner'],
+  },
+  avoider: {
+    name: 'The Avoider',
+    range: '41–65',
+    tagline: 'Aware, but not acting.',
+    description: "You know what needs to change. You can see the patterns. But there's a gap between insight and action — and that gap is costing you decisions, launches, and clarity. The Interruption Layer is where you live. Let's move you through it.",
+    color: '#4f6ef7',
+    icon: '🎯',
+    primaryCTA: { label: 'Work with the Architecture Coach', href: '/dashboard?agent=architecture-coach' },
+    secondaryCTA: { label: 'Map your inner world', href: '/dashboard?agent=inner-world-mapper' },
+    agents: ['Architecture Coach', 'Inner World Mapper'],
+  },
+  optimizer: {
+    name: 'The Optimizer',
+    range: '66–100',
+    tagline: 'Designed, not reactive.',
+    description: "You've done the work. Your baseline is solid. Now the opportunity is compounding: refining your decision framework, deepening your accountability practice, and building the systems that will scale with you. You're ready for the Architecture.",
+    color: '#7c5bf6',
+    icon: '🏗',
+    primaryCTA: { label: 'Apply for the 90-Day Cohort', href: '/join' },
+    secondaryCTA: { label: 'Use the Decision Framework', href: '/dashboard?agent=decision-framework' },
+    agents: ['Decision Framework', 'Accountability Partner'],
+  },
+} as const;
+
+function getPattern(score: number) {
+  if (score <= 40) return MINDSET_PATTERNS.reactor;
+  if (score <= 65) return MINDSET_PATTERNS.avoider;
+  return MINDSET_PATTERNS.optimizer;
+}
+
 const SCALE = [
   { value: 1, label: 'Almost never' },
   { value: 2, label: 'Rarely' },
@@ -91,12 +134,6 @@ const COLOR_MAP: Record<string, { hex: string; hexBg: string; hexBorder: string;
   green:  { hex: '#10b981', hexBg: 'rgba(16,185,129,0.08)', hexBorder: 'rgba(16,185,129,0.25)', hexText: '#34d399', barHex: '#10b981' },
 };
 
-function getInterpretation(total: number) {
-  if (total >= 80) return { label: 'The Architect', body: 'Your thinking is a competitive advantage. You\'ve built a strong internal operating system. The opportunity for you is refinement, not rebuilding. You\'re ready for advanced architecture work — optimizing the system that\'s already working.' };
-  if (total >= 60) return { label: 'The Aware One', body: 'You can see your patterns. You\'ve done some work. But there are gaps — and those gaps keep showing up as inconsistency. One month you\'re on fire, the next you\'re questioning everything. You don\'t need more information. You need a structure that holds the information you already have.' };
-  if (total >= 40) return { label: 'The Searcher', body: 'You know something\'s off. You\'ve been trying to fix it with strategy, systems, and hustle. But the thing that\'s off isn\'t outside you. It\'s in how you\'re processing what\'s in front of you. This scorecard just showed you where. That\'s a very useful place to be standing.' };
-  return { label: 'The Reactor', body: 'You\'re running your business from reactive mode. Decisions feel urgent. Setbacks feel personal. Revenue feels like a judgment on your worth. Here\'s the good news: you\'re not broken. You\'re running an operating system that was designed for survival, not for growth. And operating systems can be upgraded.' };
-}
 
 export default function ScorecardViewPage() {
   const totalQuestions = DOMAINS.reduce((n, d) => n + d.questions.length, 0);
@@ -129,8 +166,8 @@ export default function ScorecardViewPage() {
   const reset = () => { setAnswers({}); setSubmitted(false); };
 
   if (submitted) {
-    const interp = getInterpretation(totalScore);
     const lowestC = COLOR_MAP[lowestDomain.color];
+    const pattern = getPattern(totalScore);
     return (
       <div className="min-h-screen py-12 px-4" style={{ background: '#09090f' }}>
         <div className="max-w-2xl mx-auto space-y-6">
@@ -138,14 +175,94 @@ export default function ScorecardViewPage() {
           <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}>
             <p className="text-sm font-medium mb-2" style={{ color: '#9090a8' }}>Your Thinking Score</p>
             <div className="text-7xl font-black mb-1" style={{ color: '#fcc824' }}>{totalScore}</div>
-            <div className="text-lg mb-4" style={{ color: '#9090a8' }}>out of 100</div>
-            <div
-              className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4"
-              style={{ background: 'rgba(79,110,247,0.15)', color: '#818cf8', border: '1px solid rgba(79,110,247,0.3)' }}
-            >
-              {interp.label}
+            <div className="text-lg" style={{ color: '#9090a8' }}>out of 100</div>
+          </div>
+
+          {/* Named pattern card */}
+          <div
+            role="region"
+            aria-label="Your mindset pattern"
+            style={{
+              background: 'rgba(18,18,31,0.8)',
+              border: `1px solid ${pattern.color}40`,
+              borderLeft: `4px solid ${pattern.color}`,
+              borderRadius: 16,
+              padding: '24px 24px 24px 20px',
+            }}
+          >
+            {/* Pattern header */}
+            <div className="flex items-center gap-3 mb-2">
+              <span
+                aria-hidden="true"
+                style={{ fontSize: '1.4rem', lineHeight: 1 }}
+              >
+                {pattern.icon}
+              </span>
+              <h2
+                style={{
+                  color: pattern.color,
+                  fontSize: '1.5rem',
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  margin: 0,
+                }}
+              >
+                {pattern.name}
+              </h2>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: '#9090a8' }}>{interp.body}</p>
+
+            {/* Tagline */}
+            <p style={{ color: '#ededf5', fontSize: '1rem', fontWeight: 500, marginBottom: 10 }}>
+              {pattern.tagline}
+            </p>
+
+            {/* Description */}
+            <p style={{ color: '#9090a8', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 20 }}>
+              {pattern.description}
+            </p>
+
+            {/* CTAs */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', marginBottom: 16 }}>
+              <a
+                href={pattern.primaryCTA.href}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: pattern.color,
+                  color: pattern.color === '#fcc824' ? '#09090f' : '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  padding: '12px 20px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  minHeight: 44,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {pattern.primaryCTA.label}
+                <ChevronRight style={{ width: 16, height: 16, flexShrink: 0 }} aria-hidden="true" />
+              </a>
+              <a
+                href={pattern.secondaryCTA.href}
+                style={{
+                  color: pattern.color,
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  minHeight: 44,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                }}
+              >
+                {pattern.secondaryCTA.label} →
+              </a>
+            </div>
+
+            {/* Activated agents micro-row */}
+            <p style={{ color: '#5a5a72', fontSize: '0.75rem', margin: 0 }}>
+              Activated agents: {pattern.agents.join(' · ')}
+            </p>
           </div>
 
           {/* Domain breakdown */}
