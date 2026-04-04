@@ -57,6 +57,7 @@ import { ClientProfileSwitcher } from '@/components/ClientProfileSwitcher';
 import { AdminUserSwitcher } from '@/components/AdminUserSwitcher';
 import { ResearchPanel } from '@/components/ResearchPanel';
 import TrialExpiredPopup from '@/components/TrialExpiredPopup';
+import TrialUpsellModal from '@/components/TrialUpsellModal';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import WelcomeGuide from '@/components/WelcomeGuide';
 import FirstTimeModal from '@/components/FirstTimeModal';
@@ -912,6 +913,12 @@ function DashboardContent() {
     <div className="h-screen flex relative" style={{ background: '#09090f' }}>
       {/* Trial Expired Popup */}
       <TrialExpiredPopup
+        membershipTier={user?.membershipTier}
+        trialExpiresAt={user?.trialExpiresAt}
+      />
+
+      {/* Trial Upsell Modal — shows 3 days before expiry */}
+      <TrialUpsellModal
         membershipTier={user?.membershipTier}
         trialExpiresAt={user?.trialExpiresAt}
       />
