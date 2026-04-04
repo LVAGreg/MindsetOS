@@ -45,6 +45,7 @@ import { useAppStore, MINDSET_AGENTS, AgentId } from '@/lib/store';
 import { apiClient, API_URL } from '@/lib/api-client';
 import { AgentIcon } from '@/lib/agent-icons';
 import ChatWindow from '@/components/ChatWindow';
+import DecisionRehearsalPanel from '@/components/DecisionRehearsalPanel';
 import ConversationHistory from '@/components/ConversationHistory';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import { PlaybookList } from '@/components/PlaybookList';
@@ -1360,15 +1361,18 @@ function DashboardContent() {
               </div>
             </div>
           ) : currentAgent ? (
-            <ChatWindow
-              key={`chat-${currentAgent}-${currentConversationId || 'new'}`}
-              agentId={(currentAgent as string) === 'MINDSET_SUPER_AGENT'
-                ? 'mindset-super-agent'
-                : MINDSET_AGENTS[currentAgent as AgentId]?.id || currentAgent.toLowerCase().replace(/_/g, '-')
-              }
-              userRole={effectiveUser?.role}
-              conversationId={currentConversationId ?? undefined}
-            />
+            <>
+              {currentAgent === 'DECISION_FRAMEWORK' && <DecisionRehearsalPanel />}
+              <ChatWindow
+                key={`chat-${currentAgent}-${currentConversationId || 'new'}`}
+                agentId={(currentAgent as string) === 'MINDSET_SUPER_AGENT'
+                  ? 'mindset-super-agent'
+                  : MINDSET_AGENTS[currentAgent as AgentId]?.id || currentAgent.toLowerCase().replace(/_/g, '-')
+                }
+                userRole={effectiveUser?.role}
+                conversationId={currentConversationId ?? undefined}
+              />
+            </>
           ) : (
             /* ===== WELCOME HOME SCREEN — PATHWAY ===== */
             <div className="h-full overflow-y-auto custom-scrollbar" style={{ background: '#09090f' }}>
