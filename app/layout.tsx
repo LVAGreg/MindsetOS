@@ -166,6 +166,13 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://mindset-os-backend-production.up.railway.app" />
+        <Script id="sw-registration" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js').catch(function() {});
+            }
+          `}
+        </Script>
         <Script id="theme-initializer" strategy="beforeInteractive">
           {`
             (function() {

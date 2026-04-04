@@ -4,8 +4,8 @@
   "description": "AI-powered mindset coaching for entrepreneurs",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#ffc82c",
+  "background_color": "#09090f",
+  "theme_color": "#fcc824",
   "icons": [
     {
       "src": "/favicon.svg",
