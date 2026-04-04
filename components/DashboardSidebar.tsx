@@ -47,6 +47,7 @@ import {
   CheckCircle2,
   Key,
   FileText,
+  ClipboardList,
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { useAppStore } from '@/lib/store';
@@ -843,6 +844,11 @@ export default function DashboardSidebar({
             icon={<FileText className="w-4.5 h-4.5" />}
             label="Notes"
             onClick={() => router.push('/dashboard/notes')}
+          />
+          <NavItem
+            icon={<ClipboardList className="w-4.5 h-4.5" />}
+            label="Structured Assessment"
+            onClick={() => router.push('/dashboard/quiz')}
           />
         </div>
 
