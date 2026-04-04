@@ -47,6 +47,9 @@ URL: `https://mindset-os-frontend-production.up.railway.app`
 Read every file you will modify. Read files your code will call into.
 Never edit a file you haven't read.
 
+**Context budget check:**  
+Before writing, estimate your token footprint: system prompt + all file reads + conversation history. If you expect to exceed ~60% of the model's context window, plan for chunked reads — read files in offset windows rather than whole files. Long files (>500 lines) should be read in 200-line chunks targeted at the relevant section, not fully loaded.
+
 ---
 
 ## Step 3 — Score your implementation against BOTH rubrics
@@ -118,6 +121,29 @@ Format: `NEAR-MISS: [what you caught] → [class it would belong to]`
 
 ---
 
+## Step 4.5 — What to persist
+
+After every loop, ask: **"What did I learn in this implementation that a future ERIL agent shouldn't have to rediscover?"**
+
+Check these three questions:
+
+**a) Reusable pattern?**  
+If this loop involved 5+ tool calls, recovered from a bug, or discovered a non-obvious API contract — write a brief pattern note.  
+Format: `PATTERN: [what the pattern is] → [where it applies]`  
+Example: `PATTERN: idempotent column adds use ALTER TABLE IF NOT EXISTS — applies to all migration steps`
+
+**b) Failed approach?**  
+If you tried something that didn't work before finding the fix — log it.  
+Format: `FAILED: [what you tried] → [why it failed] → [what worked instead]`  
+Example: `FAILED: direct DB connection via psql → Railway internal-only → use admin API execute endpoint`
+
+**c) Memory-worthy fact?**  
+If you discovered something about the codebase that contradicts assumptions (wrong field name, unexpected schema, component API differs from docs) — add it to the Near-miss log AND flag it for V5.
+
+These notes go at the bottom of your VERDICT block. They feed future loops — treat them as investment, not overhead.
+
+---
+
 ## Step 5 — VERDICT
 
 ```
@@ -125,6 +151,8 @@ VERDICT: YES | REVISE
 Score: X.X/10 (average of applicable criteria)
 Blockers: (list any criterion <7 or blocker:yes anti-pattern hit)
 Near-misses: (list any patterns you caught pre-emptively)
+Patterns: (from Step 4.5a — reusable patterns discovered)
+Failed approaches: (from Step 4.5b — what didn't work and why)
 Files created/modified: (list)
 ```
 
@@ -181,3 +209,29 @@ After V5 runs, it must:
 2. Update `last_caught` to the current loop number
 3. Append any new patterns it found that aren't in the file
 4. Update the Class Index counts at the bottom of EVALUATION_CRITERIA.md
+
+---
+
+## Memory Tiers — What ERIL Agents Should Know
+
+MindsetOS uses three memory tiers. Understanding them helps ERIL agents write better implementations.
+
+| Tier | Storage | When injected | What goes here |
+|------|---------|---------------|----------------|
+| **Working** | Context window | Always present | Current conversation, tool outputs, in-progress task state |
+| **Durable** | `agent_memories` table (pgvector) | Session start, frozen snapshot | Facts, goals, decisions, pain points — things that reduce future steering |
+| **Episodic** | `conversations` table (tsvector index) | On-demand via search tool | Past sessions — "what did this user say about X last month?" |
+
+**Rules for ERIL agents writing memory-related code:**
+
+1. **Never re-query the durable memory store mid-conversation** — the snapshot was injected at session start. Querying again produces inconsistency and breaks prefix caching.
+2. **Extraction happens post-conversation, not mid-message** — the `extractMemories` function runs after the turn, not during.
+3. **Importance scoring 0.0–1.0** — threshold for injection is 0.7. Anything below 0.7 should be archived, not deleted.
+4. **Memory types in use**: `goals`, `pain_points`, `business_context`, `strategies`, `preferences`, `decisions`, `deliverable`, `agent_recommendation`
+5. **The episodic layer (conversation search) is under construction** — do not assume it exists yet. If implementing it, the schema is: `ALTER TABLE conversations ADD COLUMN tsv_content tsvector GENERATED ALWAYS AS (to_tsvector('english', COALESCE(summary_text, ''))) STORED;`
+
+**What the Hermes research taught us to add (priority order):**
+1. Conversation search (episodic recall) — highest impact, medium effort
+2. Frozen-snapshot caching per conversationId — low effort, real cost savings  
+3. Periodic memory nudge every 5 turns — low effort, improves memory quality
+4. Behavioral profile job (cross-session pattern inference) — medium effort, coaching differentiator
