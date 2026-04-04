@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, RotateCcw, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Loader2, Copy, Check } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -181,6 +181,14 @@ export default function QuizPage() {
   const [architectureScore, setArchitectureScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [saveError, setSaveError] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Mark score as taken for onboarding checklist detection (runs once when results shown)
+  useEffect(() => {
+    if (phase === 'results' || phase === 'error') {
+      localStorage.setItem('mindset_score_taken', '1');
+    }
+  }, [phase]);
 
   const layer = LAYERS[currentLayer];
 
@@ -533,6 +541,14 @@ export default function QuizPage() {
     const patternKey = getPattern(totalScore);
     const pattern = PATTERNS[patternKey];
 
+    const handleCopyScore = () => {
+      const text = `My MindsetOS Score: ${totalScore}/100 — ${pattern.name}.\nGet yours free: mindset.show/scorecard`;
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    };
+
     return (
       <div style={{ background: '#09090f', minHeight: '100vh', padding: '32px 16px' }}>
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
@@ -621,6 +637,39 @@ export default function QuizPage() {
             <SubScoreBar label="Awareness" score={awarenessScore} fillColor="#4f6ef7" />
             <SubScoreBar label="Interruption" score={interruptionScore} fillColor="#7c5bf6" />
             <SubScoreBar label="Architecture" score={architectureScore} fillColor="#fcc824" />
+          </div>
+
+          {/* Share score button */}
+          <div style={{ marginBottom: 12 }}>
+            <button
+              onClick={handleCopyScore}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'rgba(79,110,247,0.1)',
+                border: '1px solid rgba(79,110,247,0.25)',
+                color: copied ? '#22c55e' : '#4f6ef7',
+                borderRadius: 8,
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              {copied ? (
+                <>
+                  <Check style={{ width: 14, height: 14 }} />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy style={{ width: 14, height: 14 }} />
+                  Share your score
+                </>
+              )}
+            </button>
           </div>
 
           {/* CTAs */}
