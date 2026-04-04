@@ -66,6 +66,7 @@ export function CanvasPanel() {
   const [saved,        setSaved]        = useState(false);
   const [saveError,    setSaveError]    = useState<string | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [pdfExporting, setPdfExporting]   = useState(false);
   const [browseError,  setBrowseError]  = useState<string | null>(null);
   const [starring,     setStarring]     = useState(false);
   const [starError,    setStarError]    = useState<string | null>(null);
@@ -261,37 +262,30 @@ export function CanvasPanel() {
     }
 
     if (format === 'pdf') {
-      const el = document.createElement('div');
-      el.style.cssText = 'font-family:system-ui,sans-serif;max-width:720px;padding:32px;line-height:1.7;color:#1a1a2e';
+      setPdfExporting(true);
+      setShowDownloadMenu(false);
       try {
+        const element = document.getElementById('canvas-export-content');
+        if (!element) return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const html2pdfModule = await import('html2pdf.js') as any;
-        const html2pdfFn = html2pdfModule.default ?? html2pdfModule;
-        const html = content
-          .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-          .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-          .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>')
-          .replace(/^- (.*$)/gm, '<li>$1</li>')
-          .replace(/\n\n/g, '</p><p>')
-          .replace(/\n/g, '<br>');
-        el.innerHTML = `<p>${html}</p>`;
-        document.body.appendChild(el);
-        await html2pdfFn().from(el).set({
-          filename: `${safeName}.pdf`,
-          margin: 12,
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          html2canvas: { scale: 2, useCORS: true },
-        }).save();
+        const { default: html2pdf } = await import('html2pdf.js' as any);
+        await html2pdf()
+          .set({
+            margin: 0.5,
+            filename: `${safeName}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#09090f' },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+          })
+          .from(element)
+          .save();
       } catch (err) {
         console.error('[CanvasPanel] PDF export failed:', err);
         setDownloadError('PDF export failed. Please try again.');
         setTimeout(() => setDownloadError(null), 4000);
       } finally {
-        if (document.body.contains(el)) document.body.removeChild(el);
+        setPdfExporting(false);
       }
-      setShowDownloadMenu(false);
       return;
     }
 
@@ -926,12 +920,18 @@ export function CanvasPanel() {
                     <button
                       key={fmt}
                       onClick={() => handleDownload(fmt)}
-                      className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${i === 0 ? 'rounded-t-md' : ''} ${i === arr.length - 1 ? 'rounded-b-md' : ''}`}
+                      disabled={fmt === 'pdf' && pdfExporting}
+                      className={`w-full text-left px-3 py-1.5 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${i === 0 ? 'rounded-t-md' : ''} ${i === arr.length - 1 ? 'rounded-b-md' : ''}`}
                       style={{ color: '#9090a8' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                      onMouseEnter={e => { if (!(fmt === 'pdf' && pdfExporting)) (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     >
-                      {fmt === 'pdf' ? 'PDF (Print)' : fmt === 'docx' ? 'Word Doc (.docx)' : fmt === 'html' ? 'HTML (.html)' : fmt === 'md' ? 'Markdown (.md)' : 'Text (.txt)'}
+                      {fmt === 'pdf'
+                        ? (pdfExporting ? 'Exporting…' : 'PDF')
+                        : fmt === 'docx' ? 'Word Doc (.docx)'
+                        : fmt === 'html' ? 'HTML (.html)'
+                        : fmt === 'md' ? 'Markdown (.md)'
+                        : 'Text (.txt)'}
                     </button>
                   ))}
                 </div>
@@ -971,7 +971,7 @@ export function CanvasPanel() {
           </div>
 
           {/* ── Content Area ───────────────────────────────────────────── */}
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div id="canvas-export-content" className="flex-1 overflow-y-auto px-6 py-4">
             {content ? (
               <div
                 className="
