@@ -72,34 +72,35 @@ interface DashboardSidebarProps {
 }
 
 /* ─── Streak hook ────────────────────────────────────────── */
+/** Matches exactly what GET /api/streak and POST /api/streak/checkin return */
 interface StreakData {
-  daily_streak: number;
+  current_streak: number;
   longest_streak: number;
-  last_check_in_at: string;
+  last_activity_date: string | null;
 }
 
 const LS_STREAK_KEY = 'mindset_streak';
 
-function useAccountabilityStreak(): [number, () => void] {
+function useAccountabilityStreak(): [number, StreakData | null, () => void] {
   const [streak, setStreak] = useState<number>(0);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchStreak() {
       try {
-        // Try dedicated endpoint first
         const innerClient = (apiClient as unknown as { client: { get: (url: string) => Promise<{ data: StreakData }> } }).client;
         const res = await innerClient.get('/api/streak');
         if (!cancelled && res?.data?.current_streak !== undefined) {
           const val = res.data.current_streak;
           setStreak(val);
-          // Keep localStorage in sync
+          setStreakData(res.data);
           localStorage.setItem(LS_STREAK_KEY, String(val));
           return;
         }
       } catch {
-        // endpoint doesn't exist yet — fall back to localStorage
+        // endpoint not available — fall back to localStorage
       }
       if (!cancelled) {
         const stored = localStorage.getItem(LS_STREAK_KEY);
@@ -107,7 +108,23 @@ function useAccountabilityStreak(): [number, () => void] {
       }
     }
 
-    fetchStreak();
+    async function doCheckin() {
+      try {
+        const innerClient = (apiClient as unknown as { client: { post: (url: string) => Promise<{ data: StreakData }> } }).client;
+        const res = await innerClient.post('/api/streak/checkin');
+        if (!cancelled && res?.data?.current_streak !== undefined) {
+          const val = res.data.current_streak;
+          setStreak(val);
+          setStreakData(res.data);
+          localStorage.setItem(LS_STREAK_KEY, String(val));
+        }
+      } catch {
+        // checkin failure is non-critical — streak display remains from fetch
+      }
+    }
+
+    // Fetch current state first, then record today's activity
+    fetchStreak().then(() => { if (!cancelled) doCheckin(); });
     return () => { cancelled = true; };
   }, []);
 
@@ -119,7 +136,7 @@ function useAccountabilityStreak(): [number, () => void] {
     });
   };
 
-  return [streak, incrementStreak];
+  return [streak, streakData, incrementStreak];
 }
 
 /* ─── Token usage meter ──────────────────────────────────── */
@@ -468,6 +485,141 @@ function StatsStrip({ userId }: { userId?: string }) {
   );
 }
 
+/* ─── Streak widget ──────────────────────────────────────── */
+interface MilestoneDef {
+  id: string;
+  icon: string;
+  label: string;
+  earned: (data: StreakData, membershipTier?: string) => boolean;
+}
+
+const STREAK_MILESTONES: MilestoneDef[] = [
+  {
+    id: 'first_week',
+    icon: '🏅',
+    label: 'First Week',
+    earned: (data) => data.longest_streak >= 7,
+  },
+  {
+    id: 'score_taken',
+    icon: '🎯',
+    label: 'Score Taken',
+    // If they're logged in and using the app, the mindset score was taken
+    earned: () => true,
+  },
+  {
+    id: 'reset_done',
+    icon: '⚡',
+    label: 'Reset Done',
+    earned: (_data, membershipTier) => membershipTier !== 'free' && membershipTier !== undefined,
+  },
+];
+
+function StreakWidget({
+  streakData,
+  membershipTier,
+}: {
+  streakData: StreakData | null;
+  membershipTier?: string;
+}) {
+  if (!streakData) return null;
+
+  const currentStreak = streakData.current_streak;
+  const longestStreak = streakData.longest_streak;
+  const isEmpty = currentStreak === 0;
+
+  return (
+    <div
+      className="mx-3 mb-2"
+      style={{ borderTop: '1px solid #1e1e30', paddingTop: 10 }}
+      aria-label={`Streak and achievements section. Current streak: ${currentStreak} days.`}
+    >
+      {/* Streak counter row */}
+      <div className="flex items-baseline gap-1.5 mb-2">
+        <span role="img" aria-hidden="true" style={{ fontSize: '1rem', lineHeight: 1 }}>🔥</span>
+        {isEmpty ? (
+          <span
+            className="text-[11px]"
+            style={{ color: '#9090a8', fontStyle: 'italic' }}
+          >
+            Start your streak today
+          </span>
+        ) : (
+          <>
+            <span
+              style={{ color: '#fcc824', fontWeight: 800, fontSize: '1.1rem', lineHeight: 1 }}
+              aria-label={`${currentStreak} day streak`}
+            >
+              {currentStreak}
+            </span>
+            <span style={{ color: '#9090a8', fontSize: '0.75rem' }}>
+              {currentStreak === 1 ? 'day streak' : 'day streak'}
+            </span>
+            {longestStreak > currentStreak && (
+              <span
+                style={{ color: '#5a5a72', fontSize: '0.65rem', marginLeft: 'auto' }}
+                aria-label={`Longest streak: ${longestStreak} days`}
+              >
+                best {longestStreak}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Achievement badges */}
+      <div
+        className="flex gap-1.5"
+        style={{ flexWrap: 'wrap' }}
+        role="list"
+        aria-label="Achievement badges"
+      >
+        {STREAK_MILESTONES.map((milestone) => {
+          const isEarned = milestone.earned(streakData, membershipTier);
+          return (
+            <div
+              key={milestone.id}
+              role="listitem"
+              title={`${milestone.label}${isEarned ? ' (earned)' : ' (not yet earned)'}`}
+              aria-label={`${milestone.label} badge — ${isEarned ? 'earned' : 'not yet earned'}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                borderRadius: 8,
+                padding: '6px 10px',
+                fontSize: '0.7rem',
+                minHeight: 44,
+                minWidth: 0,
+                flexShrink: 0,
+                transition: 'opacity 0.2s',
+                ...(isEarned
+                  ? {
+                      background: 'rgba(79,110,247,0.1)',
+                      border: '1px solid rgba(79,110,247,0.3)',
+                      color: '#ededf5',
+                      opacity: 1,
+                    }
+                  : {
+                      background: 'rgba(18,18,31,0.4)',
+                      border: '1px solid #1e1e30',
+                      color: '#5a5a72',
+                      opacity: 0.4,
+                    }),
+              }}
+            >
+              <span role="img" aria-hidden="true">{milestone.icon}</span>
+              <span style={{ whiteSpace: 'nowrap', fontWeight: isEarned ? 600 : 400 }}>
+                {milestone.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main component ─────────────────────────────────────── */
 export default function DashboardSidebar({
   activeSection,
@@ -501,7 +653,7 @@ export default function DashboardSidebar({
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showAdminSection, setShowAdminSection] = useState(false);
-  const [streak, incrementStreak] = useAccountabilityStreak();
+  const [streak, streakData, incrementStreak] = useAccountabilityStreak();
 
   const isAdmin = effectiveUser?.role === 'admin';
   const isPowerUser = effectiveUser?.role === 'power_user';
@@ -743,6 +895,12 @@ export default function DashboardSidebar({
 
       {/* ── Token usage meter ─────────────────────────────── */}
       <TokenUsageMeter />
+
+      {/* ── Streak + achievements ──────────────────────────── */}
+      <StreakWidget
+        streakData={streakData}
+        membershipTier={effectiveUser?.membershipTier}
+      />
 
       {/* ── Footer: user profile ──────────────────────────── */}
       <div className="relative flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(237,237,245,0.05)' }}>
