@@ -66,6 +66,7 @@ import { CanvasPanel } from '@/components/CanvasPanel';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import { CoworkModal } from '@/components/CoworkModal';
 import QuickAgentSwitch from '@/components/QuickAgentSwitch';
+import MorningCheckin from '@/components/MorningCheckin';
 import dynamic from 'next/dynamic';
 const BrainInterface = dynamic(() => import('@/components/BrainInterface'), { ssr: false });
 
@@ -1135,6 +1136,8 @@ function DashboardContent() {
         {/* Chat Area */}
         <div className="flex-1 overflow-hidden flex">
           <div className="flex-1 min-w-0">
+          {/* Morning Check-in — shows between 5am–12pm if not done today */}
+          <MorningCheckin />
           {showAgentBrowser ? (
             <div className="h-full overflow-y-auto custom-scrollbar px-3 sm:px-6 py-4 sm:py-5" style={{ background: '#09090f' }}>
               <div className="max-w-3xl mx-auto">
