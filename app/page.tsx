@@ -789,6 +789,104 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Pricing ──────────────────────────────────── */}
+      <section id="pricing" style={{ padding: '96px 0', background: '#09090f', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+          <p style={{ textAlign: 'center', color: '#fcc824', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 16 }}>Investment</p>
+          <h2 style={{ textAlign: 'center', fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: '#ededf5', marginBottom: 16, lineHeight: 1.15 }}>
+            Start free. Go deep when you&apos;re ready.
+          </h2>
+          <p style={{ textAlign: 'center', color: '#9090a8', maxWidth: 520, margin: '0 auto 64px' }}>
+            No lock-in. The free Mindset Score takes 3 minutes and tells you exactly where to start.
+          </p>
+
+          {/* 4-column grid — stacks on mobile via auto-fit */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+
+            {/* FREE */}
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16, padding: '32px 24px' }}>
+              <p style={{ color: '#fcc824', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>Free</p>
+              <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#ededf5', margin: '0 0 4px' }}>$0</p>
+              <p style={{ color: '#9090a8', fontSize: '0.85rem', margin: '0 0 24px' }}>Forever free</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Mindset Score (5-question diagnostic)', 'Personalized pattern result', 'Agent introduction session'].map(f => (
+                  <li key={f} style={{ color: '#9090a8', fontSize: '0.85rem', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#4f6ef7', flexShrink: 0, marginTop: 1 }} aria-hidden="true">✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/scorecard" style={{ display: 'block', textAlign: 'center', padding: '12px', border: '1px solid #1e1e30', borderRadius: 8, color: '#ededf5', textDecoration: 'none', fontSize: '0.9rem', transition: 'border-color 0.2s' }}>
+                Take the Score
+              </a>
+            </div>
+
+            {/* $47 */}
+            <div style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30', borderRadius: 16, padding: '32px 24px' }}>
+              <p style={{ color: '#9090a8', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>Entry</p>
+              <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#ededf5', margin: '0 0 4px' }}>$47</p>
+              <p style={{ color: '#9090a8', fontSize: '0.85rem', margin: '0 0 24px' }}>One-time</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Everything in Free', '48-Hour Mindset Reset (6 exercises)', 'Break your reactive pattern fast', 'New behavioral baseline in 48hrs'].map(f => (
+                  <li key={f} style={{ color: '#9090a8', fontSize: '0.85rem', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#4f6ef7', flexShrink: 0, marginTop: 1 }} aria-hidden="true">✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/checkout?product=reset" style={{ display: 'block', textAlign: 'center', padding: '12px', border: '1px solid #4f6ef7', borderRadius: 8, color: '#4f6ef7', textDecoration: 'none', fontSize: '0.9rem', transition: 'opacity 0.2s' }}>
+                Get the Reset
+              </a>
+            </div>
+
+            {/* $997 — most popular */}
+            <div style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid #4f6ef7', borderRadius: 16, padding: '32px 24px', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#4f6ef7', color: '#ededf5', fontSize: '0.7rem', fontWeight: 700, padding: '4px 12px', borderRadius: 20, letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>MOST POPULAR</div>
+              <p style={{ color: '#4f6ef7', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>Core</p>
+              <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#ededf5', margin: '0 0 4px' }}>$997</p>
+              <p style={{ color: '#9090a8', fontSize: '0.85rem', margin: '0 0 24px' }}>90-day cohort</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Everything in Entry', '90-Day Architecture curriculum', '10 AI coaches, full access', 'Bi-weekly live group calls', 'Private cohort (8–12 founders)', 'Accountability partner system'].map(f => (
+                  <li key={f} style={{ color: '#9090a8', fontSize: '0.85rem', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#4f6ef7', flexShrink: 0, marginTop: 1 }} aria-hidden="true">✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/join" style={{ display: 'block', textAlign: 'center', padding: '12px', background: '#4f6ef7', borderRadius: 8, color: '#ededf5', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600, transition: 'opacity 0.2s' }}>
+                Apply for Cohort
+              </a>
+            </div>
+
+            {/* $1,997 */}
+            <div style={{ background: 'rgba(124,91,246,0.06)', border: '1px solid rgba(124,91,246,0.3)', borderRadius: 16, padding: '32px 24px' }}>
+              <p style={{ color: '#7c5bf6', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>Premium</p>
+              <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#ededf5', margin: '0 0 4px' }}>$1,997</p>
+              <p style={{ color: '#9090a8', fontSize: '0.85rem', margin: '0 0 24px' }}>1:1 Intensive add-on</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {["Everything in Core", "4 × 1:1 sessions with Greg's team", 'Deep-dive on your specific patterns', 'Accelerated OS design', '30-day money-back guarantee'].map(f => (
+                  <li key={f} style={{ color: '#9090a8', fontSize: '0.85rem', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#7c5bf6', flexShrink: 0, marginTop: 1 }} aria-hidden="true">✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/join" style={{ display: 'block', textAlign: 'center', padding: '12px', border: '1px solid rgba(124,91,246,0.4)', borderRadius: 8, color: '#7c5bf6', textDecoration: 'none', fontSize: '0.9rem', transition: 'opacity 0.2s' }}>
+                Apply for Intensive
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────── */}
+      <section id="faq" style={{ padding: '96px 0', background: 'rgba(13,13,24,0.6)', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+          <p style={{ textAlign: 'center', color: '#fcc824', fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 16 }}>Common Questions</p>
+          <h2 style={{ textAlign: 'center', fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: '#ededf5', marginBottom: 56, lineHeight: 1.15 }}>
+            Let&apos;s clear this up.
+          </h2>
+          <FaqAccordion />
+        </div>
+      </section>
+
       {/* ── Final CTA ─────────────────────────────────── */}
       <section className="relative z-10 py-32 overflow-hidden" style={{ position: 'relative' }}>
 
@@ -1060,6 +1158,98 @@ function AgentCard({
         <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
         <span style={{ fontSize: 11, color: '#9090a8', fontWeight: 500 }}>Ready</span>
       </div>
+    </div>
+  );
+}
+
+/* ── FAQ Accordion ─────────────────────────────────────────── */
+const FAQ_ITEMS = [
+  {
+    q: 'Is this just another meditation app?',
+    a: "No. It's the opposite. We're not teaching you to sit with your thoughts — we're rewiring the patterns underneath them. Meditation is acceptance. MindsetOS is interruption, then architecture. We measure this in faster decisions, not peace and quiet.",
+  },
+  {
+    q: 'What makes this better than a real coach?',
+    a: "A real 1:1 coach costs $2K–$10K a month. You get them twice a week. MindsetOS gives you 10 AI coaches available at 2am before a launch — trained on the same frameworks.",
+  },
+  {
+    q: "I've tried mindset programs before and they didn't stick.",
+    a: "Because they skipped layer one. Most programs jump straight to \"install new habits\" without surfacing what beliefs are running you. The 3-Layer Architecture forces you to audit first, then interrupt the pattern, then design the new architecture.",
+  },
+  {
+    q: "How is AI going to understand what I'm going through?",
+    a: "Our AI isn't trying to empathize. It's trained on patterns — the exact decision loops, belief systems, and reactive cycles that show up in founders again and again.",
+  },
+  {
+    q: "What if I don't have time for this?",
+    a: "The Mindset Score is 3 minutes. The 48-Hour Reset is 48 hours. The Accountability Partner is 5 minutes a day. Most founders say they end up with more time. Clarity is fast. Confusion is slow.",
+  },
+];
+
+function FaqAccordion() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggle = (i: number) => setOpenIndex(prev => (prev === i ? null : i));
+
+  return (
+    <div>
+      {FAQ_ITEMS.map((item, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div
+            key={i}
+            style={{ borderBottom: '1px solid #1e1e30' }}
+          >
+            <button
+              onClick={() => toggle(i)}
+              aria-expanded={isOpen}
+              aria-controls={`faq-answer-${i}`}
+              id={`faq-question-${i}`}
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '20px 0',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                gap: 16,
+              }}
+            >
+              <span style={{ color: '#ededf5', fontSize: '1rem', fontWeight: 600, lineHeight: 1.4 }}>{item.q}</span>
+              <span
+                aria-hidden="true"
+                style={{
+                  color: '#fcc824',
+                  fontSize: '1.25rem',
+                  fontWeight: 400,
+                  flexShrink: 0,
+                  lineHeight: 1,
+                  transition: 'transform 0.2s ease',
+                  display: 'inline-block',
+                  transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+                }}
+              >+</span>
+            </button>
+            <div
+              id={`faq-answer-${i}`}
+              role="region"
+              aria-labelledby={`faq-question-${i}`}
+              style={{
+                overflow: 'hidden',
+                maxHeight: isOpen ? '400px' : '0',
+                transition: 'max-height 0.3s ease',
+              }}
+            >
+              <p style={{ color: '#9090a8', fontSize: '0.95rem', lineHeight: 1.7, paddingBottom: 20, margin: 0 }}>
+                {item.a}
+              </p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
