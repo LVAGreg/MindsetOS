@@ -66,7 +66,8 @@ export function CanvasPanel() {
   const [saved,        setSaved]        = useState(false);
   const [saveError,    setSaveError]    = useState<string | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [pdfExporting, setPdfExporting]   = useState(false);
+  const [pdfExporting,  setPdfExporting]  = useState(false);
+  const [docxExporting, setDocxExporting] = useState(false);
   const [browseError,  setBrowseError]  = useState<string | null>(null);
   const [starring,     setStarring]     = useState(false);
   const [starError,    setStarError]    = useState<string | null>(null);
@@ -220,6 +221,8 @@ export function CanvasPanel() {
       .toLowerCase();
 
     if (format === 'docx') {
+      setDocxExporting(true);
+      setShowDownloadMenu(false);
       try {
         const { Document, Paragraph, TextRun, HeadingLevel, Packer } = await import('docx');
         const paragraphs: InstanceType<typeof Paragraph>[] = [];
@@ -256,8 +259,9 @@ export function CanvasPanel() {
         console.error('[CanvasPanel] DOCX export failed:', err);
         setDownloadError('DOCX export failed. Please try again.');
         setTimeout(() => setDownloadError(null), 4000);
+      } finally {
+        setDocxExporting(false);
       }
-      setShowDownloadMenu(false);
       return;
     }
 
@@ -916,24 +920,27 @@ export function CanvasPanel() {
               </button>
               {showDownloadMenu && (
                 <div className="absolute top-full left-0 mt-1 rounded-md shadow-lg z-50 min-w-[140px]" style={{ background: '#12121f', border: '1px solid #1e1e30' }}>
-                  {(['pdf', 'docx', 'html', 'md', 'txt'] as const).map((fmt, i, arr) => (
-                    <button
-                      key={fmt}
-                      onClick={() => handleDownload(fmt)}
-                      disabled={fmt === 'pdf' && pdfExporting}
-                      className={`w-full text-left px-3 py-1.5 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${i === 0 ? 'rounded-t-md' : ''} ${i === arr.length - 1 ? 'rounded-b-md' : ''}`}
-                      style={{ color: '#9090a8' }}
-                      onMouseEnter={e => { if (!(fmt === 'pdf' && pdfExporting)) (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-                    >
-                      {fmt === 'pdf'
-                        ? (pdfExporting ? 'Exporting…' : 'PDF')
-                        : fmt === 'docx' ? 'Word Doc (.docx)'
-                        : fmt === 'html' ? 'HTML (.html)'
-                        : fmt === 'md' ? 'Markdown (.md)'
-                        : 'Text (.txt)'}
-                    </button>
-                  ))}
+                  {(['pdf', 'docx', 'html', 'md', 'txt'] as const).map((fmt, i, arr) => {
+                    const isDisabled = (fmt === 'pdf' && pdfExporting) || (fmt === 'docx' && docxExporting);
+                    return (
+                      <button
+                        key={fmt}
+                        onClick={() => handleDownload(fmt)}
+                        disabled={isDisabled}
+                        className={`w-full text-left px-3 py-1.5 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${i === 0 ? 'rounded-t-md' : ''} ${i === arr.length - 1 ? 'rounded-b-md' : ''}`}
+                        style={{ color: '#9090a8' }}
+                        onMouseEnter={e => { if (!isDisabled) (e.currentTarget as HTMLElement).style.background = '#1e1e30'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                      >
+                        {fmt === 'pdf'
+                          ? (pdfExporting ? 'Exporting…' : 'PDF')
+                          : fmt === 'docx' ? (docxExporting ? 'Exporting…' : 'Word Doc (.docx)')
+                          : fmt === 'html' ? 'HTML (.html)'
+                          : fmt === 'md' ? 'Markdown (.md)'
+                          : 'Text (.txt)'}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

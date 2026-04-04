@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { TrendingUp, Save, CheckCircle, BarChart2 } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3010';
 
 const CLAPS_FIELDS = [
-  { key: 'connections',   label: 'Conversations',  letter: 'C', barHex: '#60a5fa', letterBg: 'rgba(96,165,250,0.12)',  letterColor: '#60a5fa', tip: 'Coaching conversations initiated' },
+  { key: 'connections',   label: 'Conversations',  letter: 'C', barHex: '#4f6ef7', letterBg: 'rgba(79,110,247,0.12)',  letterColor: '#4f6ef7', tip: 'Coaching conversations initiated' },
   { key: 'leads',         label: 'Learnings',       letter: 'L', barHex: '#7c5bf6', letterBg: 'rgba(124,91,246,0.12)', letterColor: '#7c5bf6', tip: 'Insights captured this week' },
-  { key: 'appointments',  label: 'Actions',         letter: 'A', barHex: '#4f6ef7', letterBg: 'rgba(79,110,247,0.12)', letterColor: '#4f6ef7', tip: 'Commitments made & kept' },
-  { key: 'presentations', label: 'Progress',        letter: 'P', barHex: '#fb923c', letterBg: 'rgba(251,146,60,0.12)', letterColor: '#fb923c', tip: 'Milestones hit this week' },
-  { key: 'sales',         label: 'Shifts',          letter: 'S', barHex: '#22c55e', letterBg: 'rgba(34,197,94,0.12)',  letterColor: '#22c55e', tip: 'Mindset shifts experienced' },
+  { key: 'appointments',  label: 'Actions',         letter: 'A', barHex: '#fcc824', letterBg: 'rgba(252,200,36,0.12)', letterColor: '#fcc824', tip: 'Commitments made & kept' },
+  { key: 'presentations', label: 'Progress',        letter: 'P', barHex: '#9090a8', letterBg: 'rgba(144,144,168,0.12)', letterColor: '#9090a8', tip: 'Milestones hit this week' },
+  { key: 'sales',         label: 'Shifts',          letter: 'S', barHex: '#ededf5', letterBg: 'rgba(237,237,245,0.08)',  letterColor: '#ededf5', tip: 'Mindset shifts experienced' },
 ] as const;
 
 type ClapsKey = 'connections' | 'leads' | 'appointments' | 'presentations' | 'sales';
@@ -51,6 +52,8 @@ const INPUT_CLS = 'w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:
 const INPUT_STYLE = { background: 'rgba(9,9,15,0.6)', border: '1px solid #1e1e30', color: '#ededf5' };
 
 export default function UserClapsPage() {
+  const router = useRouter();
+
   const [current, setCurrent] = useState<ClapsRow>({
     week_start: getCurrentMonday(),
     connections: 0, leads: 0, appointments: 0,
@@ -90,7 +93,15 @@ export default function UserClapsPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    // Guard: if no token in storage, redirect immediately
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
+    fetchData();
+  }, [fetchData, router]);
 
   const handleSave = async () => {
     setSaving(true);

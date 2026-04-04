@@ -335,6 +335,9 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [messageFeedback, setMessageFeedback] = useState<Record<string, 'up' | 'down'>>({});
 
+  // Quality signals state (separate from feedback — posts to /api/signals)
+  const [signalState, setSignalState] = useState<Record<string, 'thumbs_up' | 'thumbs_down'>>({});
+
   // Assets panel state
   const [showAssetsPanel, setShowAssetsPanel] = useState(false);
 
@@ -448,6 +451,43 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
         ...prev,
         [messageId]: currentFeedback
       }));
+    }
+  };
+
+  // Quality signal handler — posts to /api/signals (separate from /api/feedback)
+  const handleSignal = async (messageId: string, signalType: 'thumbs_up' | 'thumbs_down') => {
+    const current = signalState[messageId];
+    const next = current === signalType ? undefined : signalType;
+
+    // Optimistic toggle
+    setSignalState(prev => {
+      if (next === undefined) {
+        const { [messageId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [messageId]: next };
+    });
+
+    if (next) {
+      try {
+        await apiClient.post('/api/signals', {
+          agentSlug: agentId,
+          conversationId: currentConversationId || undefined,
+          signalType: next,
+        });
+      } catch (err) {
+        console.error('[SIGNAL] Failed to save quality signal:', err);
+        // Revert on error and show feedback
+        setSignalState(prev => {
+          if (current === undefined) {
+            const { [messageId]: _, ...rest } = prev;
+            return rest;
+          }
+          return { ...prev, [messageId]: current };
+        });
+        setErrorMessage('Could not save your feedback. Please try again.');
+        setShowError(true);
+      }
     }
   };
 
@@ -1027,47 +1067,58 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
 
     // Agent handoff suggestion card
     if (type === 'agent_handoff') {
-      const agents: { slug: string; name: string }[] = data?.agents || [];
+      const agents: { id?: string; slug: string; name: string; reason?: string }[] = data?.agents || [];
       if (agents.length === 0) return null;
       return (
-        <div className="mt-4 space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#fcc824' }}>
+        <div style={{ marginTop: 8 }}>
+          <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9090a8', marginBottom: 6 }}>
             Suggested Next Step{agents.length > 1 ? 's' : ''}
           </p>
           {agents.map(agent => {
-            const hex = AGENT_HEX[agent.slug] || '#6366f1';
-            // Resolve AgentId at render time — skip card entirely if slug not in MINDSET_AGENTS
+            // Resolve AgentId — skip card entirely if slug not in MINDSET_AGENTS
             const agentEntry = Object.entries(MINDSET_AGENTS).find(([, v]) => v.id === agent.slug);
             if (!agentEntry) return null;
             return (
-              <button
+              <div
                 key={agent.slug}
-                onClick={() => {
-                  useAppStore.getState().setCurrentAgent(agentEntry[0] as AgentId);
-                  useAppStore.getState().setCurrentConversation(null);
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left group transition-all"
                 style={{
-                  background: `${hex}0d`,
-                  border: `1px solid ${hex}30`,
+                  background: '#1e1e30',
+                  borderLeft: '3px solid #4f6ef7',
+                  borderRadius: 8,
+                  padding: '12px 16px',
+                  marginTop: 8,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = `${hex}60`)}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = `${hex}30`)}
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${hex}20` }}
-                  >
-                    <AgentIcon agentId={agent.slug} className="w-4 h-4" style={{ color: hex }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#ededf5]">{agent.name}</p>
-                    <p className="text-xs" style={{ color: hex }}>Continue your work →</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: hex }} />
-              </button>
+                <p style={{ fontWeight: 600, color: '#ededf5', fontSize: 14, marginBottom: agent.reason ? 4 : 8 }}>
+                  {agent.name}
+                </p>
+                {agent.reason && (
+                  <p style={{ fontSize: 13, color: '#9090a8', marginBottom: 8 }}>{agent.reason}</p>
+                )}
+                <button
+                  onClick={() => {
+                    useAppStore.getState().setCurrentAgent(agentEntry[0] as AgentId);
+                    useAppStore.getState().setCurrentConversation(null);
+                  }}
+                  aria-label={`Open ${agent.name}`}
+                  style={{
+                    background: '#4f6ef7',
+                    color: '#ffffff',
+                    borderRadius: 6,
+                    padding: '6px 14px',
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    border: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                >
+                  Open {agent.name} →
+                </button>
+              </div>
             );
           })}
         </div>
@@ -3054,7 +3105,7 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
           const quickAddOptions = (message as any).quickAddOptions as string[] | undefined;
 
           return (
-            <div key={message.id}>
+            <div key={message.id} className="msg-outer-group group/msgrow">
               {/* Message */}
               <div
                 className={`flex ${
@@ -3193,6 +3244,77 @@ export default function ChatWindow({ agentId, userRole, conversationId: propConv
                   content={message.content}
                   existingReaction={(message as any).feedback_type || null}
                 />
+              )}
+
+              {/* Quality Signals — hover-revealed thumbs below each assistant message */}
+              {message.role === 'assistant' && !isStreamingResponse && (
+                <div
+                  className="flex items-center gap-1 opacity-0 group-hover/msgrow:opacity-100 transition-opacity duration-150"
+                  style={{ marginTop: 4, marginLeft: 2 }}
+                >
+                  <button
+                    aria-label="This response was helpful"
+                    onClick={() => handleSignal(message.id, 'thumbs_up')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px 6px',
+                      borderRadius: 4,
+                      color: signalState[message.id] === 'thumbs_up' ? '#4f6ef7' : '#5a5a72',
+                      lineHeight: 1,
+                      fontSize: 13,
+                      minWidth: 44,
+                      minHeight: 44,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onMouseEnter={e => {
+                      if (signalState[message.id] !== 'thumbs_up') {
+                        (e.currentTarget as HTMLElement).style.color = '#9090a8';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (signalState[message.id] !== 'thumbs_up') {
+                        (e.currentTarget as HTMLElement).style.color = '#5a5a72';
+                      }
+                    }}
+                  >
+                    👍
+                  </button>
+                  <button
+                    aria-label="This response was not helpful"
+                    onClick={() => handleSignal(message.id, 'thumbs_down')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px 6px',
+                      borderRadius: 4,
+                      color: signalState[message.id] === 'thumbs_down' ? '#4f6ef7' : '#5a5a72',
+                      lineHeight: 1,
+                      fontSize: 13,
+                      minWidth: 44,
+                      minHeight: 44,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    onMouseEnter={e => {
+                      if (signalState[message.id] !== 'thumbs_down') {
+                        (e.currentTarget as HTMLElement).style.color = '#9090a8';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (signalState[message.id] !== 'thumbs_down') {
+                        (e.currentTarget as HTMLElement).style.color = '#5a5a72';
+                      }
+                    }}
+                  >
+                    👎
+                  </button>
+                </div>
               )}
 
               {/* Quick Add (renders BELOW the message) - Uses structured options from backend */}

@@ -48,6 +48,7 @@ import {
   Key,
   FileText,
   ClipboardList,
+  Kanban,
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { useAppStore } from '@/lib/store';
@@ -888,6 +889,11 @@ export default function DashboardSidebar({
                 icon={<TrendingUp className="w-4.5 h-4.5" />}
                 label="Weekly Wins"
                 onClick={() => router.push('/dashboard/claps')}
+              />
+              <NavItem
+                icon={<Kanban className="w-4.5 h-4.5" />}
+                label="Pipeline"
+                onClick={() => router.push('/dashboard/pipeline')}
               />
               <NavItem
                 icon={<GraduationCap className="w-4.5 h-4.5" />}

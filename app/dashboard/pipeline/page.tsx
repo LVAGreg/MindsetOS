@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Plus, ChevronRight, Trash2, Phone, Building2,
-  Linkedin, Mail, X, Check, ArrowLeft, Clock, FileText, Loader2,
+  Linkedin, Mail, X, Check, ArrowLeft, Clock, FileText, Loader2, Lock,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -76,22 +76,22 @@ const STAGES: { key: Stage; label: string; dotColor: string; headerBg: string; h
   {
     key: 'pitch_done',
     label: 'Pitch Done',
-    dotColor: '#f97316',
-    headerBg: 'rgba(249,115,22,0.08)',
-    headerBorder: 'rgba(249,115,22,0.25)',
-    badgeBg: 'rgba(249,115,22,0.18)',
-    badgeText: '#fb923c',
-    emptyBorder: 'rgba(249,115,22,0.2)',
+    dotColor: '#fcc824',
+    headerBg: 'rgba(252,200,36,0.08)',
+    headerBorder: 'rgba(252,200,36,0.25)',
+    badgeBg: 'rgba(252,200,36,0.18)',
+    badgeText: '#fcc824',
+    emptyBorder: 'rgba(252,200,36,0.2)',
   },
   {
     key: 'client',
     label: 'Client',
-    dotColor: '#22c55e',
-    headerBg: 'rgba(34,197,94,0.08)',
-    headerBorder: 'rgba(34,197,94,0.25)',
-    badgeBg: 'rgba(34,197,94,0.18)',
-    badgeText: '#4ade80',
-    emptyBorder: 'rgba(34,197,94,0.2)',
+    dotColor: '#7c5bf6',
+    headerBg: 'rgba(124,91,246,0.08)',
+    headerBorder: 'rgba(124,91,246,0.25)',
+    badgeBg: 'rgba(124,91,246,0.18)',
+    badgeText: '#a98cf8',
+    emptyBorder: 'rgba(124,91,246,0.2)',
   },
 ];
 
@@ -625,9 +625,9 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
               onClick={handleMarkContacted}
               disabled={markingContacted}
               className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-              style={{ background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.2)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.18)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(34,197,94,0.1)'; }}
+              style={{ background: 'rgba(79,110,247,0.1)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.2)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.18)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.1)'; }}
             >
               {markingContacted ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
               {markingContacted ? 'Saving...' : 'Mark Contacted'}
@@ -717,21 +717,31 @@ function ContactDrawer({ contact, onClose, onUpdated, onDeleted }: DrawerProps) 
 
 interface CardProps {
   contact: Contact;
+  nextStage: Stage | null;
   onClick: () => void;
   onDelete: () => void;
+  onMoveForward: () => void;
 }
 
-function ContactCard({ contact, onClick, onDelete }: CardProps) {
+function ContactCard({ contact, nextStage, onClick, onDelete, onMoveForward }: CardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!confirm(`Delete ${displayName(contact)}?`)) return;
     onDelete();
   };
 
+  const handleMoveForward = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onMoveForward();
+  };
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="w-full text-left group rounded-xl p-3.5 transition-all focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+      className="w-full text-left group rounded-xl p-3.5 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4f6ef7]"
       style={{
         background: 'rgba(18,18,31,0.8)',
         border: '1px solid #1e1e30',
@@ -797,7 +807,24 @@ function ContactCard({ contact, onClick, onDelete }: CardProps) {
           {contact.notes}
         </p>
       )}
-    </button>
+
+      {/* Move to next stage */}
+      {nextStage && (
+        <div className="mt-2.5 pt-2.5" style={{ borderTop: '1px solid rgba(30,30,48,0.6)' }}>
+          <button
+            onClick={handleMoveForward}
+            aria-label={`Move to ${STAGE_MAP[nextStage].label}`}
+            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg transition-all opacity-60 group-hover:opacity-100"
+            style={{ background: 'rgba(79,110,247,0.08)', color: '#4f6ef7', border: '1px solid rgba(79,110,247,0.15)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.16)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(79,110,247,0.08)'; }}
+          >
+            <ChevronRight className="w-3 h-3" />
+            Move to {STAGE_MAP[nextStage].label}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -839,7 +866,7 @@ export default function PipelinePage() {
 
   useEffect(() => {
     if (!isAllowed) {
-      router.push('/dashboard');
+      setLoading(false);
       return;
     }
     fetchContacts();
@@ -860,9 +887,69 @@ export default function PipelinePage() {
     }
   };
 
+  const handleMoveForward = async (contact: Contact, nextStage: Stage) => {
+    setPageError(null);
+    try {
+      const res = await fetch(`${API}/api/pipeline/contacts/${contact.id}`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ stage: nextStage }),
+      });
+      if (!res.ok) throw new Error('Failed to move contact');
+      fetchContacts();
+    } catch (err: any) {
+      console.error(err);
+      setPageError(err?.message || 'Failed to move contact. Please try again.');
+    }
+  };
+
+  const STAGE_ORDER: Stage[] = ['lead', 'connected', 'call_booked', 'pitch_done', 'client'];
+  const getNextStage = (current: Stage): Stage | null => {
+    const idx = STAGE_ORDER.indexOf(current);
+    return idx < STAGE_ORDER.length - 1 ? STAGE_ORDER[idx + 1] : null;
+  };
+
   const totalContacts = Object.values(grouped).reduce((sum, arr) => sum + arr.length, 0);
 
-  if (!isAllowed) return null;
+  if (!isAllowed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#09090f' }}>
+        <div
+          className="w-full max-w-md rounded-2xl p-8 text-center"
+          style={{ background: 'rgba(18,18,31,0.8)', border: '1px solid #1e1e30' }}
+        >
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            style={{ background: 'rgba(124,91,246,0.12)', border: '1px solid rgba(124,91,246,0.2)' }}
+          >
+            <Users className="w-7 h-7" style={{ color: '#7c5bf6' }} />
+          </div>
+          <h2 className="text-xl font-bold mb-2" style={{ color: '#ededf5' }}>Pipeline CRM</h2>
+          <p className="text-sm mb-6" style={{ color: '#9090a8' }}>
+            Track your leads and clients across every stage of your pipeline.
+          </p>
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
+            style={{ background: 'rgba(124,91,246,0.12)', border: '1px solid rgba(124,91,246,0.2)', color: '#7c5bf6' }}
+          >
+            <Lock className="w-3.5 h-3.5" />
+            Available on Agency plan
+          </div>
+          <div>
+            <button
+              onClick={() => router.push('/join')}
+              className="w-full py-3 text-sm font-semibold rounded-xl transition-all"
+              style={{ background: '#fcc824', color: '#09090f' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.9'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+            >
+              Upgrade to Agency
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#09090f' }}>
@@ -961,14 +1048,19 @@ export default function PipelinePage() {
                         <span className="text-xs">No contacts</span>
                       </div>
                     ) : (
-                      contacts.map(contact => (
-                        <ContactCard
-                          key={contact.id}
-                          contact={contact}
-                          onClick={() => setSelectedContact(contact)}
-                          onDelete={() => handleDeleteCard(contact)}
-                        />
-                      ))
+                      contacts.map(contact => {
+                        const ns = getNextStage(contact.stage);
+                        return (
+                          <ContactCard
+                            key={contact.id}
+                            contact={contact}
+                            nextStage={ns}
+                            onClick={() => setSelectedContact(contact)}
+                            onDelete={() => handleDeleteCard(contact)}
+                            onMoveForward={() => ns && handleMoveForward(contact, ns)}
+                          />
+                        );
+                      })
                     )}
                   </div>
 
