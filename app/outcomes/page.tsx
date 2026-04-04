@@ -14,6 +14,7 @@ interface ScoreEntry {
   score: number;
   category: string;
   scored_at: string;
+  answers?: { awareness?: number; interruption?: number; architecture?: number } | null;
 }
 
 // ── SVG Line Chart — pure, no external deps ──────────────────────────────────
@@ -445,37 +446,86 @@ export default function OutcomesPage() {
                   </div>
                 ) : (
                   !scoreError && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' }}>
-                      {/* Left: score + delta */}
-                      <div style={{ minWidth: 120, flexShrink: 0 }}>
-                        <div className="text-xs mb-1" style={{ color: '#5a5a72' }}>Current Score</div>
-                        <div
-                          className="font-bold leading-none"
-                          style={{ fontSize: '2.5rem', color: '#fcc824' }}
-                        >
-                          {latest?.score ?? '—'}
-                        </div>
-                        <div className="text-xs mt-1" style={{ color: '#5a5a72' }}>/ 100</div>
-                        {delta !== null && (
+                    <>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' }}>
+                        {/* Left: score + delta */}
+                        <div style={{ minWidth: 120, flexShrink: 0 }}>
+                          <div className="text-xs mb-1" style={{ color: '#5a5a72' }}>Current Score</div>
                           <div
-                            className="mt-3 text-sm font-medium"
-                            style={{ color: delta >= 0 ? '#4f6ef7' : '#5a5a72' }}
+                            className="font-bold leading-none"
+                            style={{ fontSize: '2.5rem', color: '#fcc824' }}
                           >
-                            {delta >= 0 ? '↑' : '↓'} {delta >= 0 ? '+' : ''}{delta} pts since you started
+                            {latest?.score ?? '—'}
                           </div>
-                        )}
-                        {latest && (
-                          <div className="mt-1 text-xs" style={{ color: '#5a5a72' }}>
-                            {latest.category}
-                          </div>
-                        )}
+                          <div className="text-xs mt-1" style={{ color: '#5a5a72' }}>/ 100</div>
+                          {delta !== null && (
+                            <div
+                              className="mt-3 text-sm font-medium"
+                              style={{ color: delta >= 0 ? '#4f6ef7' : '#5a5a72' }}
+                            >
+                              {delta >= 0 ? '↑' : '↓'} {delta >= 0 ? '+' : ''}{delta} pts since you started
+                            </div>
+                          )}
+                          {latest && (
+                            <div className="mt-1 text-xs" style={{ color: '#5a5a72' }}>
+                              {latest.category}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Right: chart */}
+                        <div style={{ flex: 1, minWidth: 180 }}>
+                          <ScoreLineChart entries={scoreHistory} />
+                        </div>
                       </div>
 
-                      {/* Right: chart */}
-                      <div style={{ flex: 1, minWidth: 180 }}>
-                        <ScoreLineChart entries={scoreHistory} />
-                      </div>
-                    </div>
+                      {/* Sub-score layer breakdown — show for most recent structured assessment */}
+                      {(() => {
+                        const latestAssessment = scoreHistory.find(
+                          e => e.category === 'structured-assessment' && e.answers
+                        );
+                        if (!latestAssessment?.answers) return null;
+                        const { awareness, interruption, architecture } = latestAssessment.answers;
+                        const layers = [
+                          { label: 'Awareness', score: awareness, color: '#4f6ef7' },
+                          { label: 'Interruption', score: interruption, color: '#7c5bf6' },
+                          { label: 'Architecture', score: architecture, color: '#fcc824' },
+                        ] as const;
+                        return (
+                          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #1e1e30' }}>
+                            <div className="text-xs mb-3" style={{ color: '#5a5a72' }}>
+                              Layer Breakdown —{' '}
+                              {new Date(latestAssessment.scored_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              {layers.map(({ label, score, color }) =>
+                                score != null ? (
+                                  <div key={label}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                      <span className="text-xs" style={{ color: '#9090a8' }}>{label}</span>
+                                      <span className="text-xs font-semibold" style={{ color }}>{score}</span>
+                                    </div>
+                                    <div style={{ background: '#1e1e30', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+                                      <div
+                                        style={{
+                                          width: `${score}%`,
+                                          background: color,
+                                          height: '100%',
+                                          borderRadius: 4,
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                ) : null
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </>
                   )
                 )}
               </div>
