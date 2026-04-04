@@ -186,11 +186,11 @@ function TokenUsageMeter() {
         <button
           onClick={() => router.push('/profile')}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-colors"
-          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+          style={{ background: 'rgba(79,110,247,0.08)', border: '1px solid rgba(79,110,247,0.2)' }}
           aria-label="BYOK active — go to profile"
         >
-          <Key className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22c55e' }} />
-          <span className="text-[11px] font-semibold" style={{ color: '#22c55e' }}>BYOK Active</span>
+          <Key className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#4f6ef7' }} />
+          <span className="text-[11px] font-semibold" style={{ color: '#4f6ef7' }}>BYOK Active</span>
         </button>
       </div>
     );
