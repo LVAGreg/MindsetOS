@@ -180,7 +180,7 @@ When introducing a new `fixed`-position overlay, document its z-index and verify
 ### `Math.random()` in render
 Using `Math.random()` inside JSX or a component render path produces a different value on every re-render, causing visual instability (flickering, layout jumps) and defeating React reconciliation. Stable pseudo-random placeholder sequences must be defined as constants outside the component. Flag for Correctness and Craft.
 
-<!-- hits:6 | last_caught:Loop-74 | class:token-violation | severity:craft | blocker:no -->
+<!-- hits:7 | last_caught:Loop-76 | class:token-violation | severity:craft | blocker:no -->
 ### Incomplete colour-token migration
 When a PR replaces a colour token (e.g., generic purple/indigo → MindsetOS amber `#fcc824` or blue `#4f6ef7`), every usage in changed files must be updated: CTA backgrounds, focus rings (`focus:ring-*`), icon colour classes, and border-colour classes. Leaving focus rings or icon accents in the old colour means the visual pass is half-done. Reviewers should grep all changed files for the old token names before accepting. Scores Craft ≤7 if the pass is partial.
 
@@ -304,7 +304,7 @@ When a file adopts the MindsetOS pattern of setting color via `style={{ color: '
 ### Silent initial-load failure on data-fetch pages
 When a page component calls a data-fetch function (e.g., `fetchContacts`, `fetchAgents`, `loadMessages`) on mount via `useEffect`, the `catch` block of that fetch function must either: (1) set a visible page-level error state (e.g., `setPageError`), or (2) set a flag that renders an error banner or empty-state message with a retry affordance. A `catch` block that only calls `console.error` while leaving the page in an empty/loading visual state is a silent failure — the user sees blank content with no explanation. This is distinct from silent save failures: it affects users who never even get to interact with the page. Scores Functionality ≤6 and Correctness ≤6. Fix: pass the caught error message into the existing page-level error state, or introduce one.
 
-<!-- hits:3 | last_caught:Loop-72 | class:mobile | severity:functionality | blocker:no -->
+<!-- hits:4 | last_caught:Loop-76 | class:mobile | severity:functionality | blocker:no -->
 ### hover-only delete affordance on touch devices
 When a delete (or destructive) action on a list card is only shown via `opacity-0 group-hover:opacity-100`, that action is invisible on touch devices where hover never fires. For MindsetOS pipeline cards and similar list items, the delete button must also be accessible on mobile — either always-visible at low opacity, revealed on long-press, or available inside the detail drawer. A touch-only path that requires opening the full drawer to delete is acceptable. A path with no delete affordance at all on mobile scores Mobile Readiness ≤6. Note: if a full-detail drawer exposes a delete action, dock only one point (score ≤7) since the action is reachable via a second interaction.
 
@@ -344,6 +344,10 @@ When building admin UI with a user-search picker, verify the backend route exist
 ### title= used instead of aria-label on icon-only table action buttons
 Icon-only buttons (e.g., pin, delete, edit icons in admin tables) must use `aria-label` to announce their purpose to screen readers. Using `title=` provides a tooltip on hover but is not reliably announced by assistive technologies — some screen readers ignore it entirely. Always pair `aria-label="Pin memory"` (etc.) alongside any `title=` if both are desired. Scores Accessibility ≤7 if the pattern is present.
 
+<!-- hits:1 | last_caught:Loop-76 | class:security | severity:correctness | blocker:no -->
+### Missing role guard on item-level PATCH/DELETE when collection-level route is guarded
+When GET and POST on a collection route (`/api/resource`) include a role check, the corresponding item-level routes (`/api/resource/:id` PATCH, DELETE) must include the same guard. A role check on the collection does not cascade to item routes — each handler is evaluated independently. The ownership check (`WHERE user_id = $n`) prevents cross-user data access but does not prevent lower-tier users from modifying their own data when the feature is intended to be tier-gated end-to-end. Reviewers: when auditing a new resource route, verify all four HTTP verbs (GET, POST, PATCH, DELETE) include equivalent role guards. Scores Correctness ≤8 if only collection routes are guarded.
+
 ---
 
 ## Anti-Pattern Class Index
@@ -353,14 +357,16 @@ Icon-only buttons (e.g., pin, delete, edit icons in admin tables) must use `aria
 | token-violation | 8 | Off-token yellow/amber (#eab308, #f59e0b) (hits:9) |
 | silent-failure | 3 | Silent async failure / Silent feature-gate API check / Silent initial-load failure (hits:6 each) |
 | cross-file-mismatch | 5 | Agent slug format inconsistency / Admin page calls non-existent search endpoint (hits:3 / hits:1) |
-| security | 1 | Cross-product metadata leak into Stripe (hits:1) |
+| security | 2 | Cross-product metadata leak into Stripe (hits:1) / Missing role guard on item routes (hits:1) |
 | integration-gap | 1 | Prop wiring type mismatch at integration site (hits:3) |
 | typescript | 5 | onMouseEnter/onMouseLeave `as HTMLElement` cast (hits:5) |
 | accessibility | 3 | Redundant keyboard handler / title= instead of aria-label on icon buttons (hits:1 each) |
-| mobile | 5 | hover-only delete affordance on touch devices (hits:3) |
+| mobile | 5 | hover-only delete affordance on touch devices (hits:4) |
 | state-management | 5 | `setTimeout`-based state re-trigger / `fetchContacts` stale-closure (hits:3 each) |
 | design-duplication | 4 | Duplicated detail/pane rendering across breakpoints (hits:2) |
 | analytics | 2 | Analytics semantic mismatch (funnel attribution corruption) (hits:1) |
+
+*Updated automatically by V5 reviewer after each loop. Last update: Loop-76.*
 | webgl | 5 | Shared WebGL geometry disposed while meshes live (hits:1) |
 
 *Updated automatically by V5 reviewer after each loop.*
