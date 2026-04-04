@@ -46,6 +46,7 @@ import {
   GraduationCap,
   CheckCircle2,
   Key,
+  FileText,
 } from 'lucide-react';
 import MindsetOSLogo from '@/components/MindsetOSLogo';
 import { useAppStore } from '@/lib/store';
@@ -838,6 +839,11 @@ export default function DashboardSidebar({
               }
             }}
           />
+          <NavItem
+            icon={<FileText className="w-4.5 h-4.5" />}
+            label="Notes"
+            onClick={() => router.push('/dashboard/notes')}
+          />
         </div>
 
         {/* ── Premium upgrade CTA — free/trial users only ────── */}
@@ -1259,6 +1265,15 @@ export default function DashboardSidebar({
           aria-label="Conversations"
         >
           <MessageSquare className="w-5 h-5 transition-colors" style={{ color: activeSection === 'conversations' ? '#fcc824' : '#5a5a72' }} />
+        </button>
+
+        <button
+          onClick={() => router.push('/dashboard/notes')}
+          className="p-3 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          title="Notes"
+          aria-label="Notes"
+        >
+          <FileText className="w-5 h-5 transition-colors" style={{ color: '#5a5a72' }} />
         </button>
 
         <button
